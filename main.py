@@ -10,6 +10,8 @@ print stats - prints your health and the monster's. does not end the turn
 engage - start the fight
 """
 GAME_VERSION = '0.0.1 ALPHA'
+
+
 def main():
     welcome_print()
     main_character = Character(name="Netherblood",
@@ -58,6 +60,7 @@ def print_live_monsters(alive_monsters: list):
     for i in range(len(alive_monsters)):
         print(alive_monsters[i])
 
+
 class LivingThing:
     """
     This is the base class for all things alive - characters, monsters and etc.
@@ -67,6 +70,28 @@ class LivingThing:
         self.health = health
         self.max_health = health
         self.mana = mana
+        self.max_mana = mana
+        self.alive = True
+        self.in_combat = False
+
+    def is_alive(self):
+        return self.alive
+
+    def enter_combat(self):
+        self.in_combat = True
+
+    def leave_combat(self):
+        self.in_combat = False
+
+    def check_if_dead(self):
+        if self.health <= 0:
+            self.alive = False
+            self.die()
+        else:
+            pass
+
+    def die(self):
+        pass
 
 
 class Monster(LivingThing):
@@ -74,10 +99,9 @@ class Monster(LivingThing):
         super().__init__(name, health, mana)
         self.min_damage = min_damage
         self.max_damage = max_damage
-        self.alive = True
 
     def __str__(self):
-        return "Creature {0} - {1}/{2} HP | {3}/{4} Mana".format(self.name, self.health, self.max_health, self.mana, self.mana)
+        return "Creature {0} - {1}/{2} HP | {3}/{4} Mana".format(self.name, self.health, self.max_health, self.mana, self.max_mana)
 
     def deal_damage(self):
         import random
@@ -87,13 +111,6 @@ class Monster(LivingThing):
     def take_attack(self, damage: int):
         self.health -= damage
         self.check_if_dead()
-
-    def check_if_dead(self):
-        if self.health <= 0:
-            self.alive = False
-            self.die()
-        else:
-            pass
 
     def die(self):
         print("Creature {} has been slain!".format(self.name))
@@ -112,8 +129,6 @@ class Character(LivingThing):
         self.min_damage = 0
         self.max_damage = 1
         self.equipped_weapon = Weapon()
-        self.alive = True
-        self.in_combat = False
 
     def equip_weapon(self, weapon: Weapon):
         self.equipped_weapon = weapon
@@ -142,6 +157,7 @@ class Character(LivingThing):
 
     def die(self):
         print("Character {} has been slain!".format(self.name))
+
 
 def welcome_print():
     print("WELCOME TO PYTHON WOW VERSION: {0}".format(GAME_VERSION))
