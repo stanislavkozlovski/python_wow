@@ -1,5 +1,4 @@
 # TODO: Add command that shows all available commands
-# TODO: Handle Character death and health resets
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
 """
@@ -65,8 +64,6 @@ class LivingThing:
         if self.health <= 0:
             self.alive = False
             self.die()
-        else:
-            pass
 
     def die(self):
         pass
@@ -92,6 +89,10 @@ class Monster(LivingThing):
 
     def die(self):
         print("Creature {} has been slain!".format(self.name))
+
+    def leave_combat(self):
+        super().leave_combat()
+        self.health = self.max_health # reset the health
 
 
 class Weapon:
@@ -126,15 +127,19 @@ class Character(LivingThing):
         self.health -= damage
         self.check_if_dead()
 
-    def check_if_dead(self):
-        if self.health <= 0:
-            self.alive = False
-            self.die()
-        else:
-            pass
-
     def die(self):
         print("Character {} has been slain!".format(self.name))
+        self.prompt_revive()
+
+    def prompt_revive(self):
+        print("Do you want to restart? Y/N")
+        if input() == 'Y':
+            self.revive()
+        else:
+            exit()
+
+    def revive(self):
+        self.health = self.max_health
 
 
 def welcome_print():

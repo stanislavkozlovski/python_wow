@@ -10,6 +10,11 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: list):
         # we start off the combat with the monster dealing the first blow
         monster_attack(monster, character)
 
+        if not character.alive:
+            monster.leave_combat()
+            print("{0} has slain character {1}".format(monster.name, character.name))
+            break
+
         command = input()
 
         while True:  # for commands that do not end the turn, like printing the stats or the possible commands
@@ -29,17 +34,18 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: list):
             print("{0} has slain {1}".format(character.name, monster.name))
 
 
+
 def monster_attack(attacker: Monster, victim: Character):
     attacker_swing = attacker.deal_damage()  # an integer representing the damage
 
-    victim.take_attack(attacker_swing)
-
     print("{0} attacks {1} for {2} damage!".format(attacker.name, victim.name, attacker_swing))
+
+    victim.take_attack(attacker_swing)
 
 
 def character_attack(attacker: Character, victim: Monster):
     attacker_swing = attacker.deal_damage()
 
-    victim.take_attack(attacker_swing)
-
     print("{0} attacks {1} for {2} damage!".format(attacker.name, victim.name, attacker_swing))
+
+    victim.take_attack(attacker_swing)

@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="20422d84-9ce6-47d8-b76a-b9160bfe7f4b" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/combat.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/combat.py" afterPath="$PROJECT_DIR$/combat.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.py" afterPath="$PROJECT_DIR$/main.py" />
     </list>
     <ignored path="python_wow.iws" />
@@ -38,14 +37,13 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.684127">
-              <caret line="33" column="0" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="0" column="53" selection-start-line="0" selection-start-column="53" selection-end-line="0" selection-end-column="53" />
               <folding>
-                <element signature="e#1351#2050#0" expanded="false" />
-                <element signature="e#2085#2797#0" expanded="false" />
-                <element signature="e#2818#2949#0" expanded="false" />
-                <element signature="e#2986#4105#0" expanded="false" />
-                <element signature="e#4133#4283#0" expanded="false" />
+                <element signature="e#1302#1970#0" expanded="false" />
+                <element signature="e#2855#2986#0" expanded="false" />
+                <element signature="e#3023#4249#0" expanded="false" />
+                <element signature="e#4277#4427#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -55,10 +53,8 @@
         <entry file="file://$PROJECT_DIR$/combat.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="26" column="58" selection-start-line="26" selection-start-column="58" selection-end-line="26" selection-end-column="58" />
-              <folding>
-                <element signature="e#1454#1630#0" expanded="false" />
-              </folding>
+              <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -330,10 +326,10 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/combat.py</url>
-          <line>31</line>
+          <line>37</line>
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="1" />
+      <option name="time" value="3" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -351,11 +347,10 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#1351#2050#0" expanded="false" />
-            <element signature="e#2085#2797#0" expanded="false" />
-            <element signature="e#2818#2949#0" expanded="false" />
-            <element signature="e#2986#4105#0" expanded="false" />
-            <element signature="e#4133#4283#0" expanded="false" />
+            <element signature="e#1302#1970#0" expanded="false" />
+            <element signature="e#2855#2986#0" expanded="false" />
+            <element signature="e#3023#4249#0" expanded="false" />
+            <element signature="e#4277#4427#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -381,11 +376,10 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#1351#2050#0" expanded="false" />
-            <element signature="e#2085#2797#0" expanded="false" />
-            <element signature="e#2818#2949#0" expanded="false" />
-            <element signature="e#2986#4105#0" expanded="false" />
-            <element signature="e#4133#4283#0" expanded="false" />
+            <element signature="e#1302#1970#0" expanded="false" />
+            <element signature="e#2855#2986#0" expanded="false" />
+            <element signature="e#3023#4249#0" expanded="false" />
+            <element signature="e#4277#4427#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -409,23 +403,20 @@
     <entry file="file://$PROJECT_DIR$/combat.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="26" column="58" selection-start-line="26" selection-start-column="58" selection-end-line="26" selection-end-column="58" />
-          <folding>
-            <element signature="e#1454#1630#0" expanded="false" />
-          </folding>
+          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.684127">
-          <caret line="33" column="0" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="53" selection-start-line="0" selection-start-column="53" selection-end-line="0" selection-end-column="53" />
           <folding>
-            <element signature="e#1351#2050#0" expanded="false" />
-            <element signature="e#2085#2797#0" expanded="false" />
-            <element signature="e#2818#2949#0" expanded="false" />
-            <element signature="e#2986#4105#0" expanded="false" />
-            <element signature="e#4133#4283#0" expanded="false" />
+            <element signature="e#1302#1970#0" expanded="false" />
+            <element signature="e#2855#2986#0" expanded="false" />
+            <element signature="e#3023#4249#0" expanded="false" />
+            <element signature="e#4277#4427#0" expanded="false" />
           </folding>
         </state>
       </provider>
