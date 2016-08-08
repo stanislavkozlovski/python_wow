@@ -1,6 +1,5 @@
 # TODO: Add command that shows all available commands
 # TODO: Handle Character death and health resets
-# TODO: Leave/Enter combat methods in classes
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
 """
@@ -9,6 +8,7 @@ attack - attacks the creature and ends the turn
 print stats - prints your health and the monster's. does not end the turn
 engage - start the fight
 """
+import combat
 GAME_VERSION = '0.0.1 ALPHA'
 
 
@@ -30,29 +30,7 @@ def main():
 
         command = input()
         if command == 'engage':
-            main_character.in_combat = True
-
-        while main_character.in_combat:
-            creature_swing = test_creature.deal_damage()
-            main_character.take_attack(creature_swing)
-            print("{0} attacks {1} for {2} damage!".format(test_creature.name, main_character.name, creature_swing))
-
-            command = input()
-            while True:
-                if command == 'print stats':
-                    print("Character {0} is at {1}/{2} health.".format(main_character.name, main_character.health, main_character.max_health))
-                    print("Monster {0} is at {1}/{2} health".format(test_creature.name, test_creature.health, test_creature.max_health))
-                    command = input()
-                else:
-                    break
-            if command == 'attack':
-                character_dmg = main_character.deal_damage()
-                test_creature.take_attack(character_dmg)
-                print("{0} attacks {1} for {2} damage!".format(main_character.name, test_creature.name, character_dmg))
-
-            if not test_creature.alive:
-                main_character.in_combat = False
-                print("{0} has slain {1}".format(main_character.name, test_creature.name))
+            combat.engage_combat(main_character, test_creature, alive_monsters)
 
 
 def print_live_monsters(alive_monsters: list):
