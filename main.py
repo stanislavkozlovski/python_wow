@@ -10,7 +10,6 @@ engage - start the fight
 import combat
 GAME_VERSION = '0.0.1 ALPHA'
 
-
 def main():
     welcome_print()
     main_character = Character(name="Netherblood",
@@ -23,19 +22,24 @@ def main():
                             mana=0,
                             min_damage=1,
                             max_damage=3)
-    alive_monsters = [test_creature]
+    alive_monsters = {test_creature.name: test_creature}
     while True:
         print_live_monsters(alive_monsters)
 
         command = input()
-        if command == 'engage':
-            combat.engage_combat(main_character, test_creature, alive_monsters)
+        if 'engage' in command:
+            target = command.split()[1] # name of monster to engage
+
+            if target in alive_monsters.keys():
+                target = alive_monsters[target] # convert the string to a Monster object
+                combat.engage_combat(main_character, target, alive_monsters)
 
 
-def print_live_monsters(alive_monsters: list):
+def print_live_monsters(alive_monsters: dict):
     print("Alive monsters: ")
-    for i in range(len(alive_monsters)):
-        print(alive_monsters[i])
+
+    for _, monster in alive_monsters.items():
+        print(monster)
 
 
 class LivingThing:
@@ -129,17 +133,18 @@ class Character(LivingThing):
 
     def die(self):
         print("Character {} has been slain!".format(self.name))
-        self.prompt_revive()
+
 
     def prompt_revive(self):
         print("Do you want to restart? Y/N")
-        if input() == 'Y':
+        if input() in 'Yy':
             self.revive()
         else:
             exit()
 
     def revive(self):
         self.health = self.max_health
+        self.alive = True
 
 
 def welcome_print():
