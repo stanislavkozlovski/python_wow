@@ -75,8 +75,9 @@ class LivingThing:
 
 
 class Monster(LivingThing):
-    def __init__(self, name: str, health: int=1, mana: int=1, level: int=1, min_damage: int=0, max_damage: int=1):
+    def __init__(self, monster_id: int, name: str, health: int=1, mana: int=1, level: int=1, min_damage: int=0, max_damage: int=1):
         super().__init__(name, health, mana)
+        self.monster_id = monster_id
         self.level = level
         self.min_damage = min_damage
         self.max_damage = max_damage
