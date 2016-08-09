@@ -6,6 +6,43 @@ from items import Weapon
 import csv
 
 
+def load_xp_reward() -> dict:
+    """
+    Load the default XP that is to be given from the creature.
+    The .csv file's contents are as follows:
+    Level, Experience to give
+    1,     50 Meaning a creature that is level 1 will give 50 XP
+    2,     75 Gives 75 XP
+    etc...
+
+    Because the Monster class will be called upon a number of times, it would be inefficient to read the whole file
+    on every monster creation. That's why this is outside of the class, to read the file only once.
+
+    :return: A dictionary as follows: Key: Level, Value: XP Reward
+                                            1   , 50
+    """
+
+    xp_reward_dict = {}
+
+    with open('creature_default_xp_rewards.csv') as _:
+        def_xp_rewards_reader = csv.reader(_)
+
+        for line in def_xp_rewards_reader:
+            level = int(line[0])
+            xp_reward = int(line[1])
+
+            xp_reward_dict[level] = xp_reward
+
+    return xp_reward_dict
+
+
+CREATURE_XP_REWARD_DICTIONARY = load_xp_reward()
+
+
+def lookup_xp_reward(level: int) -> int: # the method that is going to be used by the Monster class
+    return CREATURE_XP_REWARD_DICTIONARY[level]
+
+
 class LivingThing:
     """
     This is the base class for all things alive - characters, monsters and etc.
@@ -43,7 +80,7 @@ class Monster(LivingThing):
         self.level = level
         self.min_damage = min_damage
         self.max_damage = max_damage
-        self.xp_to_give = 401 # to read from a file for default xp rewards according to monster level
+        self.xp_to_give = lookup_xp_reward(self.level)
 
     def __str__(self):
         return "Creature Level {level} {name} - {hp}/{max_hp} HP | {mana}/{max_mana} Mana".format(level = self.level, name = self.name,
@@ -76,6 +113,8 @@ class Monster(LivingThing):
     def leave_combat(self):
         super().leave_combat()
         self.health = self.max_health # reset the health
+
+
 
 
 class Character(LivingThing):
@@ -154,15 +193,20 @@ class Character(LivingThing):
 
     def award_monster_kill(self, xp_reward: int, monster_level: int):
         level_difference = self.level - monster_level
-
+        xp_bonus_reward = 0
         if level_difference >= 5: # if the character is 5 levels higher, give no XP
             xp_reward = 0
         elif level_difference < 0: # monster is higher level
-            percentage_mod = abs(level_difference) * 0.1 # 10% increase of XP for every level the monster has over player
-            xp_reward += xp_reward*percentage_mod
+            percentage_mod = abs(level_difference) * 0.1  # 10% increase of XP for every level the monster has over player
+            xp_bonus_reward += int(xp_reward*percentage_mod)  # convert to int
 
-        self.experience += xp_reward
-        print("XP awarded: {0}".format(xp_reward))
+
+        if xp_bonus_reward:
+            print("XP awarded: {0} + bonus {1} for the level difference!".format(xp_reward, xp_bonus_reward))
+        else:
+            print("XP awarded: {0}!".format(xp_reward))
+
+        self.experience += xp_reward + xp_bonus_reward
         self.check_if_levelup()
 
     def _load_levelup_stats(self):
@@ -190,6 +234,7 @@ class Character(LivingThing):
         return level_stats
 
     def _load_xp_requirements(self):
+        # TODO: to be moved to a separate file sometime
         """
         Load the information about the necessary XP needed to reach a certain level.
         The .csv file's contents is like this:

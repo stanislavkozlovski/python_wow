@@ -10,7 +10,7 @@ engage - start the fight
 import combat
 from entities import Character, Monster
 from items import Weapon
-GAME_VERSION = '0.0.2.2 ALPHA'
+GAME_VERSION = '0.0.2.3 ALPHA'
 
 def main():
     welcome_print()
@@ -30,7 +30,7 @@ def main():
     alive_monsters = {test_creature.name: test_creature, "test":  Monster(name="test",
                             health=5,
                             mana=0,
-                            level=1,
+                            level=2,
                             min_damage=1,
                             max_damage=3)}
     while True:
