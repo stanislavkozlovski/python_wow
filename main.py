@@ -10,10 +10,9 @@ engage - start the fight
 import combat
 from entities import Character, Monster
 from items import Weapon
-GAME_VERSION = '0.0.2 ALPHA'
+GAME_VERSION = '0.0.2.1 ALPHA'
 
-def main()\
-        :
+def main():
     welcome_print()
     main_character = Character(name="Netherblood",
                                health=10,
@@ -46,9 +45,6 @@ def print_live_monsters(alive_monsters: dict):
 
     for _, monster in alive_monsters.items():
         print(monster)
-
-
-
 
 def welcome_print():
     print("WELCOME TO PYTHON WOW VERSION: {0}".format(GAME_VERSION))

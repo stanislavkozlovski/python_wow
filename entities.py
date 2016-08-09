@@ -3,6 +3,8 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 """
 
 from items import Weapon
+import csv
+
 
 class LivingThing:
     """
@@ -77,6 +79,10 @@ class Monster(LivingThing):
 
 
 class Character(LivingThing):
+    KEY_LEVEL_STATS_HEALTH = 'health'
+    KEY_LEVEL_STATS_MANA = 'mana'
+    KEY_LEVEL_STATS_STRENGTH = 'strength'
+
     def __init__(self, name: str, health: int=1, mana: int=1, strength: int=1):
         super().__init__(name, health, mana)
         self.strength = strength
@@ -86,6 +92,7 @@ class Character(LivingThing):
         self.level = 1
         self.experience = 0
         self.xp_req_to_level = 400
+        self._LEVEL_STATS = self._load_levelup_stats()
 
     def equip_weapon(self, weapon: Weapon):
         self.equipped_weapon = weapon
@@ -128,8 +135,12 @@ class Character(LivingThing):
             exit()
 
     def revive(self):
-        self.health = self.max_health
+        self._regenerate()
         self.alive = True
+
+    def leave_combat(self):
+        super().leave_combat()
+        self._regenerate()
 
     def check_if_levelup(self):
         if self.experience >= self.xp_req_to_level:
@@ -150,9 +161,50 @@ class Character(LivingThing):
         print("XP awarded: {0}".format(xp_reward))
         self.check_if_levelup()
 
+    def _load_levelup_stats(self):
+        # TODO: to be moved to a separate file sometime
+        """
+        Read the .csv file holding information about the amount of stats you should get according to the level you've attained
+        1 - level; 2 - hp; 3 - mana; 4 - strength;
+        """
+        level_stats = {} # a dictionary of dictionaries. Key - level, value - dictionary holding values for hp,mana etc.
+        with open('levelup_stats.csv') as _:
+            lvl_stats_reader = csv.reader(_)
+            for line in lvl_stats_reader:
+                level_dict = {}
+
+                level = int(line[0])
+                hp = int(line[1])
+                mana = int(line[2])
+                strength = int(line[3])
+
+                level_dict[self.KEY_LEVEL_STATS_HEALTH] = hp
+                level_dict[self.KEY_LEVEL_STATS_MANA] = mana
+                level_dict[self.KEY_LEVEL_STATS_STRENGTH] = strength
+                level_stats[level] = level_dict
+
+        return level_stats
+
     def _level_up(self):
         self.level += 1
-        # TODO: strength, mana, hp increase... maybe read from a file
+        dd = self._LEVEL_STATS[self.level]
+        ddd = dd[self.KEY_LEVEL_STATS_HEALTH]
+        # access the dictionary holding the appropriate value increases for each level
+        hp_increase_amount = self._LEVEL_STATS[self.level][self.KEY_LEVEL_STATS_HEALTH]
+        mana_increase_amount = self._LEVEL_STATS[self.level][self.KEY_LEVEL_STATS_MANA]
+        strength_increase_amount = self._LEVEL_STATS[self.level][self.KEY_LEVEL_STATS_STRENGTH]
+
+        self.max_health += hp_increase_amount
+        self.max_mana += mana_increase_amount
+        self.strength += strength_increase_amount
+        self._regenerate() # get to full hp/mana
         print('*' * 20)
         print("Character {0} has leveled up to level {1}!".format(self.name, self.level))
+        print("Health Points increased by {}".format(hp_increase_amount))
+        print("Mana Points increased by {}".format(mana_increase_amount))
+        print("Strength Points increased by {}".format(strength_increase_amount))
         print('*' * 20)
+
+    def _regenerate(self):
+        self.health = self.max_health
+        self.mana = self.max_mana
