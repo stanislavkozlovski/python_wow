@@ -93,6 +93,7 @@ class Character(LivingThing):
         self.experience = 0
         self.xp_req_to_level = 400
         self._LEVEL_STATS = self._load_levelup_stats()
+        self._REQUIRED_XP_TO_LEVEL = self._load_xp_requirements()
 
     def equip_weapon(self, weapon: Weapon):
         self.equipped_weapon = weapon
@@ -146,7 +147,10 @@ class Character(LivingThing):
         if self.experience >= self.xp_req_to_level:
             self._level_up()
             self.experience = 0
-            #self.xp_req_to_level = self.lookup_next_xp_level_req()
+            self.xp_req_to_level = self._lookup_next_xp_level_req()
+
+    def _lookup_next_xp_level_req(self):
+        return self._REQUIRED_XP_TO_LEVEL[self.level]
 
     def award_monster_kill(self, xp_reward: int, monster_level: int):
         level_difference = self.level - monster_level
@@ -184,6 +188,28 @@ class Character(LivingThing):
                 level_stats[level] = level_dict
 
         return level_stats
+
+    def _load_xp_requirements(self):
+        """
+        Load the information about the necessary XP needed to reach a certain level.
+        The .csv file's contents is like this:
+        level, xp needed to reach the next one
+        1,     400 meaning you need to have 400XP to reach level 2
+        2,     800 800XP needed to reach level 3
+        :return: A dictionary - Key: Level, Value: XP Needed
+                                        1,  400
+        """
+        xp_req_dict = {}
+
+        with open('level_xp_requirement.csv') as _:
+            xp_req_reader = csv.reader(_)
+            for line in xp_req_reader:
+                level = int(line[0])
+                xp_required = int(line[1])
+                xp_req_dict[level] = xp_required
+
+        return xp_req_dict
+
 
     def _level_up(self):
         self.level += 1

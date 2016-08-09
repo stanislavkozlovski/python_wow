@@ -10,7 +10,7 @@ engage - start the fight
 import combat
 from entities import Character, Monster
 from items import Weapon
-GAME_VERSION = '0.0.2.1 ALPHA'
+GAME_VERSION = '0.0.2.2 ALPHA'
 
 def main():
     welcome_print()
@@ -27,8 +27,14 @@ def main():
                             level=1,
                             min_damage=1,
                             max_damage=3)
-    alive_monsters = {test_creature.name: test_creature}
+    alive_monsters = {test_creature.name: test_creature, "test":  Monster(name="test",
+                            health=5,
+                            mana=0,
+                            level=1,
+                            min_damage=1,
+                            max_damage=3)}
     while True:
+        # TODO: Add info commands here
         print_live_monsters(alive_monsters)
 
         command = input()
@@ -45,6 +51,7 @@ def print_live_monsters(alive_monsters: dict):
 
     for _, monster in alive_monsters.items():
         print(monster)
+
 
 def welcome_print():
     print("WELCOME TO PYTHON WOW VERSION: {0}".format(GAME_VERSION))
