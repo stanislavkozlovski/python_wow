@@ -21,8 +21,8 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict):
 
         while True:  # for commands that do not end the turn, like printing the stats or the possible commands
             if command == 'print stats':
-                print("Character {0} is at {1}/{2} health.".format(character.name, character.health, character.max_health))
-                print("Monster {0} is at {1}/{2} health".format(monster.name, monster.health, monster.max_health))
+                print("Character {0} is at {1:.2f}/{2} health.".format(character.name, character.health, character.max_health))
+                print("Monster {0} is at {1:.2f}/{2} health".format(monster.name, monster.health, monster.max_health))
                 command = input()
             else:
                 break
@@ -38,16 +38,16 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict):
 
 
 def monster_attack(attacker: Monster, victim: Character):
-    attacker_swing = attacker.deal_damage()  # an integer representing the damage
+    attacker_swing = attacker.deal_damage(victim.level)  # an integer representing the damage
 
-    print("{0} attacks {1} for {2} damage!".format(attacker.name, victim.name, attacker_swing))
+    print("{0} attacks {1} for {2:.2f} damage!".format(attacker.name, victim.name, attacker_swing))
 
     victim.take_attack(attacker_swing)
 
 
 def character_attack(attacker: Character, victim: Monster):
-    attacker_swing = attacker.deal_damage()
+    attacker_swing = attacker.deal_damage(victim.level)
 
-    print("{0} attacks {1} for {2} damage!".format(attacker.name, victim.name, attacker_swing))
+    print("{0} attacks {1} for {2:.2f} damage!".format(attacker.name, victim.name, attacker_swing))
 
     victim.take_attack(attacker_swing)

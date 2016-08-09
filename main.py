@@ -8,7 +8,7 @@ print stats - prints your health and the monster's. does not end the turn
 engage - start the fight
 """
 import combat
-GAME_VERSION = '0.0.1 ALPHA'
+GAME_VERSION = '0.0.15 ALPHA'
 
 def main():
     welcome_print()
@@ -20,6 +20,7 @@ def main():
     test_creature = Monster(name="Zimbab",
                             health=5,
                             mana=0,
+                            level=1,
                             min_damage=1,
                             max_damage=3)
     alive_monsters = {test_creature.name: test_creature}
@@ -74,17 +75,31 @@ class LivingThing:
 
 
 class Monster(LivingThing):
-    def __init__(self, name: str, health: int=1, mana: int=1, min_damage: int=0, max_damage: int=1):
+    def __init__(self, name: str, health: int=1, mana: int=1, level: int=1, min_damage: int=0, max_damage: int=1):
         super().__init__(name, health, mana)
+        self.level = level
         self.min_damage = min_damage
         self.max_damage = max_damage
 
     def __str__(self):
-        return "Creature {0} - {1}/{2} HP | {3}/{4} Mana".format(self.name, self.health, self.max_health, self.mana, self.max_mana)
+        return "Creature Level {level} {name} - {hp}/{max_hp} HP | {mana}/{max_mana} Mana".format(level = self.level, name = self.name,
+                                                                                                  hp = self.health, max_hp = self.max_health,
+                                                                                                  mana = self.mana, max_mana = self.max_mana)
 
-    def deal_damage(self):
+    def deal_damage(self, target_level: int):
         import random
+        level_difference = self.level - target_level
+        percentage_mod = (abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
+
         damage_to_deal = random.randint(self.min_damage, self.max_damage + 1)
+        # 10% more or less damage for each level that differs
+        if level_difference == 0:
+            pass
+        elif level_difference < 0:  # character is bigger level
+            damage_to_deal -= damage_to_deal * percentage_mod  # -X%
+        elif level_difference > 0:  # monster is bigger level
+            damage_to_deal += damage_to_deal * percentage_mod  # +X%
+
         return damage_to_deal
 
     def take_attack(self, damage: int):
@@ -112,6 +127,7 @@ class Character(LivingThing):
         self.min_damage = 0
         self.max_damage = 1
         self.equipped_weapon = Weapon()
+        self.level = 10
 
     def equip_weapon(self, weapon: Weapon):
         self.equipped_weapon = weapon
@@ -122,9 +138,21 @@ class Character(LivingThing):
         self.min_damage = weapon.min_damage * 0.1 * self.strength
         self.max_damage = weapon.max_damage * 0.1 * self.strength
 
-    def deal_damage(self):
+    def deal_damage(self, target_level: int):
         import random
+
+        level_difference = self.level - target_level
+        percentage_mod = (abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
+
         damage_to_deal = random.randint(self.min_damage, self.max_damage + 1)
+        # 10% more or less damage for each level that differs
+        if level_difference == 0:
+            pass
+        elif level_difference < 0: # monster is bigger level
+            damage_to_deal -= damage_to_deal * percentage_mod # -X%
+        elif level_difference > 0: # character is bigger level
+            damage_to_deal += damage_to_deal * percentage_mod # +X%
+
         return damage_to_deal
 
     def take_attack(self, damage: int):
