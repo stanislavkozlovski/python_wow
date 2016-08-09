@@ -1,4 +1,4 @@
-from main import Character, Monster
+from entities import Character, Monster
 
 
 def engage_combat(character: Character, monster: Monster, alive_monsters: dict):
