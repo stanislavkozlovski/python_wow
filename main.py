@@ -1,7 +1,6 @@
 # TODO: Add command that shows all available commands
 # TODO: Add talents system and Class classes
 # TODO: Add abilities to said classes
-# TODO: Move the csvs to a /data folder
 # TODO: Modify Monster __str__ method to print damage
 # TODO: Figure out a way to have multiple creatures with the same name
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
@@ -16,9 +15,11 @@ engage - start the fight
 import sqlite3
 import combat
 from entities import Character, Monster
+from commands import pac_main_ooc
 from items import Weapon
 DB_PATH = './python_wowDB.db'
-GAME_VERSION = '0.0.2.5 ALPHA'
+GAME_VERSION = '0.0.2.55 ALPHA'
+
 
 def main():
     alive_monsters = load_monsters()
@@ -32,17 +33,22 @@ def main():
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))
 
+    print_live_monsters(alive_monsters)
     while True:
-        # TODO: Add info commands here
-        print_live_monsters(alive_monsters)
-
         command = input()
-        if 'engage' in command:
+
+        if command is '?':
+            pac_main_ooc()  # print available commands in the main loop when out of combat
+        elif 'engage' in command:
             target = command[7:] # name of monster to engage
 
             if target in alive_monsters.keys():
                 target = alive_monsters[target] # convert the string to a Monster object
                 combat.engage_combat(main_character, target, alive_monsters)
+        elif command == 'print alive monsters' or command == 'pav':
+            print_live_monsters(alive_monsters)
+        elif command == 'print all alive monsters':
+            print_live_monsters(alive_monsters, print_all=True)
 
 
 def load_monsters():
@@ -85,7 +91,7 @@ def load_monsters():
     return monsters_dict
 
 
-def print_live_monsters(alive_monsters: dict):
+def print_live_monsters(alive_monsters: dict, print_all=False):
     print("Alive monsters: ")
     # sort them by level and print the five that are the lowest level
     sorted_list = sorted(alive_monsters.items(), key=lambda x: x[1].level)
@@ -94,13 +100,15 @@ def print_live_monsters(alive_monsters: dict):
         print(monster)
         printed_monsters += 1
 
-        if printed_monsters == 5: # print only five monsters at once
+        if not print_all and printed_monsters == 5: # print only five monsters at once
             break
 
 
 def welcome_print():
     print("WELCOME TO PYTHON WOW VERSION: {0}".format(GAME_VERSION))
     print("A simple console RPG game inspired by the Warcraft universe!")
+    print()
+    print("Type ? to see a list of available commands.")
     print()
 if __name__ == '__main__':
     main()
