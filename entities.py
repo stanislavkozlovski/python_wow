@@ -3,19 +3,21 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 """
 
 from items import Weapon
-import csv
+import sqlite3
+
+DB_PATH = "./python_wowDB.db"
 
 
 def load_xp_reward() -> dict:
     """
     Load the default XP that is to be given from the creature.
-    The .csv file's contents are as follows:
-    Level, Experience to give
-    1,     50 Meaning a creature that is level 1 will give 50 XP
-    2,     75 Gives 75 XP
+    The table's contents are as follows:
+    Entry, Level, Experience to give
+    1,         1,     50 Meaning a creature that is level 1 will give 50 XP
+    2,         2,     75 Gives 75 XP
     etc...
 
-    Because the Monster class will be called upon a number of times, it would be inefficient to read the whole file
+    Because the Monster class will be called upon a number of times, it would be inefficient to read the whole table
     on every monster creation. That's why this is outside of the class, to read the file only once.
 
     :return: A dictionary as follows: Key: Level, Value: XP Reward
@@ -24,12 +26,13 @@ def load_xp_reward() -> dict:
 
     xp_reward_dict = {}
 
-    with open('creature_default_xp_rewards.csv') as _:
-        def_xp_rewards_reader = csv.reader(_)
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        def_xp_rewards_reader = cursor.execute("SELECT * FROM creature_default_xp_rewards")
 
         for line in def_xp_rewards_reader:
-            level = int(line[0])
-            xp_reward = int(line[1])
+            level = int(line[1])
+            xp_reward = int(line[2])
 
             xp_reward_dict[level] = xp_reward
 
@@ -114,8 +117,6 @@ class Monster(LivingThing):
     def leave_combat(self):
         super().leave_combat()
         self.health = self.max_health # reset the health
-
-
 
 
 class Character(LivingThing):
@@ -213,12 +214,14 @@ class Character(LivingThing):
     def _load_levelup_stats(self):
         # TODO: to be moved to a separate file sometime
         """
-        Read the .csv file holding information about the amount of stats you should get according to the level you've attained
+        Read the table file holding information about the amount of stats you should get according to the level you've attained
         1 - level; 2 - hp; 3 - mana; 4 - strength;
         """
         level_stats = {} # a dictionary of dictionaries. Key - level, value - dictionary holding values for hp,mana etc.
-        with open('levelup_stats.csv') as _:
-            lvl_stats_reader = csv.reader(_)
+        with sqlite3.connect(DB_PATH) as connection:
+            cursor = connection.cursor()
+            lvl_stats_reader = cursor.execute("SELECT * FROM levelup_stats")
+
             for line in lvl_stats_reader:
                 level_dict = {}
 
@@ -238,7 +241,7 @@ class Character(LivingThing):
         # TODO: to be moved to a separate file sometime
         """
         Load the information about the necessary XP needed to reach a certain level.
-        The .csv file's contents is like this:
+        The table's contents is like this:
         level, xp needed to reach the next one
         1,     400 meaning you need to have 400XP to reach level 2
         2,     800 800XP needed to reach level 3
@@ -247,8 +250,10 @@ class Character(LivingThing):
         """
         xp_req_dict = {}
 
-        with open('level_xp_requirement.csv') as _:
-            xp_req_reader = csv.reader(_)
+        with sqlite3.connect(DB_PATH) as connection:
+            cursor = connection.cursor()
+            xp_req_reader = cursor.execute("SELECT * FROM level_xp_requirement")
+
             for line in xp_req_reader:
                 level = int(line[0])
                 xp_required = int(line[1])

@@ -13,13 +13,16 @@ print stats - prints your health and the monster's. does not end the turn
 print xp - prints the XP you have and the necessary amount to reach the next level
 engage - start the fight
 """
+import sqlite3
 import combat
-import csv
 from entities import Character, Monster
 from items import Weapon
-GAME_VERSION = '0.0.2.4 ALPHA'
+DB_PATH = './python_wowDB.db'
+GAME_VERSION = '0.0.2.5 ALPHA'
 
 def main():
+    alive_monsters = load_monsters()
+
     welcome_print()
     main_character = Character(name="Netherblood",
                                health=10,
@@ -28,7 +31,7 @@ def main():
     starter_weapon = Weapon(min_damage=1, max_damage=3)
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))
-    alive_monsters = load_monsters()
+
     while True:
         # TODO: Add info commands here
         print_live_monsters(alive_monsters)
@@ -44,11 +47,11 @@ def main():
 
 def load_monsters():
     """
-    Reads the creature_template.csv to get information about all of the creatures in the game
-    creature_template.csv is of format:
+    Reads the creature_template table to get information about all of the creatures in the game
+    creature_template is of format:
 
-    creature ID, creature name, level, hp, mana, min_dmg, max_dmg
-              1, Zimbab       ,     1, 10,   10,       2,       4
+    creature entry, creature name, level, hp, mana, min_dmg, max_dmg
+                1, Zimbab       ,     1, 10,   10,       2,       4
     Creature Level: 1 Zimbab, HP: 10, MANA: 10, Damage: 2-4
 
     :return: A Dictionary: Key: Monster Name, Value: Object of class entities.py/Monster
@@ -58,10 +61,11 @@ def load_monsters():
     # Maybe use a generator and read enough to fill the list with five monsters
 
     monsters_dict = {}
-
-    with open('creature_template.csv') as _:
-        monster_reader = csv.reader(_)
-        for creature_info in monster_reader:
+    print("Loading Monsters...")
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        creature_template_reader = cursor.execute("SELECT * FROM creature_template")
+        for creature_info in creature_template_reader:
             creature_id = int(creature_info[0])
             name = creature_info[1]
             level = int(creature_info[2])
@@ -77,7 +81,7 @@ def load_monsters():
                                           mana=mana,
                                           min_damage=min_dmg,
                                           max_damage=max_dmg)
-
+    print("Monsters loaded!")
     return monsters_dict
 
 
