@@ -28,8 +28,8 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict):
             if command == '?':
                 pac_in_combat(character)  # print available commands
             elif command == 'print stats':
-                print("Character {0} is at {1:.2f}/{2} health.".format(character.name, character.health, character.max_health))
-                print("Monster {0} is at {1:.2f}/{2} health".format(monster.name, monster.health, monster.max_health))
+                print("Character {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(character.name, character.health, character.max_health, character.mana, character.max_mana))
+                print("Monster {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(monster.name, monster.health, monster.max_health, monster.mana, monster.max_mana))
             elif command == 'print xp':
                 print("{0}/{1} Experience. {2} needed to level up!".format(character.experience,
                                                                            character.xp_req_to_level,

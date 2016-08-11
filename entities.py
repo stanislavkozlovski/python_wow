@@ -96,9 +96,10 @@ class Monster(LivingThing):
         self.xp_to_give = lookup_xp_reward(self.level)
 
     def __str__(self):
-        return "Creature Level {level} {name} - {hp}/{max_hp} HP | {mana}/{max_mana} Mana".format(level = self.level, name = self.name,
+        return "Creature Level {level} {name} - {hp}/{max_hp} HP | {mana}/{max_mana} Mana | {min_dmg}-{max_dmg} Damage".format(level = self.level, name = self.name,
                                                                                                   hp = self.health, max_hp = self.max_health,
-                                                                                                  mana = self.mana, max_mana = self.max_mana)
+                                                                                                  mana = self.mana, max_mana = self.max_mana,
+                                                                                                  min_dmg=self.min_damage, max_dmg=self.max_damage)
 
     def deal_damage(self, target_level: int):
         import random

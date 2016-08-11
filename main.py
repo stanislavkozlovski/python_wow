@@ -1,7 +1,4 @@
 # TODO: Add talents system and Class classes
-# TODO: Add abilities to said classes
-# TODO: Create a spell table in the database, maybe a different table for each class, holding the damage according to rank
-# TODO: Modify Monster __str__ method to print damage
 # TODO: Figure out a way to have multiple creatures with the same name
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
