@@ -1,6 +1,6 @@
-# TODO: Add command that shows all available commands
 # TODO: Add talents system and Class classes
 # TODO: Add abilities to said classes
+# TODO: Create a spell table in the database, maybe a different table for each class, holding the damage according to rank
 # TODO: Modify Monster __str__ method to print damage
 # TODO: Figure out a way to have multiple creatures with the same name
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
@@ -14,21 +14,19 @@ engage - start the fight
 """
 import sqlite3
 import combat
-from entities import Character, Monster
+from entities import Monster
 from commands import pac_main_ooc
 from items import Weapon
+import classes
 DB_PATH = './python_wowDB.db'
-GAME_VERSION = '0.0.2.55 ALPHA'
+GAME_VERSION = '0.0.2.63 ALPHA'
 
 
 def main():
     alive_monsters = load_monsters()
 
     welcome_print()
-    main_character = Character(name="Netherblood",
-                               health=10,
-                               mana=10,
-                               strength=3)
+    main_character = classes.Paladin(name="Netherblood")
     starter_weapon = Weapon(min_damage=1, max_damage=3)
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))
@@ -36,7 +34,7 @@ def main():
     print_live_monsters(alive_monsters)
     while True:
         command = input()
-
+        main_character._level_up()
         if command is '?':
             pac_main_ooc()  # print available commands in the main loop when out of combat
         elif 'engage' in command:
@@ -45,7 +43,7 @@ def main():
             if target in alive_monsters.keys():
                 target = alive_monsters[target] # convert the string to a Monster object
                 combat.engage_combat(main_character, target, alive_monsters)
-        elif command == 'print alive monsters' or command == 'pav':
+        elif command == 'print alive monsters' or command == 'pam':
             print_live_monsters(alive_monsters)
         elif command == 'print all alive monsters':
             print_live_monsters(alive_monsters, print_all=True)
