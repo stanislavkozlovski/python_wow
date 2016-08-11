@@ -9,7 +9,8 @@ class Paladin(Character):
             Seal of Righteousness
                 Deals X damage on each attack, needs to be activated first
     """
-    learned_spells = {"Seal of Righteousness": {"damage_on_swing": 2, "mana_cost": 4, "rank": 1}}
+    learned_spells = {"Seal of Righteousness": {"damage_on_swing": 2, "mana_cost": 4, "rank": 1}
+                      }
     SOR_ACTIVE = False  # Seal of Righteousness trigger
     SOR_TURNS = 0  # Holds the remaining turns for SOR
 
@@ -25,15 +26,31 @@ class Paladin(Character):
     def _level_up(self):
         super()._level_up()
 
-        for available_spell in self._lookup_available_spells_to_learn(self.level):
+        for available_spell in self._lookup_available_spells_to_learn(self.level):  # generator that returns dictionaries holding spell attributes
 
             # update spell rank
             if available_spell['name'] in self.learned_spells:
                 self.update_spell(available_spell)
             # learn new spell
             else:
-                # TODO: Learn new spell prompt
+                self.learn_new_spell(spell=available_spell)
                 pass
+
+    def learn_new_spell(self, spell: dict):
+        print("You have learned a new spell - {}".format(spell['name']))
+
+        temp_spell_dict = {"name": spell['name'],
+                     "rank": spell['rank'],
+                     "damage_1": spell['damage_1'],
+                     "damage_2": spell['damage_2'],
+                     "damage_3": spell['damage_3'],
+                     "heal_1": spell['heal_1'],
+                     "heal_2": spell['heal_2'],
+                     "heal_3": spell['heal_3'],
+                     "mana_cost": spell['mana_cost']}
+
+        self.learned_spells[spell['name']] = temp_spell_dict
+
     def _lookup_available_spells_to_learn(self, level: int):
         """
         Generator function
@@ -89,7 +106,10 @@ class Paladin(Character):
         """
         if command == 'sor':
             return self.spell_seal_of_righteousness()
+        elif command == 'fol':
+            return self.spell_flash_of_light()
 
+        print("Unsuccessful cast")
         return False  # if we do not go into any spell
 
     def spell_seal_of_righteousness(self):
@@ -129,6 +149,29 @@ class Paladin(Character):
         print("Spell Seal of Righteousness has been updated to rank {}!".format(rank))
         print("*"*20)
 
+    def spell_flash_of_light(self):
+        """
+        Heals the paladin for a certain amount
+        :return successful cast or not
+        """
+        mana_cost = self.learned_spells['Flash of Light']['mana_cost']
+        heal_amount = self.learned_spells['Flash of Light']['heal_1']
+
+        if self.mana >= mana_cost:
+            self.health += heal_amount
+            self.mana -= mana_cost
+
+            if self.health > self.max_health: # check for overheal
+                overheal = self.health - self.max_health
+                self.health = self.max_health
+                print("Flash of Light healed {0} for {1:.2f} ({2:.2f} Overheal).".format(self.name, heal_amount - overheal, overheal))
+            else:
+                print("Flash of Light healed {0} for {1:.2f}.".format(self.name, heal_amount))
+
+            return True
+        else:
+            print("Not enough mana!")
+            return False
     # SPELLS
 
     def deal_damage(self, target_level: int):

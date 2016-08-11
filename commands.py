@@ -45,7 +45,13 @@ def print_class_abilities_in_combat(character: Character):
 def print_paladin_abilities_in_combat(character: Paladin):
     print("\tsor")
     print("\t\tCasts Seal of Righteousness")
-    print("'\t\t\tLasts three turns and adds {0} damage to each of your auto attacks\n".format(character.SOR_DAMAGE))
+    print("\t\t\tMana Cost: {}".format(character.learned_spells['Seal of Righteousness']['mana_cost']))
+    print("'\t\t\tLasts three turns and adds {0} damage to each of your auto attacks\n".format(character.learned_spells['Seal of Righteousness']['damage_on_swing'])) # TODO: rename damage_on_swing to damage_1
+    if "Flash of Light" in character.learned_spells.keys():
+        print("\tfol")
+        print("\t\tCasts Flash of Light")
+        print("\t\t\tMana Cost: {}".format(character.learned_spells['Flash of Light']['mana_cost']))
+        print("\t\t\tHeals the paladin for {0} damage.".format(character.learned_spells['Flash of Light']['heal_1'])) # TODO: Move to a method in paladin that gives heal amount of spell name
 
 
 def get_available_paladin_abilities(character: Paladin):
@@ -56,5 +62,9 @@ def get_available_paladin_abilities(character: Paladin):
     """
     available_spells = set()
     available_spells.add('sor')
+
+    if "Flash of Light" in character.learned_spells.keys():
+        available_spells.add('fol')
+
     # TODO: Add a method in paladin that returns this set
     return available_spells

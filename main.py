@@ -31,7 +31,6 @@ def main():
     print_live_monsters(alive_monsters)
     while True:
         command = input()
-        main_character._level_up()
         if command is '?':
             pac_main_ooc()  # print available commands in the main loop when out of combat
         elif 'engage' in command:

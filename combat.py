@@ -60,12 +60,13 @@ def monster_attack(attacker: Monster, victim: Character):
     victim.take_attack(attacker_swing)
 
 
+#  returns a hashset with a list of allowed commands (you can't cast a spell you haven't learned yet)
 def get_available_spells(character: Character):
     chr_class = character.get_class()
     available_spells = set()
 
     if chr_class == 'paladin':
-        available_spells = get_available_paladin_abilities(character)
+        available_spells = get_available_paladin_abilities(character)  # this function is from commands.py
 
     return available_spells
 
