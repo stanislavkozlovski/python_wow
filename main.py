@@ -19,7 +19,7 @@ from commands import pac_main_ooc
 from items import Weapon
 import classes
 DB_PATH = './python_wowDB.db'
-GAME_VERSION = '0.0.2.62 ALPHA'
+GAME_VERSION = '0.0.2.63 ALPHA'
 
 
 def main():
@@ -34,7 +34,7 @@ def main():
     print_live_monsters(alive_monsters)
     while True:
         command = input()
-
+        main_character._level_up()
         if command is '?':
             pac_main_ooc()  # print available commands in the main loop when out of combat
         elif 'engage' in command:
