@@ -11,6 +11,7 @@ class Paladin(Character):
     SOR_ACTIVE = False  # Seal of Righteousness trigger
     SOR_TURNS = 0  # Holds the remaining turns for SOR
     SOR_DAMAGE = 2  # Holds the damage SOR will deal each auto attack. TODO: Load from DB
+    SOR_MANA_COST = 4
     SOR_RANK = 1  # Holds the RANK of SOR
 
     def __init__(self, name: str, health: int=12, mana: int=15, strength: int=4):
@@ -23,16 +24,32 @@ class Paladin(Character):
         self.SOR_ACTIVE = False  # Remove SOR aura
 
     # SPELLS
-    def spell_handler(self, command: str):
+    def spell_handler(self, command: str) -> bool:
+        """
+
+        :param command: Command telling you which spell to use
+        :return: Returns a boolean indicating if the cast was successful or not
+        """
         if command == 'sor':
-            self.spell_seal_of_righteousness()
+            return self.spell_seal_of_righteousness()
+
+        return False  # if we do not go into any spell
+
 
     def spell_seal_of_righteousness(self):
-        #  When activated adds X Spell Damage to each attack
-        #  Lasts for three turns
+        """
+         When activated adds X Spell Damage to each attack
+         Lasts for three turns
+        :return: boolean indicating if the cast was successful or not
+        """
+        if self.mana < self.SOR_MANA_COST:
+            print("Not enough mana!")
+            return False
+
         self.SOR_ACTIVE = True
         self.SOR_TURNS = 3
         print("{0} activates Seal of Righteousness!".format(self.name))
+        return True
 
     def _spell_seal_of_righteousness_attack(self):
         if self.SOR_TURNS == 0: # fade spell

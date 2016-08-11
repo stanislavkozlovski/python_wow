@@ -1,4 +1,3 @@
-# TODO: Add command that shows all available commands
 # TODO: Add talents system and Class classes
 # TODO: Add abilities to said classes
 # TODO: Create a spell table in the database, maybe a different table for each class, holding the damage according to rank
@@ -15,22 +14,19 @@ engage - start the fight
 """
 import sqlite3
 import combat
-from entities import Character, Monster
+from entities import Monster
 from commands import pac_main_ooc
 from items import Weapon
 import classes
 DB_PATH = './python_wowDB.db'
-GAME_VERSION = '0.0.2.61 ALPHA'
+GAME_VERSION = '0.0.2.62 ALPHA'
 
 
 def main():
     alive_monsters = load_monsters()
 
     welcome_print()
-    main_character = classes.Paladin(name="Netherblood",
-                               health=10,
-                               mana=10,
-                               strength=3)
+    main_character = classes.Paladin(name="Netherblood")
     starter_weapon = Weapon(min_damage=1, max_damage=3)
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))

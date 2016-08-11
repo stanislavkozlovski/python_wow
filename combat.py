@@ -4,12 +4,16 @@ from commands import pac_in_combat, get_available_paladin_abilities
 
 def engage_combat(character: Character, monster: Monster, alive_monsters: dict):
     AVAILABLE_SPELLS = get_available_spells(character)  # Load all of the currently available spells for our character
+    to_skip_attack = False  # Used when we don't want the monster to attack on the next turn
     character.enter_combat()
     monster.enter_combat()
 
     while character.in_combat:
         # we start off the combat with the monster dealing the first blow
-        monster_attack(monster, character)
+        if not to_skip_attack:
+            monster_attack(monster, character)
+        else:
+            to_skip_attack = False
 
         if not character.alive:
             alive_monsters[monster.name].leave_combat()
@@ -37,7 +41,9 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict):
         if command == 'attack':
             character.attack(monster)
         elif command in AVAILABLE_SPELLS:
-            character.spell_handler(command)
+            if not character.spell_handler(command):
+                # Unsuccessful cast
+                to_skip_attack = True  # skip the next attack and load a command again
 
         if not monster.alive:
             print("{0} has slain {1}!".format(character.name, monster.name))
