@@ -145,6 +145,14 @@ class Character(LivingThing):
         self.min_damage = weapon.min_damage + (0.1 * self.strength)
         self.max_damage = weapon.max_damage + (0.1 * self.strength)
 
+    def spell_handler(self, command: str):
+        '''
+        Every class will have different spells, this method will make sure the proper spell is caster
+        :param command: the spell name that is to be cast
+        :return:
+        '''
+        pass
+
     def deal_damage(self, target_level: int):
         import random
 
@@ -161,6 +169,9 @@ class Character(LivingThing):
             damage_to_deal += damage_to_deal * percentage_mod # +X%
 
         return damage_to_deal
+
+    def character_attack(self, victim: Monster):
+        pass
 
     def take_attack(self, damage: int):
         self.health -= damage
@@ -285,3 +296,6 @@ class Character(LivingThing):
     def _regenerate(self):
         self.health = self.max_health
         self.mana = self.max_mana
+
+    def get_class(self) -> str:
+        pass

@@ -17,15 +17,17 @@ import combat
 from entities import Character, Monster
 from commands import pac_main_ooc
 from items import Weapon
+import classes
 DB_PATH = './python_wowDB.db'
-GAME_VERSION = '0.0.2.55 ALPHA'
+GAME_VERSION = '0.0.2.6 ALPHA'
+#ADDED CLASS PALADIN, SEAL OF RIGHTEOUSNESS
 
 
 def main():
     alive_monsters = load_monsters()
 
     welcome_print()
-    main_character = Character(name="Netherblood",
+    main_character = classes.Paladin(name="Netherblood",
                                health=10,
                                mana=10,
                                strength=3)
@@ -45,7 +47,7 @@ def main():
             if target in alive_monsters.keys():
                 target = alive_monsters[target] # convert the string to a Monster object
                 combat.engage_combat(main_character, target, alive_monsters)
-        elif command == 'print alive monsters' or command == 'pav':
+        elif command == 'print alive monsters' or command == 'pam':
             print_live_monsters(alive_monsters)
         elif command == 'print all alive monsters':
             print_live_monsters(alive_monsters, print_all=True)
