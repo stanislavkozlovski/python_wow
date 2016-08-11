@@ -67,14 +67,23 @@ class LivingThing:
 
     def leave_combat(self):
         self.in_combat = False
+        self._regenerate()
+
+    def _regenerate(self):
+        self.health = self.max_health
+        self.mana = self.max_mana
 
     def check_if_dead(self):
         if self.health <= 0:
-            self.alive = False
             self.die()
 
     def die(self):
-        pass
+        self.alive = False
+
+    def revive(self):
+        self._regenerate()
+        self.alive = True
+
 
 
 class Monster(LivingThing):
@@ -112,12 +121,8 @@ class Monster(LivingThing):
         self.check_if_dead()
 
     def die(self):
-        print("Creature {} has been slain!".format(self.name))
-
-    def leave_combat(self):
-        super().leave_combat()
-        self.health = self.max_health # reset the health
-
+        super().die()
+        print("Creature {} has died!".format(self.name))
 
 class Character(LivingThing):
     KEY_LEVEL_STATS_HEALTH = 'health'
@@ -170,7 +175,7 @@ class Character(LivingThing):
 
         return damage_to_deal
 
-    def character_attack(self, victim: Monster):
+    def attack(self, victim: Monster):
         pass
 
     def take_attack(self, damage: int):
@@ -178,7 +183,8 @@ class Character(LivingThing):
         self.check_if_dead()
 
     def die(self):
-        print("Character {} has been slain!".format(self.name))
+        super().die()
+        print("Character {} has died!".format(self.name))
 
     def prompt_revive(self):
         print("Do you want to restart? Y/N")
@@ -186,23 +192,6 @@ class Character(LivingThing):
             self.revive()
         else:
             exit()
-
-    def revive(self):
-        self._regenerate()
-        self.alive = True
-
-    def leave_combat(self):
-        super().leave_combat()
-        self._regenerate()
-
-    def check_if_levelup(self):
-        if self.experience >= self.xp_req_to_level:
-            self._level_up()
-            self.experience = 0
-            self.xp_req_to_level = self._lookup_next_xp_level_req()
-
-    def _lookup_next_xp_level_req(self):
-        return self._REQUIRED_XP_TO_LEVEL[self.level]
 
     def award_monster_kill(self, xp_reward: int, monster_level: int):
         level_difference = self.level - monster_level
@@ -221,6 +210,35 @@ class Character(LivingThing):
 
         self.experience += xp_reward + xp_bonus_reward
         self.check_if_levelup()
+
+    def check_if_levelup(self):
+        if self.experience >= self.xp_req_to_level:
+            self._level_up()
+            self.experience = 0
+            self.xp_req_to_level = self._lookup_next_xp_level_req()
+
+    def _level_up(self):
+        self.level += 1
+        dd = self._LEVEL_STATS[self.level]
+        ddd = dd[self.KEY_LEVEL_STATS_HEALTH]
+        # access the dictionary holding the appropriate value increases for each level
+        hp_increase_amount = self._LEVEL_STATS[self.level][self.KEY_LEVEL_STATS_HEALTH]
+        mana_increase_amount = self._LEVEL_STATS[self.level][self.KEY_LEVEL_STATS_MANA]
+        strength_increase_amount = self._LEVEL_STATS[self.level][self.KEY_LEVEL_STATS_STRENGTH]
+
+        self.max_health += hp_increase_amount
+        self.max_mana += mana_increase_amount
+        self.strength += strength_increase_amount
+        self._regenerate() # get to full hp/mana
+        print('*' * 20)
+        print("Character {0} has leveled up to level {1}!".format(self.name, self.level))
+        print("Health Points increased by {}".format(hp_increase_amount))
+        print("Mana Points increased by {}".format(mana_increase_amount))
+        print("Strength Points increased by {}".format(strength_increase_amount))
+        print('*' * 20)
+
+    def _lookup_next_xp_level_req(self):
+        return self._REQUIRED_XP_TO_LEVEL[self.level]
 
     def _load_levelup_stats(self):
         # TODO: to be moved to a separate file sometime
@@ -271,31 +289,6 @@ class Character(LivingThing):
                 xp_req_dict[level] = xp_required
 
         return xp_req_dict
-
-
-    def _level_up(self):
-        self.level += 1
-        dd = self._LEVEL_STATS[self.level]
-        ddd = dd[self.KEY_LEVEL_STATS_HEALTH]
-        # access the dictionary holding the appropriate value increases for each level
-        hp_increase_amount = self._LEVEL_STATS[self.level][self.KEY_LEVEL_STATS_HEALTH]
-        mana_increase_amount = self._LEVEL_STATS[self.level][self.KEY_LEVEL_STATS_MANA]
-        strength_increase_amount = self._LEVEL_STATS[self.level][self.KEY_LEVEL_STATS_STRENGTH]
-
-        self.max_health += hp_increase_amount
-        self.max_mana += mana_increase_amount
-        self.strength += strength_increase_amount
-        self._regenerate() # get to full hp/mana
-        print('*' * 20)
-        print("Character {0} has leveled up to level {1}!".format(self.name, self.level))
-        print("Health Points increased by {}".format(hp_increase_amount))
-        print("Mana Points increased by {}".format(mana_increase_amount))
-        print("Strength Points increased by {}".format(strength_increase_amount))
-        print('*' * 20)
-
-    def _regenerate(self):
-        self.health = self.max_health
-        self.mana = self.max_mana
 
     def get_class(self) -> str:
         pass

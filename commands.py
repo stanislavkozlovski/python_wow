@@ -6,6 +6,7 @@ abbreviation PAC means Print Available Commands
 from entities import Character
 from classes import Paladin
 
+
 def pac_main_ooc():
     print()
     print("Available commands:")
@@ -46,3 +47,14 @@ def print_paladin_abilities_in_combat(character: Paladin):
     print("\t\tCasts Seal of Righteousness")
     print("'\t\t\tLasts three turns and adds {0} damage to each of your auto attacks\n".format(character.SOR_DAMAGE))
 
+
+def get_available_paladin_abilities(character: Paladin):
+    """
+    Returns a set holding the COMMANDS for all of the available paladin spells to use
+    :param character:
+    :return:
+    """
+    available_spells = set()
+    available_spells.add('sor')
+    # TODO: Add a method in paladin that returns this set
+    return available_spells

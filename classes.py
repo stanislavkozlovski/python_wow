@@ -8,22 +8,24 @@ class Paladin(Character):
             Seal of Righteousness
                 Deals X damage on each attack, needs to be activated first
     """
-    SOR_ACTIVE = False  # Seal of Righteousness
-    SOR_TURNS = 0
-    SOR_DAMAGE = 2
+    SOR_ACTIVE = False  # Seal of Righteousness trigger
+    SOR_TURNS = 0  # Holds the remaining turns for SOR
+    SOR_DAMAGE = 2  # Holds the damage SOR will deal each auto attack. TODO: Load from DB
+    SOR_RANK = 1  # Holds the RANK of SOR
 
     def __init__(self, name: str, health: int=12, mana: int=15, strength: int=4):
         super().__init__(name=name, health=health, mana=mana, strength=strength)
         self.min_damage = 1
         self.max_damage = 3
 
+    def leave_combat(self):
+        super().leave_combat()
+        self.SOR_ACTIVE = False  # Remove SOR aura
+
+    # SPELLS
     def spell_handler(self, command: str):
         if command == 'sor':
             self.spell_seal_of_righteousness()
-
-    def leave_combat(self):
-        super().leave_combat()
-        self.SOR_ACTIVE = False
 
     def spell_seal_of_righteousness(self):
         #  When activated adds X Spell Damage to each attack
@@ -41,6 +43,8 @@ class Paladin(Character):
             self.SOR_TURNS -= 1
             # TODO: Load damage from DB
             return self.SOR_DAMAGE  # damage from SOR
+
+    # SPELLS
 
     def deal_damage(self, target_level: int):
         import random
@@ -67,7 +71,7 @@ class Paladin(Character):
 
         return damage_to_deal, sor_damage
 
-    def character_attack(self, victim: Monster):
+    def attack(self, victim: Monster):
         attacker_swing = self.deal_damage(victim.level)  # tuple holding auto attack and seal damage (if active)
 
         auto_attack = attacker_swing[0]

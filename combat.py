@@ -1,10 +1,9 @@
 from entities import Character, Monster
-import classes
-from commands import pac_in_combat
+from commands import pac_in_combat, get_available_paladin_abilities
 
 
 def engage_combat(character: Character, monster: Monster, alive_monsters: dict):
-
+    AVAILABLE_SPELLS = get_available_spells(character)  # Load all of the currently available spells for our character
     character.enter_combat()
     monster.enter_combat()
 
@@ -36,16 +35,15 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict):
             command = input()
 
         if command == 'attack':
-            character.character_attack(monster)
-        elif command == 'sor':
+            character.attack(monster)
+        elif command in AVAILABLE_SPELLS:
             character.spell_handler(command)
 
         if not monster.alive:
-            print("{0} has slain {1}".format(character.name, monster.name))
+            print("{0} has slain {1}!".format(character.name, monster.name))
             character.award_monster_kill(monster.xp_to_give, monster.level)
             character.leave_combat()  # will exit the loop
             del alive_monsters[monster.name]  # removes the monster from the dictionary
-
 
 
 def monster_attack(attacker: Monster, victim: Character):
@@ -54,3 +52,14 @@ def monster_attack(attacker: Monster, victim: Character):
     print("{0} attacks {1} for {2:.2f} damage!".format(attacker.name, victim.name, attacker_swing))
 
     victim.take_attack(attacker_swing)
+
+
+def get_available_spells(character: Character):
+    chr_class = character.get_class()
+    available_spells = set()
+
+    if chr_class == 'paladin':
+        available_spells = get_available_paladin_abilities(character)
+
+    return available_spells
+
