@@ -11,12 +11,12 @@ engage - start the fight
 import sqlite3
 import combat
 from entities import Monster
-from commands import pac_main_ooc
+from commands import pac_main_ooc, pac_map_directions
 from items import Weapon
 import classes
 from zones.elwynn_forest import ElwynnForest
 DB_PATH = './python_wowDB.db'
-GAME_VERSION = '0.0.2.7 ALPHA'
+GAME_VERSION = '0.0.2.71 ALPHA'
 ZONES = {"Elwynn Forest": ElwynnForest}
 
 def main():
@@ -35,6 +35,9 @@ def main():
         command = input()
         if command is '?':
             pac_main_ooc()  # print available commands in the main loop when out of combat
+        elif command == 'go to ?':
+            map_directions = zone_object.get_map_directions(zone_object, main_character.current_subzone)
+            pac_map_directions(possible_routes=map_directions)
         elif 'engage' in command:
             target = command[7:] # name of monster to engage
 
@@ -45,6 +48,13 @@ def main():
             if target_guid in alive_monsters.keys():
                 target = alive_monsters[target_guid] # convert the string to a Monster object
                 combat.engage_combat(main_character, target, alive_monsters, guid_name_set, target_guid)
+        elif 'go to' in command:
+            destination = command[6:]
+            main_character.current_subzone = destination
+            alive_monsters, guid_name_set = zone_object.get_live_monsters_and_guid_name_set(zone_object,
+                                                                                            main_character.current_subzone)
+            print("Moved to {0}".format(main_character.current_subzone))
+            print_live_monsters(alive_monsters)
         elif command == 'print alive monsters' or command == 'pam':
             print_live_monsters(alive_monsters)
         elif command == 'print all alive monsters':

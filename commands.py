@@ -17,6 +17,10 @@ def pac_main_ooc():
     print("\t\tPrints 5 monsters that are alive.\n")
     print("\tprint all alive monsters")
     print("\t\tPrints all monsters that are alive.\n")
+    print("\tgo to [Sub Zone]")
+    print("\t\tMoves the character to the selected sub zone.\n")
+    print("\tgo to ?")
+    print("\t\tShows a list of the reachable sub zones from the one the character is in.\n")
     print("\t?")
     print("\t\tShows a list of available commands.\n")
 
@@ -35,6 +39,11 @@ def pac_in_combat(character):
     print("\tattack")
     print("\t\tAttacks the monster you are in combat with a meele swing.\n")
     print_class_abilities_in_combat(character)
+
+def pac_map_directions(possible_routes: list):
+    print("Possible directions:")
+    for route in possible_routes:
+        print("\t\t{route}".format(route=route))
 
 
 def print_class_abilities_in_combat(character: Character):
