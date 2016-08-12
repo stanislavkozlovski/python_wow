@@ -1,5 +1,4 @@
 # TODO: Add talents system and Class classes
-# TODO: Figure out a way to have multiple creatures with the same name
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
 """
@@ -15,19 +14,22 @@ from entities import Monster
 from commands import pac_main_ooc
 from items import Weapon
 import classes
+from zones.elwynn_forest import ElwynnForest
 DB_PATH = './python_wowDB.db'
-GAME_VERSION = '0.0.2.63 ALPHA'
-
+GAME_VERSION = '0.0.2.7 ALPHA'
+ZONES = {"Elwynn Forest": ElwynnForest}
 
 def main():
-    alive_monsters = load_monsters()
-
     welcome_print()
+
     main_character = classes.Paladin(name="Netherblood")
     starter_weapon = Weapon(min_damage=1, max_damage=3)
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))
 
+    zone_object = get_zone_object(main_character.current_zone)
+
+    alive_monsters, guid_name_set = zone_object.get_live_monsters_and_guid_name_set(zone_object, main_character.current_subzone)
     print_live_monsters(alive_monsters)
     while True:
         command = input()
@@ -36,53 +38,26 @@ def main():
         elif 'engage' in command:
             target = command[7:] # name of monster to engage
 
-            if target in alive_monsters.keys():
-                target = alive_monsters[target] # convert the string to a Monster object
-                combat.engage_combat(main_character, target, alive_monsters)
+            # return a list with the guids for each monster we've targeted and get the first guid [0]
+            # using the guid, target him from the alive_monsters dictionary
+            target_guid = [guid if name == target else None for guid, name in guid_name_set][0]
+
+            if target_guid in alive_monsters.keys():
+                target = alive_monsters[target_guid] # convert the string to a Monster object
+                combat.engage_combat(main_character, target, alive_monsters, guid_name_set, target_guid)
         elif command == 'print alive monsters' or command == 'pam':
             print_live_monsters(alive_monsters)
         elif command == 'print all alive monsters':
             print_live_monsters(alive_monsters, print_all=True)
 
 
-def load_monsters():
+def get_zone_object(zone: str):
     """
-    Reads the creature_template table to get information about all of the creatures in the game
-    creature_template is of format:
 
-    creature entry, creature name, level, hp, mana, min_dmg, max_dmg
-                1, Zimbab       ,     1, 10,   10,       2,       4
-    Creature Level: 1 Zimbab, HP: 10, MANA: 10, Damage: 2-4
-
-    :return: A Dictionary: Key: Monster Name, Value: Object of class entities.py/Monster
+    :param zone: The name of the zone
+    :return: Returns a class object from the ZONES dictionary
     """
-    # TODO: Move this somewhere else
-    # TODO: Think of another approach rather than loading them all at once!
-    # Maybe use a generator and read enough to fill the list with five monsters
-
-    monsters_dict = {}
-    print("Loading Monsters...")
-    with sqlite3.connect(DB_PATH) as connection:
-        cursor = connection.cursor()
-        creature_template_reader = cursor.execute("SELECT * FROM creature_template")
-        for creature_info in creature_template_reader:
-            creature_id = int(creature_info[0])
-            name = creature_info[1]
-            level = int(creature_info[2])
-            health = int(creature_info[3])
-            mana = int(creature_info[4])
-            min_dmg = int(creature_info[5])
-            max_dmg = int(creature_info[6])
-
-            monsters_dict[name] = Monster(monster_id=creature_id,
-                                          name=name,
-                                          level=level,
-                                          health=health,
-                                          mana=mana,
-                                          min_damage=min_dmg,
-                                          max_damage=max_dmg)
-    print("Monsters loaded!")
-    return monsters_dict
+    return ZONES[zone]
 
 
 def print_live_monsters(alive_monsters: dict, print_all=False):

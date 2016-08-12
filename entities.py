@@ -139,6 +139,8 @@ class Character(LivingThing):
         self.level = 1
         self.experience = 0
         self.xp_req_to_level = 400
+        self.current_zone = "Elwynn Forest"
+        self.current_subzone = "Northshire Abbey"
         self._LEVEL_STATS = self._load_levelup_stats()
         self._REQUIRED_XP_TO_LEVEL = self._load_xp_requirements()
 

@@ -2,7 +2,7 @@ from entities import Character, Monster
 from commands import pac_in_combat, get_available_paladin_abilities
 
 
-def engage_combat(character: Character, monster: Monster, alive_monsters: dict):
+def engage_combat(character: Character, monster: Monster, alive_monsters: dict, guid_name_set: set, monster_GUID: int):
     AVAILABLE_SPELLS = get_available_spells(character)  # Load all of the currently available spells for our character
     to_skip_attack = False  # Used when we don't want the monster to attack on the next turn
     character.enter_combat()
@@ -16,7 +16,7 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict):
             to_skip_attack = False
 
         if not character.alive:
-            alive_monsters[monster.name].leave_combat()
+            alive_monsters[monster_GUID].leave_combat()
             print("{0} has slain character {1}".format(monster.name, character.name))
 
             character.prompt_revive()
@@ -49,7 +49,8 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict):
             print("{0} has slain {1}!".format(character.name, monster.name))
             character.award_monster_kill(monster.xp_to_give, monster.level)
             character.leave_combat()  # will exit the loop
-            del alive_monsters[monster.name]  # removes the monster from the dictionary
+            del alive_monsters[monster_GUID]  # removes the monster from the dictionary
+            guid_name_set.remove((monster_GUID, monster.name))  # remove it from the set used for looking up
 
 
 def monster_attack(attacker: Monster, victim: Character):
