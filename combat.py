@@ -47,7 +47,7 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
 
         if not monster.alive:
             print("{0} has slain {1}!".format(character.name, monster.name))
-            character.award_monster_kill(monster.xp_to_give, monster.level)
+            character.award_monster_kill(monster=monster)
             character.leave_combat()  # will exit the loop
             del alive_monsters[monster_GUID]  # removes the monster from the dictionary
             guid_name_set.remove((monster_GUID, monster.name))  # remove it from the set used for looking up

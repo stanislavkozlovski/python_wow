@@ -3,6 +3,7 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 """
 
 from items import Weapon
+from quest import Quest
 import sqlite3
 
 DB_PATH = "./python_wowDB.db"
@@ -87,13 +88,14 @@ class LivingThing:
 
 
 class Monster(LivingThing):
-    def __init__(self, monster_id: int, name: str, health: int=1, mana: int=1, level: int=1, min_damage: int=0, max_damage: int=1):
+    def __init__(self, monster_id: int, name: str, health: int=1, mana: int=1, level: int=1, min_damage: int=0, max_damage: int=1, quest_relation_id = 0):
         super().__init__(name, health, mana)
         self.monster_id = monster_id
         self.level = level
         self.min_damage = min_damage
         self.max_damage = max_damage
         self.xp_to_give = lookup_xp_reward(self.level)
+        self.quest_relation_ID = quest_relation_id
 
     def __str__(self):
         return "Creature Level {level} {name} - {hp}/{max_hp} HP | {mana}/{max_mana} Mana | {min_dmg}-{max_dmg} Damage".format(level = self.level, name = self.name,
@@ -143,6 +145,7 @@ class Character(LivingThing):
         self.current_subzone = "Northshire Valley"
         self._LEVEL_STATS = self._load_levelup_stats()
         self._REQUIRED_XP_TO_LEVEL = self._load_xp_requirements()
+        self.quest_log = {}
 
     def equip_weapon(self, weapon: Weapon):
         self.equipped_weapon = weapon
@@ -196,7 +199,23 @@ class Character(LivingThing):
         else:
             exit()
 
-    def award_monster_kill(self, xp_reward: int, monster_level: int):
+    def add_quest(self, quest: Quest):
+        self.quest_log[quest.ID] = quest
+
+    def check_if_quest_completed(self, quest: Quest):
+        if quest.completed:
+            del self.quest_log[quest.ID] # remove from quest log
+            xp_reward = quest.reward()
+            print("Quest {} completed! XP awarded: {}!".format(quest.name, xp_reward))
+            self.experience += xp_reward
+            self.check_if_levelup()
+
+# TODO: Change this method to take a monster object, check if we have quest for said monster below
+    def award_monster_kill(self, monster: Monster):
+        monster_level = monster.level
+        xp_reward = monster.xp_to_give
+        monster_quest_ID = monster.quest_relation_ID
+
         level_difference = self.level - monster_level
         xp_bonus_reward = 0
         if level_difference >= 5: # if the character is 5 levels higher, give no XP
@@ -213,6 +232,13 @@ class Character(LivingThing):
 
         self.experience += xp_reward + xp_bonus_reward
         self.check_if_levelup()
+
+        # If this monster is for a quest and we have that quest
+        if monster_quest_ID and monster_quest_ID in self.quest_log:
+            quest = self.quest_log[monster_quest_ID]
+            quest.add_kill()
+            self.check_if_quest_completed(quest)
+            self.quest_log[monster_quest_ID] = quest
 
     def check_if_levelup(self):
         if self.experience >= self.xp_req_to_level:

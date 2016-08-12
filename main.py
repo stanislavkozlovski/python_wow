@@ -1,4 +1,12 @@
 # TODO: Add talents system and Class classes
+# TODO: Lots of things to do regarding quests
+# TODO: Quest - add to DB
+# TODO: Quest - tie to zones
+# TODO: Quest - clean up code
+# TODO: Quest - print commands
+# TODO: Quest - commands to accept quest
+# TODO: add more monsters and subzones
+# TODO: Add a AddExperience method in Character and replace where appropriate
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
 """
@@ -10,13 +18,13 @@ engage - start the fight
 """
 import sqlite3
 import combat
-from entities import Monster
+from quest import Quest
 from commands import pac_main_ooc, pac_map_directions
 from items import Weapon
 import classes
 from zones.elwynn_forest import ElwynnForest
 DB_PATH = './python_wowDB.db'
-GAME_VERSION = '0.0.2.71 ALPHA'
+GAME_VERSION = '0.0.2.8 ALPHA'
 ZONES = {"Elwynn Forest": ElwynnForest}
 
 def main():
@@ -26,7 +34,7 @@ def main():
     starter_weapon = Weapon(min_damage=1, max_damage=3)
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))
-
+    main_character.add_quest(Quest(quest_name="Kill 2 Wolves", quest_id=1, creature_name="Wolf", kill_amount=2, xp_reward=1000))
     zone_object = get_zone_object(main_character.current_zone)
 
     alive_monsters, guid_name_set = zone_object.get_live_monsters_and_guid_name_set(zone_object, main_character.current_subzone)

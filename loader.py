@@ -50,6 +50,7 @@ def load_creatures(zone: str, subzone:str):
             creature_template_mana = int(creature_template_info[4])
             creature_template_min_dmg = int(creature_template_info[5])
             creature_template_max_dmg = int(creature_template_info[6])
+            creature_template_quest_relation_ID = int(creature_template_info[7])
 
             # save into the set
             guid_name_set.add((creature_guid, creature_template_name))
@@ -60,7 +61,8 @@ def load_creatures(zone: str, subzone:str):
                                                    mana=creature_template_mana,
                                                    level=creature_template_level,
                                                    min_damage=creature_template_min_dmg,
-                                                   max_damage=creature_template_max_dmg)
+                                                   max_damage=creature_template_max_dmg,
+                                                   quest_relation_id=creature_template_quest_relation_ID)
 
 
 
