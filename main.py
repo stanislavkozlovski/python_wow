@@ -1,9 +1,6 @@
 # TODO: Add talents system and Class classes
 # TODO: Lots of things to do regarding quests
-# TODO: Quest - add to DB
-# TODO: Quest - tie to zones
 # TODO: Quest - clean up code
-# TODO: Quest - print commands
 # TODO: Quest - commands to accept quest
 # TODO: add more monsters and subzones
 # TODO: Add a AddExperience method in Character and replace where appropriate
@@ -26,7 +23,6 @@ from zones.elwynn_forest import ElwynnForest
 DB_PATH = './python_wowDB.db'
 GAME_VERSION = '0.0.2.8 ALPHA'
 ZONES = {"Elwynn Forest": ElwynnForest}
-
 def main():
     welcome_print()
 
@@ -41,6 +37,7 @@ def main():
     guid_name_set: A Set of Tuples ((Monster GUID, Monster Name)) used to convert the engage X command to target a creature in alive_monsters
     available_quests: A Dictionary: Key: name of quest, Value: Object of class quest.py/Quest
     '''
+
     alive_monsters, guid_name_set, available_quests = zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object, main_character.current_subzone)
     print_live_monsters(alive_monsters)
     while True:
@@ -62,6 +59,15 @@ def main():
             if target_guid in alive_monsters.keys():
                 target = alive_monsters[target_guid] # convert the string to a Monster object
                 combat.engage_combat(main_character, target, alive_monsters, guid_name_set, target_guid)
+        elif 'accept' in command:  # accept the quest
+            quest_to_accept = command[7:]  # name of quest to accept
+
+            if quest_to_accept in available_quests.keys():
+                quest = available_quests[quest_to_accept]
+
+                if main_character.level >= quest.level_required:
+                    main_character.add_quest(quest)
+                    del available_quests[quest_to_accept]  # remove it from the list
         elif 'go to' in command:
             destination = command[6:]
             main_character.current_subzone = destination
@@ -106,6 +112,9 @@ def print_available_quests(available_quests: dict, character_level: int):
                                                                                                                           required_kills=quest.needed_kills,
                                                                                                                           monster_name=quest.monster_to_kill,
                                                                                                                           xp_reward=quest.xp_to_give))
+
+
+
 def welcome_print():
     print("WELCOME TO PYTHON WOW VERSION: {0}".format(GAME_VERSION))
     print("A simple console RPG game inspired by the Warcraft universe!")

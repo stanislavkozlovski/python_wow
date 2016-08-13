@@ -203,12 +203,13 @@ class Character(LivingThing):
         self.quest_log[quest.ID] = quest
 
     def check_if_quest_completed(self, quest: Quest):
-        if quest.completed:
+        if quest.completed:  # TODO: Move to complete_quest method
             del self.quest_log[quest.ID] # remove from quest log
             xp_reward = quest.reward()
             print("Quest {} completed! XP awarded: {}!".format(quest.name, xp_reward))
             self.experience += xp_reward
             self.check_if_levelup()
+
 
 # TODO: Change this method to take a monster object, check if we have quest for said monster below
     def award_monster_kill(self, monster: Monster):
