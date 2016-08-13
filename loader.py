@@ -1,4 +1,5 @@
 from entities import Monster
+from quest import Quest
 import sqlite3
 
 DB_PATH = "./python_wowDB.db"
@@ -68,3 +69,47 @@ def load_creatures(zone: str, subzone:str):
 
     print("Monsters loaded!")
     return monsters_dict, guid_name_set
+
+
+def load_quests(zone: str, subzone:str) -> list:
+    """
+    Gets a query from the quest_template table to load all the quests in our current zone.
+    Table is as follows:
+    entry,            name, level_required,           monster_required,  amount_required,         zone,          sub_zone, xp_reward, comment
+        1, A Canine Menace,              1,      (name of monster)Wolf,               10,Elwynn Forest, Northshire Valley,       300, Our First Quest!
+
+        Using the parameters, we run a query through quest_template to get all the quests that are for our zone
+
+    :param zone: The zone that the query will use
+    :param subzone: The subzone that the query will use
+    :return: A list of Quest objects
+    """
+
+    quest_list = []
+
+    # populate list
+    print("Loading Quests...")
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        quests_reader = cursor.execute("SELECT * FROM quest_template WHERE zone = ? AND sub_zone = ?", [zone, subzone])
+
+        for row in quests_reader.fetchall():
+            # save the quest information
+            quest_entry = int(row[0])
+            quest_name = row[1]
+            quest_level_requirement = int(row[2])
+            quest_monster_required = row[3]  # monster name
+            quest_monster_kill_amount_required = int(row[4])
+            # row[5] = zone
+            # row[6] = sub_zone
+            quest_xp_reward = int(row[7])
+            # row[8] = comment
+
+            quest_list.append(Quest(quest_name= quest_name,
+                                    quest_id=quest_entry,
+                                    creature_name=quest_monster_required,
+                                    kill_amount=quest_monster_kill_amount_required,
+                                    xp_reward=quest_xp_reward,
+                                    level_required=quest_level_requirement))
+
+    return quest_list

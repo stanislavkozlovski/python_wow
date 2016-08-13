@@ -34,10 +34,14 @@ def main():
     starter_weapon = Weapon(min_damage=1, max_damage=3)
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))
-    main_character.add_quest(Quest(quest_name="Kill 2 Wolves", quest_id=1, creature_name="Wolf", kill_amount=2, xp_reward=1000))
     zone_object = get_zone_object(main_character.current_zone)
 
-    alive_monsters, guid_name_set = zone_object.get_live_monsters_and_guid_name_set(zone_object, main_character.current_subzone)
+    '''
+    alive_monsters: A Dictionary: Key: guid of monster, Value: Object of class entities.py/Monster
+    guid_name_set: A Set of Tuples ((Monster GUID, Monster Name)) used to convert the engage X command to target a creature in alive_monsters
+    available_quests: A List of Quest Objects
+    '''
+    alive_monsters, guid_name_set, available_quests = zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object, main_character.current_subzone)
     print_live_monsters(alive_monsters)
     while True:
         command = input()
@@ -59,7 +63,7 @@ def main():
         elif 'go to' in command:
             destination = command[6:]
             main_character.current_subzone = destination
-            alive_monsters, guid_name_set = zone_object.get_live_monsters_and_guid_name_set(zone_object,
+            alive_monsters, guid_name_set, available_quests = zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object,
                                                                                             main_character.current_subzone)
             print("Moved to {0}".format(main_character.current_subzone))
             print_live_monsters(alive_monsters)
