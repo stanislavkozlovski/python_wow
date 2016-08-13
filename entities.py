@@ -236,10 +236,12 @@ class Character(LivingThing):
 
         # If this monster is for a quest and we have that quest
         if monster_quest_ID and monster_quest_ID in self.quest_log:
+            # TODO: Might want another way to handle this
             quest = self.quest_log[monster_quest_ID]
             quest.add_kill()
-            self.check_if_quest_completed(quest)
             self.quest_log[monster_quest_ID] = quest
+
+            self.check_if_quest_completed(quest)
 
     def check_if_levelup(self):
         if self.experience >= self.xp_req_to_level:
@@ -266,6 +268,19 @@ class Character(LivingThing):
         print("Mana Points increased by {}".format(mana_increase_amount))
         print("Strength Points increased by {}".format(strength_increase_amount))
         print('*' * 20)
+
+    def print_quest_log(self):
+        print("Your quest log:")
+
+        for _, quest in self.quest_log.items():
+            print("\t{quest_name} - {monsters_killed}/{required_kills} {monster_name} slain.".format(
+                                                                            quest_name=quest.name,
+                                                                             monsters_killed=quest.kills,
+                                                                              required_kills=quest.needed_kills,
+                                                                                 monster_name=quest.monster_to_kill))
+
+        print()
+
 
     def _lookup_next_xp_level_req(self):
         return self._REQUIRED_XP_TO_LEVEL[self.level]

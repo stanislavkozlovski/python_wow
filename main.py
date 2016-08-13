@@ -1,11 +1,11 @@
 # TODO: Add talents system and Class classes
 # TODO: Lots of things to do regarding quests
 # TODO: Quest - clean up code
-# TODO: Quest - commands to accept quest
 # TODO: add more monsters and subzones
 # TODO: Add a AddExperience method in Character and replace where appropriate
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
+# TODO: Refactor code, add underscore _ to private members/functions and MORE COMMENTS!
 """
 current commands:
 attack - attacks the creature and ends the turn
@@ -21,7 +21,7 @@ from items import Weapon
 import classes
 from zones.elwynn_forest import ElwynnForest
 DB_PATH = './python_wowDB.db'
-GAME_VERSION = '0.0.2.8 ALPHA'
+GAME_VERSION = '0.0.2.85 ALPHA'
 ZONES = {"Elwynn Forest": ElwynnForest}
 def main():
     welcome_print()
@@ -37,7 +37,6 @@ def main():
     guid_name_set: A Set of Tuples ((Monster GUID, Monster Name)) used to convert the engage X command to target a creature in alive_monsters
     available_quests: A Dictionary: Key: name of quest, Value: Object of class quest.py/Quest
     '''
-
     alive_monsters, guid_name_set, available_quests = zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object, main_character.current_subzone)
     print_live_monsters(alive_monsters)
     while True:
@@ -47,8 +46,10 @@ def main():
         elif command == 'go to ?':
             map_directions = zone_object.get_map_directions(zone_object, main_character.current_subzone)
             pac_map_directions(possible_routes=map_directions)
-        elif command == 'print available quests':
+        elif command == 'print available quests' or command == 'paq':
             print_available_quests(available_quests, main_character.level)
+        elif command == 'print quest log':
+            main_character.print_quest_log()
         elif 'engage' in command:
             target = command[7:] # name of monster to engage
 
@@ -66,8 +67,14 @@ def main():
                 quest = available_quests[quest_to_accept]
 
                 if main_character.level >= quest.level_required:
+                    print("Accepted Quest - {}".format(quest.name))
                     main_character.add_quest(quest)
-                    del available_quests[quest_to_accept]  # remove it from the list
+                    del available_quests[quest_to_accept]  # removes it from the list
+                else:
+                    print("You need to be level {} to accept {}".format(quest.level_required, quest.name))
+
+            else:
+                print("No such quest.")
         elif 'go to' in command:
             destination = command[6:]
             main_character.current_subzone = destination
@@ -106,7 +113,7 @@ def print_live_monsters(alive_monsters: dict, print_all=False):
 def print_available_quests(available_quests: dict, character_level: int):
     print("Available quests: ")
 
-    for quest in available_quests:
+    for _, quest in available_quests.items():
         if quest.level_required <= character_level:  # print quests that the character has the required level for only!
             print("{quest_name} - Requires {required_kills} {monster_name} kills. Rewards {xp_reward} experience.".format(quest_name=quest.name,
                                                                                                                           required_kills=quest.needed_kills,

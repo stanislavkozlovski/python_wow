@@ -51,7 +51,7 @@ def load_creatures(zone: str, subzone:str):
             creature_template_mana = int(creature_template_info[4])
             creature_template_min_dmg = int(creature_template_info[5])
             creature_template_max_dmg = int(creature_template_info[6])
-            creature_template_quest_relation_ID = int(creature_template_info[7])
+            creature_template_quest_relation_ID = int(creature_template_info[7]) if not creature_template_info[7] is None else -1
 
             # save into the set
             guid_name_set.add((creature_guid, creature_template_name))
