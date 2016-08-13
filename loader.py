@@ -82,10 +82,10 @@ def load_quests(zone: str, subzone:str) -> list:
 
     :param zone: The zone that the query will use
     :param subzone: The subzone that the query will use
-    :return: A list of Quest objects
+    :return: A Dctionary Key: Quest Name Value: Quest Object
     """
 
-    quest_list = []
+    quest_list = {}
 
     # populate list
     print("Loading Quests...")
@@ -105,11 +105,11 @@ def load_quests(zone: str, subzone:str) -> list:
             quest_xp_reward = int(row[7])
             # row[8] = comment
 
-            quest_list.append(Quest(quest_name= quest_name,
+            quest_list[quest_name] = Quest(quest_name= quest_name,
                                     quest_id=quest_entry,
                                     creature_name=quest_monster_required,
                                     kill_amount=quest_monster_kill_amount_required,
                                     xp_reward=quest_xp_reward,
-                                    level_required=quest_level_requirement))
+                                    level_required=quest_level_requirement)
 
     return quest_list

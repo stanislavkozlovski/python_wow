@@ -39,7 +39,7 @@ def main():
     '''
     alive_monsters: A Dictionary: Key: guid of monster, Value: Object of class entities.py/Monster
     guid_name_set: A Set of Tuples ((Monster GUID, Monster Name)) used to convert the engage X command to target a creature in alive_monsters
-    available_quests: A List of Quest Objects
+    available_quests: A Dictionary: Key: name of quest, Value: Object of class quest.py/Quest
     '''
     alive_monsters, guid_name_set, available_quests = zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object, main_character.current_subzone)
     print_live_monsters(alive_monsters)
