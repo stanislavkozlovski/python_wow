@@ -50,6 +50,8 @@ def main():
         elif command == 'go to ?':
             map_directions = zone_object.get_map_directions(zone_object, main_character.current_subzone)
             pac_map_directions(possible_routes=map_directions)
+        elif command == 'print available quests':
+            print_available_quests(available_quests, main_character.level)
         elif 'engage' in command:
             target = command[7:] # name of monster to engage
 
@@ -95,6 +97,15 @@ def print_live_monsters(alive_monsters: dict, print_all=False):
             break
 
 
+def print_available_quests(available_quests: dict, character_level: int):
+    print("Available quests: ")
+
+    for quest in available_quests:
+        if quest.level_required <= character_level:  # print quests that the character has the required level for only!
+            print("{quest_name} - Requires {required_kills} {monster_name} kills. Rewards {xp_reward} experience.".format(quest_name=quest.name,
+                                                                                                                          required_kills=quest.needed_kills,
+                                                                                                                          monster_name=quest.monster_to_kill,
+                                                                                                                          xp_reward=quest.xp_to_give))
 def welcome_print():
     print("WELCOME TO PYTHON WOW VERSION: {0}".format(GAME_VERSION))
     print("A simple console RPG game inspired by the Warcraft universe!")

@@ -17,6 +17,8 @@ def pac_main_ooc():
     print("\t\tPrints 5 monsters that are alive.\n")
     print("\tprint all alive monsters")
     print("\t\tPrints all monsters that are alive.\n")
+    print("\tprint available quests")
+    print("\t\tPrints all quests that are available in the current zone/subzone.\n")
     print("\tgo to [Sub Zone]")
     print("\t\tMoves the character to the selected sub zone.\n")
     print("\tgo to ?")
