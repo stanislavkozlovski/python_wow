@@ -13,14 +13,11 @@ print stats - prints your health and the monster's. does not end the turn
 print xp - prints the XP you have and the necessary amount to reach the next level
 engage - start the fight
 """
-import sqlite3
 import combat
-from quest import Quest
 from commands import pac_main_ooc, pac_map_directions
 from items import Weapon
 import classes
 from zones.elwynn_forest import ElwynnForest
-DB_PATH = './python_wowDB.db'
 GAME_VERSION = '0.0.2.85 ALPHA'
 ZONES = {"Elwynn Forest": ElwynnForest}
 def main():

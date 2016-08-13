@@ -1,6 +1,7 @@
 from entities import Character, Monster
+from database_info import DB_PATH, DBINDEX_PALADIN_SPELLS_TEMPLATE_NAME, DBINDEX_PALADIN_SPELLS_TEMPLATE_RANK, DBINDEX_PALADIN_SPELLS_TEMPLATE_LEVEL_REQUIRED, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE1, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE2, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE3, DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1, DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2, DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3, DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST
+
 import sqlite3
-DB_PATH = "./python_wowDB.db"
 
 class Paladin(Character):
     """
@@ -68,16 +69,16 @@ class Paladin(Character):
 
             for line in spell_reader:
                 spell = {}
-                name = line[1]
-                rank = int(line[2])
-                level_req = int(line[3])
-                damage_1 = int(line[4])
-                damage_2 = int(line[5])
-                damage_3 = int(line[6])
-                heal_1 = int(line[7])
-                heal_2 = int(line[8])
-                heal_3 = int(line[9])
-                mana_cost = int(line[10])
+                name = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_NAME]
+                rank = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_RANK])
+                level_req = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_LEVEL_REQUIRED])
+                damage_1 = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE1])
+                damage_2 = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE2])
+                damage_3 = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE3])
+                heal_1 = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1])
+                heal_2 = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2])
+                heal_3 = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3])
+                mana_cost = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST])
 
                 spell['name'] = name
                 spell['rank'] = rank

@@ -1,9 +1,17 @@
 from entities import Monster
 from quest import Quest
+from database_info import (DB_PATH, DBINDEX_CREATURES_GUID, DBINDEX_CREATURES_CREATURE_ID, DBINDEX_CREATURE_TEMPLATE_NAME,
+                           DBINDEX_CREATURE_TEMPLATE_LEVEL, DBINDEX_CREATURE_TEMPLATE_HEALTH, DBINDEX_CREATURE_TEMPLATE_MANA,
+                           DBINDEX_CREATURE_TEMPLATE_MIN_DMG, DBINDEX_CREATURE_TEMPLATE_MAX_DMG,
+                           DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID, DBINDEX_QUEST_TEMPLATE_ENTRY,
+                           DBINDEX_QUEST_TEMPLATE_NAME, DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED,
+                           DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED, DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED,
+                           DBINDEX_QUEST_TEMPLATE_XP_REWARD
+                           )
 import sqlite3
 
-DB_PATH = "./python_wowDB.db"
 
+# row[8] = comment
 def load_creatures(zone: str, subzone:str):
     """
         Gets a query from the creatures table to load all the creatures in our current zone
@@ -34,24 +42,26 @@ def load_creatures(zone: str, subzone:str):
                                                   , [zone, subzone])  # query all the creatures in our location :)
 
         for creature_info in creatures_reader.fetchall():
-            creature_guid = int(creature_info[0])
-            creature_id = int(creature_info[1])
+            creature_guid = int(creature_info[DBINDEX_CREATURES_GUID])
+            creature_id = int(creature_info[DBINDEX_CREATURES_CREATURE_ID])
 
             # This will currently run a query for every monster, meaning if there are 20 of the exact same monsters,
             # 20 queries will be run. There isn't much sense in that, so:
             # TODO: Modify so we don't run unecessary queries for monster info that we've already loaded from the DB
             creature_template_reader = cursor.execute("SELECT * FROM creature_template WHERE entry = ?", [creature_id])
-            creature_template_info = creature_template_reader.fetchone() # entry is unique meaning the query will always return one monster
+            creature_template_info = creature_template_reader.fetchone() # entry is unique meaning the query will \
+            # always return one monster
 
             # save the creature values
             # )
-            creature_template_name = creature_template_info[1]
-            creature_template_level = int(creature_template_info[2])
-            creature_template_health = int(creature_template_info[3])
-            creature_template_mana = int(creature_template_info[4])
-            creature_template_min_dmg = int(creature_template_info[5])
-            creature_template_max_dmg = int(creature_template_info[6])
-            creature_template_quest_relation_ID = int(creature_template_info[7]) if not creature_template_info[7] is None else -1
+            creature_template_name = creature_template_info[DBINDEX_CREATURE_TEMPLATE_NAME]
+            creature_template_level = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_LEVEL])
+            creature_template_health = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_HEALTH])
+            creature_template_mana = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MANA])
+            creature_template_min_dmg = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MIN_DMG])
+            creature_template_max_dmg = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MAX_DMG])
+            creature_template_quest_relation_ID = (int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID])
+                if not creature_template_info[7] is None else -1)
 
             # save into the set
             guid_name_set.add((creature_guid, creature_template_name))
@@ -94,16 +104,13 @@ def load_quests(zone: str, subzone:str) -> list:
         quests_reader = cursor.execute("SELECT * FROM quest_template WHERE zone = ? AND sub_zone = ?", [zone, subzone])
 
         for row in quests_reader.fetchall():
-            # save the quest information
-            quest_entry = int(row[0])
-            quest_name = row[1]
-            quest_level_requirement = int(row[2])
-            quest_monster_required = row[3]  # monster name
-            quest_monster_kill_amount_required = int(row[4])
-            # row[5] = zone
-            # row[6] = sub_zone
-            quest_xp_reward = int(row[7])
-            # row[8] = comment
+            # save the quest information we'll need
+            quest_entry = int(row[DBINDEX_QUEST_TEMPLATE_ENTRY])
+            quest_name = row[DBINDEX_QUEST_TEMPLATE_NAME]
+            quest_level_requirement = int(row[DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED])
+            quest_monster_required = row[DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED]  # monster name
+            quest_monster_kill_amount_required = int(row[DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED])
+            quest_xp_reward = int(row[DBINDEX_QUEST_TEMPLATE_XP_REWARD])
 
             quest_list[quest_name] = Quest(quest_name= quest_name,
                                     quest_id=quest_entry,

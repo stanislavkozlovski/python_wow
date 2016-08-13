@@ -4,9 +4,10 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 
 from items import Weapon
 from quest import Quest
-import sqlite3
+from database_info import DB_PATH, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP, DBINDEX_LEVELUP_STATS_LEVEL, DBINDEX_LEVELUP_STATS_HEALTH, DBINDEX_LEVELUP_STATS_MANA, DBINDEX_LEVELUP_STATS_STRENGTH, DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
 
-DB_PATH = "./python_wowDB.db"
+
+import sqlite3
 
 
 def load_xp_reward() -> dict:
@@ -32,8 +33,8 @@ def load_xp_reward() -> dict:
         def_xp_rewards_reader = cursor.execute("SELECT * FROM creature_default_xp_rewards")
 
         for line in def_xp_rewards_reader:
-            level = int(line[1])
-            xp_reward = int(line[2])
+            level = int(line[DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL])
+            xp_reward = int(line[DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP])
 
             xp_reward_dict[level] = xp_reward
 
@@ -299,10 +300,10 @@ class Character(LivingThing):
             for line in lvl_stats_reader:
                 level_dict = {}
 
-                level = int(line[0])
-                hp = int(line[1])
-                mana = int(line[2])
-                strength = int(line[3])
+                level = int(line[DBINDEX_LEVELUP_STATS_LEVEL])
+                hp = int(line[DBINDEX_LEVELUP_STATS_HEALTH])
+                mana = int(line[DBINDEX_LEVELUP_STATS_MANA])
+                strength = int(line[DBINDEX_LEVELUP_STATS_STRENGTH])
 
                 level_dict[self.KEY_LEVEL_STATS_HEALTH] = hp
                 level_dict[self.KEY_LEVEL_STATS_MANA] = mana
@@ -329,8 +330,8 @@ class Character(LivingThing):
             xp_req_reader = cursor.execute("SELECT * FROM level_xp_requirement")
 
             for line in xp_req_reader:
-                level = int(line[0])
-                xp_required = int(line[1])
+                level = int(line[DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL])
+                xp_required = int(line[DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED])
                 xp_req_dict[level] = xp_required
 
         return xp_req_dict
