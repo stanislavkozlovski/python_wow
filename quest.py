@@ -15,7 +15,10 @@ class Quest:
 
     def update_kills(self):
         self.kills += 1
-        print("Quest {0}: {1}/{2} {3} slain.".format(self.name, self.kills, self.required_kills, self.monster_to_kill))
+        print("Quest {name}: {kills}/{required_kills} {monster_name} slain.".format(name=self.name,
+                                                                                    kills=self.kills,
+                                                                                    required_kills=self.required_kills,
+                                                                                    monster_name=self.monster_to_kill))
         self._check_if_complete()
 
     def _check_if_complete(self):

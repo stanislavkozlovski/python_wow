@@ -80,7 +80,7 @@ class Monster(LivingThing):
                                                    mana=self.mana, max_mana=self.max_mana,
                                                    min_dmg=self.min_damage, max_dmg=self.max_damage)
 
-    def auto_attack(self, target_level: int):
+    def get_auto_attack_damage(self, target_level: int):
         level_difference = self.level - target_level
         percentage_mod = (abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
 
@@ -94,6 +94,13 @@ class Monster(LivingThing):
             damage_to_deal += damage_to_deal * percentage_mod  # +X%
 
         return damage_to_deal
+
+    def attack(self, victim):  # victim: Character
+        monster_swing = self.get_auto_attack_damage(victim.level)  # an integer representing the damage
+
+        print("{0} attacks {1} for {2:.2f} damage!".format(self.name, victim.name, monster_swing))
+
+        victim.take_attack(monster_swing)
 
     def take_attack(self, damage: int):
         self.health -= damage
@@ -143,7 +150,7 @@ class Character(LivingThing):
         """
         pass
 
-    def auto_attack(self, target_level: int):
+    def get_auto_attack_damage(self, target_level: int):
         level_difference = self.level - target_level
         percentage_mod = (abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
 
@@ -157,6 +164,9 @@ class Character(LivingThing):
             damage_to_deal += damage_to_deal * percentage_mod # +X%
 
         return damage_to_deal
+
+    def attack(self, victim: Monster):
+        pass
 
     def take_attack(self, damage: int):
         self.health -= damage

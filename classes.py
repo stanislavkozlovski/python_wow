@@ -17,10 +17,12 @@ class Paladin(Character):
             Seal of Righteousness
                 Deals X damage on each attack, needs to be activated first
     """
-    learned_spells = {"Seal of Righteousness": {"damage_on_swing": 2, "mana_cost": 4, "rank": 1}
+    learned_spells = {"Seal of Righteousness": {"damage1": 2, "mana_cost": 4, "rank": 1}
                       }
     SOR_ACTIVE = False  # Seal of Righteousness trigger
     SOR_TURNS = 0  # Holds the remaining turns for SOR
+    KEY_FLASH_OF_LIGHT = "Flash of Light"
+    KEY_SEAL_OF_RIGHTEOSNESS = "Seal of Righteousness"
 
     def __init__(self, name: str, health: int=12, mana: int=15, strength: int=4):
         super().__init__(name=name, health=health, mana=mana, strength=strength)
@@ -92,7 +94,7 @@ class Paladin(Character):
     def update_spell(self, spell: dict):
         spell_name = spell['name']
 
-        if spell_name == 'Seal of Righteousness':
+        if spell_name == self.KEY_SEAL_OF_RIGHTEOSNESS:
             self._update_seal_of_righteousness(spell)
 
     # SPELLS
@@ -112,7 +114,7 @@ class Paladin(Character):
 
     def spell_seal_of_righteousness(self):
         """
-         When activated adds X Spell Damage to each attack
+         When activated adds DAMAGE1 Spell Damage to each attack
          Lasts for three turns
         :return: boolean indicating if the cast was successful or not
         """
@@ -132,16 +134,17 @@ class Paladin(Character):
         else:
             self.SOR_TURNS -= 1
             # TODO: Load damage from DB
-            return self.learned_spells['Seal of Righteousness']['damage_on_swing']  # damage from SOR
+            return self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['damage1']  # damage from SOR
 
     def _update_seal_of_righteousness(self, new_rank: dict):
         """ Updates the values of the spell in the learned_spells dictionary"""
         damage_on_swing = new_rank['damage_1']
         rank = new_rank['rank']
         mana_cost = new_rank['mana_cost']
-        self.learned_spells['Seal of Righteousness']['damage_on_swing'] = damage_on_swing
-        self.learned_spells['Seal of Righteousness']['rank'] = rank
-        self.learned_spells['Seal of Righteousness']['mana_cost'] = mana_cost
+
+        self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['damage1'] = damage_on_swing
+        self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['rank'] = rank
+        self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['mana_cost'] = mana_cost
 
         print("Spell Seal of Righteousness has been updated to rank {}!".format(rank))
         print("*"*20)
@@ -170,7 +173,7 @@ class Paladin(Character):
         return cast_is_successful
     # SPELLS
 
-    def auto_attack(self, target_level: int):
+    def get_auto_attack_damage(self, target_level: int):
         import random
 
         level_difference = self.level - target_level
@@ -196,7 +199,7 @@ class Paladin(Character):
         return damage_to_deal, sor_damage
 
     def attack(self, victim: Monster):
-        attacker_swing = self.auto_attack(victim.level)  # tuple holding auto attack and seal damage (if active)
+        attacker_swing = self.get_auto_attack_damage(victim.level)  # tuple holding auto attack and seal damage (if active)
 
         auto_attack = attacker_swing[0]
         sor_damage = attacker_swing[1]  # if the seal isn't active the damage will be 0

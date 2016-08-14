@@ -34,7 +34,6 @@ def main():
     '''
     alive_monsters, guid_name_set, available_quests, _ = zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object, main_character.current_subzone)
     print_live_monsters(alive_monsters)
-    main_character._level_up()
     while True:
         command = input()
         if command is '?':
@@ -55,6 +54,8 @@ def main():
             if target_guid in alive_monsters.keys():
                 target = alive_monsters[target_guid] # convert the string to a Monster object
                 combat.engage_combat(main_character, target, alive_monsters, guid_name_set, target_guid)
+            else:
+                print("Could not find creature {}.".format(target))
         elif 'accept' in command:  # accept the quest
             quest_to_accept = command[7:]  # name of quest to accept
 
