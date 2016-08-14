@@ -8,6 +8,9 @@ from classes import Paladin
 
 
 def pac_main_ooc():
+    """
+    Prints all the possible commands you can use while out of combat.
+    """
     print()
     print("Available commands:")
     print("\tengage [Monster Name]")
@@ -31,6 +34,11 @@ def pac_main_ooc():
 
 
 def pac_in_combat(character):
+    """
+    Prints all possible commands that can be used in combat
+    :param character: A Character object from class entities.py/Character
+    :return:
+    """
     print()
     print("Available commands that do not end the turn:")
     print("\tprint stats")
@@ -45,7 +53,12 @@ def pac_in_combat(character):
     print("\t\tAttacks the monster you are in combat with a meele swing.\n")
     print_class_abilities_in_combat(character)
 
+
 def pac_map_directions(possible_routes: list):
+    """
+    Prints all possible subzones you can go in from your current subzone
+    :param possible_routes: A list holding the name of each subzone you have access to
+    """
     print("Possible directions:")
     for route in possible_routes:
         print("\t\t{route}".format(route=route))

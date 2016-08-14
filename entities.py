@@ -5,7 +5,7 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 from items import Weapon
 from quest import Quest
 from database_info import DB_PATH, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP, DBINDEX_LEVELUP_STATS_LEVEL, DBINDEX_LEVELUP_STATS_HEALTH, DBINDEX_LEVELUP_STATS_MANA, DBINDEX_LEVELUP_STATS_STRENGTH, DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
-from loader import load_creature_xp_rewards, load_character_level_stats
+from loader import load_creature_xp_rewards, load_character_level_stats, load_character_xp_requirements
 
 import sqlite3
 import random
@@ -62,9 +62,9 @@ class LivingThing:
         self._alive = True
 
 
-
 class Monster(LivingThing):
-    def __init__(self, monster_id: int, name: str, health: int=1, mana: int=1, level: int=1, min_damage: int=0, max_damage: int=1, quest_relation_id = 0):
+    def __init__(self, monster_id: int, name: str, health: int=1, mana: int=1, level: int=1, min_damage: int=0,
+                 max_damage: int=1, quest_relation_id=0):
         super().__init__(name, health, mana)
         self.monster_id = monster_id
         self.level = level
@@ -74,10 +74,11 @@ class Monster(LivingThing):
         self.quest_relation_ID = quest_relation_id
 
     def __str__(self):
-        return "Creature Level {level} {name} - {hp}/{max_hp} HP | {mana}/{max_mana} Mana | {min_dmg}-{max_dmg} Damage".format(level = self.level, name = self.name,
-                                                                                                  hp = self.health, max_hp = self.max_health,
-                                                                                                  mana = self.mana, max_mana = self.max_mana,
-                                                                                                  min_dmg=self.min_damage, max_dmg=self.max_damage)
+        return "Creature Level {level} {name} - {hp}/{max_hp} HP | {mana}/{max_mana} Mana | " \
+               "{min_dmg}-{max_dmg} Damage".format(level=self.level, name=self.name,
+                                                   hp=self.health, max_hp=self.max_health,
+                                                   mana=self.mana, max_mana=self.max_mana,
+                                                   min_dmg=self.min_damage, max_dmg=self.max_damage)
 
     def auto_attack(self, target_level: int):
         level_difference = self.level - target_level
@@ -104,6 +105,7 @@ class Monster(LivingThing):
 
 
 class Character(LivingThing):
+    # keys are used to access the level_stats dictionary that holds information on stats to update on each level up
     KEY_LEVEL_STATS_HEALTH = 'health'
     KEY_LEVEL_STATS_MANA = 'mana'
     KEY_LEVEL_STATS_STRENGTH = 'strength'
@@ -121,7 +123,7 @@ class Character(LivingThing):
         self.current_subzone = "Northshire Valley"
         # A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
         self._LEVEL_STATS = load_character_level_stats()
-        self._REQUIRED_XP_TO_LEVEL = self._load_xp_requirements()
+        self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements()
         self.quest_log = {}
 
     def equip_weapon(self, weapon: Weapon):
@@ -172,16 +174,22 @@ class Character(LivingThing):
         else:
             exit()
 
+
     def add_quest(self, quest: Quest):
         self.quest_log[quest.ID] = quest
 
-    def check_if_quest_completed(self, quest: Quest):
-        if quest.is_completed:  # TODO: Move to complete_quest method
-            del self.quest_log[quest.ID] # remove from quest log
-            xp_reward = quest.give_reward()
-            print("Quest {} is_completed! XP awarded: {}!".format(quest.name, xp_reward))
-            self.experience += xp_reward
-            self.check_if_levelup()
+    def _check_if_quest_completed(self, quest: Quest):
+        if quest.is_completed:
+            self._complete_quest(quest)
+
+    def _complete_quest(self, quest: Quest):
+        print("Quest {} is_completed! XP awarded: {}!".format(quest.name, xp_reward))
+        xp_reward = quest.give_reward()
+
+        del self.quest_log[quest.ID]  # remove from quest log
+
+        self.experience += xp_reward
+        self.check_if_levelup()
 
 
     def award_monster_kill(self, monster: Monster):
@@ -213,7 +221,7 @@ class Character(LivingThing):
             quest.update_kills()
             self.quest_log[monster_quest_ID] = quest
 
-            self.check_if_quest_completed(quest)
+            self._check_if_quest_completed(quest)
 
     def check_if_levelup(self):
         if self.experience >= self.xp_req_to_level:
@@ -248,18 +256,15 @@ class Character(LivingThing):
         for _, quest in self.quest_log.items():
             print("\t{quest_name} - {monsters_killed}/{required_kills} {monster_name} slain.".format(
                                                                             quest_name=quest.name,
-                                                                             monsters_killed=quest.kills,
-                                                                              required_kills=quest.needed_kills,
-                                                                                 monster_name=quest.monster_to_kill))
+                                                                            monsters_killed=quest.kills,
+                                                                            required_kills=quest.needed_kills,
+                                                                            monster_name=quest.monster_to_kill))
 
         print()
 
     def _lookup_next_xp_level_req(self):
         return self._REQUIRED_XP_TO_LEVEL[self.level]
 
-
-
-
-
     def get_class(self) -> str:
+        """Returns the class of the character as a string"""
         pass

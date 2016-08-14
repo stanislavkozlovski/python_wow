@@ -34,6 +34,7 @@ def main():
     '''
     alive_monsters, guid_name_set, available_quests, _ = zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object, main_character.current_subzone)
     print_live_monsters(alive_monsters)
+    main_character._level_up()
     while True:
         command = input()
         if command is '?':
@@ -91,7 +92,6 @@ def main():
 
 def get_zone_object(zone: str):
     """
-
     :param zone: The name of the zone
     :return: Returns a class object from the ZONES dictionary
     """
@@ -107,7 +107,7 @@ def print_live_monsters(alive_monsters: dict, print_all=False):
         print(monster)
         printed_monsters += 1
 
-        if not print_all and printed_monsters == 5: # print only five monsters at once
+        if not print_all and printed_monsters == 5:  # print only five monsters at once
             break
 
 
@@ -116,11 +116,11 @@ def print_available_quests(available_quests: dict, character_level: int):
 
     for _, quest in available_quests.items():
         if quest.level_required <= character_level:  # print quests that the character has the required level for only!
-            print("{quest_name} - Requires {required_kills} {monster_name} kills. Rewards {xp_reward} experience.".format(quest_name=quest.name,
-                                                                                                                          required_kills=quest.needed_kills,
-                                                                                                                          monster_name=quest.monster_to_kill,
-                                                                                                                          xp_reward=quest.xp_to_give))
-
+            print("{quest_name} - Requires {required_kills} {monster_name} kills. "
+                 + "Rewards {xp_reward} experience.".format(quest_name=quest.name,
+                                                            required_kills=quest.needed_kills,
+                                                            monster_name=quest.monster_to_kill,
+                                                            xp_reward=quest.xp_to_give))
 
 
 def welcome_print():
@@ -129,5 +129,6 @@ def welcome_print():
     print()
     print("Type ? to see a list of available commands.")
     print()
+
 if __name__ == '__main__':
     main()

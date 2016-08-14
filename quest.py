@@ -16,13 +16,13 @@ class Quest:
     def update_kills(self):
         self.kills += 1
         print("Quest {0}: {1}/{2} {3} slain.".format(self.name, self.kills, self.required_kills, self.monster_to_kill))
-        self.check_if_complete()
+        self._check_if_complete()
 
-    def check_if_complete(self):
+    def _check_if_complete(self):
         if self.kills == self.required_kills:
-            self.quest_complete()
+            self._quest_complete()
 
-    def quest_complete(self):
+    def _quest_complete(self):
         self.is_completed = True
 
     def give_reward(self):

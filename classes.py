@@ -1,7 +1,14 @@
-from entities import Character, Monster
-from database_info import DB_PATH, DBINDEX_PALADIN_SPELLS_TEMPLATE_NAME, DBINDEX_PALADIN_SPELLS_TEMPLATE_RANK, DBINDEX_PALADIN_SPELLS_TEMPLATE_LEVEL_REQUIRED, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE1, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE2, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE3, DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1, DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2, DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3, DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST
-
 import sqlite3
+
+from entities import Character, Monster
+from database_info import (
+    DB_PATH,
+    DBINDEX_PALADIN_SPELLS_TEMPLATE_NAME, DBINDEX_PALADIN_SPELLS_TEMPLATE_RANK,
+    DBINDEX_PALADIN_SPELLS_TEMPLATE_LEVEL_REQUIRED, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE1,
+    DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE2, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE3,
+    DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1, DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2,
+    DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3, DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST)
+
 
 class Paladin(Character):
     """
@@ -40,17 +47,7 @@ class Paladin(Character):
     def learn_new_spell(self, spell: dict):
         print("You have learned a new spell - {}".format(spell['name']))
 
-        temp_spell_dict = {"name": spell['name'],
-                     "rank": spell['rank'],
-                     "damage_1": spell['damage_1'],
-                     "damage_2": spell['damage_2'],
-                     "damage_3": spell['damage_3'],
-                     "heal_1": spell['heal_1'],
-                     "heal_2": spell['heal_2'],
-                     "heal_3": spell['heal_3'],
-                     "mana_cost": spell['mana_cost']}
-
-        self.learned_spells[spell['name']] = temp_spell_dict
+        self.learned_spells[spell['name']] = spell
 
     def _lookup_available_spells_to_learn(self, level: int):
         """
@@ -65,7 +62,7 @@ class Paladin(Character):
             cursor = connection.cursor()
             # this will return a list of tuples holding information about each spell we have the req level to learn
 
-            spell_reader = cursor.execute("SELECT * FROM paladin_spells_template WHERE required_level = ?", [level])
+            spell_reader = cursor.execute("SELECT * FROM paladin_spells_template WHERE level_required = ?", [level])
 
             for line in spell_reader:
                 spell = {}
@@ -119,14 +116,13 @@ class Paladin(Character):
          Lasts for three turns
         :return: boolean indicating if the cast was successful or not
         """
-        if self.mana < self.learned_spells['Seal of Righteousness']['mana_cost']:
-            print("Not enough mana!")
-            return False
+        cast_is_successful = self._check_enough_mana(self.learned_spells['Seal of Righteousness']["mana_cost"])
 
-        self.SOR_ACTIVE = True
-        self.SOR_TURNS = 3
-        print("{0} activates Seal of Righteousness!".format(self.name))
-        return True
+        if cast_is_successful:
+            self.SOR_ACTIVE = True
+            self.SOR_TURNS = 3
+            print("{0} activates Seal of Righteousness!".format(self.name))
+        return cast_is_successful
 
     def _spell_seal_of_righteousness_attack(self):
         if self.SOR_TURNS == 0:  # fade spell
@@ -158,7 +154,9 @@ class Paladin(Character):
         mana_cost = self.learned_spells['Flash of Light']['mana_cost']
         heal_amount = self.learned_spells['Flash of Light']['heal_1']
 
-        if self.mana >= mana_cost:
+        cast_is_successful = self._check_enough_mana(mana_cost)
+
+        if cast_is_successful:
             self.health += heal_amount
             self.mana -= mana_cost
 
@@ -169,10 +167,7 @@ class Paladin(Character):
             else:
                 print("Flash of Light healed {0} for {1:.2f}.".format(self.name, heal_amount))
 
-            return True
-        else:
-            print("Not enough mana!")
-            return False
+        return cast_is_successful
     # SPELLS
 
     def auto_attack(self, target_level: int):
@@ -213,11 +208,14 @@ class Paladin(Character):
 
         victim.take_attack(auto_attack + sor_damage)
 
-
-    # This is useless, come to think about it
-
-    # def _load_paladin_spells(self):
-    #     """
+    def _check_enough_mana(self, mana_cost: int) -> bool:
+        """
+        Check if we have enough mana to cast the spell we want to cast and return the result.
+        """
+        if self.mana < mana_cost:
+            return False
+        else:
+            return True
 
     def get_class(self):
         return 'paladin'

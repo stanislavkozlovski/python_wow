@@ -60,7 +60,7 @@ def load_creatures(zone: str, subzone:str) -> tuple:
             # 20 queries will be run. There isn't much sense in that, so:
             # TODO: Modify so we don't run unecessary queries for monster info that we've already loaded from the DB
             creature_template_reader = cursor.execute("SELECT * FROM creature_template WHERE entry = ?", [creature_id])
-            creature_template_info = creature_template_reader.fetchone() # entry is unique meaning the query will \
+            creature_template_info = creature_template_reader.fetchone()  # entry is unique meaning the query will-
             # always return one monster
 
             # save the creature values
@@ -96,8 +96,10 @@ def load_quests(zone: str, subzone:str) -> list:
     """
     Gets a query from the quest_template table to load all the quests in our current zone.
     Table is as follows:
-    entry,            name, required_level,           monster_required,  amount_required,         zone,          sub_zone, xp_reward, comment
-        1, A Canine Menace,              1,      (name of monster)Wolf,               10,Elwynn Forest, Northshire Valley,       300, Our First Quest!
+entry,            name, required_level,           monster_required,  amount_required,         zone,          sub_zone,
+    1, A Canine Menace,              1,      (name of monster)Wolf,               10,Elwynn Forest, Northshire Valley,
+xp_reward, comment
+    300, Our First Quest!
 
         Using the parameters, we run a query through quest_template to get all the quests that are for our zone
 
@@ -193,7 +195,7 @@ def load_character_level_stats() -> dict:
     return level_stats
 
 
-def _load_xp_requirements() -> dict:
+def load_character_xp_requirements() -> dict:
     """
     Load the information about the necessary XP needed to reach a certain level.
     The table's contents is like this:
