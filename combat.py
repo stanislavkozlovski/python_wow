@@ -8,14 +8,14 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
     character.enter_combat()
     monster.enter_combat()
 
-    while character.in_combat:
+    while character._in_combat:
         # we start off the combat with the monster dealing the first blow
         if not to_skip_attack:
             monster_attack(monster, character)
         else:
             to_skip_attack = False
 
-        if not character.alive:
+        if not character.is_alive():
             alive_monsters[monster_GUID].leave_combat()
             print("{0} has slain character {1}".format(monster.name, character.name))
 
@@ -45,7 +45,7 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
                 # Unsuccessful cast
                 to_skip_attack = True  # skip the next attack and load a command again
 
-        if not monster.alive:
+        if not monster.is_alive():
             print("{0} has slain {1}!".format(character.name, monster.name))
             character.award_monster_kill(monster=monster)
             character.leave_combat()  # will exit the loop
@@ -54,7 +54,7 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
 
 
 def monster_attack(attacker: Monster, victim: Character):
-    attacker_swing = attacker.deal_damage(victim.level)  # an integer representing the damage
+    attacker_swing = attacker.auto_attack(victim.level)  # an integer representing the damage
 
     print("{0} attacks {1} for {2:.2f} damage!".format(attacker.name, victim.name, attacker_swing))
 

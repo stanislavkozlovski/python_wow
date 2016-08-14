@@ -2,28 +2,28 @@ class Quest:
     """
     Standard kill X of Y quest
     """
-    def __init__(self, quest_name: str, quest_id, creature_name: str, kill_amount: int, xp_reward: int, level_required: int):
+    def __init__(self, quest_name: str, quest_id, creature_name: str, required_kills: int, xp_reward: int,
+                 level_required: int, is_completed: bool = False):
         self.name = quest_name
         self.ID = quest_id
         self.monster_to_kill = creature_name
-        self.needed_kills = kill_amount
+        self.required_kills = required_kills
         self.kills = 0
-        self.xp_to_give = xp_reward
-        self.completed = False
-        self.level_required = level_required
+        self.xp_reward = xp_reward
+        self.is_completed = is_completed
+        self.required_level = level_required
 
-    def add_kill(self):
+    def update_kills(self):
         self.kills += 1
-        print("Quest {0}: {1}/{2} {3} slain.".format(self.name, self.kills, self.needed_kills, self.monster_to_kill))
+        print("Quest {0}: {1}/{2} {3} slain.".format(self.name, self.kills, self.required_kills, self.monster_to_kill))
         self.check_if_complete()
 
     def check_if_complete(self):
-        if self.kills == self.needed_kills:
+        if self.kills == self.required_kills:
             self.quest_complete()
-        else:
-            pass
-    def quest_complete(self):
-        self.completed = True
 
-    def reward(self):
-        return self.xp_to_give
+    def quest_complete(self):
+        self.is_completed = True
+
+    def give_reward(self):
+        return self.xp_reward

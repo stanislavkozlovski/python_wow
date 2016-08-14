@@ -65,7 +65,7 @@ class Paladin(Character):
             cursor = connection.cursor()
             # this will return a list of tuples holding information about each spell we have the req level to learn
 
-            spell_reader = cursor.execute("SELECT * FROM paladin_spells_template WHERE level_required = ?", [level])
+            spell_reader = cursor.execute("SELECT * FROM paladin_spells_template WHERE required_level = ?", [level])
 
             for line in spell_reader:
                 spell = {}
@@ -175,7 +175,7 @@ class Paladin(Character):
             return False
     # SPELLS
 
-    def deal_damage(self, target_level: int):
+    def auto_attack(self, target_level: int):
         import random
 
         level_difference = self.level - target_level
@@ -201,7 +201,7 @@ class Paladin(Character):
         return damage_to_deal, sor_damage
 
     def attack(self, victim: Monster):
-        attacker_swing = self.deal_damage(victim.level)  # tuple holding auto attack and seal damage (if active)
+        attacker_swing = self.auto_attack(victim.level)  # tuple holding auto attack and seal damage (if active)
 
         auto_attack = attacker_swing[0]
         sor_damage = attacker_swing[1]  # if the seal isn't active the damage will be 0

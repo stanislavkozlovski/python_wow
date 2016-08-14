@@ -5,52 +5,24 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 from items import Weapon
 from quest import Quest
 from database_info import DB_PATH, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP, DBINDEX_LEVELUP_STATS_LEVEL, DBINDEX_LEVELUP_STATS_HEALTH, DBINDEX_LEVELUP_STATS_MANA, DBINDEX_LEVELUP_STATS_STRENGTH, DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
-
+from loader import load_creature_xp_rewards, load_character_level_stats
 
 import sqlite3
+import random
+
+# dictionary that holds information about how much XP a monster of a certain level should award the player.
+# key: level(int), value: xp reward(int)
+CREATURE_XP_REWARD_DICTIONARY = load_creature_xp_rewards()
 
 
-def load_xp_reward() -> dict:
-    """
-    Load the default XP that is to be given from the creature.
-    The table's contents are as follows:
-    Entry, Level, Experience to give
-    1,         1,     50 Meaning a creature that is level 1 will give 50 XP
-    2,         2,     75 Gives 75 XP
-    etc...
-
-    Because the Monster class will be called upon a number of times, it would be inefficient to read the whole table
-    on every monster creation. That's why this is outside of the class, to read the file only once.
-
-    :return: A dictionary as follows: Key: Level, Value: XP Reward
-                                            1   , 50
-    """
-
-    xp_reward_dict = {}
-
-    with sqlite3.connect(DB_PATH) as connection:
-        cursor = connection.cursor()
-        def_xp_rewards_reader = cursor.execute("SELECT * FROM creature_default_xp_rewards")
-
-        for line in def_xp_rewards_reader:
-            level = int(line[DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL])
-            xp_reward = int(line[DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP])
-
-            xp_reward_dict[level] = xp_reward
-
-    return xp_reward_dict
-
-
-CREATURE_XP_REWARD_DICTIONARY = load_xp_reward()
-
-
-def lookup_xp_reward(level: int) -> int: # the method that is going to be used by the Monster class
+def lookup_xp_reward(level: int) -> int:
+    """ Return the appropriate XP reward associated with the given level"""
     return CREATURE_XP_REWARD_DICTIONARY[level]
 
 
 class LivingThing:
     """
-    This is the base class for all things alive - characters, monsters and etc.
+    This is the base class for all things _alive - characters, monsters and etc.
     """
     def __init__(self, name: str, health: int=1, mana: int=1):
         self.name = name
@@ -58,17 +30,20 @@ class LivingThing:
         self.max_health = health
         self.mana = mana
         self.max_mana = mana
-        self.alive = True
-        self.in_combat = False
+        self._alive = True
+        self._in_combat = False
 
     def is_alive(self):
-        return self.alive
+        return self._alive
+
+    def is_in_combat(self):
+        return self._in_combat
 
     def enter_combat(self):
-        self.in_combat = True
+        self._in_combat = True
 
     def leave_combat(self):
-        self.in_combat = False
+        self._in_combat = False
         self._regenerate()
 
     def _regenerate(self):
@@ -77,14 +52,14 @@ class LivingThing:
 
     def check_if_dead(self):
         if self.health <= 0:
-            self.die()
+            self._die()
 
-    def die(self):
-        self.alive = False
+    def _die(self):
+        self._alive = False
 
     def revive(self):
         self._regenerate()
-        self.alive = True
+        self._alive = True
 
 
 
@@ -104,8 +79,7 @@ class Monster(LivingThing):
                                                                                                   mana = self.mana, max_mana = self.max_mana,
                                                                                                   min_dmg=self.min_damage, max_dmg=self.max_damage)
 
-    def deal_damage(self, target_level: int):
-        import random
+    def auto_attack(self, target_level: int):
         level_difference = self.level - target_level
         percentage_mod = (abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
 
@@ -124,9 +98,10 @@ class Monster(LivingThing):
         self.health -= damage
         self.check_if_dead()
 
-    def die(self):
-        super().die()
+    def _die(self):
+        super()._die()
         print("Creature {} has died!".format(self.name))
+
 
 class Character(LivingThing):
     KEY_LEVEL_STATS_HEALTH = 'health'
@@ -144,7 +119,8 @@ class Character(LivingThing):
         self.xp_req_to_level = 400
         self.current_zone = "Elwynn Forest"
         self.current_subzone = "Northshire Valley"
-        self._LEVEL_STATS = self._load_levelup_stats()
+        # A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
+        self._LEVEL_STATS = load_character_level_stats()
         self._REQUIRED_XP_TO_LEVEL = self._load_xp_requirements()
         self.quest_log = {}
 
@@ -158,16 +134,14 @@ class Character(LivingThing):
         self.max_damage = weapon.max_damage + (0.1 * self.strength)
 
     def spell_handler(self, command: str):
-        '''
+        """
         Every class will have different spells, this method will make sure the proper spell is caster
         :param command: the spell name that is to be cast
         :return:
-        '''
+        """
         pass
 
-    def deal_damage(self, target_level: int):
-        import random
-
+    def auto_attack(self, target_level: int):
         level_difference = self.level - target_level
         percentage_mod = (abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
 
@@ -182,21 +156,19 @@ class Character(LivingThing):
 
         return damage_to_deal
 
-    def attack(self, victim: Monster):
-        pass
-
     def take_attack(self, damage: int):
         self.health -= damage
         self.check_if_dead()
 
-    def die(self):
-        super().die()
+    def _die(self):
+        super()._die()
         print("Character {} has died!".format(self.name))
 
     def prompt_revive(self):
         print("Do you want to restart? Y/N")
         if input() in 'Yy':
             self.revive()
+            print("Character {} has been revived!".format(self.name))
         else:
             exit()
 
@@ -204,15 +176,14 @@ class Character(LivingThing):
         self.quest_log[quest.ID] = quest
 
     def check_if_quest_completed(self, quest: Quest):
-        if quest.completed:  # TODO: Move to complete_quest method
+        if quest.is_completed:  # TODO: Move to complete_quest method
             del self.quest_log[quest.ID] # remove from quest log
-            xp_reward = quest.reward()
-            print("Quest {} completed! XP awarded: {}!".format(quest.name, xp_reward))
+            xp_reward = quest.give_reward()
+            print("Quest {} is_completed! XP awarded: {}!".format(quest.name, xp_reward))
             self.experience += xp_reward
             self.check_if_levelup()
 
 
-# TODO: Change this method to take a monster object, check if we have quest for said monster below
     def award_monster_kill(self, monster: Monster):
         monster_level = monster.level
         xp_reward = monster.xp_to_give
@@ -239,7 +210,7 @@ class Character(LivingThing):
         if monster_quest_ID and monster_quest_ID in self.quest_log:
             # TODO: Might want another way to handle this
             quest = self.quest_log[monster_quest_ID]
-            quest.add_kill()
+            quest.update_kills()
             self.quest_log[monster_quest_ID] = quest
 
             self.check_if_quest_completed(quest)
@@ -252,17 +223,18 @@ class Character(LivingThing):
 
     def _level_up(self):
         self.level += 1
-        dd = self._LEVEL_STATS[self.level]
-        ddd = dd[self.KEY_LEVEL_STATS_HEALTH]
+
+        current_level_stats = self._LEVEL_STATS[self.level]
         # access the dictionary holding the appropriate value increases for each level
-        hp_increase_amount = self._LEVEL_STATS[self.level][self.KEY_LEVEL_STATS_HEALTH]
-        mana_increase_amount = self._LEVEL_STATS[self.level][self.KEY_LEVEL_STATS_MANA]
-        strength_increase_amount = self._LEVEL_STATS[self.level][self.KEY_LEVEL_STATS_STRENGTH]
+        hp_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_HEALTH]
+        mana_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_MANA]
+        strength_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_STRENGTH]
 
         self.max_health += hp_increase_amount
         self.max_mana += mana_increase_amount
         self.strength += strength_increase_amount
-        self._regenerate() # get to full hp/mana
+        self._regenerate() # regen to full hp/mana
+
         print('*' * 20)
         print("Character {0} has leveled up to level {1}!".format(self.name, self.level))
         print("Health Points increased by {}".format(hp_increase_amount))
@@ -282,59 +254,12 @@ class Character(LivingThing):
 
         print()
 
-
     def _lookup_next_xp_level_req(self):
         return self._REQUIRED_XP_TO_LEVEL[self.level]
 
-    def _load_levelup_stats(self):
-        # TODO: to be moved to a separate file sometime
-        """
-        Read the table file holding information about the amount of stats you should get according to the level you've attained
-        1 - level; 2 - hp; 3 - mana; 4 - strength;
-        """
-        level_stats = {} # a dictionary of dictionaries. Key - level, value - dictionary holding values for hp,mana etc.
-        with sqlite3.connect(DB_PATH) as connection:
-            cursor = connection.cursor()
-            lvl_stats_reader = cursor.execute("SELECT * FROM levelup_stats")
 
-            for line in lvl_stats_reader:
-                level_dict = {}
 
-                level = int(line[DBINDEX_LEVELUP_STATS_LEVEL])
-                hp = int(line[DBINDEX_LEVELUP_STATS_HEALTH])
-                mana = int(line[DBINDEX_LEVELUP_STATS_MANA])
-                strength = int(line[DBINDEX_LEVELUP_STATS_STRENGTH])
 
-                level_dict[self.KEY_LEVEL_STATS_HEALTH] = hp
-                level_dict[self.KEY_LEVEL_STATS_MANA] = mana
-                level_dict[self.KEY_LEVEL_STATS_STRENGTH] = strength
-                level_stats[level] = level_dict
-
-        return level_stats
-
-    def _load_xp_requirements(self):
-        # TODO: to be moved to a separate file sometime
-        """
-        Load the information about the necessary XP needed to reach a certain level.
-        The table's contents is like this:
-        level, xp needed to reach the next one
-        1,     400 meaning you need to have 400XP to reach level 2
-        2,     800 800XP needed to reach level 3
-        :return: A dictionary - Key: Level, Value: XP Needed
-                                        1,  400
-        """
-        xp_req_dict = {}
-
-        with sqlite3.connect(DB_PATH) as connection:
-            cursor = connection.cursor()
-            xp_req_reader = cursor.execute("SELECT * FROM level_xp_requirement")
-
-            for line in xp_req_reader:
-                level = int(line[DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL])
-                xp_required = int(line[DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED])
-                xp_req_dict[level] = xp_required
-
-        return xp_req_dict
 
     def get_class(self) -> str:
         pass

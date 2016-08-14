@@ -6,20 +6,17 @@
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
 # TODO: Refactor code, add underscore _ to private members/functions and MORE COMMENTS!
-"""
-current commands:
-attack - attacks the creature and ends the turn
-print stats - prints your health and the monster's. does not end the turn
-print xp - prints the XP you have and the necessary amount to reach the next level
-engage - start the fight
-"""
 import combat
+
 from commands import pac_main_ooc, pac_map_directions
 from items import Weapon
 import classes
 from zones.elwynn_forest import ElwynnForest
+
 GAME_VERSION = '0.0.2.85 ALPHA'
 ZONES = {"Elwynn Forest": ElwynnForest}
+
+
 def main():
     welcome_print()
 
@@ -28,20 +25,20 @@ def main():
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))
     zone_object = get_zone_object(main_character.current_zone)
-
+    # map_directions - a list of all the possible subzones we could go to from ours directly
+    map_directions = zone_object.get_map_directions(zone_object, main_character.current_subzone)
     '''
     alive_monsters: A Dictionary: Key: guid of monster, Value: Object of class entities.py/Monster
     guid_name_set: A Set of Tuples ((Monster GUID, Monster Name)) used to convert the engage X command to target a creature in alive_monsters
     available_quests: A Dictionary: Key: name of quest, Value: Object of class quest.py/Quest
     '''
-    alive_monsters, guid_name_set, available_quests = zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object, main_character.current_subzone)
+    alive_monsters, guid_name_set, available_quests, _ = zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object, main_character.current_subzone)
     print_live_monsters(alive_monsters)
     while True:
         command = input()
         if command is '?':
             pac_main_ooc()  # print available commands in the main loop when out of combat
         elif command == 'go to ?':
-            map_directions = zone_object.get_map_directions(zone_object, main_character.current_subzone)
             pac_map_directions(possible_routes=map_directions)
         elif command == 'print available quests' or command == 'paq':
             print_available_quests(available_quests, main_character.level)
@@ -74,14 +71,21 @@ def main():
                 print("No such quest.")
         elif 'go to' in command:
             destination = command[6:]
-            main_character.current_subzone = destination
-            alive_monsters, guid_name_set, available_quests = zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object,
-                                                                                            main_character.current_subzone)
-            print("Moved to {0}".format(main_character.current_subzone))
+
+            alive_monsters, guid_name_set, available_quests, zone_is_valid = \
+                zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object, destination)
+
+            if zone_is_valid and destination in map_directions:
+                # if the move has been successful
+                main_character.current_subzone = destination
+                print("Moved to {0}".format(main_character.current_subzone))
+                print_live_monsters(alive_monsters)
+            else:
+                print("No such destination as {} that is connected to your current subzone.".format(destination))
+
+        elif command == 'print _alive monsters' or command == 'pam':
             print_live_monsters(alive_monsters)
-        elif command == 'print alive monsters' or command == 'pam':
-            print_live_monsters(alive_monsters)
-        elif command == 'print all alive monsters':
+        elif command == 'print all _alive monsters':
             print_live_monsters(alive_monsters, print_all=True)
 
 
