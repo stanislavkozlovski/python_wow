@@ -51,7 +51,7 @@ def main():
             target_guid_list = [guid if name == target else None for guid, name in guid_name_set]
             if target_guid_list:
                 target_guid = target_guid_list[0]
-            else:
+            else:  # if the list is empty
                 target_guid = None
 
             if target_guid in alive_monsters.keys():
@@ -77,12 +77,17 @@ def main():
         elif 'go to' in command:
             destination = command[6:]
 
-            alive_monsters, guid_name_set, available_quests, zone_is_valid = \
+            temp_alive_monsters, temp_guid_name_set, temp_available_quests, zone_is_valid = \
                 zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object, destination)
 
             if zone_is_valid and destination in map_directions:
                 # if the move has been successful
+
+                alive_monsters, guid_name_set, available_quests = temp_alive_monsters, temp_guid_name_set, temp_available_quests
+
                 main_character.current_subzone = destination
+                # update map directions
+                map_directions = zone_object.get_map_directions(zone_object, main_character.current_subzone)
                 print("Moved to {0}".format(main_character.current_subzone))
                 print_live_monsters(alive_monsters)
             else:
