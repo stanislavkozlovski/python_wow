@@ -93,9 +93,9 @@ def main():
             else:
                 print("No such destination as {} that is connected to your current subzone.".format(destination))
 
-        elif command == 'print _alive monsters' or command == 'pam':
+        elif command == 'print alive monsters' or command == 'pam':
             print_live_monsters(alive_monsters)
-        elif command == 'print all _alive monsters':
+        elif command == 'print all alive monsters':
             print_live_monsters(alive_monsters, print_all=True)
 
 
