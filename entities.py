@@ -5,17 +5,24 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 import random
 
 from items import Weapon
-from loader import load_creature_xp_rewards, load_character_level_stats, load_character_xp_requirements
+from loader import (load_creature_xp_rewards, load_character_level_stats,
+                    load_character_xp_requirements, load_creature_gold_reward)
 from quest import Quest
 
 # dictionary that holds information about how much XP a monster of a certain level should award the player.
 # key: level(int), value: xp reward(int)
 CREATURE_XP_REWARD_DICTIONARY = load_creature_xp_rewards()
+CREATURE_GOLD_REWARD_DICTIONARY = load_creature_gold_reward()
 
 
 def lookup_xp_reward(level: int) -> int:
     """ Return the appropriate XP reward associated with the given level"""
     return CREATURE_XP_REWARD_DICTIONARY[level]
+
+
+def lookup_gold_reward(level: int) -> int:
+    """ Return the appropriate gold reward associated with the given level"""
+    return CREATURE_GOLD_REWARD_DICTIONARY[level]
 
 
 class LivingThing:
@@ -70,6 +77,7 @@ class Monster(LivingThing):
         self.min_damage = min_damage
         self.max_damage = max_damage
         self.xp_to_give = lookup_xp_reward(self.level)
+        self.gold_to_give = lookup_gold_reward(self.level)
         self.quest_relation_ID = quest_relation_id
 
     def __str__(self):
@@ -124,6 +132,7 @@ class Character(LivingThing):
         self.equipped_weapon = Weapon()
         self.level = 1
         self.experience = 0
+        self.gold = 0
         self.xp_req_to_level = 400
         self.current_zone = "Elwynn Forest"
         self.current_subzone = "Northshire Valley"
@@ -202,6 +211,7 @@ class Character(LivingThing):
     def award_monster_kill(self, monster: Monster):
         monster_level = monster.level
         xp_reward = monster.xp_to_give
+        gold_reward = monster.gold_to_give
         monster_quest_ID = monster.quest_relation_ID
 
         level_difference = self.level - monster_level
@@ -219,6 +229,7 @@ class Character(LivingThing):
             print("XP awarded: {0}!".format(xp_reward))
 
         self.experience += xp_reward + xp_bonus_reward
+        self.gold += gold_reward
         self.check_if_levelup()
 
         # If this monster is for a quest and we have that quest

@@ -1,10 +1,9 @@
 # TODO: Add talents system and Class classes
-# TODO: Lots of things to do regarding quests
-# TODO: Quest - clean up code
 # TODO: add more monsters and subzones
 # TODO: Add a AddExperience method in Character and replace where appropriate
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
+
 # TODO: Refactor code, add underscore _ to private members/functions and MORE COMMENTS!
 import classes
 import combat
@@ -12,7 +11,7 @@ from commands import pac_main_ooc, pac_map_directions
 from items import Weapon
 from zones.elwynn_forest import ElwynnForest
 
-GAME_VERSION = '0.0.2.85 ALPHA'
+GAME_VERSION = '0.0.2.86 ALPHA'
 ZONES = {"Elwynn Forest": ElwynnForest}
 
 
