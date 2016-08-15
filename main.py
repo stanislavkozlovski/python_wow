@@ -48,7 +48,11 @@ def main():
 
             # return a list with the guids for each monster we've targeted and get the first guid [0]
             # using the guid, target him from the alive_monsters dictionary
-            target_guid = [guid if name == target else None for guid, name in guid_name_set][0]
+            target_guid_list = [guid if name == target else None for guid, name in guid_name_set]
+            if target_guid_list:
+                target_guid = target_guid_list[0]
+            else:
+                target_guid = None
 
             if target_guid in alive_monsters.keys():
                 target = alive_monsters[target_guid]  # convert the string to a Monster object
