@@ -1,6 +1,5 @@
 import sqlite3
 
-from entities import Character, Monster
 from database_info import (
     DB_PATH,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_NAME, DBINDEX_PALADIN_SPELLS_TEMPLATE_RANK,
@@ -8,6 +7,7 @@ from database_info import (
     DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE2, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE3,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1, DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3, DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST)
+from entities import Character, Monster
 
 
 class Paladin(Character):
@@ -24,7 +24,7 @@ class Paladin(Character):
     KEY_FLASH_OF_LIGHT = "Flash of Light"
     KEY_SEAL_OF_RIGHTEOSNESS = "Seal of Righteousness"
 
-    def __init__(self, name: str, health: int=12, mana: int=15, strength: int=4):
+    def __init__(self, name: str, health: int = 12, mana: int = 15, strength: int = 4):
         super().__init__(name=name, health=health, mana=mana, strength=strength)
         self.min_damage = 1
         self.max_damage = 3
@@ -36,7 +36,8 @@ class Paladin(Character):
     def _level_up(self):
         super()._level_up()
 
-        for available_spell in self._lookup_available_spells_to_learn(self.level):  # generator that returns dictionaries holding spell attributes
+        for available_spell in self._lookup_available_spells_to_learn(
+                self.level):  # generator that returns dictionaries holding spell attributes
 
             # update spell rank
             if available_spell['name'] in self.learned_spells:
@@ -147,7 +148,7 @@ class Paladin(Character):
         self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['mana_cost'] = mana_cost
 
         print("Spell Seal of Righteousness has been updated to rank {}!".format(rank))
-        print("*"*20)
+        print("*" * 20)
 
     def spell_flash_of_light(self):
         """
@@ -163,14 +164,17 @@ class Paladin(Character):
             self.health += heal_amount
             self.mana -= mana_cost
 
-            if self.health > self.max_health: # check for overheal
+            if self.health > self.max_health:  # check for overheal
                 overheal = self.health - self.max_health
                 self.health = self.max_health
-                print("Flash of Light healed {0} for {1:.2f} ({2:.2f} Overheal).".format(self.name, heal_amount - overheal, overheal))
+                print("Flash of Light healed {0} for {1:.2f} ({2:.2f} Overheal).".format(self.name,
+                                                                                         heal_amount - overheal,
+                                                                                         overheal))
             else:
                 print("Flash of Light healed {0} for {1:.2f}.".format(self.name, heal_amount))
 
         return cast_is_successful
+
     # SPELLS
 
     def get_auto_attack_damage(self, target_level: int):
@@ -178,7 +182,7 @@ class Paladin(Character):
 
         level_difference = self.level - target_level
         percentage_mod = (
-        abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
+            abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
 
         sor_damage = 0
         damage_to_deal = random.randint(int(self.min_damage), int(self.max_damage) + 1)
@@ -199,13 +203,15 @@ class Paladin(Character):
         return damage_to_deal, sor_damage
 
     def attack(self, victim: Monster):
-        attacker_swing = self.get_auto_attack_damage(victim.level)  # tuple holding auto attack and seal damage (if active)
+        attacker_swing = self.get_auto_attack_damage(
+            victim.level)  # tuple holding auto attack and seal damage (if active)
 
         auto_attack = attacker_swing[0]
         sor_damage = attacker_swing[1]  # if the seal isn't active the damage will be 0
 
         if sor_damage:
-            print("{0} attacks {1} for {2:.2f} + {3:.2f} from Seal of Righteousness!".format(self.name, victim.name, auto_attack, sor_damage))
+            print("{0} attacks {1} for {2:.2f} + {3:.2f} from Seal of Righteousness!".format(self.name, victim.name,
+                                                                                             auto_attack, sor_damage))
         else:
             print("{0} attacks {1} for {2:.2f} damage!".format(self.name, victim.name, auto_attack))
 

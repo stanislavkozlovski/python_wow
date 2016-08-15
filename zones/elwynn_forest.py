@@ -13,10 +13,10 @@ class ElwynnForest:
     zone_name = "Elwynn Forest"
 
     northshire_valley_guid_name_set, northshire_valley_alive_monsters, \
-        northshire_valley_quest_list, northshire_valley_loaded = {}, {}, [], False
+    northshire_valley_quest_list, northshire_valley_loaded = {}, {}, [], False
 
     northshire_vineyards_guid_name_set, northshire_vineyards_alive_monsters, \
-        northshire_vineyards_quest_list, northshire_vineyards_loaded = {}, {}, [], False
+    northshire_vineyards_quest_list, northshire_vineyards_loaded = {}, {}, [], False
 
     def get_live_monsters_guid_name_set_and_quest_list(self, subzone: str) -> tuple:
         """
@@ -52,9 +52,9 @@ class ElwynnForest:
                 self.northshire_vineyards_quest_list = load_quests(self.zone_name, subzone)
                 self.northshire_vineyards_loaded = True
 
-            return self.northshire_vineyards_alive_monsters,\
+            return self.northshire_vineyards_alive_monsters, \
                    self.northshire_vineyards_guid_name_set, \
-                   self.northshire_vineyards_quest_list,\
+                   self.northshire_vineyards_quest_list, \
                    True
 
         return None, None, None, False

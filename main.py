@@ -6,11 +6,10 @@
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
 # TODO: Refactor code, add underscore _ to private members/functions and MORE COMMENTS!
+import classes
 import combat
-
 from commands import pac_main_ooc, pac_map_directions
 from items import Weapon
-import classes
 from zones.elwynn_forest import ElwynnForest
 
 GAME_VERSION = '0.0.2.85 ALPHA'
@@ -32,7 +31,8 @@ def main():
     guid_name_set: A Set of Tuples ((Monster GUID, Monster Name)) used to convert the engage X command to target a creature in alive_monsters
     available_quests: A Dictionary: Key: name of quest, Value: Object of class quest.py/Quest
     '''
-    alive_monsters, guid_name_set, available_quests, _ = zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object, main_character.current_subzone)
+    alive_monsters, guid_name_set, available_quests, _ = zone_object.get_live_monsters_guid_name_set_and_quest_list(
+        zone_object, main_character.current_subzone)
     print_live_monsters(alive_monsters)
     while True:
         command = input()
@@ -45,14 +45,14 @@ def main():
         elif command == 'print quest log':
             main_character.print_quest_log()
         elif 'engage' in command:
-            target = command[7:] # name of monster to engage
+            target = command[7:]  # name of monster to engage
 
             # return a list with the guids for each monster we've targeted and get the first guid [0]
             # using the guid, target him from the alive_monsters dictionary
             target_guid = [guid if name == target else None for guid, name in guid_name_set][0]
 
             if target_guid in alive_monsters.keys():
-                target = alive_monsters[target_guid] # convert the string to a Monster object
+                target = alive_monsters[target_guid]  # convert the string to a Monster object
                 combat.engage_combat(main_character, target, alive_monsters, guid_name_set, target_guid)
             else:
                 print("Could not find creature {}.".format(target))
@@ -118,10 +118,10 @@ def print_available_quests(available_quests: dict, character_level: int):
     for _, quest in available_quests.items():
         if quest.level_required <= character_level:  # print quests that the character has the required level for only!
             print("{quest_name} - Requires {required_kills} {monster_name} kills. "
-                 + "Rewards {xp_reward} experience.".format(quest_name=quest.name,
-                                                            required_kills=quest.needed_kills,
-                                                            monster_name=quest.monster_to_kill,
-                                                            xp_reward=quest.xp_to_give))
+                  + "Rewards {xp_reward} experience.".format(quest_name=quest.name,
+                                                             required_kills=quest.needed_kills,
+                                                             monster_name=quest.monster_to_kill,
+                                                             xp_reward=quest.xp_to_give))
 
 
 def welcome_print():
@@ -130,6 +130,7 @@ def welcome_print():
     print()
     print("Type ? to see a list of available commands.")
     print()
+
 
 if __name__ == '__main__':
     main()

@@ -3,8 +3,8 @@ This is the class that will print and return the available commands when the use
 
 abbreviation PAC means Print Available Commands
 """
-from entities import Character
 from classes import Paladin
+from entities import Character
 
 
 def pac_main_ooc():
@@ -73,12 +73,15 @@ def print_paladin_abilities_in_combat(character: Paladin):
     print("\tsor")
     print("\t\tCasts Seal of Righteousness")
     print("\t\t\tMana Cost: {}".format(character.learned_spells['Seal of Righteousness']['mana_cost']))
-    print("'\t\t\tLasts three turns and adds {0} damage to each of your auto attacks\n".format(character.learned_spells['Seal of Righteousness']['damage_on_swing'])) # TODO: rename damage_on_swing to damage_1
+    print("'\t\t\tLasts three turns and adds {0} damage to each of your auto attacks\n".format(
+        character.learned_spells['Seal of Righteousness'][
+            'damage_on_swing']))  # TODO: rename damage_on_swing to damage_1
     if "Flash of Light" in character.learned_spells.keys():
         print("\tfol")
         print("\t\tCasts Flash of Light")
         print("\t\t\tMana Cost: {}".format(character.learned_spells['Flash of Light']['mana_cost']))
-        print("\t\t\tHeals the paladin for {0} damage.".format(character.learned_spells['Flash of Light']['heal_1'])) # TODO: Move to a method in paladin that gives heal amount of spell name
+        print("\t\t\tHeals the paladin for {0} damage.".format(character.learned_spells['Flash of Light'][
+                                                                   'heal_1']))  # TODO: Move to a method in paladin that gives heal amount of spell name
 
 
 def get_available_paladin_abilities(character: Paladin):

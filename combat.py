@@ -1,5 +1,5 @@
-from entities import Character, Monster
 from commands import pac_in_combat, get_available_paladin_abilities
+from entities import Character, Monster
 
 
 def engage_combat(character: Character, monster: Monster, alive_monsters: dict, guid_name_set: set, monster_GUID: int):
@@ -46,12 +46,17 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
             if command == '?':
                 pac_in_combat(character)  # print available commands
             elif command == 'print stats':
-                print("Character {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(character.name, character.health, character.max_health, character.mana, character.max_mana))
-                print("Monster {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(monster.name, monster.health, monster.max_health, monster.mana, monster.max_mana))
+                print("Character {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(character.name, character.health,
+                                                                                      character.max_health,
+                                                                                      character.mana,
+                                                                                      character.max_mana))
+                print("Monster {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(monster.name, monster.health,
+                                                                                    monster.max_health, monster.mana,
+                                                                                    monster.max_mana))
             elif command == 'print xp':
                 print("{0}/{1} Experience. {2} needed to level up!".format(character.experience,
                                                                            character.xp_req_to_level,
-                                                                           character.xp_req_to_level-character.experience))
+                                                                           character.xp_req_to_level - character.experience))
             else:
                 break
             command = input()
@@ -73,7 +78,7 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
             guid_name_set.remove((monster_GUID, monster.name))  # remove it from the set used for looking up
 
 
-#  returns a set with a list of allowed commands (you can't cast a spell you haven't learned yet)
+# returns a set with a list of allowed commands (you can't cast a spell you haven't learned yet)
 def get_available_spells(character: Character):
     chr_class = character.get_class()
     available_spells = set()

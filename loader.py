@@ -1,27 +1,27 @@
 import sqlite3
 
-from quest import Quest
 from database_info import \
-       (DB_PATH, DBINDEX_CREATURES_GUID, DBINDEX_CREATURES_CREATURE_ID,
+    (DB_PATH, DBINDEX_CREATURES_GUID, DBINDEX_CREATURES_CREATURE_ID,
 
-        DBINDEX_CREATURE_TEMPLATE_NAME, DBINDEX_CREATURE_TEMPLATE_LEVEL,
-        DBINDEX_CREATURE_TEMPLATE_HEALTH, DBINDEX_CREATURE_TEMPLATE_MANA,
-        DBINDEX_CREATURE_TEMPLATE_MIN_DMG, DBINDEX_CREATURE_TEMPLATE_MAX_DMG,
-        DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID,
-        DBINDEX_QUEST_TEMPLATE_ENTRY, DBINDEX_QUEST_TEMPLATE_NAME,
-        DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED, DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED,
-        DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED, DBINDEX_QUEST_TEMPLATE_XP_REWARD,
+     DBINDEX_CREATURE_TEMPLATE_NAME, DBINDEX_CREATURE_TEMPLATE_LEVEL,
+     DBINDEX_CREATURE_TEMPLATE_HEALTH, DBINDEX_CREATURE_TEMPLATE_MANA,
+     DBINDEX_CREATURE_TEMPLATE_MIN_DMG, DBINDEX_CREATURE_TEMPLATE_MAX_DMG,
+     DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID,
+     DBINDEX_QUEST_TEMPLATE_ENTRY, DBINDEX_QUEST_TEMPLATE_NAME,
+     DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED, DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED,
+     DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED, DBINDEX_QUEST_TEMPLATE_XP_REWARD,
 
-        DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP,
+     DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP,
 
-        DBINDEX_LEVELUP_STATS_LEVEL, DBINDEX_LEVELUP_STATS_HEALTH, DBINDEX_LEVELUP_STATS_MANA,
-        DBINDEX_LEVELUP_STATS_STRENGTH,
+     DBINDEX_LEVELUP_STATS_LEVEL, DBINDEX_LEVELUP_STATS_HEALTH, DBINDEX_LEVELUP_STATS_MANA,
+     DBINDEX_LEVELUP_STATS_STRENGTH,
 
-        DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
-        )
+     DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
+     )
+from quest import Quest
 
 
-def load_creatures(zone: str, subzone:str) -> tuple:
+def load_creatures(zone: str, subzone: str) -> tuple:
     """
         Gets a query from the creatures table to load all the creatures in our current zone
 
@@ -50,7 +50,7 @@ def load_creatures(zone: str, subzone:str) -> tuple:
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
         creatures_reader = cursor.execute("SELECT * FROM creatures WHERE zone = ? AND sub_zone = ?"
-                                                  , [zone, subzone])  # query all the creatures in our location :)
+                                          , [zone, subzone])  # query all the creatures in our location :)
 
         for creature_info in creatures_reader.fetchall():
             creature_guid = int(creature_info[DBINDEX_CREATURES_GUID])
@@ -71,8 +71,9 @@ def load_creatures(zone: str, subzone:str) -> tuple:
             creature_template_mana = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MANA])
             creature_template_min_dmg = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MIN_DMG])
             creature_template_max_dmg = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MAX_DMG])
-            creature_template_quest_relation_ID = (int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID])
-                if not creature_template_info[7] is None else -1)
+            creature_template_quest_relation_ID = (
+            int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID])
+            if not creature_template_info[7] is None else -1)
 
             # save into the set
             guid_name_set.add((creature_guid, creature_template_name))
@@ -125,7 +126,7 @@ xp_reward, comment
             quest_monster_kill_amount_required = int(row[DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED])
             quest_xp_reward = int(row[DBINDEX_QUEST_TEMPLATE_XP_REWARD])
 
-            quest_list[quest_name] = Quest(quest_name= quest_name,
+            quest_list[quest_name] = Quest(quest_name=quest_name,
                                            quest_id=quest_entry,
                                            creature_name=quest_monster_required,
                                            required_kills=quest_monster_kill_amount_required,

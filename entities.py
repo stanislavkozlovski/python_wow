@@ -2,13 +2,11 @@
 This holds the classes for every entity in the game: Monsters and Characters currently
 """
 
-from items import Weapon
-from quest import Quest
-from database_info import DB_PATH, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP, DBINDEX_LEVELUP_STATS_LEVEL, DBINDEX_LEVELUP_STATS_HEALTH, DBINDEX_LEVELUP_STATS_MANA, DBINDEX_LEVELUP_STATS_STRENGTH, DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
-from loader import load_creature_xp_rewards, load_character_level_stats, load_character_xp_requirements
-
-import sqlite3
 import random
+
+from items import Weapon
+from loader import load_creature_xp_rewards, load_character_level_stats, load_character_xp_requirements
+from quest import Quest
 
 # dictionary that holds information about how much XP a monster of a certain level should award the player.
 # key: level(int), value: xp reward(int)
@@ -24,7 +22,8 @@ class LivingThing:
     """
     This is the base class for all things _alive - characters, monsters and etc.
     """
-    def __init__(self, name: str, health: int=1, mana: int=1):
+
+    def __init__(self, name: str, health: int = 1, mana: int = 1):
         self.name = name
         self.health = health
         self.max_health = health
@@ -63,8 +62,8 @@ class LivingThing:
 
 
 class Monster(LivingThing):
-    def __init__(self, monster_id: int, name: str, health: int=1, mana: int=1, level: int=1, min_damage: int=0,
-                 max_damage: int=1, quest_relation_id=0):
+    def __init__(self, monster_id: int, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
+                 max_damage: int = 1, quest_relation_id=0):
         super().__init__(name, health, mana)
         self.monster_id = monster_id
         self.level = level
@@ -117,7 +116,7 @@ class Character(LivingThing):
     KEY_LEVEL_STATS_MANA = 'mana'
     KEY_LEVEL_STATS_STRENGTH = 'strength'
 
-    def __init__(self, name: str, health: int=1, mana: int=1, strength: int=1):
+    def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1):
         super().__init__(name, health, mana)
         self.strength = strength
         self.min_damage = 0
@@ -158,10 +157,10 @@ class Character(LivingThing):
         # 10% more or less damage for each level that differs
         if level_difference == 0:
             pass
-        elif level_difference < 0: # monster is bigger level
-            damage_to_deal -= damage_to_deal * percentage_mod # -X%
-        elif level_difference > 0: # character is bigger level
-            damage_to_deal += damage_to_deal * percentage_mod # +X%
+        elif level_difference < 0:  # monster is bigger level
+            damage_to_deal -= damage_to_deal * percentage_mod  # -X%
+        elif level_difference > 0:  # character is bigger level
+            damage_to_deal += damage_to_deal * percentage_mod  # +X%
 
         return damage_to_deal
 
@@ -184,7 +183,6 @@ class Character(LivingThing):
         else:
             exit()
 
-
     def add_quest(self, quest: Quest):
         self.quest_log[quest.ID] = quest
 
@@ -201,7 +199,6 @@ class Character(LivingThing):
         self.experience += xp_reward
         self.check_if_levelup()
 
-
     def award_monster_kill(self, monster: Monster):
         monster_level = monster.level
         xp_reward = monster.xp_to_give
@@ -209,12 +206,12 @@ class Character(LivingThing):
 
         level_difference = self.level - monster_level
         xp_bonus_reward = 0
-        if level_difference >= 5: # if the character is 5 levels higher, give no XP
+        if level_difference >= 5:  # if the character is 5 levels higher, give no XP
             xp_reward = 0
-        elif level_difference < 0: # monster is higher level
-            percentage_mod = abs(level_difference) * 0.1  # 10% increase of XP for every level the monster has over player
-            xp_bonus_reward += int(xp_reward*percentage_mod)  # convert to int
-
+        elif level_difference < 0:  # monster is higher level
+            percentage_mod = abs(
+                level_difference) * 0.1  # 10% increase of XP for every level the monster has over player
+            xp_bonus_reward += int(xp_reward * percentage_mod)  # convert to int
 
         if xp_bonus_reward:
             print("XP awarded: {0} + bonus {1} for the level difference!".format(xp_reward, xp_bonus_reward))
@@ -251,7 +248,7 @@ class Character(LivingThing):
         self.max_health += hp_increase_amount
         self.max_mana += mana_increase_amount
         self.strength += strength_increase_amount
-        self._regenerate() # regen to full hp/mana
+        self._regenerate()  # regen to full hp/mana
 
         print('*' * 20)
         print("Character {0} has leveled up to level {1}!".format(self.name, self.level))
@@ -265,10 +262,10 @@ class Character(LivingThing):
 
         for _, quest in self.quest_log.items():
             print("\t{quest_name} - {monsters_killed}/{required_kills} {monster_name} slain.".format(
-                                                                            quest_name=quest.name,
-                                                                            monsters_killed=quest.kills,
-                                                                            required_kills=quest.needed_kills,
-                                                                            monster_name=quest.monster_to_kill))
+                quest_name=quest.name,
+                monsters_killed=quest.kills,
+                required_kills=quest.needed_kills,
+                monster_name=quest.monster_to_kill))
 
         print()
 

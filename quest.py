@@ -2,6 +2,7 @@ class Quest:
     """
     Standard kill X of Y quest
     """
+
     def __init__(self, quest_name: str, quest_id, creature_name: str, required_kills: int, xp_reward: int,
                  level_required: int, is_completed: bool = False):
         self.name = quest_name
