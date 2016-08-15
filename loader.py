@@ -13,7 +13,8 @@ from database_info import \
 
      DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP,
 
-     DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_GOLD_REWARD,
+     DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MIN_GOLD_REWARD,
+     DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MAX_GOLD_REWARD,
 
      DBINDEX_LEVELUP_STATS_LEVEL, DBINDEX_LEVELUP_STATS_HEALTH, DBINDEX_LEVELUP_STATS_MANA,
      DBINDEX_LEVELUP_STATS_STRENGTH,
@@ -170,11 +171,11 @@ def load_creature_gold_reward() -> dict:
     """
     Load the default gold amount that is to be given from the creature according to it's level.
     The creature_default_gold_reward table's contents are as follows:
-    creature_level, gold_reward
-                 1,           5 Meaning a creature of level 1 will drop 5 gold
+    creature_level, min_gold_reward, max_gold_reward
+                 1,               2,              5 Meaning a creature of level 1 will drop from 2 to 5 gold
 
-    :return: A dictionary - Key: Level(int), Value: Gold Reward(int)
-                                     1,                 5
+    :return: A dictionary - Key: Level(int), Value: Tuple(min_gold(int), max_gold(int))
+                                     1,                 (2,5)
     """
 
     gold_rewards_dict = {}
@@ -185,9 +186,10 @@ def load_creature_gold_reward() -> dict:
 
         for line in gold_rewards_reader:
             level = int(line[DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_LEVEL])
-            gold_reward = int(line[DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_GOLD_REWARD])
+            min_gold_reward = int(line[DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MIN_GOLD_REWARD])
+            max_gold_reward = int(line[DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MAX_GOLD_REWARD])
 
-            gold_rewards_dict[level] = gold_reward
+            gold_rewards_dict[level] = (min_gold_reward, max_gold_reward)
 
     return gold_rewards_dict
 

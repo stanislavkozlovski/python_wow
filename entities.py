@@ -20,8 +20,8 @@ def lookup_xp_reward(level: int) -> int:
     return CREATURE_XP_REWARD_DICTIONARY[level]
 
 
-def lookup_gold_reward(level: int) -> int:
-    """ Return the appropriate gold reward associated with the given level"""
+def lookup_gold_reward(level: int) -> tuple:
+    """ Return a tuple that has the minimum and maximum gold amount a creature of certain level should give"""
     return CREATURE_GOLD_REWARD_DICTIONARY[level]
 
 
@@ -77,7 +77,7 @@ class Monster(LivingThing):
         self.min_damage = min_damage
         self.max_damage = max_damage
         self.xp_to_give = lookup_xp_reward(self.level)
-        self.gold_to_give = lookup_gold_reward(self.level)
+        self.gold_to_give = self._calculate_gold_reward(lookup_gold_reward(self.level))
         self.quest_relation_ID = quest_relation_id
 
     def __str__(self):
@@ -117,6 +117,12 @@ class Monster(LivingThing):
         super()._die()
         print("Creature {} has died!".format(self.name))
 
+    def _calculate_gold_reward(self, min_max_gold: tuple) -> int:
+        """ Calculate the gold this monster is going to award the player
+            min_max_gold: A tuple containing the minimum and maximum amount of gold a creature of this level can give
+            (2,5) meaning this creature should give from 2-5 gold, picked at random"""
+        return random.randint(min_max_gold[0], min_max_gold[1])
+
 
 class Character(LivingThing):
     # keys are used to access the level_stats dictionary that holds information on stats to update on each level up
@@ -149,6 +155,7 @@ class Character(LivingThing):
         # current formula for damage is: wep_dmg * 0.1 * strength
         self.min_damage = weapon.min_damage + (0.1 * self.strength)
         self.max_damage = weapon.max_damage + (0.1 * self.strength)
+
 
     def spell_handler(self, command: str):
         """
@@ -228,6 +235,7 @@ class Character(LivingThing):
         else:
             print("XP awarded: {0}!".format(xp_reward))
 
+        print("Gold awarded: {}!".format(gold_reward))
         self.experience += xp_reward + xp_bonus_reward
         self.gold += gold_reward
         self.check_if_levelup()
