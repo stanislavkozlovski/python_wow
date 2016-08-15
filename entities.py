@@ -218,7 +218,6 @@ class Character(LivingThing):
     def award_monster_kill(self, monster: Monster):
         monster_level = monster.level
         xp_reward = monster.xp_to_give
-        gold_reward = monster.gold_to_give
         monster_quest_ID = monster.quest_relation_ID
 
         level_difference = self.level - monster_level
@@ -235,9 +234,7 @@ class Character(LivingThing):
         else:
             print("XP awarded: {0}!".format(xp_reward))
 
-        print("Gold awarded: {}!".format(gold_reward))
         self.experience += xp_reward + xp_bonus_reward
-        self.gold += gold_reward
         self.check_if_levelup()
 
         # If this monster is for a quest and we have that quest
@@ -248,6 +245,9 @@ class Character(LivingThing):
             self.quest_log[monster_quest_ID] = quest
 
             self._check_if_quest_completed(quest)
+
+    def award_gold(self, gold: int):
+        self.gold += gold
 
     def check_if_levelup(self):
         if self.experience >= self.xp_req_to_level:

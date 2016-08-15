@@ -1,4 +1,4 @@
-from commands import pac_in_combat, get_available_paladin_abilities
+from commands import pac_in_combat, pac_looting,get_available_paladin_abilities
 from entities import Character, Monster
 
 
@@ -76,6 +76,34 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
 
             del alive_monsters[monster_GUID]  # removes the monster from the dictionary
             guid_name_set.remove((monster_GUID, monster.name))  # remove it from the set used for looking up
+
+            # handle loot
+            handle_loot(character, monster)
+
+
+
+def handle_loot(character: Character, monster: Monster):
+    """ Display the loot dropped from the monster and listen for input if the player wants to take any"""
+    # TODO: Make this work using a dictionary of items dropped and remove an item once it's taken, add the gold to it as well
+    # TODO: Auto-exit the loot window once there is no more loot to be taken
+    print()
+    print("Loot dropped:")
+    print("{} gold".format(monster.gold_to_give))
+    gold_is_taken = False
+    while True:
+        command = input()
+
+        if command == "take gold" and not gold_is_taken:
+            print("{char_name} has looted {gold_amount} gold.".format(char_name=character.name,
+                                                                      gold_amount=monster.gold_to_give))
+            character.award_gold(gold=monster.gold_to_give)
+            gold_is_taken = True
+        elif command == "?":
+            pac_looting()
+        elif command == "exit":  # end the looting process
+            break
+        else:
+            print("Invalid command.")
 
 
 # returns a set with a list of allowed commands (you can't cast a spell you haven't learned yet)

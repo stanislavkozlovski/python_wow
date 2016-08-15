@@ -54,6 +54,18 @@ def pac_in_combat(character):
     print_class_abilities_in_combat(character)
 
 
+def pac_looting():
+    """Prints all possible commands the player can use while looting a creature"""
+    print()
+    print("Available commands:")
+    print("\ttake gold")
+    print("\t\tLoots the gold dropped from the monster.\n")
+    print("\ttake [item_name]")
+    print("\t\tLoots the specified item.\n")
+    print("\texit")
+    print("\t\tExits the loot window")
+    print("\t?")
+    print("\t\tShows a list of available commands.\n")
 def pac_map_directions(possible_routes: list):
     """
     Prints all possible subzones you can go in from your current subzone
