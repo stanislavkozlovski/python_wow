@@ -6,7 +6,7 @@ import random
 
 from items import Weapon, Item
 from loader import (load_creature_xp_rewards, load_character_level_stats,
-                    load_character_xp_requirements, load_creature_gold_reward)
+                    load_character_xp_requirements, load_creature_gold_reward, load_loot_table, load_item)
 from quest import Quest
 
 # dictionary that holds information about how much XP a monster of a certain level should award the player.
@@ -70,7 +70,7 @@ class LivingThing:
 
 class Monster(LivingThing):
     def __init__(self, monster_id: int, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id=0):
+                 max_damage: int = 1, quest_relation_id=0, loot_table_ID: int = 0):
         super().__init__(name, health, mana)
         self.monster_id = monster_id
         self.level = level
@@ -79,8 +79,8 @@ class Monster(LivingThing):
         self.xp_to_give = lookup_xp_reward(self.level)
         self._gold_to_give = self._calculate_gold_reward(lookup_gold_reward(self.level))
         self.quest_relation_ID = quest_relation_id
-        self.loot = {"gold": self._gold_to_give,
-                     "test": Item(name="test")}  # dict Key: str, Value: Item class object
+        self.loot_table_ID = loot_table_ID
+        self.loot = {"gold": self._gold_to_give}  # dict Key: str, Value: Item class object
 
     def __str__(self):
         return "Creature Level {level} {name} - {hp}/{max_hp} HP | {mana}/{max_mana} Mana | " \
@@ -115,6 +115,31 @@ class Monster(LivingThing):
         self.health -= damage
         self.check_if_dead()
 
+    def _drop_loot(self):
+        """
+        This method gets the loot the monster can drop, rolls the dice on each drop chance and
+        populates the creature's self.loot dictionary that will hold the dropped loot
+        """
+        # loot_list is a list of tuples containing (item_ID(int), drop_chance(1-100))
+        loot_list = load_loot_table(monster_loot_table_ID=self.loot_table_ID)
+
+        for item_ID, item_drop_chance in loot_list:
+            '''
+            Generate a random float from 0.0 to ~0.9999 with random.random(), then multiply it by 100
+            and compare it to the drop_chance. If the drop_chance is bigger, the item has dropped.
+
+            Example: drop chance is 30% and we roll a random float. There's a 70% chance to get a float that's bigger
+            than 0.3 and a 30% chance to get a float that's smaller. We roll 0.25, multiply it by 100 = 25 and see
+            that the drop chance is bigger, therefore the item should drop.
+            '''
+            random_float = random.random()
+
+            if item_drop_chance >= (random_float * 100):
+                # item has dropped, load it from the DB
+                item = load_item(item_ID)
+
+                self.loot[item.name] = item
+
     def give_loot(self, item_name: str):
         """ Returns the item that's looted and removes it from the monster's inventory"""
         if item_name not in self.loot:
@@ -128,6 +153,7 @@ class Monster(LivingThing):
 
     def _die(self):
         super()._die()
+        self._drop_loot()
         print("Creature {} has died!".format(self.name))
 
     def _calculate_gold_reward(self, min_max_gold: tuple) -> int:
@@ -135,6 +161,8 @@ class Monster(LivingThing):
             min_max_gold: A tuple containing the minimum and maximum amount of gold a creature of this level can give
             (2,5) meaning this creature should give from 2-5 gold, picked at random"""
         return random.randint(min_max_gold[0], min_max_gold[1])
+
+
 
 
 class Character(LivingThing):

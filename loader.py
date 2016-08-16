@@ -6,7 +6,11 @@ from database_info import \
      DBINDEX_CREATURE_TEMPLATE_NAME, DBINDEX_CREATURE_TEMPLATE_LEVEL,
      DBINDEX_CREATURE_TEMPLATE_HEALTH, DBINDEX_CREATURE_TEMPLATE_MANA,
      DBINDEX_CREATURE_TEMPLATE_MIN_DMG, DBINDEX_CREATURE_TEMPLATE_MAX_DMG,
-     DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID,
+     DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID, DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID,
+
+     DBINDEX_ITEM_TEMPLATE_NAME, DBINDEX_ITEM_TEMPLATE_TYPE, DBINDEX_ITEM_TEMPLATE_BUY_PRICE,
+     DBINDEX_ITEM_TEMPLATE_SELL_PRICE, DBINDEX_ITEM_TEMPLATE_MIN_DMG, DBINDEX_ITEM_TEMPLATE_MAX_DMG,
+
      DBINDEX_QUEST_TEMPLATE_ENTRY, DBINDEX_QUEST_TEMPLATE_NAME,
      DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED, DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED,
      DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED, DBINDEX_QUEST_TEMPLATE_XP_REWARD,
@@ -22,7 +26,7 @@ from database_info import \
      DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
      )
 from quest import Quest
-
+import items
 
 def load_creatures(zone: str, subzone: str) -> tuple:
     """
@@ -74,9 +78,14 @@ def load_creatures(zone: str, subzone: str) -> tuple:
             creature_template_mana = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MANA])
             creature_template_min_dmg = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MIN_DMG])
             creature_template_max_dmg = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MAX_DMG])
+
             creature_template_quest_relation_ID = (
             int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID])
-            if not creature_template_info[7] is None else -1)
+            if not creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID] is None else -1)
+
+            creature_template_loot_table_ID = (
+            int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID])
+            if not creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID] is None else -1)
 
             # save into the set
             guid_name_set.add((creature_guid, creature_template_name))
@@ -88,7 +97,8 @@ def load_creatures(zone: str, subzone: str) -> tuple:
                                                    level=creature_template_level,
                                                    min_damage=creature_template_min_dmg,
                                                    max_damage=creature_template_max_dmg,
-                                                   quest_relation_id=creature_template_quest_relation_ID)
+                                                   quest_relation_id=creature_template_quest_relation_ID,
+                                                   loot_table_ID=creature_template_loot_table_ID)
 
 
 
@@ -193,6 +203,81 @@ def load_creature_gold_reward() -> dict:
 
     return gold_rewards_dict
 
+
+def load_loot_table(monster_loot_table_ID: int):
+    """
+    Load the loot table of a specific monster
+    entry, item1_ID, item1_chance, item2_ID, item2_chance, item3_ID, item3_chance, ... item20_ID, item20_chance
+        1,       4,            55,        3,         30,          0,            0,             0,            0
+    Meaning a creature whose col loot_table_ID from creature_template is equal to 1 has:
+    55% chance to drop Item with ID 4
+    30% chance to drop Item with ID 3
+    Does not drop any more items, because the rest of the rows are 0s.
+
+    :return: A List of Tuples, holding each item's ID and drop chance.
+    Example: [ (4,55), (3,30) ] would be the list for our table row up there
+    """
+    # TODO: Maybe load all of the loot table into a dictionary and store it in memory, or at least store the ones already
+    # TODO: loaded, since sending a query to the DB on each separate monster is inefficient
+
+    loot_list = [] # type: list[tuple]
+
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM loot_table WHERE entry = ?", [monster_loot_table_ID])
+
+        loot_table_info = list(cursor.fetchone())  # load the loot_table row into a list
+        # get an index at which we stop at because there are no further items beyond said index
+        stop_at_idx = loot_table_info.index(0)  # TODO: Try/Catch because this will crash if the loot_table row is full
+
+        if stop_at_idx % 2 == 0:
+            """
+            if we stop at an even index, that means that we're stopping at a itemX_chance row, which means that we
+            have an item with a 0% drop chance and that is against our interests.
+            """
+            raise Exception("loot_table row is invalid!")
+
+        # pack each drop into a tuple containing the item_ID and the chance to drop
+        for idx in range(1, stop_at_idx, 2):
+            item_ID = loot_table_info[idx]
+            item_drop_chance = loot_table_info[idx+1]
+
+            loot_list.append((item_ID, item_drop_chance))
+
+    return loot_list
+
+
+def load_item(item_ID: int):
+    """
+    Load an item from item_template, convert it to a object of Class Item and return it
+    The item_template table is as follows:
+    entry,      name, type, buy_price, sell_price, min_dmg, max_dmg
+        1,'Wolf Pelt','misc',       1,          1,     Null, Null
+    The item is of type misc, making us use the default class Item
+
+    entry,             name,    type, buy_price, sell_price, min_dmg, max_dmg
+      100, 'Arcanite Reaper', 'weapon',   125,          100,     56,      128
+    This item is of type weapon, making us use the class Weapon to create it
+    """
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM item_template WHERE entry = ?", [item_ID])
+        item_template_info = cursor.fetchone()
+
+        item_name = item_template_info[DBINDEX_ITEM_TEMPLATE_NAME]
+        item_type = item_template_info[DBINDEX_ITEM_TEMPLATE_TYPE]
+        item_buy_price = int(item_template_info[DBINDEX_ITEM_TEMPLATE_BUY_PRICE])
+        item_sell_price = int(item_template_info[DBINDEX_ITEM_TEMPLATE_SELL_PRICE])
+
+        if item_type == 'misc':
+            return items.Item(name=item_name)
+        elif item_type == 'weapon':
+            item_min_dmg = int(item_template_info[DBINDEX_ITEM_TEMPLATE_MIN_DMG])
+            item_max_dmg = int(item_template_info[DBINDEX_ITEM_TEMPLATE_MAX_DMG])
+
+            return items.Weapon(name=item_name, min_damage=item_min_dmg, max_damage=item_max_dmg)
+        else:
+            raise Exception("Unsupported item type {}".format(item_type))
 
 def load_character_level_stats() -> dict:
     """

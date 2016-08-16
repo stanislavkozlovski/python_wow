@@ -81,7 +81,6 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
             handle_loot(character, monster)
 
 
-
 def handle_loot(character: Character, monster: Monster):
     """ Display the loot dropped from the monster and listen for input if the player wants to take any"""
     # TODO: Auto-exit the loot window once there is no more loot to be taken
