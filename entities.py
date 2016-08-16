@@ -4,7 +4,7 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 
 import random
 
-from items import Weapon
+from items import Weapon, Item
 from loader import (load_creature_xp_rewards, load_character_level_stats,
                     load_character_xp_requirements, load_creature_gold_reward)
 from quest import Quest
@@ -77,8 +77,10 @@ class Monster(LivingThing):
         self.min_damage = min_damage
         self.max_damage = max_damage
         self.xp_to_give = lookup_xp_reward(self.level)
-        self.gold_to_give = self._calculate_gold_reward(lookup_gold_reward(self.level))
+        self._gold_to_give = self._calculate_gold_reward(lookup_gold_reward(self.level))
         self.quest_relation_ID = quest_relation_id
+        self.loot = {"gold": self._gold_to_give,
+                     "test": Item(name="test")}  # dict Key: str, Value: Item class object
 
     def __str__(self):
         return "Creature Level {level} {name} - {hp}/{max_hp} HP | {mana}/{max_mana} Mana | " \
@@ -113,6 +115,17 @@ class Monster(LivingThing):
         self.health -= damage
         self.check_if_dead()
 
+    def give_loot(self, item_name: str):
+        """ Returns the item that's looted and removes it from the monster's inventory"""
+        if item_name not in self.loot:
+            # unsuccessful loot
+            print("{monster_name} did not drop {item_name}.".format(monster_name=self.name,item_name=item_name))
+            return False
+
+        item = self.loot[item_name] # type: Item
+        del self.loot[item_name] # remove it from the inventory
+        return item
+
     def _die(self):
         super()._die()
         print("Creature {} has died!".format(self.name))
@@ -135,7 +148,7 @@ class Character(LivingThing):
         self.strength = strength
         self.min_damage = 0
         self.max_damage = 1
-        self.equipped_weapon = Weapon()
+        self.equipped_weapon = Weapon(name="Starter Weapon")
         self.level = 1
         self.experience = 0
         self.gold = 0
@@ -146,6 +159,7 @@ class Character(LivingThing):
         self._LEVEL_STATS = load_character_level_stats()
         self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements()
         self.quest_log = {}
+        self.inventory = {} # dict Key: str, Value: Item class object
 
     def equip_weapon(self, weapon: Weapon):
         self.equipped_weapon = weapon
@@ -248,6 +262,10 @@ class Character(LivingThing):
 
     def award_gold(self, gold: int):
         self.gold += gold
+
+    def award_item(self, item: Item):
+        """ Take an item and put it into the character's inventory"""
+        self.inventory[item.name] = item
 
     def check_if_levelup(self):
         if self.experience >= self.xp_req_to_level:

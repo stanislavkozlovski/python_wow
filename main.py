@@ -3,8 +3,8 @@
 # TODO: Add a AddExperience method in Character and replace where appropriate
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
-
-# TODO: Refactor code, add underscore _ to private members/functions and MORE COMMENTS!
+# TODO: Add __str__ to items
+# TODO: Handle stackable items
 import classes
 import combat
 from commands import pac_main_ooc, pac_map_directions
@@ -19,7 +19,7 @@ def main():
     welcome_print()
 
     main_character = classes.Paladin(name="Netherblood")
-    starter_weapon = Weapon(min_damage=1, max_damage=3)
+    starter_weapon = Weapon(name="Starter Weapon", min_damage=1, max_damage=3)
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))
     zone_object = get_zone_object(main_character.current_zone)

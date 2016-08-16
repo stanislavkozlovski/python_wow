@@ -84,26 +84,50 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
 
 def handle_loot(character: Character, monster: Monster):
     """ Display the loot dropped from the monster and listen for input if the player wants to take any"""
-    # TODO: Make this work using a dictionary of items dropped and remove an item once it's taken, add the gold to it as well
     # TODO: Auto-exit the loot window once there is no more loot to be taken
-    print()
-    print("Loot dropped:")
-    print("{} gold".format(monster.gold_to_give))
-    gold_is_taken = False
+
+    print_loot_table(monster)
     while True:
         command = input()
 
-        if command == "take gold" and not gold_is_taken:
-            print("{char_name} has looted {gold_amount} gold.".format(char_name=character.name,
-                                                                      gold_amount=monster.gold_to_give))
-            character.award_gold(gold=monster.gold_to_give)
-            gold_is_taken = True
+        if "take" in command:
+            item_name = command[5:]
+
+            if item_name == "gold":
+                gold = monster.give_loot("gold")
+
+                if gold:  # if it's successful
+                    character.award_gold(gold)
+                    print("{char_name} has looted {gold_amount} gold.".format(char_name=character.name,
+                                                                              gold_amount=gold))
+            else:  # if we want to take an item
+                item = monster.give_loot(item_name = item_name)
+
+                if item:  # if the loot is successful
+                    character.award_item(item=item)
+                    print("{char_name} has looted {item_name}.".format(char_name=character.name,
+                                                                       item_name=item_name))
+
+            print_loot_table(monster)  # print the updated table each time we take something
         elif command == "?":
             pac_looting()
         elif command == "exit":  # end the looting process
             break
         else:
             print("Invalid command.")
+
+
+def print_loot_table(monster: Monster):
+    print()
+    print("Loot dropped:")
+
+    if "gold" in monster.loot.keys():
+        # print the gold separately so it always comes up on top
+        print("\t{} gold".format(monster.loot['gold']))
+
+    for item_name, item in monster.loot.items(): # type: dict
+        if item_name is not "gold":
+            print("\t{}".format(item_name))
 
 
 # returns a set with a list of allowed commands (you can't cast a spell you haven't learned yet)

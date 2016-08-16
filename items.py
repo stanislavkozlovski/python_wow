@@ -9,7 +9,7 @@ class Item:
 
 
 class Weapon(Item):
-    def __init__(self, min_damage: int = 0, max_damage: int = 1):
-        super().__init__()
+    def __init__(self, name: str, min_damage: int = 0, max_damage: int = 1):
+        super().__init__(name)
         self.min_damage = min_damage
         self.max_damage = max_damage
