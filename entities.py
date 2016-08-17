@@ -269,7 +269,7 @@ class Character(LivingThing):
             self._complete_quest(quest)
 
     def _complete_quest(self, quest: Quest):
-        print("Quest {} is_completed! XP awarded: {}!".format(quest.name, xp_reward))
+        print("Quest {} is completed! XP awarded: {}!".format(quest.name, quest.xp_reward))
         xp_reward = quest.give_reward()
 
         del self.quest_log[quest.ID]  # remove from quest log
