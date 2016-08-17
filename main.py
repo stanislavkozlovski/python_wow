@@ -3,8 +3,11 @@
 # TODO: Add a AddExperience method in Character and replace where appropriate
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
-# TODO: Refactor
+# TODO: Refactor combat.py, moving the commands into functions and print functions into their respective modules
+# TODO: Refactor function parameter names in the command_handler and information_printer modules
 # TODO: Think of what do to with map_directions so we don't have to assign new values to it on every command
+# TODO: Print high level quests in red
+
 import classes
 
 from command_handler import handle_main_commands, print_live_monsters, print_live_npcs

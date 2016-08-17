@@ -3,10 +3,22 @@ This module will handle the player's commands
 """
 from combat import engage_combat
 from commands import pac_main_ooc, pac_map_directions
-
+from information_printer import print_live_npcs, print_live_monsters, print_available_quests
 
 def handle_main_commands(main_character, available_quests: dict, map_directions, alive_npcs: dict,
                          npc_guid_name_set: set, alive_monsters: dict, guid_name_set: set, zone_object):
+    """
+    Get a command from the player and if it's a valid command: run it.
+    :param main_character: A Character class object. This is basically the player
+    :param available_quests: A Dictionary holding the available quests in this zone
+    :param map_directions: A List holding the name of the zones we can access from our current sub zone
+    :param alive_npcs: A Dictionary key: NPC_GUID, value: FriendlyNPC class object
+    :param npc_guid_name_set: A Set of Tuples { (NPC_GUID, FriendlyNPC class object) }
+    :param alive_monsters: A Dictionary key: Monster_GUID, value: Monster class object
+    :param guid_name_set: A Set of Tuples { (Monster_GUID, Monster class object) }
+    :param zone_object: A class object of Zone(not implemented yet, currently: ElwynnForest)
+    :return: map_directions, in case we switch zones and they get updated, we need to return them
+    """
     command = input()
     if command is '?':
         pac_main_ooc()  # print available commands in the main loop when out of combat
@@ -36,6 +48,7 @@ def handle_main_commands(main_character, available_quests: dict, map_directions,
         print_live_npcs(alive_npcs, print_all=True)
 
     return map_directions
+
 
 def handle_talk_to_command(command:str, character, alive_npcs: dict, guid_name_set: set):
     target = command[8:]  # name of NPC
@@ -114,40 +127,5 @@ def handle_go_to_command(command: str,  main_character, zone_object, map_directi
 
     return map_directions  # return the new map directions
 
-def print_live_monsters(alive_monsters: dict, print_all=False):
-    print("Alive monsters: ")
-    # sort them by level and print the five that are the lowest level
-    sorted_list = sorted(alive_monsters.items(), key=lambda x: x[1].level)
-    printed_monsters = 0
-    for _, monster in sorted_list:
-        print(monster)
-        printed_monsters += 1
-
-        if not print_all and printed_monsters == 5:  # print only five monsters at once
-            break
-
-    print()
 
 
-def print_live_npcs(alive_npcs: dict, print_all=False):
-    print("Alive NPCs: ")
-    printed_npcs = 0
-
-    for _, npc in alive_npcs.items():
-        print(npc)
-        printed_npcs += 1
-
-        if not print_all and printed_npcs == 5:
-            break
-
-    print()
-
-
-def print_available_quests(available_quests: dict, character_level: int):
-    print("Available quests: ")
-
-    for _, quest in available_quests.items():
-        if quest.required_level <= character_level:  # print quests that the character has the required level for only!
-            print("{quest_name} - Requires {required_kills} {monster_name} kills. Rewards {xp_reward} experience."
-                  .format(quest_name=quest.name, required_kills=quest.required_kills,
-                          monster_name=quest.monster_to_kill, xp_reward=quest.xp_reward))
