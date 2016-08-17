@@ -126,7 +126,7 @@ def print_loot_table(monster: Monster):
 
     for item_name, item in monster.loot.items(): # type: dict
         if item_name is not "gold":
-            print("\t{}".format(item_name))
+            print("\t{}".format(item))
 
 
 # returns a set with a list of allowed commands (you can't cast a spell you haven't learned yet)

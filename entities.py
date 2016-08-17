@@ -163,8 +163,6 @@ class Monster(LivingThing):
         return random.randint(min_max_gold[0], min_max_gold[1])
 
 
-
-
 class Character(LivingThing):
     # keys are used to access the level_stats dictionary that holds information on stats to update on each level up
     KEY_LEVEL_STATS_HEALTH = 'health'

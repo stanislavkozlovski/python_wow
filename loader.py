@@ -270,12 +270,13 @@ def load_item(item_ID: int):
         item_sell_price = int(item_template_info[DBINDEX_ITEM_TEMPLATE_SELL_PRICE])
 
         if item_type == 'misc':
-            return items.Item(name=item_name)
+            return items.Item(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price)
         elif item_type == 'weapon':
             item_min_dmg = int(item_template_info[DBINDEX_ITEM_TEMPLATE_MIN_DMG])
             item_max_dmg = int(item_template_info[DBINDEX_ITEM_TEMPLATE_MAX_DMG])
 
-            return items.Weapon(name=item_name, min_damage=item_min_dmg, max_damage=item_max_dmg)
+            return items.Weapon(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price,
+                                min_damage=item_min_dmg, max_damage=item_max_dmg)
         else:
             raise Exception("Unsupported item type {}".format(item_type))
 
