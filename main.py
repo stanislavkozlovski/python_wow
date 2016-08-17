@@ -3,7 +3,7 @@
 # TODO: Add a AddExperience method in Character and replace where appropriate
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
-# TODO: Add __str__ to items
+# TODO: Add friendly NPCs
 # TODO: Handle stackable items
 import classes
 import combat
@@ -43,6 +43,8 @@ def main():
             print_available_quests(available_quests, main_character.level)
         elif command == 'print quest log':
             main_character.print_quest_log()
+        elif command == 'print inventory':
+            main_character.print_inventory()
         elif 'engage' in command:
             target = command[7:]  # name of monster to engage
 

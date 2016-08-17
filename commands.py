@@ -25,6 +25,8 @@ def pac_main_ooc():
     print("\t\tPrints all quests that are available in the current zone/subzone.\n")
     print("\tprint quest log")
     print("\t\tPrints the quests you are currently on.\n")
+    print("\tprint inventory")
+    print("\t\tPrints every item in your inventory.\n")
     print("\tgo to [Sub Zone]")
     print("\t\tMoves the character to the selected sub zone.\n")
     print("\tgo to ?")

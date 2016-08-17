@@ -332,6 +332,12 @@ class Character(LivingThing):
 
         print()
 
+    def print_inventory(self):
+        print("Your inventory:")
+
+        for _, item in self.inventory.items():
+            print("\t{}".format(item))
+
     def _lookup_next_xp_level_req(self):
         return self._REQUIRED_XP_TO_LEVEL[self.level]
 
