@@ -15,6 +15,8 @@ def pac_main_ooc():
     print("Available commands:")
     print("\tengage [Monster Name]")
     print("\t\tEngages in combat with the monster whose name you've entered.\n")
+    print("\ttalk to [NPC Name]")
+    print("\t\tTalks to the NPC.\n")
     print("\tprint alive monsters")
     print("\tpam")
     print("\t\tPrints 5 monsters that are alive.\n")

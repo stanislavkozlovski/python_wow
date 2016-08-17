@@ -191,8 +191,6 @@ def load_npcs(zone: str, subzone: str) -> tuple:
                                                    loot_table_ID=creature_template_loot_table_ID,
                                                    gossip=creature_template_gossip)
 
-
-
     print("Friendly NPCs loaded!")
     return npcs_dict, guid_name_set
 

@@ -46,6 +46,22 @@ def main():
             main_character.print_quest_log()
         elif command == 'print inventory':
             main_character.print_inventory()
+        elif 'talk to' in command:
+            target = command[8:] # name of NPC
+
+            # return a list with the guids for each monster we've targeted and get the first guid [0]
+            # using the guid, target him from the alive_monsters dictionary
+            target_guid_list = [guid if name == target else None for guid, name in npc_guid_name_set]
+            if target_guid_list:
+                target_guid = target_guid_list[0]
+            else:  # if the list is empty
+                target_guid = None
+
+            if target_guid in alive_npcs.keys():
+                target = alive_npcs[target_guid]
+                target.talk(main_character.name)
+            else:
+                print("Could not find NPC {}.".format(target))
         elif 'engage' in command:
             target = command[7:]  # name of monster to engage
 
