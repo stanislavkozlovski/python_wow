@@ -142,7 +142,7 @@ class Monster(LivingThing):
 
     def give_loot(self, item_name: str):
         """ Returns the item that's looted and removes it from the monster's inventory"""
-        if item_name not in self.loot:
+        if item_name not in self.loot:  # TODO: This should not be checked here
             # unsuccessful loot
             print("{monster_name} did not drop {item_name}.".format(monster_name=self.name,item_name=item_name))
             return False
@@ -289,8 +289,15 @@ class Character(LivingThing):
         self.inventory['gold'] += gold
 
     def award_item(self, item: Item):
-        """ Take an item and put it into the character's inventory"""
-        self.inventory[item.name] = item
+        """ Take an item and put it into the character's inventory,
+        store it as a tuple holding (Item Object, Item Count) """
+
+        if item.name not in self.inventory.keys():  # if we don't have the item
+            self.inventory[item.name] = (item, 1)
+        else:
+            # if there is such an item, simply update it's count by one
+            item, item_count = self.inventory[item.name]
+            self.inventory[item.name] = (item, item_count + 1)
 
     def check_if_levelup(self):
         if self.experience >= self.xp_req_to_level:
@@ -336,9 +343,10 @@ class Character(LivingThing):
 
         # print the gold separately so it always comes up on top
         print("\t{} gold".format(self.inventory['gold']))
-        for key, item in self.inventory.items():
+        for key, item_tuple in self.inventory.items():
             if key is not "gold":
-                print("\t{}".format(item))
+                item, item_count = item_tuple
+                print("\t{item_count} {item}".format(item_count=item_count, item=item))
 
     def _lookup_next_xp_level_req(self):
         return self._REQUIRED_XP_TO_LEVEL[self.level]

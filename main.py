@@ -4,14 +4,13 @@
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
 # TODO: Add friendly NPCs
-# TODO: Handle stackable items
 import classes
 import combat
 from commands import pac_main_ooc, pac_map_directions
 from items import Weapon
 from zones.elwynn_forest import ElwynnForest
 
-GAME_VERSION = '0.0.3 ALPHA'
+GAME_VERSION = '0.0.3.1 ALPHA'
 ZONES = {"Elwynn Forest": ElwynnForest}
 
 

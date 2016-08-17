@@ -258,6 +258,8 @@ def load_item(item_ID: int):
     entry,             name,    type, buy_price, sell_price, min_dmg, max_dmg
       100, 'Arcanite Reaper', 'weapon',   125,          100,     56,      128
     This item is of type weapon, making us use the class Weapon to create it
+
+    :returns a class object, depending on what the type is
     """
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
