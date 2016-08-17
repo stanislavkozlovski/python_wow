@@ -177,7 +177,6 @@ class Character(LivingThing):
         self.equipped_weapon = Weapon(name="Starter Weapon")
         self.level = 1
         self.experience = 0
-        self.gold = 0
         self.xp_req_to_level = 400
         self.current_zone = "Elwynn Forest"
         self.current_subzone = "Northshire Valley"
@@ -185,7 +184,7 @@ class Character(LivingThing):
         self._LEVEL_STATS = load_character_level_stats()
         self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements()
         self.quest_log = {}
-        self.inventory = {} # dict Key: str, Value: Item class object
+        self.inventory = {"gold": 0} # dict Key: str, Value: Item class object
 
     def equip_weapon(self, weapon: Weapon):
         self.equipped_weapon = weapon
@@ -287,7 +286,7 @@ class Character(LivingThing):
             self._check_if_quest_completed(quest)
 
     def award_gold(self, gold: int):
-        self.gold += gold
+        self.inventory['gold'] += gold
 
     def award_item(self, item: Item):
         """ Take an item and put it into the character's inventory"""
@@ -335,8 +334,11 @@ class Character(LivingThing):
     def print_inventory(self):
         print("Your inventory:")
 
-        for _, item in self.inventory.items():
-            print("\t{}".format(item))
+        # print the gold separately so it always comes up on top
+        print("\t{} gold".format(self.inventory['gold']))
+        for key, item in self.inventory.items():
+            if key is not "gold":
+                print("\t{}".format(item))
 
     def _lookup_next_xp_level_req(self):
         return self._REQUIRED_XP_TO_LEVEL[self.level]
