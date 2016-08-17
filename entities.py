@@ -68,15 +68,38 @@ class LivingThing:
         self._alive = True
 
 
+class FriendlyNPC(LivingThing):
+    """
+    This is the class for friendly creatures in the world
+    """
+
+    def __init__(self, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
+                 max_damage: int = 1, quest_relation_id = 0, loot_table_ID: int = 0, gossip: str = 'Hello'):
+        super().__init__(name, health, mana)
+        self.level = level
+        self.min_damage = min_damage
+        self.max_damage = max_damage
+        self.gossip = gossip
+
+    def __str__(self):
+        return "{npc_name}".format(npc_name=self.name)
+
+    def talk(self, player_name: str):
+        print("{npc_name} says: {msg}".format(npc_name=self.name, msg=self.gossip.replace("$N", player_name)))
+
+
+
+
 class Monster(LivingThing):
     def __init__(self, monster_id: int, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id=0, loot_table_ID: int = 0):
+                 max_damage: int = 1, quest_relation_id=0, loot_table_ID: int = 0, gossip = ''):
         super().__init__(name, health, mana)
         self.monster_id = monster_id
         self.level = level
         self.min_damage = min_damage
         self.max_damage = max_damage
         self.xp_to_give = lookup_xp_reward(self.level)
+        self.gossip = gossip
         self._gold_to_give = self._calculate_gold_reward(lookup_gold_reward(self.level))
         self.quest_relation_ID = quest_relation_id
         self.loot_table_ID = loot_table_ID

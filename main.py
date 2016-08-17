@@ -29,8 +29,10 @@ def main():
     guid_name_set: A Set of Tuples ((Monster GUID, Monster Name)) used to convert the engage X command to target a creature in alive_monsters
     available_quests: A Dictionary: Key: name of quest, Value: Object of class quest.py/Quest
     '''
-    alive_monsters, guid_name_set, available_quests, _ = zone_object.get_live_monsters_guid_name_set_and_quest_list(
+    alive_monsters, guid_name_set, alive_npcs, npc_guid_name_set, available_quests,  _ = zone_object.get_live_monsters_guid_name_set_and_quest_list(
         zone_object, main_character.current_subzone)
+
+    print_live_npcs(alive_npcs, print_all=True)
     print_live_monsters(alive_monsters)
     while True:
         command = input()
@@ -78,26 +80,33 @@ def main():
         elif 'go to' in command:
             destination = command[6:]
 
-            temp_alive_monsters, temp_guid_name_set, temp_available_quests, zone_is_valid = \
+            temp_alive_monsters, temp_guid_name_set, temp_alive_npcs, temp_npc_guid_name_set, temp_available_quests, zone_is_valid = \
                 zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object, destination)
 
             if zone_is_valid and destination in map_directions:
                 # if the move has been successful
 
-                alive_monsters, guid_name_set, available_quests = temp_alive_monsters, temp_guid_name_set, temp_available_quests
+                alive_monsters, guid_name_set, alive_npcs, npc_guid_name_set, available_quests = (
+                    temp_alive_monsters, temp_guid_name_set, temp_alive_npcs, temp_npc_guid_name_set,
+                    temp_available_quests)
 
                 main_character.current_subzone = destination
                 # update map directions
                 map_directions = zone_object.get_map_directions(zone_object, main_character.current_subzone)
                 print("Moved to {0}".format(main_character.current_subzone))
+                print_live_npcs(alive_npcs, print_all=True)
                 print_live_monsters(alive_monsters)
             else:
                 print("No such destination as {} that is connected to your current subzone.".format(destination))
 
         elif command == 'print alive monsters' or command == 'pam':
             print_live_monsters(alive_monsters)
+        elif command == 'print alive npcs' or command == 'pan':
+            print_live_npcs(alive_npcs)
         elif command == 'print all alive monsters':
             print_live_monsters(alive_monsters, print_all=True)
+        elif command == 'print all alive npcs':
+            print_live_npcs(alive_npcs, print_all=True)
 
 
 def get_zone_object(zone: str):
@@ -119,6 +128,22 @@ def print_live_monsters(alive_monsters: dict, print_all=False):
 
         if not print_all and printed_monsters == 5:  # print only five monsters at once
             break
+
+    print()
+
+
+def print_live_npcs(alive_npcs: dict, print_all=False):
+    print("Alive NPCs: ")
+    printed_npcs = 0
+
+    for _, npc in alive_npcs.items():
+        print(npc)
+        printed_npcs += 1
+
+        if not print_all and printed_npcs == 5:
+            break
+
+    print()
 
 
 def print_available_quests(available_quests: dict, character_level: int):

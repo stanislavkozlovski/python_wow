@@ -3,7 +3,7 @@ A Module that will take care of loading creatures that are in the Elwynn Forest 
 This is created so that we don't have to load the creatures every time we change zones AND
 to have dead creatures stay dead, not be reloaded
 """
-from loader import load_creatures, load_quests
+from loader import load_monsters, load_npcs, load_quests
 
 
 class ElwynnForest:
@@ -13,10 +13,12 @@ class ElwynnForest:
     zone_name = "Elwynn Forest"
 
     northshire_valley_guid_name_set, northshire_valley_alive_monsters, \
-    northshire_valley_quest_list, northshire_valley_loaded = {}, {}, [], False
+    northshire_valley_npc_guid_name_set, northshire_valley_alive_npcs, \
+    northshire_valley_quest_list, northshire_valley_loaded = {}, {}, {}, {}, [], False
 
     northshire_vineyards_guid_name_set, northshire_vineyards_alive_monsters, \
-    northshire_vineyards_quest_list, northshire_vineyards_loaded = {}, {}, [], False
+    northshire_vineyards_npc_guid_name_set, northshire_vineyards_alive_npcs, \
+    northshire_vineyards_quest_list, northshire_vineyards_loaded = {}, {}, {}, {}, [], False
 
     def get_live_monsters_guid_name_set_and_quest_list(self, subzone: str) -> tuple:
         """
@@ -29,31 +31,41 @@ class ElwynnForest:
         :return: A tuple containing the following (1, 2, 3)
          1 - A Dictionary holding information about the monster - Key: GUID, Value: Monster object from class Monster
          2 - A Set holding tuples of (Monster GUID, Monster Name)
-         3 - A Dictionary holding information about quests - Key: Quest Name, Value: Quest object from class Quest
-         4 - A Boolean indicating if we have moved or not
+         3 - A Dictionary holding information a bout the friendly npcs - Key: GUID, Value: object from class FriendlyNPC
+         4 - A Set holding tuples of (NPC GUID, NPC Name)
+         5 - A Dictionary holding information about quests - Key: Quest Name, Value: Quest object from class Quest
+         6 - A Boolean indicating if we have moved or not
         """
 
         if subzone == 'Northshire Valley':
             if not self.northshire_valley_loaded:
-                self.northshire_valley_alive_monsters, self.northshire_valley_guid_name_set = load_creatures(
+                self.northshire_valley_alive_monsters, self.northshire_valley_guid_name_set = load_monsters(
+                    self.zone_name, subzone)
+                self.northshire_valley_alive_npcs, self.northshire_valley_npc_guid_name_set = load_npcs(
                     self.zone_name, subzone)
                 self.northshire_valley_quest_list = load_quests(self.zone_name, subzone)
                 self.northshire_valley_loaded = True
 
             return self.northshire_valley_alive_monsters, \
                    self.northshire_valley_guid_name_set, \
+                   self.northshire_valley_alive_npcs, \
+                   self.northshire_valley_npc_guid_name_set, \
                    self.northshire_valley_quest_list, \
                    True
 
         elif subzone == 'Northshire Vineyards':
             if not self.northshire_vineyards_loaded:
-                self.northshire_vineyards_alive_monsters, self.northshire_vineyards_guid_name_set = load_creatures(
+                self.northshire_vineyards_alive_monsters, self.northshire_vineyards_guid_name_set = load_monsters(
+                    self.zone_name, subzone)
+                self.northshire_vineyards_alive_npcs, self.northshire_vineyards_npc_guid_name_set = load_npcs(
                     self.zone_name, subzone)
                 self.northshire_vineyards_quest_list = load_quests(self.zone_name, subzone)
                 self.northshire_vineyards_loaded = True
 
             return self.northshire_vineyards_alive_monsters, \
                    self.northshire_vineyards_guid_name_set, \
+                   self.northshire_vineyards_alive_npcs, \
+                   self.northshire_vineyards_npc_guid_name_set, \
                    self.northshire_vineyards_quest_list, \
                    True
 

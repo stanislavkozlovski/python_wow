@@ -7,6 +7,7 @@ from database_info import \
      DBINDEX_CREATURE_TEMPLATE_HEALTH, DBINDEX_CREATURE_TEMPLATE_MANA,
      DBINDEX_CREATURE_TEMPLATE_MIN_DMG, DBINDEX_CREATURE_TEMPLATE_MAX_DMG,
      DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID, DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID,
+     DBINDEX_CREATURE_TEMPLATE_GOSSIP,
 
      DBINDEX_ITEM_TEMPLATE_NAME, DBINDEX_ITEM_TEMPLATE_TYPE, DBINDEX_ITEM_TEMPLATE_BUY_PRICE,
      DBINDEX_ITEM_TEMPLATE_SELL_PRICE, DBINDEX_ITEM_TEMPLATE_MIN_DMG, DBINDEX_ITEM_TEMPLATE_MAX_DMG,
@@ -28,12 +29,13 @@ from database_info import \
 from quest import Quest
 import items
 
-def load_creatures(zone: str, subzone: str) -> tuple:
-    """
-        Gets a query from the creatures table to load all the creatures in our current zone
 
-        guid, creature_id,         zone,          subzone
-           1,          11,Elwynn Forest, Northshire Abbey
+def load_monsters(zone: str, subzone: str) -> tuple:
+    """
+        Gets a query from the creatures table to load all hostile creatures in our current zone
+
+        guid, creature_id,       type,             zone,          subzone
+           1,          11,  'monster',    Elwynn Forest, Northshire Abbey
 
         Then, with each guid queries up the creature information from creatures_template and
          creates a Monster object in a dictionary has GUID as a key and the monster as the value
@@ -41,9 +43,14 @@ def load_creatures(zone: str, subzone: str) -> tuple:
 
         creature_template table is as follows:
 
-        creature entry, creature name, level, hp, mana, min_dmg, max_dmg
-                    1, Zimbab       ,     1, 10,   10,       2,       4
-        Creature Level: 1 Zimbab, HP: 10, MANA: 10, Damage: 2-4
+        creature entry, creature name,      type,   level, hp, mana, min_dmg, max_dmg, quest_relation_ID, loot_table,ID,      gossip
+                    1, Zimbab       ,   "monster"       1, 10,   10,       2,       4                  1,             1, "Hey there"
+
+        type is "monster" meaning this is a hostile NPC
+        Creature Level: 1 Zimbab, HP: 10, MANA: 10, Damage: 2-4.
+        He is needed to complete quest with ID 1 and the loot he drops is from the row in the loot_table DB table with
+        entry 1. If talking to him is enabled, he would say "Hey there".
+
 
         :return: A Dictionary: Key: guid, Value: Object of class entities.py/Monster,
                  A Set of Tuples ((Monster GUID, Monster Name))
@@ -56,8 +63,8 @@ def load_creatures(zone: str, subzone: str) -> tuple:
     print("Loading Monsters...")
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
-        creatures_reader = cursor.execute("SELECT * FROM creatures WHERE zone = ? AND sub_zone = ?"
-                                          , [zone, subzone])  # query all the creatures in our location :)
+        creatures_reader = cursor.execute("SELECT * FROM creatures WHERE type = ? AND zone = ? AND sub_zone = ?"
+                                          , ["monster", zone, subzone])  # query all the creatures in our location :)
 
         for creature_info in creatures_reader.fetchall():
             creature_guid = int(creature_info[DBINDEX_CREATURES_GUID])
@@ -66,7 +73,8 @@ def load_creatures(zone: str, subzone: str) -> tuple:
             # This will currently run a query for every monster, meaning if there are 20 of the exact same monsters,
             # 20 queries will be run. There isn't much sense in that, so:
             # TODO: Modify so we don't run unecessary queries for monster info that we've already loaded from the DB
-            creature_template_reader = cursor.execute("SELECT * FROM creature_template WHERE entry = ?", [creature_id])
+            creature_template_reader = cursor.execute("SELECT * FROM creature_template WHERE type = ? AND entry = ?",
+                                                      ["monster",creature_id])
             creature_template_info = creature_template_reader.fetchone()  # entry is unique meaning the query will-
             # always return one monster
 
@@ -104,6 +112,89 @@ def load_creatures(zone: str, subzone: str) -> tuple:
 
     print("Monsters loaded!")
     return monsters_dict, guid_name_set
+
+
+def load_npcs(zone: str, subzone: str) -> tuple:
+    """
+        Gets a query from the creatures table to load all friendly creatures in our current zone
+
+        guid, creature_id,       type,             zone,          subzone
+           1,          11,  'fnpc',    Elwynn Forest, Northshire Abbey
+
+        Then, with each guid queries up the creature information from creatures_template and
+         creates a Monster object in a dictionary has GUID as a key and the monster as the value
+        Key: 1, Value: Monster(....)
+
+        creature_template table is as follows:
+
+        creature entry, creature name,      type,   level, hp, mana, min_dmg, max_dmg, quest_relation_ID, loot_table,ID,      gossip
+                    1, Zimbab       ,    "fnpc" ,      1, 10,   10,       2,       4                  0,             0, "Hey there $N"
+
+        type is "fnpc" meaning this is a Friendly NPC
+        Creature Level: 1 Zimbab, HP: 10, MANA: 10, Damage: 2-4.
+        If the player talks to him, he would say "Hey there (player_name" ($N is placeholder for the player's name)
+
+
+        :return: A Dictionary: Key: guid, Value: Object of class entities.py/FriendlyNPC,
+                 A Set of Tuples ((npc GUID, npc Name))
+    """
+    from entities import FriendlyNPC  # needed to be imported here otherwise we end up in an import loop
+
+    npcs_dict = {}
+    guid_name_set = set()
+
+    print("Loading Friendly NPCs...")
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        fnpc_reader = cursor.execute("SELECT * FROM creatures WHERE type = ? AND zone = ? AND sub_zone = ?"
+                                          , ["fnpc", zone, subzone])  # query all the creatures in our location :)
+
+        for creature_info in fnpc_reader.fetchall():
+            creature_guid = int(creature_info[DBINDEX_CREATURES_GUID])
+            creature_id = int(creature_info[DBINDEX_CREATURES_CREATURE_ID])
+
+            # This will currently run a query for every fnpc, meaning if there are 20 of the exact same npcs,
+            # 20 queries will be run. There isn't much sense in that, so:
+            # TODO: Modify so we don't run unecessary queries for fnpc info that we've already loaded from the DB
+            creature_template_reader = cursor.execute("SELECT * FROM creature_template WHERE type = ? AND entry = ?",
+                                                      ["fnpc",creature_id])
+            creature_template_info = creature_template_reader.fetchone()  # entry is unique meaning the query will-
+            # always return one npc
+
+            # save the creature values
+
+            creature_template_name = creature_template_info[DBINDEX_CREATURE_TEMPLATE_NAME]
+            creature_template_level = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_LEVEL])
+            creature_template_health = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_HEALTH])
+            creature_template_mana = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MANA])
+            creature_template_min_dmg = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MIN_DMG])
+            creature_template_max_dmg = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MAX_DMG])
+
+            creature_template_quest_relation_ID = (
+            int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID])
+            if not creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID] is None else -1)
+
+            creature_template_loot_table_ID = (
+            int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID])
+            if not creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID] is None else -1)
+
+            creature_template_gossip = creature_template_info[DBINDEX_CREATURE_TEMPLATE_GOSSIP]
+
+            # save into the set
+            guid_name_set.add((creature_guid, creature_template_name))
+            # save into the dict
+            npcs_dict[creature_guid] = FriendlyNPC(name=creature_template_name, health=creature_template_health,
+                                                   mana=creature_template_mana, level=creature_template_level,
+                                                   min_damage=creature_template_min_dmg,
+                                                   max_damage=creature_template_max_dmg,
+                                                   quest_relation_id=creature_template_quest_relation_ID,
+                                                   loot_table_ID=creature_template_loot_table_ID,
+                                                   gossip=creature_template_gossip)
+
+
+
+    print("Friendly NPCs loaded!")
+    return npcs_dict, guid_name_set
 
 
 def load_quests(zone: str, subzone:str) -> list:
