@@ -72,4 +72,4 @@ class ElwynnForest:
         return None, None, None, False
 
     def get_map_directions(self, subzone: str):  # return the zone map holding the connections of sub_zones
-        return self.zone_map[subzone]
+        return set(self.zone_map[subzone])

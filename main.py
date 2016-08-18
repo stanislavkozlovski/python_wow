@@ -5,7 +5,7 @@
 # TODO: A million other things
 # TODO: Refactor combat.py, moving the commands into functions and print functions into their respective modules
 # TODO: Refactor function parameter names in the command_handler and information_printer modules
-# TODO: Think of what do to with map_directions so we don't have to assign new values to it on every command
+# TODO: Create a zone module with a base class for zones
 # TODO: Print high level quests in red
 
 import classes
@@ -28,8 +28,6 @@ def main():
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))
     zone_object = get_zone_object(main_character.current_zone)
-    # map_directions - a list of all the possible subzones we could go to from ours directly
-    map_directions = zone_object.get_map_directions(zone_object, main_character.current_subzone)
     '''
     alive_monsters: A Dictionary: Key: guid of monster, Value: Object of class entities.py/Monster
     guid_name_set: A Set of Tuples ((Monster GUID, Monster Name)) used to convert the engage X command to target a creature in alive_monsters
@@ -41,7 +39,7 @@ def main():
     print_live_npcs(alive_npcs, print_all=True)
     print_live_monsters(alive_monsters)
     while True:
-        map_directions = handle_main_commands(main_character, available_quests, map_directions, alive_npcs,
+        handle_main_commands(main_character, available_quests, alive_npcs,
                                               npc_guid_name_set, alive_monsters, guid_name_set, zone_object)
 
 

@@ -5,7 +5,8 @@ from combat import engage_combat
 from commands import pac_main_ooc, pac_map_directions
 from information_printer import print_live_npcs, print_live_monsters, print_available_quests
 
-def handle_main_commands(main_character, available_quests: dict, map_directions, alive_npcs: dict,
+
+def handle_main_commands(main_character, available_quests: dict, alive_npcs: dict,
                          npc_guid_name_set: set, alive_monsters: dict, guid_name_set: set, zone_object):
     """
     Get a command from the player and if it's a valid command: run it.
@@ -17,12 +18,13 @@ def handle_main_commands(main_character, available_quests: dict, map_directions,
     :param alive_monsters: A Dictionary key: Monster_GUID, value: Monster class object
     :param guid_name_set: A Set of Tuples { (Monster_GUID, Monster class object) }
     :param zone_object: A class object of Zone(not implemented yet, currently: ElwynnForest)
-    :return: map_directions, in case we switch zones and they get updated, we need to return them
     """
     command = input()
     if command is '?':
         pac_main_ooc()  # print available commands in the main loop when out of combat
     elif command == 'go to ?':
+        map_directions = zone_object.get_map_directions(main_character.current_subzone)
+
         pac_map_directions(possible_routes=map_directions)
     elif command == 'print available quests' or command == 'paq':
         print_available_quests(available_quests, main_character.level)
@@ -37,7 +39,7 @@ def handle_main_commands(main_character, available_quests: dict, map_directions,
     elif 'accept' in command:  # accept the quest
         handle_accept_quest_command(command, main_character, available_quests)
     elif 'go to' in command:
-        map_directions = handle_go_to_command(command, main_character, zone_object, map_directions)
+        handle_go_to_command(command, main_character, zone_object)
     elif command == 'print alive monsters' or command == 'pam':
         print_live_monsters(alive_monsters)
     elif command == 'print alive npcs' or command == 'pan':
@@ -46,8 +48,6 @@ def handle_main_commands(main_character, available_quests: dict, map_directions,
         print_live_monsters(alive_monsters, print_all=True)
     elif command == 'print all alive npcs':
         print_live_npcs(alive_npcs, print_all=True)
-
-    return map_directions
 
 
 def handle_talk_to_command(command:str, character, alive_npcs: dict, guid_name_set: set):
@@ -103,7 +103,11 @@ def handle_accept_quest_command(command: str, character, available_quests: dict)
         print("No such quest.")
 
 
-def handle_go_to_command(command: str,  main_character, zone_object, map_directions: dict):
+def handle_go_to_command(command: str,  main_character, zone_object):
+
+    # map_directions - a list of all the possible subzones we could go to from ours directly
+    map_directions = zone_object.get_map_directions(main_character.current_subzone)
+
     destination = command[6:]
 
     temp_alive_monsters, temp_guid_name_set, temp_alive_npcs, temp_npc_guid_name_set, temp_available_quests, zone_is_valid = \
@@ -125,7 +129,6 @@ def handle_go_to_command(command: str,  main_character, zone_object, map_directi
     else:
         print("No such destination as {} that is connected to your current subzone.".format(destination))
 
-    return map_directions  # return the new map directions
 
 
 
