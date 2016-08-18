@@ -1,7 +1,7 @@
 """
 This module will hold functions that print all kinds of information to the player
 """
-
+from termcolor import colored
 
 def print_live_monsters(alive_monsters: dict, print_all=False):
     """
@@ -53,7 +53,13 @@ def print_available_quests(available_quests: dict, character_level: int):
     print("Available quests: ")
 
     for _, quest in available_quests.items():
-        if quest.required_level <= character_level:  # print quests that the character has the required level for only!
+        if quest.required_level <= character_level:
             print("{quest_name} - Requires {required_kills} {monster_name} kills. Rewards {xp_reward} experience."
                   .format(quest_name=quest.name, required_kills=quest.required_kills,
                           monster_name=quest.monster_to_kill, xp_reward=quest.xp_reward))
+        else:
+            quest_information_to_print = "{quest_name} [Requires Level {req_level}]".format(quest_name=quest.name,
+                                                                                            req_level=quest.required_level)
+
+            colored_print = colored(quest_information_to_print, "red")
+            print(colored_print)

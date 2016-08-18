@@ -6,7 +6,8 @@
 # TODO: Refactor combat.py, moving the commands into functions and print functions into their respective modules
 # TODO: Refactor function parameter names in the command_handler and information_printer modules
 # TODO: Create a zone module with a base class for zones
-# TODO: Print high level quests in red
+# TODO: Print in colors
+# TODO: Research more about the curses module and maybe about alternatives
 
 import classes
 
