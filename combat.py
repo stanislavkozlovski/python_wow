@@ -107,13 +107,19 @@ def handle_loot(character: Character, monster: Monster):
                     print("{char_name} has looted {item_name}.".format(char_name=character.name,
                                                                        item_name=item_name))
 
+            if not monster.loot:  # if the loot is empty, exit the loot window
+                print('-' * 40)
+                break
+
             print_loot_table(monster)  # print the updated table each time we take something
         elif command == "?":
             pac_looting()
         elif command == "exit":  # end the looting process
+            print('-' * 40)
             break
         else:
             print("Invalid command.")
+
 
 
 def print_loot_table(monster: Monster):
