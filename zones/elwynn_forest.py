@@ -18,12 +18,6 @@ class ElwynnForest(Zone):
     loaded_zones = {"Northshire Valley": None,
                     "Northshire Vineyards": None}
 
-    cs_alive_monsters, cs_monsters_guid_name_set = {}, set()
-    cs_alive_npcs, cs_npcs_guid_name_set = {}, set()
-    cs_available_quests = {}
-    cs_map = []
-    curr_subzone = ""
-
     def __init__(self):
         super().__init__()
         subzone_object = NorthshireValley(name="Northshire Valley", parent_zone_name=self.zone_name,
@@ -43,53 +37,43 @@ class ElwynnForest(Zone):
         :return: a boolean indicating if the move is possible
         """
         if current_subzone in self.zone_map.keys() and current_subzone == self.curr_subzone:
-            if destination in self.zone_map[current_subzone] and destination in self.loaded_zones.keys():
-                # save the information in case we've killed monsters or done quests for example
-                temp_sz_object = self.loaded_zones[current_subzone]  # type: SubZone
-                temp_sz_object.update_monsters(self.cs_alive_monsters, self.cs_monsters_guid_name_set)
-                temp_sz_object.update_npcs(self.cs_alive_npcs, self.cs_npcs_guid_name_set)
-                temp_sz_object.update_quests(self.cs_available_quests)
-                self.loaded_zones[current_subzone] = temp_sz_object
 
-                if not self.loaded_zones[destination]:
-                    # if we have not loaded the zone before, we need to initialize it's class and put it in the loaded_zones
-                    if destination == "Northshire Valley":
-                        self.loaded_zones[destination] = NorthshireValley(name=destination,
-                                                                          parent_zone_name=self.zone_name,
-                                                                          zone_map=self.zone_map[destination])
-                    elif destination == "Northshire Vineyards":
-                        self.loaded_zones[destination] = NorthshireVineyards(name=destination,
-                                                                          parent_zone_name=self.zone_name,
-                                                                          zone_map=self.zone_map[destination])
+            if destination in self.zone_map[current_subzone] and destination in self.loaded_zones.keys():
+                # Before moving:
+                # update the information for our current in case we've killed monsters or done quests for example
+                self._update_subzone_attributes(current_subzone)
+
+                if not self.loaded_zones[destination]:  # if we don't have the destination's attributes loaded load them
+                    self._load_zone(destination)
+
                 self.curr_subzone = destination
-                subzone_object = self.loaded_zones[destination]  # type: SubZone
-                # We move, therefore load the new attributes
-                self.cs_alive_monsters, self.cs_monsters_guid_name_set = subzone_object.get_monsters()
-                self.cs_alive_npcs, self.cs_npcs_guid_name_set = subzone_object.get_npcs()
-                self.cs_available_quests = subzone_object.get_quests()
-                self.cs_map = subzone_object.get_map_directions()
+
+                # We move, therefore update our attributes
+                self._update_attributes(destination)
                 return True
             else:
                 print("No such destination {}.".format(destination))
+
         else:
             raise Exception("The subzone is not in the zone_object!")
 
         return False
 
-    def get_monsters(self):
-        return self.cs_alive_monsters, self.cs_monsters_guid_name_set
+    def _load_zone(self, subzone: str):
+        # if we have not loaded the zone before, we need to initialize it's class and put it in the loaded_zones
+        if subzone == "Northshire Valley":
+            self.loaded_zones[subzone] = NorthshireValley(name=subzone,
+                                                          parent_zone_name=self.zone_name,
+                                                          zone_map=self.zone_map[subzone])
+        elif subzone == "Northshire Vineyards":
+            self.loaded_zones[subzone] = NorthshireVineyards(name=subzone,
+                                                             parent_zone_name=self.zone_name,
+                                                             zone_map=self.zone_map[subzone])
 
-    def get_npcs(self):
-        return self.cs_alive_npcs, self.cs_npcs_guid_name_set
-
-    def get_quests(self):
-        return self.cs_available_quests
-
-    def get_map(self):
-        return self.cs_map
 
 class NorthshireValley(SubZone):
     pass
+
 
 class NorthshireVineyards(SubZone):
     pass

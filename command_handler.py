@@ -24,7 +24,7 @@ def handle_main_commands(main_character, available_quests: dict, alive_npcs: dic
     if command is '?':
         pac_main_ooc()  # print available commands in the main loop when out of combat
     elif command == 'go to ?':
-        map_directions = zone_object.get_map()
+        map_directions = zone_object.get_cs_map()
 
         pac_map_directions(possible_routes=map_directions)
     elif command == 'print available quests' or command == 'paq':
@@ -111,13 +111,13 @@ def handle_go_to_command(command: str,  main_character, zone_object: Zone):
 
     if valid_move:
         # if the move has been successful
-        alive_monsters, guid_name_set = zone_object.get_monsters()
-        alive_npcs, npc_guid_name_set = zone_object.get_npcs()
-        available_quests = zone_object.get_quests()
+        alive_monsters, guid_name_set = zone_object.get_cs_monsters()
+        alive_npcs, npc_guid_name_set = zone_object.get_cs_npcs()
+        available_quests = zone_object.get_cs_quests()
 
         main_character.current_subzone = destination
         # update _map directions
-        map_directions = zone_object.get_map()
+        map_directions = zone_object.get_cs_map()
         print("Moved to {0}".format(main_character.current_subzone))
         print_live_npcs(alive_npcs, print_all=True)
         print_live_monsters(alive_monsters)
