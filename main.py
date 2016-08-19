@@ -13,7 +13,7 @@ from zones.zone import Zone
 from items import Weapon
 from zones.elwynn_forest import ElwynnForest
 
-GAME_VERSION = '0.0.3.1 ALPHA'
+GAME_VERSION = '0.0.3.2 ALPHA'
 ZONES = {"Elwynn Forest": ElwynnForest()}
 
 

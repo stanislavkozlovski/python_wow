@@ -130,9 +130,7 @@ class Monster(LivingThing):
     def attack(self, victim):  # victim: Character
         monster_swing = self.get_auto_attack_damage(victim.level)  # an integer representing the damage
 
-        print("{0} attacks {1} for {2:.2f} damage!".format(self.name, victim.name, monster_swing))
-
-        victim.take_attack(monster_swing)
+        victim.take_attack(self.name, monster_swing, self.level)
 
     def take_attack(self, damage: int):
         self.health -= damage
@@ -191,6 +189,7 @@ class Character(LivingThing):
     KEY_LEVEL_STATS_HEALTH = 'health'
     KEY_LEVEL_STATS_MANA = 'mana'
     KEY_LEVEL_STATS_STRENGTH = 'strength'
+    KEY_LEVEL_STATS_ARMOR = 'armor'
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1):
         super().__init__(name, health, mana)
@@ -201,6 +200,7 @@ class Character(LivingThing):
         self.level = 1
         self.experience = 0
         self.xp_req_to_level = 400
+        self.armor = 75
         self.current_zone = "Elwynn Forest"
         self.current_subzone = "Northshire Valley"
         # A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
@@ -245,9 +245,26 @@ class Character(LivingThing):
     def attack(self, victim: Monster):
         pass
 
-    def take_attack(self, damage: int):
+    def take_attack(self, monster_name:str, damage: float, attacker_level: int):
+        damage = self._apply_armor_reduction(damage, attacker_level)
+
+        print("{0} attacks {1} for {2:.2f} damage!".format(monster_name, self.name, damage))
         self.health -= damage
         self.check_if_dead()
+
+    def _apply_armor_reduction(self, damage: float, attacker_level: int):
+        """
+        This method applies the armor reduction to a blow, the formula is as follows:
+        Percentage to Reduce = Armor / (Armor + 400 + 85 * Attacker_Level)
+        :param damage: the raw damage
+        :return: the damage with the applied reduction
+        """
+        reduction_percentage = self.armor / (self.armor + 400 + 85 * attacker_level)
+        damage_to_deduct = damage * reduction_percentage
+        reduced_damage = damage - damage_to_deduct
+        print("TEMPORARY: DAMAGEREDUCTION: {}, ORIGINALDAMAGE: {}, RESULT: {}".format(damage_to_deduct, damage, reduced_damage))
+
+        return round(reduced_damage, 3)
 
     def _die(self):
         super()._die()
@@ -339,14 +356,17 @@ class Character(LivingThing):
         hp_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_HEALTH]
         mana_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_MANA]
         strength_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_STRENGTH]
+        armor_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_ARMOR]
 
         self.max_health += hp_increase_amount
         self.max_mana += mana_increase_amount
         self.strength += strength_increase_amount
+        self.armor += armor_increase_amount
         self._regenerate()  # regen to full hp/mana
 
         print('*' * 20)
         print("Character {0} has leveled up to level {1}!".format(self.name, self.level))
+        print("Armor Points increased by {}".format(armor_increase_amount))
         print("Health Points increased by {}".format(hp_increase_amount))
         print("Mana Points increased by {}".format(mana_increase_amount))
         print("Strength Points increased by {}".format(strength_increase_amount))

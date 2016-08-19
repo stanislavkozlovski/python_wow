@@ -22,7 +22,7 @@ from database_info import \
      DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MAX_GOLD_REWARD,
 
      DBINDEX_LEVELUP_STATS_LEVEL, DBINDEX_LEVELUP_STATS_HEALTH, DBINDEX_LEVELUP_STATS_MANA,
-     DBINDEX_LEVELUP_STATS_STRENGTH,
+     DBINDEX_LEVELUP_STATS_STRENGTH, DBINDEX_LEVELUP_STATS_ARMOR,
 
      DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
      )
@@ -374,12 +374,13 @@ def load_item(item_ID: int):
 def load_character_level_stats() -> dict:
     """
     Read the table file holding information about the amount of stats you should get according to the level you've attained
-    1 - level; 2 - hp; 3 - mana; 4 - strength;
+    1 - level; 2 - hp; 3 - mana; 4 - strength; 5 - armor;
     :returns A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
     """
     key_level_stats_health = 'health'
     key_level_stats_mana = 'mana'
     key_level_stats_strength = 'strength'
+    key_level_stats_armor = 'armor'
 
     level_stats = {}
     with sqlite3.connect(DB_PATH) as connection:
@@ -393,10 +394,12 @@ def load_character_level_stats() -> dict:
             hp = int(line[DBINDEX_LEVELUP_STATS_HEALTH])
             mana = int(line[DBINDEX_LEVELUP_STATS_MANA])
             strength = int(line[DBINDEX_LEVELUP_STATS_STRENGTH])
+            armor = int(line[DBINDEX_LEVELUP_STATS_ARMOR])
 
             level_dict[key_level_stats_health] = hp
             level_dict[key_level_stats_mana] = mana
             level_dict[key_level_stats_strength] = strength
+            level_dict[key_level_stats_armor] = armor
 
             level_stats[level] = level_dict
 

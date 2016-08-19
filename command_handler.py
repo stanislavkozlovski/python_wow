@@ -2,7 +2,6 @@
 This module will handle the player's commands
 """
 from zones.zone import Zone
-from combat import engage_combat
 from commands import pac_main_ooc, pac_map_directions, pac_in_combat
 from information_printer import (print_live_npcs, print_live_monsters,
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar)
@@ -72,6 +71,7 @@ def handle_talk_to_command(command:str, character, alive_npcs: dict, guid_name_s
 
 
 def handle_engage_command(command: str, character, alive_monsters: dict, guid_name_set: set):
+    from combat import engage_combat
     target = command[7:]  # name of monster to engage
 
     # return a list with the guids for each monster we've targeted and get the first guid [0]
