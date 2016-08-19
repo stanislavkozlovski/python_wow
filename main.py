@@ -2,7 +2,6 @@
 # TODO: add more monsters and subzones
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
-# TODO: Refactor combat.py, moving the commands into functions and print functions into their respective modules
 # TODO: Refactor function parameter names in the command_handler and information_printer modules
 # TODO: Print in colors
 # TODO: Research more about the curses module and maybe about alternatives

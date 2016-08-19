@@ -3,8 +3,10 @@ This module will handle the player's commands
 """
 from zones.zone import Zone
 from combat import engage_combat
-from commands import pac_main_ooc, pac_map_directions
-from information_printer import print_live_npcs, print_live_monsters, print_available_quests
+from commands import pac_main_ooc, pac_map_directions, pac_in_combat
+from information_printer import (print_live_npcs, print_live_monsters,
+                                 print_available_quests, print_in_combat_stats, print_character_xp_bar)
+
 
 
 def handle_main_commands(main_character, available_quests: dict, alive_npcs: dict,
@@ -123,6 +125,21 @@ def handle_go_to_command(command: str,  main_character, zone_object: Zone):
         print_live_monsters(alive_monsters)
     else:
         print("No such destination as {} that is connected to your current subzone.".format(destination))
+
+# IN COMBAT COMMANDS
+# COMMANDS THAT DO NOT END THE TURN
+def handle_in_combat_non_ending_turn_commands(command: str, character, monster) -> str:
+    while True:  # for commands that do not end the turn, like printing the stats or the possible commands
+        if command == '?':
+            pac_in_combat(character)  # print available commands
+        elif command == 'print stats':
+            print_in_combat_stats(character, monster)
+        elif command == 'print xp':
+            print_character_xp_bar(character)
+        else:
+            return command
+        command = input()
+
 
 
 

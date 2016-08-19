@@ -3,6 +3,7 @@ This module will hold functions that print all kinds of information to the playe
 """
 from termcolor import colored
 
+
 def print_live_monsters(alive_monsters: dict, print_all=False):
     """
     Prints the monsters that are alive in the current subzone
@@ -63,3 +64,37 @@ def print_available_quests(available_quests: dict, character_level: int):
 
             colored_print = colored(quest_information_to_print, "red")
             print(colored_print)
+
+
+def print_in_combat_stats(character, monster):
+    print("Character {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(character.name, character.health,
+                                                                          character.max_health,
+                                                                          character.mana,
+                                                                          character.max_mana))
+
+
+    print("Monster {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(monster.name, monster.health,
+                                                                        monster.max_health, monster.mana,
+                                                                        monster.max_mana))
+
+
+def print_character_xp_bar(character):
+    print("{0}/{1} Experience. {2} needed to level up!".format(character.experience,
+                                                               character.xp_req_to_level,
+                                                               character.xp_req_to_level - character.experience))
+
+def print_loot_table(monster):
+    """
+    Prints the loot table
+    :param monster: A monster object of class Monster
+    """
+    print()
+    print("Loot dropped:")
+
+    if "gold" in monster.loot.keys():
+        # print the gold separately so it always comes up on top
+        print("\t{} gold".format(monster.loot['gold']))
+
+    for item_name, item in monster.loot.items():  # type: dict
+        if item_name is not "gold":
+            print("\t{}".format(item))

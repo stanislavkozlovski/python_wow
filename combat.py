@@ -1,5 +1,7 @@
-from commands import pac_in_combat, pac_looting,get_available_paladin_abilities
+from commands import pac_looting,get_available_paladin_abilities
 from entities import Character, Monster
+from command_handler import handle_in_combat_non_ending_turn_commands
+from information_printer import print_loot_table
 
 
 def engage_combat(character: Character, monster: Monster, alive_monsters: dict, guid_name_set: set, monster_GUID: int):
@@ -41,25 +43,8 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
             break
 
         command = input()
-
-        while True:  # for commands that do not end the turn, like printing the stats or the possible commands
-            if command == '?':
-                pac_in_combat(character)  # print available commands
-            elif command == 'print stats':
-                print("Character {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(character.name, character.health,
-                                                                                      character.max_health,
-                                                                                      character.mana,
-                                                                                      character.max_mana))
-                print("Monster {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(monster.name, monster.health,
-                                                                                    monster.max_health, monster.mana,
-                                                                                    monster.max_mana))
-            elif command == 'print xp':
-                print("{0}/{1} Experience. {2} needed to level up!".format(character.experience,
-                                                                           character.xp_req_to_level,
-                                                                           character.xp_req_to_level - character.experience))
-            else:
-                break
-            command = input()
+        # check if the command does not end the turn, if it doesn't the same command gets returned
+        command = handle_in_combat_non_ending_turn_commands(command, character, monster)
 
         if command == 'attack':
             character.attack(monster)
@@ -83,8 +68,6 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
 
 def handle_loot(character: Character, monster: Monster):
     """ Display the loot dropped from the monster and listen for input if the player wants to take any"""
-    # TODO: Auto-exit the loot window once there is no more loot to be taken
-
     print_loot_table(monster)
     while True:
         command = input()
@@ -119,20 +102,6 @@ def handle_loot(character: Character, monster: Monster):
             break
         else:
             print("Invalid command.")
-
-
-
-def print_loot_table(monster: Monster):
-    print()
-    print("Loot dropped:")
-
-    if "gold" in monster.loot.keys():
-        # print the gold separately so it always comes up on top
-        print("\t{} gold".format(monster.loot['gold']))
-
-    for item_name, item in monster.loot.items(): # type: dict
-        if item_name is not "gold":
-            print("\t{}".format(item))
 
 
 # returns a set with a list of allowed commands (you can't cast a spell you haven't learned yet)
