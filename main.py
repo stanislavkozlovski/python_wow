@@ -1,6 +1,5 @@
 # TODO: Add talents system and Class classes
 # TODO: add more monsters and subzones
-# TODO: Add a AddExperience method in Character and replace where appropriate
 # TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 # TODO: A million other things
 # TODO: Refactor combat.py, moving the commands into functions and print functions into their respective modules

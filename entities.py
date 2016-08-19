@@ -274,6 +274,10 @@ class Character(LivingThing):
 
         del self.quest_log[quest.ID]  # remove from quest log
 
+        self._award_experience(xp_reward)
+
+    def _award_experience(self, xp_reward: int):
+        """ Method that awards experience to the player and checks if he levels up"""
         self.experience += xp_reward
         self.check_if_levelup()
 
@@ -296,8 +300,7 @@ class Character(LivingThing):
         else:
             print("XP awarded: {0}!".format(xp_reward))
 
-        self.experience += xp_reward + xp_bonus_reward
-        self.check_if_levelup()
+        self._award_experience(xp_reward + xp_bonus_reward)
 
         # If this monster is for a quest and we have that quest
         if monster_quest_ID and monster_quest_ID in self.quest_log:
