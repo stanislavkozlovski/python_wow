@@ -75,6 +75,8 @@ def pac_looting():
     print("\t\tExits the loot window")
     print("\t?")
     print("\t\tShows a list of available commands.\n")
+
+
 def pac_map_directions(possible_routes: list):
     """
     Prints all possible subzones you can go in from your current subzone

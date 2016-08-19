@@ -1,6 +1,7 @@
 """
 This module will handle the player's commands
 """
+from zones.zone import Zone
 from combat import engage_combat
 from commands import pac_main_ooc, pac_map_directions
 from information_printer import print_live_npcs, print_live_monsters, print_available_quests
@@ -23,7 +24,7 @@ def handle_main_commands(main_character, available_quests: dict, alive_npcs: dic
     if command is '?':
         pac_main_ooc()  # print available commands in the main loop when out of combat
     elif command == 'go to ?':
-        map_directions = zone_object.get_map_directions(main_character.current_subzone)
+        map_directions = zone_object.get_map()
 
         pac_map_directions(possible_routes=map_directions)
     elif command == 'print available quests' or command == 'paq':
@@ -103,26 +104,20 @@ def handle_accept_quest_command(command: str, character, available_quests: dict)
         print("No such quest.")
 
 
-def handle_go_to_command(command: str,  main_character, zone_object):
-
-    # map_directions - a list of all the possible subzones we could go to from ours directly
-    map_directions = zone_object.get_map_directions(main_character.current_subzone)
-
+def handle_go_to_command(command: str,  main_character, zone_object: Zone):
     destination = command[6:]
 
-    temp_alive_monsters, temp_guid_name_set, temp_alive_npcs, temp_npc_guid_name_set, temp_available_quests, zone_is_valid = \
-        zone_object.get_zone_attributes(zone_object, destination)
+    valid_move = zone_object.move_player(main_character.current_subzone, destination)
 
-    if zone_is_valid and destination in map_directions:
+    if valid_move:
         # if the move has been successful
-
-        alive_monsters, guid_name_set, alive_npcs, npc_guid_name_set, available_quests = (
-            temp_alive_monsters, temp_guid_name_set, temp_alive_npcs, temp_npc_guid_name_set,
-            temp_available_quests)
+        alive_monsters, guid_name_set = zone_object.get_monsters()
+        alive_npcs, npc_guid_name_set = zone_object.get_npcs()
+        available_quests = zone_object.get_quests()
 
         main_character.current_subzone = destination
-        # update map directions
-        map_directions = zone_object.get_map_directions(zone_object, main_character.current_subzone)
+        # update _map directions
+        map_directions = zone_object.get_map()
         print("Moved to {0}".format(main_character.current_subzone))
         print_live_npcs(alive_npcs, print_all=True)
         print_live_monsters(alive_monsters)

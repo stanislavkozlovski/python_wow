@@ -2,72 +2,94 @@
 A Module that will take care of loading creatures that are in the Elwynn Forest zone
 This is created so that we don't have to load the creatures every time we change zones AND
 to have dead creatures stay dead, not be reloaded
+
+the cs in cs_alive_monsters and similar names stands for Current Subzone
 """
-from zones.zone import Zone
-from loader import load_monsters, load_npcs, load_quests
+from zones.zone import Zone, SubZone
 
 
 class ElwynnForest(Zone):
-    # the map that shows us where we can go from our current subzone
+    # the _map that shows us where we can go from our current subzone
     zone_map = {"Northshire Valley": ["Northshire Vineyards"],
                 "Northshire Vineyards": ["Northshire Valley"]}
     zone_name = "Elwynn Forest"
+    starter_subzone = "Northshire Valley"
+    # dictionary that will hold the subzone class objects
+    loaded_zones = {"Northshire Valley": None,
+                    "Northshire Vineyards": None}
 
-    northshire_valley_guid_name_set, northshire_valley_alive_monsters, \
-    northshire_valley_npc_guid_name_set, northshire_valley_alive_npcs, \
-    northshire_valley_quest_list, northshire_valley_loaded = {}, {}, {}, {}, [], False
+    cs_alive_monsters, cs_monsters_guid_name_set = {}, set()
+    cs_alive_npcs, cs_npcs_guid_name_set = {}, set()
+    cs_available_quests = {}
+    cs_map = []
+    curr_subzone = ""
 
-    northshire_vineyards_guid_name_set, northshire_vineyards_alive_monsters, \
-    northshire_vineyards_npc_guid_name_set, northshire_vineyards_alive_npcs, \
-    northshire_vineyards_quest_list, northshire_vineyards_loaded = {}, {}, {}, {}, [], False
+    def __init__(self):
+        super().__init__()
+        subzone_object = NorthshireValley(name="Northshire Valley", parent_zone_name=self.zone_name,
+                                          zone_map=self.zone_map["Northshire Valley"])
+        self.cs_alive_monsters, self.cs_monsters_guid_name_set = subzone_object.get_monsters()
+        self.cs_alive_npcs, self.cs_npcs_guid_name_set = subzone_object.get_npcs()
+        self.cs_available_quests = subzone_object.get_quests()
+        self.cs_map = subzone_object.get_map_directions()
+        self.curr_subzone = "Northshire Valley"
+        self.loaded_zones["Northshire Valley"] = subzone_object
 
-    def get_live_monsters_guid_name_set_and_quest_list(self: Zone, subzone: str) -> tuple:
+    def move_player(self, current_subzone: str, destination: str):
         """
-        A method used to load the specific monsters and quests tied to the subzone the character is in.
-        First we figure out which subzone we're in, then we see if it has been loaded.
-        If it has been loaded - return the already loaded dic, set, dict
-        If it has not been loaded - load them from the load functions in loader.py and return them
 
-        :param subzone: the subzone from which we should get the monsters and quests
-        :return: A tuple containing the following (1, 2, 3)
-         1 - A Dictionary holding information about the monster - Key: GUID, Value: Monster object from class Monster
-         2 - A Set holding tuples of (Monster GUID, Monster Name)
-         3 - A Dictionary holding information a bout the friendly npcs - Key: GUID, Value: object from class FriendlyNPC
-         4 - A Set holding tuples of (NPC GUID, NPC Name)
-         5 - A Dictionary holding information about quests - Key: Quest Name, Value: Quest object from class Quest
-         6 - A Boolean indicating if we have moved or not
+        :param current_subzone: the subzone the character is in
+        :param destination: the subzone he wants to go in
+        :return: a boolean indicating if the move is possible
         """
+        if current_subzone in self.zone_map.keys() and current_subzone == self.curr_subzone:
+            if destination in self.zone_map[current_subzone] and destination in self.loaded_zones.keys():
+                # save the information in case we've killed monsters or done quests for example
+                temp_sz_object = self.loaded_zones[current_subzone]  # type: SubZone
+                temp_sz_object.update_monsters(self.cs_alive_monsters, self.cs_monsters_guid_name_set)
+                temp_sz_object.update_npcs(self.cs_alive_npcs, self.cs_npcs_guid_name_set)
+                temp_sz_object.update_quests(self.cs_available_quests)
+                self.loaded_zones[current_subzone] = temp_sz_object
 
-        if subzone == 'Northshire Valley':
-            if not self.northshire_valley_loaded:
-                self.northshire_valley_alive_monsters, self.northshire_valley_guid_name_set = load_monsters(
-                    self.zone_name, subzone)
-                self.northshire_valley_alive_npcs, self.northshire_valley_npc_guid_name_set = load_npcs(
-                    self.zone_name, subzone)
-                self.northshire_valley_quest_list = load_quests(self.zone_name, subzone)
-                self.northshire_valley_loaded = True
+                if not self.loaded_zones[destination]:
+                    # if we have not loaded the zone before, we need to initialize it's class and put it in the loaded_zones
+                    if destination == "Northshire Valley":
+                        self.loaded_zones[destination] = NorthshireValley(name=destination,
+                                                                          parent_zone_name=self.zone_name,
+                                                                          zone_map=self.zone_map[destination])
+                    elif destination == "Northshire Vineyards":
+                        self.loaded_zones[destination] = NorthshireVineyards(name=destination,
+                                                                          parent_zone_name=self.zone_name,
+                                                                          zone_map=self.zone_map[destination])
+                self.curr_subzone = destination
+                subzone_object = self.loaded_zones[destination]  # type: SubZone
+                # We move, therefore load the new attributes
+                self.cs_alive_monsters, self.cs_monsters_guid_name_set = subzone_object.get_monsters()
+                self.cs_alive_npcs, self.cs_npcs_guid_name_set = subzone_object.get_npcs()
+                self.cs_available_quests = subzone_object.get_quests()
+                self.cs_map = subzone_object.get_map_directions()
+                return True
+            else:
+                print("No such destination {}.".format(destination))
+        else:
+            raise Exception("The subzone is not in the zone_object!")
 
-            return self.northshire_valley_alive_monsters, \
-                   self.northshire_valley_guid_name_set, \
-                   self.northshire_valley_alive_npcs, \
-                   self.northshire_valley_npc_guid_name_set, \
-                   self.northshire_valley_quest_list, \
-                   True
+        return False
 
-        elif subzone == 'Northshire Vineyards':
-            if not self.northshire_vineyards_loaded:
-                self.northshire_vineyards_alive_monsters, self.northshire_vineyards_guid_name_set = load_monsters(
-                    self.zone_name, subzone)
-                self.northshire_vineyards_alive_npcs, self.northshire_vineyards_npc_guid_name_set = load_npcs(
-                    self.zone_name, subzone)
-                self.northshire_vineyards_quest_list = load_quests(self.zone_name, subzone)
-                self.northshire_vineyards_loaded = True
+    def get_monsters(self):
+        return self.cs_alive_monsters, self.cs_monsters_guid_name_set
 
-            return self.northshire_vineyards_alive_monsters, \
-                   self.northshire_vineyards_guid_name_set, \
-                   self.northshire_vineyards_alive_npcs, \
-                   self.northshire_vineyards_npc_guid_name_set, \
-                   self.northshire_vineyards_quest_list, \
-                   True
+    def get_npcs(self):
+        return self.cs_alive_npcs, self.cs_npcs_guid_name_set
 
-        return None, None, None, None, None, False
+    def get_quests(self):
+        return self.cs_available_quests
+
+    def get_map(self):
+        return self.cs_map
+
+class NorthshireValley(SubZone):
+    pass
+
+class NorthshireVineyards(SubZone):
+    pass

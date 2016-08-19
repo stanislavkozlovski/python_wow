@@ -4,7 +4,6 @@
 # TODO: A million other things
 # TODO: Refactor combat.py, moving the commands into functions and print functions into their respective modules
 # TODO: Refactor function parameter names in the command_handler and information_printer modules
-# TODO: Maybe create subzone class?
 # TODO: Print in colors
 # TODO: Research more about the curses module and maybe about alternatives
 
@@ -16,7 +15,7 @@ from items import Weapon
 from zones.elwynn_forest import ElwynnForest
 
 GAME_VERSION = '0.0.3.1 ALPHA'
-ZONES = {"Elwynn Forest": ElwynnForest}
+ZONES = {"Elwynn Forest": ElwynnForest()}
 
 
 def main():
@@ -32,8 +31,9 @@ def main():
     guid_name_set: A Set of Tuples ((Monster GUID, Monster Name)) used to convert the engage X command to target a creature in alive_monsters
     available_quests: A Dictionary: Key: name of quest, Value: Object of class quest.py/Quest
     '''
-    alive_monsters, guid_name_set, alive_npcs, npc_guid_name_set, available_quests,  _ = zone_object.get_zone_attributes(zone_object,
-        main_character.current_subzone)
+    alive_monsters, guid_name_set = zone_object.get_monsters()
+    alive_npcs, npc_guid_name_set = zone_object.get_npcs()
+    available_quests = zone_object.get_quests()
 
     print_live_npcs(alive_npcs, print_all=True)
     print_live_monsters(alive_monsters)
