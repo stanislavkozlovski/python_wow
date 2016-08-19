@@ -8,18 +8,11 @@ from information_printer import (print_live_npcs, print_live_monsters,
 
 
 
-def handle_main_commands(main_character, available_quests: dict, alive_npcs: dict,
-                         npc_guid_name_set: set, alive_monsters: dict, guid_name_set: set, zone_object):
+def handle_main_commands(main_character, zone_object):
     """
     Get a command from the player and if it's a valid command: run it.
     :param main_character: A Character class object. This is basically the player
-    :param available_quests: A Dictionary holding the available quests in this zone
-    :param map_directions: A List holding the name of the zones we can access from our current sub zone
-    :param alive_npcs: A Dictionary key: NPC_GUID, value: FriendlyNPC class object
-    :param npc_guid_name_set: A Set of Tuples { (NPC_GUID, FriendlyNPC class object) }
-    :param alive_monsters: A Dictionary key: Monster_GUID, value: Monster class object
-    :param guid_name_set: A Set of Tuples { (Monster_GUID, Monster class object) }
-    :param zone_object: A class object of Zone(not implemented yet, currently: ElwynnForest)
+    :param zone_object: A class object of Zone
     """
     command = input()
     if command is '?':
@@ -29,26 +22,32 @@ def handle_main_commands(main_character, available_quests: dict, alive_npcs: dic
 
         pac_map_directions(possible_routes=map_directions)
     elif command == 'print available quests' or command == 'paq':
-        print_available_quests(available_quests, main_character.level)
+        print_available_quests(available_quests=zone_object.get_cs_quests(), character_level=main_character.level)
     elif command == 'print quest log':
         main_character.print_quest_log()
     elif command == 'print inventory':
         main_character.print_inventory()
     elif 'talk to' in command:
-        handle_talk_to_command(command, main_character, alive_npcs, npc_guid_name_set)
+        alive_npcs, guid_name_set = zone_object.get_cs_npcs()
+        handle_talk_to_command(command, main_character, alive_npcs, guid_name_set)
     elif 'engage' in command:
+        alive_monsters, guid_name_set = zone_object.get_cs_monsters()
         handle_engage_command(command, main_character, alive_monsters, guid_name_set)
     elif 'accept' in command:  # accept the quest
-        handle_accept_quest_command(command, main_character, available_quests)
+        handle_accept_quest_command(command, main_character, available_quests=zone_object.get_cs_quests())
     elif 'go to' in command:
         handle_go_to_command(command, main_character, zone_object)
     elif command == 'print alive monsters' or command == 'pam':
+        alive_monsters, _ = zone_object.get_cs_monsters()
         print_live_monsters(alive_monsters)
     elif command == 'print alive npcs' or command == 'pan':
+        alive_npcs, _ = zone_object.get_cs_npcs()
         print_live_npcs(alive_npcs)
     elif command == 'print all alive monsters':
+        alive_monsters, _ = zone_object.get_cs_monsters()
         print_live_monsters(alive_monsters, print_all=True)
     elif command == 'print all alive npcs':
+        alive_npcs, _ = zone_object.get_cs_npcs()
         print_live_npcs(alive_npcs, print_all=True)
 
 

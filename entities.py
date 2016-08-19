@@ -262,7 +262,6 @@ class Character(LivingThing):
         reduction_percentage = self.armor / (self.armor + 400 + 85 * attacker_level)
         damage_to_deduct = damage * reduction_percentage
         reduced_damage = damage - damage_to_deduct
-        print("TEMPORARY: DAMAGEREDUCTION: {}, ORIGINALDAMAGE: {}, RESULT: {}".format(damage_to_deduct, damage, reduced_damage))
 
         return round(reduced_damage, 3)
 

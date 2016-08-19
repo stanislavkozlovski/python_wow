@@ -25,20 +25,14 @@ def main():
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))
     zone_object = get_zone_object(main_character.current_zone)  # type: Zone
-    '''
-    alive_monsters: A Dictionary: Key: guid of monster, Value: Object of class entities.py/Monster
-    guid_name_set: A Set of Tuples ((Monster GUID, Monster Name)) used to convert the engage X command to target a creature in alive_monsters
-    available_quests: A Dictionary: Key: name of quest, Value: Object of class quest.py/Quest
-    '''
-    alive_monsters, guid_name_set = zone_object.get_cs_monsters()
-    alive_npcs, npc_guid_name_set = zone_object.get_cs_npcs()
-    available_quests = zone_object.get_cs_quests()
+
+    alive_npcs, _ = zone_object.get_cs_npcs()
+    alive_monsters, _ = zone_object.get_cs_monsters()
 
     print_live_npcs(alive_npcs, print_all=True)
     print_live_monsters(alive_monsters)
     while True:
-        handle_main_commands(main_character, available_quests, alive_npcs,
-                                              npc_guid_name_set, alive_monsters, guid_name_set, zone_object)
+        handle_main_commands(main_character, zone_object)
 
 
 def get_zone_object(zone: str):
