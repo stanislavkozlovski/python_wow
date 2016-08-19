@@ -3,10 +3,11 @@ A Module that will take care of loading creatures that are in the Elwynn Forest 
 This is created so that we don't have to load the creatures every time we change zones AND
 to have dead creatures stay dead, not be reloaded
 """
+from zones.zone import Zone
 from loader import load_monsters, load_npcs, load_quests
 
 
-class ElwynnForest:
+class ElwynnForest(Zone):
     # the map that shows us where we can go from our current subzone
     zone_map = {"Northshire Valley": ["Northshire Vineyards"],
                 "Northshire Vineyards": ["Northshire Valley"]}
@@ -20,7 +21,7 @@ class ElwynnForest:
     northshire_vineyards_npc_guid_name_set, northshire_vineyards_alive_npcs, \
     northshire_vineyards_quest_list, northshire_vineyards_loaded = {}, {}, {}, {}, [], False
 
-    def get_live_monsters_guid_name_set_and_quest_list(self, subzone: str) -> tuple:
+    def get_live_monsters_guid_name_set_and_quest_list(self: Zone, subzone: str) -> tuple:
         """
         A method used to load the specific monsters and quests tied to the subzone the character is in.
         First we figure out which subzone we're in, then we see if it has been loaded.
@@ -69,7 +70,4 @@ class ElwynnForest:
                    self.northshire_vineyards_quest_list, \
                    True
 
-        return None, None, None, False
-
-    def get_map_directions(self, subzone: str):  # return the zone map holding the connections of sub_zones
-        return set(self.zone_map[subzone])
+        return None, None, None, None, None, False

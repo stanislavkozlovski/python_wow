@@ -111,7 +111,7 @@ def handle_go_to_command(command: str,  main_character, zone_object):
     destination = command[6:]
 
     temp_alive_monsters, temp_guid_name_set, temp_alive_npcs, temp_npc_guid_name_set, temp_available_quests, zone_is_valid = \
-        zone_object.get_live_monsters_guid_name_set_and_quest_list(zone_object, destination)
+        zone_object.get_zone_attributes(zone_object, destination)
 
     if zone_is_valid and destination in map_directions:
         # if the move has been successful
