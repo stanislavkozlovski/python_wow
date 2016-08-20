@@ -1,15 +1,3 @@
-# TODO: Add talents system and Class classes
-# TODO: add more monsters and subzones
-# TODO: Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
-# TODO: A million other things
-# TODO: Refactor function parameter names in the command_handler and information_printer modules
-# TODO: Print in colors
-# TODO: Research more about the curses module and maybe about alternatives
-# TODO: Remove the int() calls from loader.py
-# TODO: Print own inventory
-# TODO: Print NPCs
-# TODO: Move these TODOs to a separate file!
-
 import classes
 
 from command_handler import handle_main_commands, print_live_monsters, print_live_npcs
