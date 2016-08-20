@@ -56,13 +56,9 @@ def handle_main_commands(main_character, zone_object):
 def handle_talk_to_command(command:str, character, alive_npcs: dict, guid_name_set: set):
     target = command[8:]  # name of NPC
 
-    # return a list with the guids for each monster we've targeted and get the first guid [0]
+    # return the guid for the npc we want to target, or None if there is no such one
     # using the guid, target him from the alive_monsters dictionary
-    target_guid_list = [guid if name == target else None for guid, name in guid_name_set]
-    if target_guid_list:
-        target_guid = target_guid_list[0]
-    else:  # if the list is empty
-        target_guid = None
+    target_guid = next([guid if name == target else None for guid, name in guid_name_set], None)
 
     if target_guid in alive_npcs.keys():
         target = alive_npcs[target_guid]
@@ -75,13 +71,9 @@ def handle_engage_command(command: str, character, alive_monsters: dict, guid_na
     from combat import engage_combat
     target = command[7:]  # name of monster to engage
 
-    # return a list with the guids for each monster we've targeted and get the first guid [0]
+    # return the guid for the monster we want to target, or None if there is no such one
     # using the guid, target him from the alive_monsters dictionary
-    target_guid_list = [guid if name == target else None for guid, name in guid_name_set]
-    if target_guid_list:
-        target_guid = target_guid_list[0]
-    else:  # if the list is empty
-        target_guid = None
+    target_guid = next([guid if name == target else None for guid, name in guid_name_set], None)
 
     if target_guid in alive_monsters.keys():
         target = alive_monsters[target_guid]  # convert the string to a Monster object
@@ -112,13 +104,9 @@ def handle_buy_from_command(command: str, character, zone_object: Zone):
 
     alive_npcs, guid_name_set  = zone_object.get_cs_npcs()
 
-    # return a list with the guids for each monster we've targeted and get the first guid [0]
+    # return the guid for the npc we want to target, or None if there is no such one
     # using the guid, target him from the alive_monsters dictionary
-    target_guid_list = [guid if name == target else None for guid, name in guid_name_set]
-    if target_guid_list:
-        target_guid = target_guid_list[0]
-    else:  # if the list is empty
-        target_guid = None
+    target_guid = next([guid if name == target else None for guid, name in guid_name_set], None)
 
     if target_guid in alive_npcs.keys():
         target = alive_npcs[target_guid]

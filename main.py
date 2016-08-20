@@ -9,7 +9,6 @@
 # TODO: Print own inventory
 # TODO: Print NPCs
 # TODO: Move these TODOs to a separate file!
-# TODO: Fix the targeting of NPCs by filtering the None variables (line 61 and etc)
 
 import classes
 
