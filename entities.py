@@ -105,11 +105,35 @@ class VendorNPC(FriendlyNPC):
 
     def print_inventory(self):
         print("{}'s items for sale:".format(self.name))
-        for item, item_count in self.inventory:
+        for item, item_count in self.inventory.values():
             print("\t{item_count} {item_name} - {price} gold.".format(item_count=item_count,
                                                                       item_name=item.name,
                                                                       price=item.buy_price))
 
+    def has_item(self, item_name: str) -> bool:
+        """
+        Checks if the vendor has the item in stock
+        :param item_name: The name of the item in a string
+        :return: A boolean indicating if we have it or not
+        """
+        return item_name in self.inventory.keys()
+
+    def get_item_price(self, item_name: str) -> int:
+        """Returns the price the vendor sells the item for"""
+        item, _ = self.inventory[item_name]
+        return item.buy_price
+
+    def sell_item(self, item_name: str) -> tuple:
+        """ Returns a tuple(1,2,3)
+            1 - the item object type: Item
+            2 - the number of items type: int
+            3 - the price of the item type: int"""
+        item, item_count = self.inventory[item_name]
+        item_price = item.buy_price
+
+        del self.inventory[item_name]
+
+        return item, item_count, item_price
 
 
 class Monster(LivingThing):
@@ -299,6 +323,26 @@ class Character(LivingThing):
         else:
             exit()
 
+    def has_enough_gold(self, gold: int) -> bool:
+        """
+        :return: a boolean indicating if we have that much gold
+        """
+        return self.inventory['gold'] >= gold
+
+    def buy_item(self, sale: tuple):
+        """
+        This method is used when we buy an item from a vendor. It subtracts the price of the item from our gold and
+        gives us the item in our inventory
+        :param sale: A Tuple(1,2,3)
+                        1 - the item object type: Item
+                        2 - the number of items type: int
+                        3 - the price of the item type: int
+        """
+        item, item_count, item_price = sale
+
+        self.inventory['gold'] -= item_price
+
+        self.award_item(item, item_count)
     def add_quest(self, quest: Quest):
         self.quest_log[quest.ID] = quest
 
@@ -352,16 +396,16 @@ class Character(LivingThing):
     def award_gold(self, gold: int):
         self.inventory['gold'] += gold
 
-    def award_item(self, item: Item):
+    def award_item(self, item: Item, item_count=1):
         """ Take an item and put it into the character's inventory,
         store it as a tuple holding (Item Object, Item Count) """
 
         if item.name not in self.inventory.keys():  # if we don't have the item
-            self.inventory[item.name] = (item, 1)
+            self.inventory[item.name] = (item, item_count)
         else:
             # if there is such an item, simply update it's count by one
             item, item_count = self.inventory[item.name]
-            self.inventory[item.name] = (item, item_count + 1)
+            self.inventory[item.name] = (item, item_count + item_count)
 
     def check_if_levelup(self):
         if self.experience >= self.xp_req_to_level:

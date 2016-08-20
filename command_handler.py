@@ -2,7 +2,7 @@
 This module will handle the player's commands
 """
 from zones.zone import Zone
-from commands import pac_main_ooc, pac_map_directions, pac_in_combat
+from commands import pac_main_ooc, pac_map_directions, pac_in_combat, pac_vendor_dialogue
 from information_printer import (print_live_npcs, print_live_monsters,
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar)
 
@@ -30,6 +30,8 @@ def handle_main_commands(main_character, zone_object):
     elif 'talk to' in command:
         alive_npcs, guid_name_set = zone_object.get_cs_npcs()
         handle_talk_to_command(command, main_character, alive_npcs, guid_name_set)
+    elif 'buy from' in command:
+        handle_buy_from_command(command, main_character, zone_object)
     elif 'engage' in command:
         alive_monsters, guid_name_set = zone_object.get_cs_monsters()
         handle_engage_command(command, main_character, alive_monsters, guid_name_set)
@@ -104,6 +106,47 @@ def handle_accept_quest_command(command: str, character, available_quests: dict)
     else:
         print("No such quest.")
 
+
+def handle_buy_from_command(command: str, character, zone_object: Zone):
+    target = command[9:]  # name of Vendor
+
+    alive_npcs, guid_name_set  = zone_object.get_cs_npcs()
+
+    # return a list with the guids for each monster we've targeted and get the first guid [0]
+    # using the guid, target him from the alive_monsters dictionary
+    target_guid_list = [guid if name == target else None for guid, name in guid_name_set]
+    if target_guid_list:
+        target_guid = target_guid_list[0]
+    else:  # if the list is empty
+        target_guid = None
+
+    if target_guid in alive_npcs.keys():
+        target = alive_npcs[target_guid]
+        handle_vendor_sale(character, target)
+    else:
+        print("Could not find Vendor {}".format(target))
+
+
+def handle_vendor_sale(character, vendor):
+    while True:
+        print(vendor.print_inventory())
+
+        command = input()
+        if command == 'exit':
+            break
+        elif 'buy ' in command:
+            item = command[4:]  # name of the item
+            if vendor.has_item(item):
+                # check if the player has enough gold
+                if character.has_enough_gold(vendor.get_item_price(item)):
+                    character.buy_item(vendor.sell_item(item))
+                    print("{character_name} has bought {item_name} from {vendor_name}!".format(
+                        character_name=character.name, item_name=item, vendor_name=vendor.name
+                    ))
+            else:
+                print("{} does not have {} in stock.".format(vendor.name, item))
+        elif command == '?':
+            pac_vendor_dialogue()
 
 def handle_go_to_command(command: str,  main_character, zone_object: Zone):
     destination = command[6:]

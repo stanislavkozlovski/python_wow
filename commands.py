@@ -17,6 +17,8 @@ def pac_main_ooc():
     print("\t\tEngages in combat with the monster whose name you've entered.\n")
     print("\ttalk to [NPC Name]")
     print("\t\tTalks to the NPC.\n")
+    print("\tbuy from [NPC Name]")
+    print("\t\tOpens a dialogue with the vendor where you can see and buy the items he has for sale.\n")
     print("\tprint alive monsters")
     print("\tpam")
     print("\t\tPrints 5 monsters that are alive.\n")
@@ -62,6 +64,14 @@ def pac_in_combat(character):
     print("\t\tAttacks the monster you are in combat with a meele swing.\n")
     print_class_abilities_in_combat(character)
 
+
+def pac_vendor_dialogue():
+    print("\tbuy [Item Name]")
+    print("\t\tBuys the item from the vendor.\n")
+    print("\texit")
+    print("\t\tCloses the vendor window..\n")
+    print("\t?")
+    print("\t\tShows a list of available commands.\n")
 
 def pac_looting():
     """Prints all possible commands the player can use while looting a creature"""
