@@ -6,7 +6,8 @@ import random
 
 from items import Weapon, Item
 from loader import (load_creature_xp_rewards, load_character_level_stats,
-                    load_character_xp_requirements, load_creature_gold_reward, load_loot_table, load_item)
+                    load_character_xp_requirements, load_creature_gold_reward,
+                    load_loot_table, load_item, load_vendor_inventory)
 from quest import Quest
 
 # dictionary that holds information about how much XP a monster of a certain level should award the player.
@@ -87,6 +88,27 @@ class FriendlyNPC(LivingThing):
     def talk(self, player_name: str):
         print("{npc_name} says: {msg}".format(npc_name=self.name, msg=self.gossip.replace("$N", player_name)))
 
+
+class VendorNPC(FriendlyNPC):
+    """
+    This is the class for the vendor NPCs in the world
+    """
+
+    def __init__(self, name: str, entry: int, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
+                 max_damage: int = 1, quest_relation_id = 0, loot_table_ID: int = 0, gossip: str = 'Hello'):
+        super().__init__(name, health, mana, level, min_damage, max_damage, quest_relation_id, loot_table_ID, gossip)
+        self.entry = entry
+        self.inventory = load_vendor_inventory(self.entry)  # type: dict: key-item_name(str), value: tuple(item object, count)
+
+    def __str__(self):
+        return "{npc_name} <Vendor>".format(npc_name=self.name)
+
+    def print_inventory(self):
+        print("{}'s items for sale:".format(self.name))
+        for item, item_count in self.inventory:
+            print("\t{item_count} {item_name} - {price} gold.".format(item_count=item_count,
+                                                                      item_name=item.name,
+                                                                      price=item.buy_price))
 
 
 

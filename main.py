@@ -5,6 +5,10 @@
 # TODO: Refactor function parameter names in the command_handler and information_printer modules
 # TODO: Print in colors
 # TODO: Research more about the curses module and maybe about alternatives
+# TODO: Remove the int() calls from loader.py
+# TODO: Print own inventory
+# TODO: Print NPCs
+# TODO: Move these TODOs to a separate file!
 
 import classes
 
@@ -13,7 +17,7 @@ from zones.zone import Zone
 from items import Weapon
 from zones.elwynn_forest import ElwynnForest
 
-GAME_VERSION = '0.0.3.2 ALPHA'
+GAME_VERSION = '0.0.3.25 ALPHA'
 ZONES = {"Elwynn Forest": ElwynnForest()}
 
 

@@ -7,7 +7,9 @@ from database_info import \
      DBINDEX_CREATURE_TEMPLATE_HEALTH, DBINDEX_CREATURE_TEMPLATE_MANA,
      DBINDEX_CREATURE_TEMPLATE_MIN_DMG, DBINDEX_CREATURE_TEMPLATE_MAX_DMG,
      DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID, DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID,
-     DBINDEX_CREATURE_TEMPLATE_GOSSIP,
+     DBINDEX_CREATURE_TEMPLATE_GOSSIP, DBINDEX_CREATURE_TEMPLATE_ENTRY, DBINDEX_CREATURE_TEMPLATE_TYPE,
+
+     DBINDEX_NPC_VENDOR_ITEM_COUNT, DBINDEX_NPC_VENDOR_ITEM_ID, DBINDEX_NPC_VENDOR_PRICE,
 
      DBINDEX_ITEM_TEMPLATE_NAME, DBINDEX_ITEM_TEMPLATE_TYPE, DBINDEX_ITEM_TEMPLATE_BUY_PRICE,
      DBINDEX_ITEM_TEMPLATE_SELL_PRICE, DBINDEX_ITEM_TEMPLATE_MIN_DMG, DBINDEX_ITEM_TEMPLATE_MAX_DMG,
@@ -117,6 +119,7 @@ def load_monsters(zone: str, subzone: str) -> tuple:
 def load_npcs(zone: str, subzone: str) -> tuple:
     """
         Gets a query from the creatures table to load all friendly creatures in our current zone
+        Supported types are: "fnpc" - just a normal gossip npc and "vendor" - a vendor of items
 
         guid, creature_id,       type,             zone,          subzone
            1,          11,  'fnpc',    Elwynn Forest, Northshire Abbey
@@ -139,6 +142,7 @@ def load_npcs(zone: str, subzone: str) -> tuple:
                  A Set of Tuples ((npc GUID, npc Name))
     """
     from entities import FriendlyNPC  # needed to be imported here otherwise we end up in an import loop
+    from entities import VendorNPC
 
     npcs_dict = {}
     guid_name_set = set()
@@ -146,8 +150,8 @@ def load_npcs(zone: str, subzone: str) -> tuple:
     print("Loading Friendly NPCs...")
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
-        fnpc_reader = cursor.execute("SELECT * FROM creatures WHERE type = ? AND zone = ? AND sub_zone = ?"
-                                          , ["fnpc", zone, subzone])  # query all the creatures in our location :)
+        fnpc_reader = cursor.execute("SELECT * FROM creatures WHERE (type = ? OR type = ?) AND zone = ? AND sub_zone = ?"
+                                          , ["fnpc", "vendor", zone, subzone])  # query all the creatures in our location :)
 
         for creature_info in fnpc_reader.fetchall():
             creature_guid = int(creature_info[DBINDEX_CREATURES_GUID])
@@ -156,14 +160,15 @@ def load_npcs(zone: str, subzone: str) -> tuple:
             # This will currently run a query for every fnpc, meaning if there are 20 of the exact same npcs,
             # 20 queries will be run. There isn't much sense in that, so:
             # TODO: Modify so we don't run unecessary queries for fnpc info that we've already loaded from the DB
-            creature_template_reader = cursor.execute("SELECT * FROM creature_template WHERE type = ? AND entry = ?",
-                                                      ["fnpc",creature_id])
+            creature_template_reader = cursor.execute("SELECT * FROM creature_template WHERE (type = ? OR type = ?) AND entry = ?",
+                                                      ["fnpc", "vendor", creature_id])
             creature_template_info = creature_template_reader.fetchone()  # entry is unique meaning the query will-
             # always return one npc
 
             # save the creature values
-
+            creature_template_entry = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_ENTRY])
             creature_template_name = creature_template_info[DBINDEX_CREATURE_TEMPLATE_NAME]
+            creature_template_type = creature_template_info[DBINDEX_CREATURE_TEMPLATE_TYPE]
             creature_template_level = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_LEVEL])
             creature_template_health = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_HEALTH])
             creature_template_mana = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MANA])
@@ -183,14 +188,25 @@ def load_npcs(zone: str, subzone: str) -> tuple:
             # save into the set
             guid_name_set.add((creature_guid, creature_template_name))
             # save into the dict
-            npcs_dict[creature_guid] = FriendlyNPC(name=creature_template_name, health=creature_template_health,
-                                                   mana=creature_template_mana, level=creature_template_level,
-                                                   min_damage=creature_template_min_dmg,
-                                                   max_damage=creature_template_max_dmg,
-                                                   quest_relation_id=creature_template_quest_relation_ID,
-                                                   loot_table_ID=creature_template_loot_table_ID,
-                                                   gossip=creature_template_gossip)
+            if creature_template_type == "fnpc":
+                npcs_dict[creature_guid] = FriendlyNPC(name=creature_template_name, health=creature_template_health,
+                                                       mana=creature_template_mana, level=creature_template_level,
+                                                       min_damage=creature_template_min_dmg,
+                                                       max_damage=creature_template_max_dmg,
+                                                       quest_relation_id=creature_template_quest_relation_ID,
+                                                       loot_table_ID=creature_template_loot_table_ID,
+                                                       gossip=creature_template_gossip)
 
+            elif creature_template_type == "vendor":
+                npcs_dict[creature_guid] = VendorNPC(name=creature_template_name, entry=creature_template_entry,
+                                                     health=creature_template_health,
+                                                     mana=creature_template_mana, level=creature_template_level,
+                                                     min_damage=creature_template_min_dmg,
+                                                     max_damage=creature_template_max_dmg,
+                                                     quest_relation_id=creature_template_quest_relation_ID,
+                                                     loot_table_ID=creature_template_loot_table_ID,
+                                                     gossip=creature_template_gossip
+                                                     )
     print("Friendly NPCs loaded!")
     return npcs_dict, guid_name_set
 
@@ -292,6 +308,47 @@ def load_creature_gold_reward() -> dict:
 
     return gold_rewards_dict
 
+def load_vendor_inventory(creature_entry: int) -> dict:
+    """
+    This function loads all the items that a certain vendor should sell.
+    We take them from the npc_vendor DB table, whose contents are as follows:
+
+    creature_entry - the entry of the vendor in creature_template
+    item_id - the ID of the item that he's supposed to sell
+    item_count - the count of items he sell at once
+    price - The price in gold. By default we use the Item's item.buy_price variable in it's class.
+    However, if this is set to something we override the price. Example:
+        creature_entry, item_id, item_count, price
+                13,       1,          5,    10
+    The NPC whose entry is 13, sells the item with ID 1, 5 at a time for 10 gold.
+    He sells the whole 5 items for 10 gold. He cannot sell 1,2,3 or 4 items, only 5.
+
+    :param creature_entry: The DB entry of the npc in the creature_template table
+    :return: A dictionary of Key: "Item Name", Value: Tuple(1,2)
+                                                            1 - Item object of class Item from items.py
+                                                            2 - The count of the item
+    """
+    vendor_inventory = {}
+
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+
+        npc_vendor_reader = cursor.execute("SELECT * FROM npc_vendor WHERE creature_entry = ?", [creature_entry])
+
+        for npc_vendor_info in npc_vendor_reader:
+            item_id = npc_vendor_info[DBINDEX_NPC_VENDOR_ITEM_ID]
+            item_count = npc_vendor_info[DBINDEX_NPC_VENDOR_ITEM_COUNT]
+            price = npc_vendor_info[DBINDEX_NPC_VENDOR_PRICE]
+
+            item = load_item(item_id)  # type: Item
+
+            if price: # check if there is anything set to price that'll make us override
+                item.buy_price = price
+
+            vendor_inventory[item.name] = (item, item_count)
+
+    return vendor_inventory
+
 
 def load_loot_table(monster_loot_table_ID: int):
     """
@@ -334,7 +391,6 @@ def load_loot_table(monster_loot_table_ID: int):
             loot_list.append((item_ID, item_drop_chance))
 
     return loot_list
-
 
 def load_item(item_ID: int):
     """
@@ -404,7 +460,6 @@ def load_character_level_stats() -> dict:
             level_stats[level] = level_dict
 
     return level_stats
-
 
 def load_character_xp_requirements() -> dict:
     """
