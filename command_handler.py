@@ -57,9 +57,10 @@ def handle_talk_to_command(command:str, character, alive_npcs: dict, guid_name_s
     target = command[8:]  # name of NPC
 
     # return the guid for the npc we want to target, or None if there is no such one
-    # using the guid, target him from the alive_monsters dictionary
-    target_guid = next([guid if name == target else None for guid, name in guid_name_set], None)
+    target_guid = get_guid_by_name(target, guid_name_set)
 
+
+    # using the guid, target him from the alive_monsters dictionary
     if target_guid in alive_npcs.keys():
         target = alive_npcs[target_guid]
         target.talk(character.name)
@@ -72,9 +73,10 @@ def handle_engage_command(command: str, character, alive_monsters: dict, guid_na
     target = command[7:]  # name of monster to engage
 
     # return the guid for the monster we want to target, or None if there is no such one
-    # using the guid, target him from the alive_monsters dictionary
-    target_guid = next([guid if name == target else None for guid, name in guid_name_set], None)
+    target_guid = get_guid_by_name(target, guid_name_set)
 
+
+    # using the guid, target him from the alive_monsters dictionary
     if target_guid in alive_monsters.keys():
         target = alive_monsters[target_guid]  # convert the string to a Monster object
         engage_combat(character, target, alive_monsters, guid_name_set, target_guid)
@@ -105,9 +107,9 @@ def handle_buy_from_command(command: str, character, zone_object: Zone):
     alive_npcs, guid_name_set  = zone_object.get_cs_npcs()
 
     # return the guid for the npc we want to target, or None if there is no such one
-    # using the guid, target him from the alive_monsters dictionary
-    target_guid = next([guid if name == target else None for guid, name in guid_name_set], None)
+    target_guid = get_guid_by_name(target, guid_name_set)
 
+    # using the guid, target him from the alive_monsters dictionary
     if target_guid in alive_npcs.keys():
         target = alive_npcs[target_guid]
         handle_vendor_sale(character, target)
@@ -169,6 +171,20 @@ def handle_in_combat_non_ending_turn_commands(command: str, character, monster) 
         else:
             return command
         command = input()
+
+
+def get_guid_by_name(name: str, guid_name_set: set):
+    """
+    A function that returns a GUID which is associated with the given name,
+    if there is no such one, return None
+    :param name: The name of the creature you want to get a GUID of
+    :return: the GUID you're searching for
+    """
+    for guid, _name in guid_name_set:
+        if _name == name:
+            return guid
+
+    return None
 
 
 
