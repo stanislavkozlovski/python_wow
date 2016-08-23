@@ -16,6 +16,9 @@
 - [x] Add zones to the game
 - [x] Add vendors to the game
 - [x] Move these TODOs to a separate file!
+- [x] Print own inventory
+- [x] Print NPCs
+- [x] Remove the int() calls from loader.py
 
 # Low Priority TODOs
 - [] Add more monsters and subzones
@@ -25,12 +28,10 @@
 - [] Add more spells to the existing classes
 
 # Small TODOs
-- [] Print own inventory
-- [] Print NPCs
-- [] Remove the int() calls from loader.py
 - [] Refactor function parameter names in the command_handler and information_printer modules
 - [] Add item gossip text
 - [] Add command to print item information (that is in the vendor, inventory and loot table)
+
 # TODOs
 - [] Add ability for player to equip weapons and eventually other items
 - [] Add some kind of armor item type (Head, etc)

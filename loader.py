@@ -69,8 +69,8 @@ def load_monsters(zone: str, subzone: str) -> tuple:
                                           , ["monster", zone, subzone])  # query all the creatures in our location :)
 
         for creature_info in creatures_reader.fetchall():
-            creature_guid = int(creature_info[DBINDEX_CREATURES_GUID])
-            creature_id = int(creature_info[DBINDEX_CREATURES_CREATURE_ID])
+            creature_guid = creature_info[DBINDEX_CREATURES_GUID]  # type: int
+            creature_id = creature_info[DBINDEX_CREATURES_CREATURE_ID]  # type: int
 
             # This will currently run a query for every monster, meaning if there are 20 of the exact same monsters,
             # 20 queries will be run. There isn't much sense in that, so:
@@ -83,18 +83,18 @@ def load_monsters(zone: str, subzone: str) -> tuple:
             # save the creature values
             # )
             creature_template_name = creature_template_info[DBINDEX_CREATURE_TEMPLATE_NAME]
-            creature_template_level = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_LEVEL])
-            creature_template_health = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_HEALTH])
-            creature_template_mana = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MANA])
-            creature_template_min_dmg = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MIN_DMG])
-            creature_template_max_dmg = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MAX_DMG])
+            creature_template_level = creature_template_info[DBINDEX_CREATURE_TEMPLATE_LEVEL]  # type: int
+            creature_template_health = creature_template_info[DBINDEX_CREATURE_TEMPLATE_HEALTH]  # type: int
+            creature_template_mana = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MANA]  # type: int
+            creature_template_min_dmg = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MIN_DMG]  # type: int
+            creature_template_max_dmg = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MAX_DMG]  # type: int
 
             creature_template_quest_relation_ID = (
-            int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID])
+            creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID]  # type: int
             if not creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID] is None else -1)
 
             creature_template_loot_table_ID = (
-            int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID])
+            creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID]  # type: int
             if not creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID] is None else -1)
 
             # save into the set
@@ -154,8 +154,8 @@ def load_npcs(zone: str, subzone: str) -> tuple:
                                           , ["fnpc", "vendor", zone, subzone])  # query all the creatures in our location :)
 
         for creature_info in fnpc_reader.fetchall():
-            creature_guid = int(creature_info[DBINDEX_CREATURES_GUID])
-            creature_id = int(creature_info[DBINDEX_CREATURES_CREATURE_ID])
+            creature_guid = creature_info[DBINDEX_CREATURES_GUID]  # type: int
+            creature_id = creature_info[DBINDEX_CREATURES_CREATURE_ID]  # type: int
 
             # This will currently run a query for every fnpc, meaning if there are 20 of the exact same npcs,
             # 20 queries will be run. There isn't much sense in that, so:
@@ -166,21 +166,21 @@ def load_npcs(zone: str, subzone: str) -> tuple:
             # always return one npc
 
             # save the creature values
-            creature_template_entry = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_ENTRY])
+            creature_template_entry = creature_template_info[DBINDEX_CREATURE_TEMPLATE_ENTRY]  # type: int
             creature_template_name = creature_template_info[DBINDEX_CREATURE_TEMPLATE_NAME]
             creature_template_type = creature_template_info[DBINDEX_CREATURE_TEMPLATE_TYPE]
-            creature_template_level = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_LEVEL])
-            creature_template_health = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_HEALTH])
-            creature_template_mana = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MANA])
-            creature_template_min_dmg = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MIN_DMG])
-            creature_template_max_dmg = int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MAX_DMG])
+            creature_template_level = creature_template_info[DBINDEX_CREATURE_TEMPLATE_LEVEL]  # type: int
+            creature_template_health = creature_template_info[DBINDEX_CREATURE_TEMPLATE_HEALTH]  # type: int
+            creature_template_mana = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MANA]  # type: int
+            creature_template_min_dmg = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MIN_DMG]  # type: int
+            creature_template_max_dmg = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MAX_DMG]  # type: int
 
             creature_template_quest_relation_ID = (
-            int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID])
+            creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID]  # type: int
             if not creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID] is None else -1)
 
             creature_template_loot_table_ID = (
-            int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID])
+            creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID]  # type: int
             if not creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID] is None else -1)
 
             creature_template_gossip = creature_template_info[DBINDEX_CREATURE_TEMPLATE_GOSSIP]
@@ -237,12 +237,12 @@ xp_reward, comment
 
         for row in quests_reader.fetchall():
             # save the quest information we'll need
-            quest_entry = int(row[DBINDEX_QUEST_TEMPLATE_ENTRY])
+            quest_entry = row[DBINDEX_QUEST_TEMPLATE_ENTRY]  # type: int
             quest_name = row[DBINDEX_QUEST_TEMPLATE_NAME]
-            quest_level_requirement = int(row[DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED])
+            quest_level_requirement = row[DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED]  # type: int
             quest_monster_required = row[DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED]  # monster name
-            quest_monster_kill_amount_required = int(row[DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED])
-            quest_xp_reward = int(row[DBINDEX_QUEST_TEMPLATE_XP_REWARD])
+            quest_monster_kill_amount_required = row[DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED]  # type: int
+            quest_xp_reward = row[DBINDEX_QUEST_TEMPLATE_XP_REWARD]  # type: int
 
             quest_list[quest_name] = Quest(quest_name=quest_name,
                                            quest_id=quest_entry,
@@ -274,8 +274,8 @@ def load_creature_xp_rewards() -> dict:
         def_xp_rewards_reader = cursor.execute("SELECT * FROM creature_default_xp_rewards")
 
         for line in def_xp_rewards_reader:
-            level = int(line[DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL])
-            xp_reward = int(line[DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP])
+            level = line[DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL]  # type: int
+            xp_reward = line[DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP]  # type: int
 
             xp_reward_dict[level] = xp_reward
 
@@ -300,9 +300,9 @@ def load_creature_gold_reward() -> dict:
         gold_rewards_reader = cursor.execute("SELECT * FROM creature_default_gold_rewards")
 
         for line in gold_rewards_reader:
-            level = int(line[DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_LEVEL])
-            min_gold_reward = int(line[DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MIN_GOLD_REWARD])
-            max_gold_reward = int(line[DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MAX_GOLD_REWARD])
+            level = line[DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_LEVEL]  # type: int
+            min_gold_reward = line[DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MIN_GOLD_REWARD]  # type: int
+            max_gold_reward = line[DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MAX_GOLD_REWARD]  # type: int
 
             gold_rewards_dict[level] = (min_gold_reward, max_gold_reward)
 
@@ -413,14 +413,14 @@ def load_item(item_ID: int):
 
         item_name = item_template_info[DBINDEX_ITEM_TEMPLATE_NAME]
         item_type = item_template_info[DBINDEX_ITEM_TEMPLATE_TYPE]
-        item_buy_price = int(item_template_info[DBINDEX_ITEM_TEMPLATE_BUY_PRICE])
-        item_sell_price = int(item_template_info[DBINDEX_ITEM_TEMPLATE_SELL_PRICE])
+        item_buy_price = item_template_info[DBINDEX_ITEM_TEMPLATE_BUY_PRICE]  # type: int
+        item_sell_price = item_template_info[DBINDEX_ITEM_TEMPLATE_SELL_PRICE]  # type: int
 
         if item_type == 'misc':
             return items.Item(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price)
         elif item_type == 'weapon':
-            item_min_dmg = int(item_template_info[DBINDEX_ITEM_TEMPLATE_MIN_DMG])
-            item_max_dmg = int(item_template_info[DBINDEX_ITEM_TEMPLATE_MAX_DMG])
+            item_min_dmg = item_template_info[DBINDEX_ITEM_TEMPLATE_MIN_DMG]  # type: int
+            item_max_dmg = item_template_info[DBINDEX_ITEM_TEMPLATE_MAX_DMG]  # type: int
 
             return items.Weapon(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price,
                                 min_damage=item_min_dmg, max_damage=item_max_dmg)
@@ -446,11 +446,11 @@ def load_character_level_stats() -> dict:
         for line in lvl_stats_reader:
             level_dict = {}
 
-            level = int(line[DBINDEX_LEVELUP_STATS_LEVEL])
-            hp = int(line[DBINDEX_LEVELUP_STATS_HEALTH])
-            mana = int(line[DBINDEX_LEVELUP_STATS_MANA])
-            strength = int(line[DBINDEX_LEVELUP_STATS_STRENGTH])
-            armor = int(line[DBINDEX_LEVELUP_STATS_ARMOR])
+            level = line[DBINDEX_LEVELUP_STATS_LEVEL]  # type: int
+            hp = line[DBINDEX_LEVELUP_STATS_HEALTH]   # type: int
+            mana = line[DBINDEX_LEVELUP_STATS_MANA]  # type: int
+            strength = line[DBINDEX_LEVELUP_STATS_STRENGTH]  # type: int
+            armor = line[DBINDEX_LEVELUP_STATS_ARMOR]  # type: int
 
             level_dict[key_level_stats_health] = hp
             level_dict[key_level_stats_mana] = mana
@@ -478,8 +478,8 @@ def load_character_xp_requirements() -> dict:
         xp_req_reader = cursor.execute("SELECT * FROM level_xp_requirement")
 
         for line in xp_req_reader:
-            level = int(line[DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL])
-            xp_required = int(line[DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED])
+            level = line[DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL]  # type: int
+            xp_required = line[DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED]  # type: int
 
             xp_req_dict[level] = xp_required
 
