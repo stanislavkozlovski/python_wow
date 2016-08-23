@@ -55,9 +55,7 @@ def print_available_quests(available_quests: dict, character_level: int):
 
     for _, quest in available_quests.items():
         if quest.required_level <= character_level:
-            print("{quest_name} - Requires {required_kills} {monster_name} kills. Rewards {xp_reward} experience."
-                  .format(quest_name=quest.name, required_kills=quest.required_kills,
-                          monster_name=quest.monster_to_kill, xp_reward=quest.xp_reward))
+            print(quest)
         else:
             quest_information_to_print = "{quest_name} [Requires Level {req_level}]".format(quest_name=quest.name,
                                                                                             req_level=quest.required_level)

@@ -23,28 +23,28 @@
 
 # Low Priority TODOs
 - Add more monsters and subzones
--[] Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
-- [] Add Talents System
-- [] Print in colors
-- [] Add more spells to the existing classes
+- Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
+- Add Talents System
+- Print in colors
+- Add more spells to the existing classes
 
 # Small TODOs
-- [] Refactor function parameter names in the command_handler and information_printer modules
-- [] Print Equipment
-- [] Print Stats (hp, mana, xp and everything else at once)
-- [] Add item gossip text
-- [] Add command to print item information (that is in the vendor, inventory and loot table)
+- Refactor function parameter names in the command_handler and information_printer modules
+- Print Equipment
+- Print Stats (hp, mana, xp and everything else at once)
+- Add item gossip text
+- Add command to print item information (that is in the vendor, inventory and loot table)
 
 # TODOs
-- [] Add some kind of armor item type (Head, etc)
-- [] Add a stat of your choice to the game.
-- [] Convert the damage into it's own separate class. 
-- [] Add different kinds of damage
-- [] Add another class of choice. (Mage is on my mind)
-- [] Add DoTs to the game
-- [] Add Quests that require items
-- [] Add Quest item rewards
-- [] Add Buffs to the game
-- [] Add Potions to the game
-- [] Add the ability to save the character
-- [] Add a scripted NPC to the game
+- Add some kind of armor item type (Head, etc)
+- Add a stat of your choice to the game.
+- Convert the damage into it's own separate class. 
+- Add different kinds of damage
+- Add another class of choice. (Mage is on my mind)
+- Add DoTs to the game
+- Add Quests that require items
+- Add Quest item rewards
+- Add Buffs to the game
+- Add Potions to the game
+- Add the ability to save the character
+- Add a scripted NPC to the game

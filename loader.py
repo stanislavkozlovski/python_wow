@@ -14,7 +14,7 @@ from database_info import \
      DBINDEX_ITEM_TEMPLATE_NAME, DBINDEX_ITEM_TEMPLATE_TYPE, DBINDEX_ITEM_TEMPLATE_BUY_PRICE,
      DBINDEX_ITEM_TEMPLATE_SELL_PRICE, DBINDEX_ITEM_TEMPLATE_MIN_DMG, DBINDEX_ITEM_TEMPLATE_MAX_DMG,
 
-     DBINDEX_QUEST_TEMPLATE_ENTRY, DBINDEX_QUEST_TEMPLATE_NAME,
+     DBINDEX_QUEST_TEMPLATE_ENTRY, DBINDEX_QUEST_TEMPLATE_NAME, DBINDEX_QUEST_TEMPLATE_TYPE,
      DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED, DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED,
      DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED, DBINDEX_QUEST_TEMPLATE_XP_REWARD,
 
@@ -28,7 +28,7 @@ from database_info import \
 
      DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
      )
-from quest import Quest
+from quest import KillQuest
 import items
 
 
@@ -215,12 +215,13 @@ def load_quests(zone: str, subzone:str) -> list:
     """
     Gets a query from the quest_template table to load all the quests in our current zone.
     Table is as follows:
-entry,            name, required_level,           monster_required,  amount_required,         zone,          sub_zone,
-    1, A Canine Menace,              1,      (name of monster)Wolf,               10,Elwynn Forest, Northshire Valley,
-xp_reward, comment
-    300, Our First Quest!
+entry,            name,    type, required_level,           monster_required,  amount_required,         zone,
+    1, A Canine Menace,killquest              1,      (name of monster)Wolf,               10,Elwynn Forest,
+          sub_zone,xp_reward, comment
+ Northshire Valley,      300, Our First Quest!
 
-        Using the parameters, we run a query through quest_template to get all the quests that are for our zone
+    Type decides what kind of quests it is.
+    Using the parameters, we run a query through quest_template to get all the quests that are for our zone
 
     :param zone: The zone that the query will use
     :param subzone: The subzone that the query will use
@@ -239,17 +240,20 @@ xp_reward, comment
             # save the quest information we'll need
             quest_entry = row[DBINDEX_QUEST_TEMPLATE_ENTRY]  # type: int
             quest_name = row[DBINDEX_QUEST_TEMPLATE_NAME]
+            quest_type = row[DBINDEX_QUEST_TEMPLATE_TYPE]  #  type: str
             quest_level_requirement = row[DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED]  # type: int
             quest_monster_required = row[DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED]  # monster name
             quest_monster_kill_amount_required = row[DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED]  # type: int
             quest_xp_reward = row[DBINDEX_QUEST_TEMPLATE_XP_REWARD]  # type: int
 
-            quest_list[quest_name] = Quest(quest_name=quest_name,
-                                           quest_id=quest_entry,
-                                           creature_name=quest_monster_required,
-                                           required_kills=quest_monster_kill_amount_required,
-                                           xp_reward=quest_xp_reward,
-                                           level_required=quest_level_requirement)
+            #  create the quest object according to it's type
+            if quest_type == "killquest":
+                quest_list[quest_name] = KillQuest(quest_name=quest_name,
+                                                   quest_id=quest_entry,
+                                                   required_monster=quest_monster_required,
+                                                   required_kills=quest_monster_kill_amount_required,
+                                                   xp_reward=quest_xp_reward,
+                                                   level_required=quest_level_requirement)
 
     return quest_list
 
