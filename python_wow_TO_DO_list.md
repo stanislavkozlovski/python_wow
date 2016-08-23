@@ -19,21 +19,23 @@
 - [x] Print own inventory
 - [x] Print NPCs
 - [x] Remove the int() calls from loader.py
+- [x] Add ability for player to equip weapons and eventually other items
 
 # Low Priority TODOs
-- [] Add more monsters and subzones
-- [] Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
+- Add more monsters and subzones
+-[] Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 - [] Add Talents System
 - [] Print in colors
 - [] Add more spells to the existing classes
 
 # Small TODOs
 - [] Refactor function parameter names in the command_handler and information_printer modules
+- [] Print Equipment
+- [] Print Stats (hp, mana, xp and everything else at once)
 - [] Add item gossip text
 - [] Add command to print item information (that is in the vendor, inventory and loot table)
 
 # TODOs
-- [] Add ability for player to equip weapons and eventually other items
 - [] Add some kind of armor item type (Head, etc)
 - [] Add a stat of your choice to the game.
 - [] Convert the damage into it's own separate class. 
@@ -43,5 +45,6 @@
 - [] Add Quests that require items
 - [] Add Quest item rewards
 - [] Add Buffs to the game
+- [] Add Potions to the game
 - [] Add the ability to save the character
 - [] Add a scripted NPC to the game
