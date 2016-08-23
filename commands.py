@@ -19,6 +19,8 @@ def pac_main_ooc():
     print("\t\tTalks to the NPC.\n")
     print("\tbuy from [NPC Name]")
     print("\t\tOpens a dialogue with the vendor where you can see and buy the items he has for sale.\n")
+    print("\topen inventory")
+    print("\t\tGives you access to your inventory.\n")
     print("\tprint alive monsters")
     print("\tpam")
     print("\t\tPrints 5 monsters that are alive.\n")
@@ -73,6 +75,7 @@ def pac_vendor_dialogue():
     print("\t?")
     print("\t\tShows a list of available commands.\n")
 
+
 def pac_looting():
     """Prints all possible commands the player can use while looting a creature"""
     print()
@@ -86,6 +89,15 @@ def pac_looting():
     print("\t?")
     print("\t\tShows a list of available commands.\n")
 
+
+def pac_opened_inventory():
+    """Prints all possible commands that the player can use while his inventory is opened"""
+    print("\tequip [Item Name]")
+    print("\t\tEquips the item\n")
+    print("\texit")
+    print("\t\tCloses the inventory\n")
+    print("\t?")
+    print("\t\tShows a list of available commands.\n")
 
 def pac_map_directions(possible_routes: list):
     """
@@ -102,6 +114,7 @@ def print_class_abilities_in_combat(character: Character):
         print_paladin_abilities_in_combat(character)
 
 
+######### PALADIN #########
 def print_paladin_abilities_in_combat(character: Paladin):
     print("\tsor")
     print("\t\tCasts Seal of Righteousness")
@@ -131,3 +144,4 @@ def get_available_paladin_abilities(character: Paladin):
 
     # TODO: Add a method in paladin that returns this set
     return available_spells
+######### PALADIN #########

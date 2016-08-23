@@ -255,6 +255,33 @@ class Character(LivingThing):
         self.quest_log = {}
         self.inventory = {"gold": 0} # dict Key: str, Value: Item class object
 
+    def equip_item(self, item: Item):
+        """
+        This method equips an item to the character and handles the appropriate change in inventory following the equip
+        (equipped item goes back to the inventory and the item to be equipped is removed from the inventory)
+        :param item:
+        :return:
+        """
+        if isinstance(item, Weapon):
+            item_in_inventory, count = self.inventory[item.name]
+
+            # remove the item we're equipping from the inventory
+            if count == 1:  # remove from the inventory
+                del self.inventory[item.name]
+            else:  # reduce it's count
+                self.inventory[item.name] = item_in_inventory, count-1
+
+            # transfer the equipped weapon to the inventory
+            eq_weapon = self.equipped_weapon
+
+            if eq_weapon.name in self.inventory.keys():  # if we have such an item in the inventory, we add one more
+                weapon_in_inventory, wep_count = self.inventory[eq_weapon.name]
+                self.inventory[eq_weapon.name] = weapon_in_inventory, wep_count + 1
+            else:  # we don't have such an item in the inventory, we create one
+                self.inventory[eq_weapon.name] = eq_weapon, 1
+
+            self.equip_weapon(item)
+
     def equip_weapon(self, weapon: Weapon):
         self.equipped_weapon = weapon
         self._calculate_damage(self.equipped_weapon)

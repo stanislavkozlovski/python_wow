@@ -2,7 +2,7 @@
 This module will handle the player's commands
 """
 from zones.zone import Zone
-from commands import pac_main_ooc, pac_map_directions, pac_in_combat, pac_vendor_dialogue
+from commands import pac_main_ooc, pac_map_directions, pac_in_combat, pac_vendor_dialogue, pac_opened_inventory
 from information_printer import (print_live_npcs, print_live_monsters,
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar)
 
@@ -27,6 +27,8 @@ def handle_main_commands(main_character, zone_object):
         main_character.print_quest_log()
     elif command == 'print inventory':
         main_character.print_inventory()
+    elif command == "open inventory":
+        handle_open_inventory_command(main_character)
     elif 'talk to' in command:
         alive_npcs, guid_name_set = zone_object.get_cs_npcs()
         handle_talk_to_command(command, main_character, alive_npcs, guid_name_set)
@@ -138,6 +140,30 @@ def handle_vendor_sale(character, vendor):
         elif command == '?':
             pac_vendor_dialogue()
 
+
+def handle_open_inventory_command(character):
+    """
+    This command opens the inventory of the character and lets him fiddle with the items there
+    """
+    character.print_inventory()
+
+    while True:
+        command = input()
+        if command == "?":
+            pac_opened_inventory()
+        elif command == "exit":
+            break
+        elif "equip" in command:
+            """ Equips the item """
+            item_name = command[6:]
+
+            # failsafe check if the item is in the inventory of the player. if it's not it will return a None object,
+            # which will not pass the if checks in the equip_item method
+            item, _ = character.inventory.get(item_name, (None, None))
+
+            character.equip_item(item)
+
+
 def handle_go_to_command(command: str,  main_character, zone_object: Zone):
     destination = command[6:]
 
@@ -157,6 +183,7 @@ def handle_go_to_command(command: str,  main_character, zone_object: Zone):
         print_live_monsters(alive_monsters)
     else:
         print("No such destination as {} that is connected to your current subzone.".format(destination))
+
 
 # IN COMBAT COMMANDS
 # COMMANDS THAT DO NOT END THE TURN
