@@ -51,8 +51,6 @@ class ElwynnForest(Zone):
                 # We move, therefore update our attributes
                 self._update_attributes(destination)
                 return True
-            else:
-                print("No such destination {}.".format(destination))
 
         else:
             raise Exception("The subzone is not in the zone_object!")
