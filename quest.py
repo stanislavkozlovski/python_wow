@@ -74,5 +74,12 @@ class FetchQuest(Quest):
         """ Given the player's inventory, check if he has enough to complete the quest"""
         _, item_count = inventory.get(self.required_item, (self.required_item, 0))
 
+        if item_count:
+            print("Quest {name}: {item_count}/{req_item_count} {item_name} obtained."
+                  .format(name=self.name,
+                          item_count=item_count,
+                          req_item_count=self.required_item_count,
+                          item_name=self.required_item))
+
         if item_count >= self.required_item_count:
             self._quest_complete()

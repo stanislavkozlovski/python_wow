@@ -22,7 +22,7 @@
 - [x] Add ability for player to equip weapons and eventually other items
 - [x] Convert the damage into it's own separate class.
 - [x] Add magic damage
-
+- [x] Add Quests that require items
 # Low Priority TODOs
 - Add more monsters and subzones
 - Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
@@ -44,7 +44,6 @@
 - Add different kinds of damage
 - Add another class of choice. (Mage is on my mind)
 - Add DoTs to the game
-- Add Quests that require items
 - Add Quest item rewards
 - Add Buffs to the game
 - Add Potions to the game
