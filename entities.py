@@ -429,6 +429,7 @@ class Character(LivingThing):
     def award_item(self, item: Item, item_count=1):
         """ Take an item and put it into the character's inventory,
         store it as a tuple holding (Item Object, Item Count) """
+        item_quest_id = item.quest_ID
 
         if item.name not in self.inventory.keys():  # if we don't have the item
             self.inventory[item.name] = (item, item_count)
@@ -436,6 +437,17 @@ class Character(LivingThing):
             # if there is such an item, simply update it's count by one
             item, item_count = self.inventory[item.name]
             self.inventory[item.name] = (item, item_count + item_count)
+
+        # if the item is related to a quest and if we have that quest
+        if item_quest_id and item_quest_id in self.quest_log:
+            temp_quest = self.quest_log[item_quest_id]
+
+            # have the quest check if the player has enough items to complete it
+            temp_quest.check_if_complete(self.inventory)
+
+            self.quest_log[item_quest_id] = temp_quest
+
+            self._check_if_quest_completed(temp_quest)
 
     def check_if_levelup(self):
         if self.experience >= self.xp_req_to_level:

@@ -13,10 +13,11 @@ from database_info import \
 
      DBINDEX_ITEM_TEMPLATE_NAME, DBINDEX_ITEM_TEMPLATE_TYPE, DBINDEX_ITEM_TEMPLATE_BUY_PRICE,
      DBINDEX_ITEM_TEMPLATE_SELL_PRICE, DBINDEX_ITEM_TEMPLATE_MIN_DMG, DBINDEX_ITEM_TEMPLATE_MAX_DMG,
+     DBINDEX_ITEM_TEMPLATE_QUEST_ID,
 
      DBINDEX_QUEST_TEMPLATE_ENTRY, DBINDEX_QUEST_TEMPLATE_NAME, DBINDEX_QUEST_TEMPLATE_TYPE,
      DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED, DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED,
-     DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED, DBINDEX_QUEST_TEMPLATE_XP_REWARD,
+     DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED, DBINDEX_QUEST_TEMPLATE_XP_REWARD, DBINDEX_QUEST_TEMPLATE_ITEM_REQUIRED,
 
      DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP,
 
@@ -28,7 +29,7 @@ from database_info import \
 
      DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
      )
-from quest import KillQuest
+from quest import KillQuest, FetchQuest
 import items
 
 
@@ -215,12 +216,15 @@ def load_quests(zone: str, subzone:str) -> list:
     """
     Gets a query from the quest_template table to load all the quests in our current zone.
     Table is as follows:
-entry,            name,    type, required_level,           monster_required,  amount_required,         zone,
-    1, A Canine Menace,killquest              1,      (name of monster)Wolf,               10,Elwynn Forest,
-          sub_zone,xp_reward, comment
- Northshire Valley,      300, Our First Quest!
+entry,            name,    type, required_level,           monster_required,  item_required, amount_required,
+    1, A Canine Menace,killquest              1,      (name of monster)Wolf,      Wolf Meat,              10,
+
+                zone,           sub_zone,   xp_reward, comment
+       Elwynn Forest,   Northshire Valley,        300, Our First Quest!
 
     Type decides what kind of quests it is.
+    killquest = kill X amount of monster_required
+    fetchquest = obtain X amount of item_required.
     Using the parameters, we run a query through quest_template to get all the quests that are for our zone
 
     :param zone: The zone that the query will use
@@ -242,8 +246,9 @@ entry,            name,    type, required_level,           monster_required,  am
             quest_name = row[DBINDEX_QUEST_TEMPLATE_NAME]
             quest_type = row[DBINDEX_QUEST_TEMPLATE_TYPE]  #  type: str
             quest_level_requirement = row[DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED]  # type: int
-            quest_monster_required = row[DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED]  # monster name
-            quest_monster_kill_amount_required = row[DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED]  # type: int
+            quest_monster_required = row[DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED]  # type: str
+            quest_item_required = row[DBINDEX_QUEST_TEMPLATE_ITEM_REQUIRED]  # type: str
+            quest_amount_required = row[DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED]  # type: int
             quest_xp_reward = row[DBINDEX_QUEST_TEMPLATE_XP_REWARD]  # type: int
 
             #  create the quest object according to it's type
@@ -251,7 +256,14 @@ entry,            name,    type, required_level,           monster_required,  am
                 quest_list[quest_name] = KillQuest(quest_name=quest_name,
                                                    quest_id=quest_entry,
                                                    required_monster=quest_monster_required,
-                                                   required_kills=quest_monster_kill_amount_required,
+                                                   required_kills=quest_amount_required,
+                                                   xp_reward=quest_xp_reward,
+                                                   level_required=quest_level_requirement)
+            elif quest_type == "fetchquest":
+                quest_list[quest_name] = FetchQuest(quest_name=quest_name,
+                                                   quest_id=quest_entry,
+                                                   required_item=quest_item_required,
+                                                   required_item_count=quest_amount_required,
                                                    xp_reward=quest_xp_reward,
                                                    level_required=quest_level_requirement)
 
@@ -421,7 +433,8 @@ def load_item(item_ID: int):
         item_sell_price = item_template_info[DBINDEX_ITEM_TEMPLATE_SELL_PRICE]  # type: int
 
         if item_type == 'misc':
-            return items.Item(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price)
+            item_quest_ID = item_template_info[DBINDEX_ITEM_TEMPLATE_QUEST_ID]
+            return items.Item(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price, quest_ID=item_quest_ID)
         elif item_type == 'weapon':
             item_min_dmg = item_template_info[DBINDEX_ITEM_TEMPLATE_MIN_DMG]  # type: int
             item_max_dmg = item_template_info[DBINDEX_ITEM_TEMPLATE_MAX_DMG]  # type: int

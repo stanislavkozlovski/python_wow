@@ -4,10 +4,11 @@ This holds the classes for every kind of item in the game
 
 
 class Item:
-    def __init__(self, name: str, buy_price: int, sell_price: int):
+    def __init__(self, name: str, buy_price: int, sell_price: int, quest_ID: int=0):
         self.name = name
         self.buy_price = buy_price
         self.sell_price = sell_price
+        self.quest_ID = quest_ID
 
     def __str__(self):
         return "{} - Miscellaneous Item".format(self.name)
