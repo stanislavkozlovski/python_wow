@@ -20,6 +20,8 @@
 - [x] Print NPCs
 - [x] Remove the int() calls from loader.py
 - [x] Add ability for player to equip weapons and eventually other items
+- [x] Convert the damage into it's own separate class.
+- [x] Add magic damage
 
 # Low Priority TODOs
 - Add more monsters and subzones
@@ -38,7 +40,7 @@
 # TODOs
 - Add some kind of armor item type (Head, etc)
 - Add a stat of your choice to the game.
-- Convert the damage into it's own separate class. 
+- Convert heals into their own separate class.
 - Add different kinds of damage
 - Add another class of choice. (Mage is on my mind)
 - Add DoTs to the game

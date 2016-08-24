@@ -8,6 +8,7 @@ from database_info import (
     DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1, DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3, DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST)
 from entities import Character, Monster
+from damage import Damage
 
 
 class Paladin(Character):
@@ -45,7 +46,6 @@ class Paladin(Character):
             # learn new spell
             else:
                 self.learn_new_spell(spell=available_spell)
-                pass
 
     def learn_new_spell(self, spell: dict):
         print("You have learned a new spell - {}".format(spell['name']))
@@ -177,7 +177,7 @@ class Paladin(Character):
 
     # SPELLS
 
-    def get_auto_attack_damage(self, target_level: int):
+    def get_auto_attack_damage(self, target_level: int) -> tuple:
         import random
 
         level_difference = self.level - target_level
@@ -200,22 +200,23 @@ class Paladin(Character):
             damage_to_deal += damage_to_deal * percentage_mod  # +X%
             sor_damage += sor_damage * percentage_mod
 
-        return damage_to_deal, sor_damage
+        return Damage(phys_dmg=damage_to_deal, magic_dmg=sor_damage), sor_damage
 
     def attack(self, victim: Monster):
         attacker_swing = self.get_auto_attack_damage(
-            victim.level)  # tuple holding auto attack and seal damage (if active)
+            victim.level)  # tuple holding Damage object and seal damage (if active)
 
-        auto_attack = attacker_swing[0]
+        auto_attack = attacker_swing[0]  # type: Damage
+        # the sor_damage below is used just to check for printing
         sor_damage = attacker_swing[1]  # if the seal isn't active the damage will be 0
 
         if sor_damage:
-            print("{0} attacks {1} for {2:.2f} + {3:.2f} from Seal of Righteousness!".format(self.name, victim.name,
-                                                                                             auto_attack, sor_damage))
+            print("{0} attacks {1} for {2} from Seal of Righteousness!".format(self.name, victim.name,
+                                                                                          auto_attack))
         else:
-            print("{0} attacks {1} for {2:.2f} damage!".format(self.name, victim.name, auto_attack))
+            print("{0} attacks {1} for {2}!".format(self.name, victim.name, auto_attack))
 
-        victim.take_attack(auto_attack + sor_damage)
+        victim.take_attack(auto_attack)
 
     def _check_enough_mana(self, mana_cost: int) -> bool:
         """
