@@ -68,7 +68,7 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
 
 def handle_loot(character: Character, monster: Monster):
     """ Display the loot dropped from the monster and listen for input if the player wants to take any"""
-    print_loot_table(monster)
+    print_loot_table(monster.loot)
     while True:
         command = input()
 
@@ -94,7 +94,7 @@ def handle_loot(character: Character, monster: Monster):
                 print('-' * 40)
                 break
 
-            print_loot_table(monster)  # print the updated table each time we take something
+            print_loot_table(monster.loot)  # print the updated table each time we take something
         elif command == "?":
             pac_looting()
         elif command == "exit":  # end the looting process

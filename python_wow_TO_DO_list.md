@@ -23,6 +23,8 @@
 - [x] Convert the damage into it's own separate class.
 - [x] Add magic damage
 - [x] Add Quests that require items
+- [x] Refactor function parameter names in the command_handler and information_printer modules
+
 # Low Priority TODOs
 - Add more monsters and subzones
 - Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
@@ -31,7 +33,6 @@
 - Add more spells to the existing classes
 
 # Small TODOs
-- Refactor function parameter names in the command_handler and information_printer modules
 - Print Equipment
 - Print Stats (hp, mana, xp and everything else at once)
 - Add item gossip text

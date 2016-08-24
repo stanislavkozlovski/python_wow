@@ -2,14 +2,16 @@
 This module will hold functions that print all kinds of information to the player
 """
 from termcolor import colored
+from zones.zone import Zone
 
 
-def print_live_monsters(alive_monsters: dict, print_all=False):
+def print_live_monsters(zone_object: Zone, print_all=False):
     """
     Prints the monsters that are alive in the current subzone
-    :param alive_monsters: A Dictionary key: Monster_GUID, value: Monster class object
+    :param zone_object: an object of class Zone in zones.zone.py
     :param print_all: A Boolean indicating if we want to print all the monsters in alive_monsters or by default: only 5
     """
+    alive_monsters, _ = zone_object.get_cs_monsters()
 
     print("Alive monsters: ")
     # sort them by level and print the five that are the lowest level
@@ -25,12 +27,13 @@ def print_live_monsters(alive_monsters: dict, print_all=False):
     print()
 
 
-def print_live_npcs(alive_npcs: dict, print_all=False):
+def print_live_npcs(zone_object: Zone, print_all=False):
     """
     Prints the NPCs that are alive in the current subzone
-    :param alive_npcs: A Dictionary key: NPC_GUID, value: FriendlyNPC class object
+    :param zone_object: an object of class Zone in zones.zone.py
     :param print_all: A Boolean indicating if we want to print all the npcs in alive_npcs or by default: only 5
     """
+    alive_npcs, _ = zone_object.get_cs_npcs()
     print("Alive NPCs: ")
     printed_npcs = 0
 
@@ -44,17 +47,17 @@ def print_live_npcs(alive_npcs: dict, print_all=False):
     print()
 
 
-def print_available_quests(available_quests: dict, character_level: int):
+def print_available_quests(available_quests: dict, players_level: int):
     """
     Prints all the quests that are available to the player in the current subzone
     :param available_quests:  A Dictionary Key: Quest Name, Value: Quest object from class Quest
-    :param character_level: The player character's level. Used to check if he's eligible for given quest.
+    :param players_level: The player character's level. Used to check if he's eligible for given quest.
     :return:
     """
     print("Available quests: ")
 
     for _, quest in available_quests.items():
-        if quest.required_level <= character_level:
+        if quest.required_level <= players_level:
             print(quest)
         else:
             quest_information_to_print = "{quest_name} [Requires Level {req_level}]".format(quest_name=quest.name,
@@ -64,11 +67,11 @@ def print_available_quests(available_quests: dict, character_level: int):
             print(colored_print)
 
 
-def print_in_combat_stats(character, monster):
-    print("Character {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(character.name, character.health,
-                                                                          character.max_health,
-                                                                          character.mana,
-                                                                          character.max_mana))
+def print_in_combat_stats(player, monster):
+    print("Character {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(player.name, player.health,
+                                                                          player.max_health,
+                                                                          player.mana,
+                                                                          player.max_mana))
 
 
     print("Monster {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(monster.name, monster.health,
@@ -76,23 +79,24 @@ def print_in_combat_stats(character, monster):
                                                                         monster.max_mana))
 
 
-def print_character_xp_bar(character):
-    print("{0}/{1} Experience. {2} needed to level up!".format(character.experience,
-                                                               character.xp_req_to_level,
-                                                               character.xp_req_to_level - character.experience))
+def print_character_xp_bar(player):
+    print("{0}/{1} Experience. {2} needed to level up!".format(player.experience,
+                                                               player.xp_req_to_level,
+                                                               player.xp_req_to_level - player.experience))
 
-def print_loot_table(monster):
+
+def print_loot_table(monster_loot: dict):
     """
     Prints the loot table
-    :param monster: A monster object of class Monster
+    :param monster_loot: a dictionary that holds the loot the monster has dropped
     """
     print()
     print("Loot dropped:")
 
-    if "gold" in monster.loot.keys():
+    if "gold" in monster_loot.keys():
         # print the gold separately so it always comes up on top
-        print("\t{} gold".format(monster.loot['gold']))
+        print("\t{} gold".format(monster_loot['gold']))
 
-    for item_name, item in monster.loot.items():  # type: dict
+    for item_name, item in monster_loot.items():  # type: dict
         if item_name is not "gold":
             print("\t{}".format(item))

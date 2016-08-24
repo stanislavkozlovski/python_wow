@@ -21,8 +21,8 @@ def main():
     alive_npcs, _ = zone_object.get_cs_npcs()
     alive_monsters, _ = zone_object.get_cs_monsters()
 
-    print_live_npcs(alive_npcs, print_all=True)
-    print_live_monsters(alive_monsters)
+    print_live_npcs(zone_object, print_all=True)
+    print_live_monsters(zone_object)
     while True:
         handle_main_commands(main_character, zone_object)
 
