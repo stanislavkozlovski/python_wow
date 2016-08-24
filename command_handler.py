@@ -148,10 +148,12 @@ def handle_open_inventory_command(character):
     character.print_inventory()
 
     while True:
+        print(">inventory ", end='')
         command = input()
         if command == "?":
             pac_opened_inventory()
         elif command == "exit":
+            print("-" * 40)
             break
         elif "equip" in command:
             """ Equips the item """

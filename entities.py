@@ -284,6 +284,7 @@ class Character(LivingThing):
             self.equip_weapon(item)
 
     def equip_weapon(self, weapon: Weapon):
+        print("{} has equipped Weapon {}".format(self.name, weapon.name))
         self.equipped_weapon = weapon
         self._calculate_damage(self.equipped_weapon)
 
