@@ -121,7 +121,7 @@ def handle_buy_from_command(command: str, character, zone_object: Zone):
 
 def handle_vendor_sale(character, vendor):
     while True:
-        print(vendor.print_inventory())
+        vendor.print_inventory()
 
         command = input()
         if command == 'exit':
@@ -135,6 +135,8 @@ def handle_vendor_sale(character, vendor):
                     print("{character_name} has bought {item_name} from {vendor_name}!".format(
                         character_name=character.name, item_name=item, vendor_name=vendor.name
                     ))
+                else:
+                    print("You do not have enough gold to buy {}!\n".format(item))
             else:
                 print("{} does not have {} in stock.".format(vendor.name, item))
         elif command == '?':
