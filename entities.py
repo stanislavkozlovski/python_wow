@@ -258,6 +258,30 @@ class Character(LivingThing):
         self.inventory = {"gold": 0} # dict Key: str, Value: Item class object
         self.buffs = {}  # dict Key: Buff an instance of object Class, Value: The turns it has left to be active, int
 
+    def end_turn_update(self):
+        """
+        Here we handle all things that are turn based,
+        For now: buff durations only
+        buff durations - go through the buffs, reduce their duration and if they are expired, add them to a list.
+        after iterating through the buffs, go through each  one that is expired and remove it
+        """
+
+        buffs_to_remove = []  # type: list of Buffs
+
+        # iterate through active buffs and reduce duration
+        for buff in self.buffs.keys():
+            # reduce duration by 1 turn
+            turns_left = self.buffs[buff]
+            turns_left -= 1
+            self.buffs[buff] = turns_left
+
+            if not turns_left:  # if it is expired
+                buffs_to_remove.append(buff)
+
+        # remove the buffs
+        for buff in buffs_to_remove:
+            self.remove_buff(buff)
+
     def equip_item(self, item: Item):
         """
         This method equips an item to the character and handles the appropriate change in inventory following the equip
@@ -342,11 +366,6 @@ class Character(LivingThing):
 
         return Damage(phys_dmg=reduced_damage)
 
-    def add_buff(self, buff: Buff):
-        """ Method that handles when a buff is added to the player"""
-        self.buffs[buff] = buff.duration
-        self._apply_buff(buff)
-
     def _apply_buff(self, buff: Buff):
         """ Add the buff to the character's stats"""
         buff_attributes = buff.get_buffed_attributes()  # type: dict
@@ -361,6 +380,23 @@ class Character(LivingThing):
                 self.strength += buff_amount
             elif buff_type == "armor":
                 self.armor += buff_amount
+
+    def _deapply_buff(self, buff: Buff):
+        """ Remove the buff from the character's stats"""
+        buff_attributes = buff.get_buffed_attributes()  # type: dict
+
+        # iterate through the buffed attributes and remove them fromthe character
+        for buff_type, buff_amount in buff_attributes.items():
+            if buff_type == "health":
+                # TODO: Reduce health method to reduce active health too, otherwise we can end up with 10/5 HP
+                self.max_health -= buff_amount
+            elif buff_type == "mana":
+                # TODO: Reduce mana method to reduce active mana too
+                self.max_mana -= buff_amount
+            elif buff_type == "strength":
+                self.strength -= buff_amount
+            elif buff_type == "armor":
+                self.armor -= buff_amount
 
     def _die(self):
         super()._die()
@@ -394,6 +430,17 @@ class Character(LivingThing):
         self.inventory['gold'] -= item_price
 
         self.award_item(item, item_count)
+
+    def remove_buff(self, buff: Buff):
+        """ Method that handles when a buff is removed/expired"""
+        del self.buffs[buff]
+        self._deapply_buff(buff)
+        print("Buff {} has expired from {}.".format(buff.name, self.name))
+
+    def add_buff(self, buff: Buff):
+        """ Method that handles when a buff is added to the player"""
+        self.buffs[buff] = buff.duration
+        self._apply_buff(buff)
 
     def add_quest(self, quest: Quest):
         self.quest_log[quest.ID] = quest
