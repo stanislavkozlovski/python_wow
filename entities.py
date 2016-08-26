@@ -10,6 +10,7 @@ from loader import (load_creature_xp_rewards, load_character_level_stats,
                     load_loot_table, load_item, load_vendor_inventory)
 from quest import Quest
 from damage import Damage
+from buffs import Buff
 
 # dictionary that holds information about how much XP a monster of a certain level should award the player.
 # key: level(int), value: xp reward(int)
@@ -255,6 +256,7 @@ class Character(LivingThing):
         self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements()
         self.quest_log = {}
         self.inventory = {"gold": 0} # dict Key: str, Value: Item class object
+        self.buffs = {}  # dict Key: Buff an instance of object Class, Value: The turns it has left to be active, int
 
     def equip_item(self, item: Item):
         """
@@ -339,6 +341,8 @@ class Character(LivingThing):
         reduced_damage = damage.phys_dmg - damage_to_deduct
 
         return Damage(phys_dmg=reduced_damage)
+
+
 
     def _die(self):
         super()._die()
