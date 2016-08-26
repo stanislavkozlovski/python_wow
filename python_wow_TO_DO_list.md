@@ -37,6 +37,7 @@
 - Print Stats (hp, mana, xp and everything else at once)
 - Add item gossip text
 - Add command to print item information (that is in the vendor, inventory and loot table)
+- Store player's attributes (mana,hp etc) in a dictionary (easier application of buffs that way, will remove if checks)
 
 # TODOs
 - Add some kind of armor item type (Head, etc)

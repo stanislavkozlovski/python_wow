@@ -61,7 +61,6 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
 
             del alive_monsters[monster_GUID]  # removes the monster from the dictionary
             guid_name_set.remove((monster_GUID, monster.name))  # remove it from the set used for looking up
-
             # handle loot
             handle_loot(character, monster)
 

@@ -38,3 +38,19 @@ class Buff:
             self.buff_amounts[buff_type] = self.amount
         else:
             raise ValueError("Buff type {} is not supported!".format(buff_type))
+
+    def get_buffed_attributes(self) -> dict:
+        """
+        Return a dictionary
+            Key: buff_type (str)
+            Value: buff_amount (int)
+        Only filled with the buffs that are increased
+        """
+        buffed_attributes = {}  # type: dict
+
+        for buff_type, buff_amount in self.buff_amounts.items():
+            if buff_amount:
+                buffed_attributes[buff_type] = buff_amount
+
+        return  buffed_attributes
+

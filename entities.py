@@ -342,7 +342,25 @@ class Character(LivingThing):
 
         return Damage(phys_dmg=reduced_damage)
 
+    def add_buff(self, buff: Buff):
+        """ Method that handles when a buff is added to the player"""
+        self.buffs[buff] = buff.duration
+        self._apply_buff(buff)
 
+    def _apply_buff(self, buff: Buff):
+        """ Add the buff to the character's stats"""
+        buff_attributes = buff.get_buffed_attributes()  # type: dict
+
+        # iterate through the buffed attributes and apply them to the character
+        for buff_type, buff_amount in buff_attributes.items():
+            if buff_type == "health":
+                self.max_health += buff_amount
+            elif buff_type == "mana":
+                self.max_mana += buff_amount
+            elif buff_type == "strength":
+                self.strength += buff_amount
+            elif buff_type == "armor":
+                self.armor += buff_amount
 
     def _die(self):
         super()._die()
