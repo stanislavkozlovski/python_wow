@@ -23,15 +23,15 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
     :param monster_GUID: The monster GUID
     """
     available_spells = get_available_spells(character)  # Load all of the currently available spells for our character
-    to_skip_attack = False  # Used when we don't want the monster to attack on the next turn
+    will_end_turn = True  # Dictates if we are going to count the iteration of the loop as a turn
 
     character.enter_combat()
     monster.enter_combat()
 
     while character.is_in_combat():
         # We start off the combat with the monster dealing the first blow
-        if to_skip_attack:
-            to_skip_attack = False
+        if not will_end_turn:  # skip attack if the turn has not ended
+            will_end_turn = True
         else:
             monster.attack(character)
 
@@ -51,7 +51,11 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
         elif command in available_spells:
             if not character.spell_handler(command):
                 # Unsuccessful cast
-                to_skip_attack = True  # skip the next attack and load a command again
+                will_end_turn = False  # skip the next attack, don't count this iteration as a turn and load a command again
+
+        if will_end_turn:
+            # turn has ended
+            pass
 
         if not monster.is_alive():
             print("{0} has slain {1}!".format(character.name, monster.name))
