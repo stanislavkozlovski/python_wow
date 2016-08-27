@@ -10,7 +10,7 @@ from loader import (load_creature_xp_rewards, load_character_level_stats,
                     load_loot_table, load_item, load_vendor_inventory)
 from quest import Quest
 from damage import Damage
-from buffs import Buff
+from buffs import Buff, DoT
 
 # dictionary that holds information about how much XP a monster of a certain level should award the player.
 # key: level(int), value: xp reward(int)
@@ -258,6 +258,33 @@ class Character(LivingThing):
         self.inventory = {"gold": 0} # dict Key: str, Value: Item class object
         self.buffs = {}  # dict Key: an instance of class Buff, Value: The turns it has left to be active, int
 
+    def start_turn_update(self):
+        """
+        Here we handle all things that are turn based and dependant on the STAR tof the turn,
+        For now: Damage over time effects only (DoT)
+
+        buff durations - go through the buffs, filter the DoTs, reduce their duration and if they are expired, add them to a list.
+        after iterating through the DoTs, go through each  one that is expired and remove it
+        """
+
+        dots_to_remove = []  # type: list of Buffs
+
+        # filter the DoTs from the character's buffs, iterate through active DoTs and reduce duration
+        for DoT in list(filter(lambda buff: isinstance(buff, DoT), self.buffs.keys())):
+            # activate DoT effect
+            # TODO: self.take_dot_proc()
+            # reduce duration by 1 turn
+            turns_left = self.buffs[DoT]
+            turns_left -= 1
+            self.buffs[DoT] = turns_left
+
+            if not turns_left:  # if it is expired
+                dots_to_remove.append(DoT)
+
+        # remove the buffs
+        for DoT in dots_to_remove:
+            self.remove_buff(DoT)
+
     def end_turn_update(self):
         """
         Here we handle all things that are turn based,
@@ -269,7 +296,7 @@ class Character(LivingThing):
         buffs_to_remove = []  # type: list of Buffs
 
         # iterate through active buffs and reduce duration
-        for buff in self.buffs.keys():
+        for buff in list(filter(lambda buff: isinstance(buff, Buff), self.buffs.keys())):
             # reduce duration by 1 turn
             turns_left = self.buffs[buff]
             turns_left -= 1
@@ -460,9 +487,11 @@ class Character(LivingThing):
         print("Buff {} has expired from {}.".format(buff.name, self.name))
 
     def add_buff(self, buff: Buff):
-        """ Method that handles when a buff is added to the player"""
+        """ Method that handles when a buff is added to the player
+        also adds DoTs to the list"""
         self.buffs[buff] = buff.duration
-        self._apply_buff(buff)
+        if isinstance(buff, Buff):
+            self._apply_buff(buff)
 
     def add_quest(self, quest: Quest):
         self.quest_log[quest.ID] = quest
