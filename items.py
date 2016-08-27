@@ -29,7 +29,10 @@ class Potion(Item):
     """ Consumable item that gives a buff to the player"""
     def __init__(self, name: str, buy_price: int, sell_price: int,  buff: Buff, quest_ID: int=0,):
         super().__init__(name, buy_price, sell_price, quest_ID)
+        self.buff = buff
+
+    def __str__(self):
+        return "{} - Potion".format(self.name)
 
     def consume(self, character):
-        # TODO: character.add_buff(self.buff)
-        pass
+        character.add_buff(self.buff)
