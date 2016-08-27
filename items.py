@@ -32,7 +32,7 @@ class Potion(Item):
         self.buff = buff
 
     def __str__(self):
-        return "{} - Potion".format(self.name)
+        return "{} - Potion ({})".format(self.name, self.buff)
 
     def consume(self, character):
         character.add_buff(self.buff)
