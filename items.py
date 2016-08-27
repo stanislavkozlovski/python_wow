@@ -1,6 +1,7 @@
 """
 This holds the classes for every kind of item in the game
 """
+from buffs import Buff
 
 
 class Item:
@@ -22,3 +23,13 @@ class Weapon(Item):
 
     def __str__(self):
         return "{} - Weapon ({}-{} damage)".format(self.name, self.min_damage, self.max_damage)
+
+
+class Potion(Item):
+    """ Consumable item that gives a buff to the player"""
+    def __init__(self, name: str, buy_price: int, sell_price: int,  buff: Buff, quest_ID: int=0,):
+        super().__init__(name, buy_price, sell_price, quest_ID)
+
+    def consume(self, character):
+        # TODO: character.add_buff(self.buff)
+        pass

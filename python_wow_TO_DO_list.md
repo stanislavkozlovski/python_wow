@@ -24,6 +24,7 @@
 - [x] Add magic damage
 - [x] Add Quests that require items
 - [x] Refactor function parameter names in the command_handler and information_printer modules
+- [x] Add Buffs to the game
 
 # Low Priority TODOs
 - Add more monsters and subzones
@@ -40,6 +41,7 @@
 - Store player's attributes (mana,hp etc) in a dictionary (easier application of buffs that way, will remove if checks)
 
 # TODOs
+- Add documentation!
 - Add some kind of armor item type (Head, etc)
 - Add a stat of your choice to the game.
 - Convert heals into their own separate class.
@@ -47,7 +49,6 @@
 - Add another class of choice. (Mage is on my mind)
 - Add DoTs to the game
 - Add Quest item rewards
-- Add Buffs to the game
 - Add Potions to the game
 - Add the ability to save the character
 - Add a scripted NPC to the game

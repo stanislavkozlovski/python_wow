@@ -13,7 +13,7 @@ from database_info import \
 
      DBINDEX_ITEM_TEMPLATE_NAME, DBINDEX_ITEM_TEMPLATE_TYPE, DBINDEX_ITEM_TEMPLATE_BUY_PRICE,
      DBINDEX_ITEM_TEMPLATE_SELL_PRICE, DBINDEX_ITEM_TEMPLATE_MIN_DMG, DBINDEX_ITEM_TEMPLATE_MAX_DMG,
-     DBINDEX_ITEM_TEMPLATE_QUEST_ID,
+     DBINDEX_ITEM_TEMPLATE_QUEST_ID, DBINDEX_ITEM_TEMPLATE_EFFECT,
 
      DBINDEX_QUEST_TEMPLATE_ENTRY, DBINDEX_QUEST_TEMPLATE_NAME, DBINDEX_QUEST_TEMPLATE_TYPE,
      DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED, DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED,
@@ -412,14 +412,17 @@ def load_item(item_ID: int):
     """
     Load an item from item_template, convert it to a object of Class Item and return it
     The item_template table is as follows:
-    entry,      name, type, buy_price, sell_price, min_dmg, max_dmg
-        1,'Wolf Pelt','misc',       1,          1,     Null, Null
-    The item is of type misc, making us use the default class Item
+    entry,      name, type, buy_price, sell_price, min_dmg, max_dmg, quest_ID, effect
+        1,'Wolf Pelt','misc',       1,          1,     Null, Null  ,        1,      0
+    The item is of type misc, making us use the default class Item. It is also collected for the quest with ID 1
 
-    entry,             name,    type, buy_price, sell_price, min_dmg, max_dmg
-      100, 'Arcanite Reaper', 'weapon',   125,          100,     56,      128
+    entry,             name,    type, buy_price, sell_price, min_dmg, max_dmg, quest_ID, effect
+      100, 'Arcanite Reaper', 'weapon',   125,          100,     56,      128,        0,      0
     This item is of type weapon, making us use the class Weapon to create it
 
+    entry,             name,    type, buy_price, sell_price, min_dmg, max_dmg, quest_ID, effect
+        4,'Strength Potion', 'potion',       1,           1,    Null,    Null,        0,      1
+    This item is of type Potion and when consumed gives off the effect (spell_buffs table entry) 1
     :returns a class object, depending on what the type is
     """
     with sqlite3.connect(DB_PATH) as connection:
@@ -441,6 +444,11 @@ def load_item(item_ID: int):
 
             return items.Weapon(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price,
                                 min_damage=item_min_dmg, max_damage=item_max_dmg)
+        elif item_type == 'potion':
+            buff_id = item_template_info[DBINDEX_ITEM_TEMPLATE_EFFECT]  # type: int
+            # TODO: item_buff_effect = load_buff(buff_id)
+
+            # TODO: return items.Potion(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price, buff=item_buff_effect)
         else:
             raise Exception("Unsupported item type {}".format(item_type))
 
