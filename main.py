@@ -15,7 +15,6 @@ def main():
     main_character = classes.Paladin(name="Netherblood")
     starter_weapon = Weapon(name="Starter Weapon", min_damage=1, max_damage=3)
     main_character.equip_weapon(starter_weapon)
-    main_character.add_buff(Buff("The Great Health Buff of the TESTER", 25, "health", 4))  # TEST PURPOSES
     print("Character {0} created!".format(main_character.name))
     zone_object = get_zone_object(main_character.current_zone)  # type: Zone
 

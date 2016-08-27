@@ -24,6 +24,8 @@ from database_info import \
      DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MIN_GOLD_REWARD,
      DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MAX_GOLD_REWARD,
 
+     DBINDEX_SPELL_BUFFS_NAME, DBINDEX_SPELL_BUFFS_STAT, DBINDEX_SPELL_BUFFS_AMOUNT, DBINDEX_SPELL_BUFFS_DURATION,
+
      DBINDEX_LEVELUP_STATS_LEVEL, DBINDEX_LEVELUP_STATS_HEALTH, DBINDEX_LEVELUP_STATS_MANA,
      DBINDEX_LEVELUP_STATS_STRENGTH, DBINDEX_LEVELUP_STATS_ARMOR,
 
@@ -31,6 +33,7 @@ from database_info import \
      )
 from quest import KillQuest, FetchQuest
 import items
+from buffs import Buff
 
 
 def load_monsters(zone: str, subzone: str) -> tuple:
@@ -446,11 +449,38 @@ def load_item(item_ID: int):
                                 min_damage=item_min_dmg, max_damage=item_max_dmg)
         elif item_type == 'potion':
             buff_id = item_template_info[DBINDEX_ITEM_TEMPLATE_EFFECT]  # type: int
-            # TODO: item_buff_effect = load_buff(buff_id)
+            item_buff_effect = load_buff(buff_id)  # type: Buff
 
-            # TODO: return items.Potion(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price, buff=item_buff_effect)
+            return items.Potion(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price,
+                                buff=item_buff_effect)
         else:
             raise Exception("Unsupported item type {}".format(item_type))
+
+
+def load_buff(buff_id: int) -> Buff:
+    """
+    Loads a buff from the DB table spells_buffs, whose contents are the following:
+    entry,             name,     stat,   amount,    duration, comment
+        1,  Heart of a Lion, strength,       10,           5,For the potion: Strength Potion
+        stat - the stat this buff increases
+        amount - the amount it increases the stat by
+        duration - the amount of turns this buff lasts for
+    This buff increases your strength by 10 for 5 turns.
+
+    :param buff_id: the buff entry in spells_buffs
+    :return: A instance of class Buff
+    """
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM spell_buffs WHERE entry = ?", [buff_id])
+        buff_information = cursor.fetchone()
+
+        buff_name = buff_information[DBINDEX_SPELL_BUFFS_NAME]  # type: str
+        buff_stat = buff_information[DBINDEX_SPELL_BUFFS_STAT]  # type: str
+        buff_amount = buff_information[DBINDEX_SPELL_BUFFS_AMOUNT]  # type: int
+        buff_duration = buff_information[DBINDEX_SPELL_BUFFS_DURATION]  # type: int
+
+    return Buff(name=buff_name, amount=buff_amount, buff_type=buff_stat, duration=buff_duration)
 
 def load_character_level_stats() -> dict:
     """
