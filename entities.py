@@ -256,7 +256,7 @@ class Character(LivingThing):
         self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements()
         self.quest_log = {}
         self.inventory = {"gold": 0} # dict Key: str, Value: Item class object
-        self.buffs = {}  # dict Key: Buff an instance of object Class, Value: The turns it has left to be active, int
+        self.buffs = {}  # dict Key: an instance of class Buff, Value: The turns it has left to be active, int
 
     def end_turn_update(self):
         """

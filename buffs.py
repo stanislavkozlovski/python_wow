@@ -19,7 +19,7 @@ class Buff:
                     KEY_BUFF_TYPE_HEALTH: 0,
                     KEY_BUFF_TYPE_MANA: 0}  # type: dict
 
-    def __init__(self, name: str, buff_stats_and_amounts: list, duration: int):
+    def __init__(self, name: str, buff_stats_and_amounts: list, duration: int, description: str):
         """
         Buff(10, armor, 3) will increase your armor by 10 for 3 turns
 
@@ -32,7 +32,11 @@ class Buff:
         self.name = name
         self.buff_stats_and_amounts = buff_stats_and_amounts
         self.duration = duration  # measured in turns
+        self.description = description
         self._manage_buff_types(buff_stats_and_amounts)  # updates buff_amounts
+
+    def __str__(self):
+        return self.description
 
     def _manage_buff_types(self, buff_list: list):
         """

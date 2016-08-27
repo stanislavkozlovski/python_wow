@@ -26,6 +26,7 @@ from database_info import \
 
      DBINDEX_SPELL_BUFFS_NAME, DBINDEX_SPELL_BUFFS_DURATION, DBINDEX_SPELL_BUFFS_STAT1, DBINDEX_SPELL_BUFFS_AMOUNT1,
      DBINDEX_SPELL_BUFFS_STAT2, DBINDEX_SPELL_BUFFS_AMOUNT2, DBINDEX_SPELL_BUFFS_STAT3, DBINDEX_SPELL_BUFFS_AMOUNT3,
+     DBINDEX_SPELL_BUFFS_COMMENT,
 
      DBINDEX_LEVELUP_STATS_LEVEL, DBINDEX_LEVELUP_STATS_HEALTH, DBINDEX_LEVELUP_STATS_MANA,
      DBINDEX_LEVELUP_STATS_STRENGTH, DBINDEX_LEVELUP_STATS_ARMOR,
@@ -462,7 +463,7 @@ def load_buff(buff_id: int) -> Buff:
     """
     Loads a buff from the DB table spells_buffs, whose contents are the following:
     entry,             name, duration,    stat,   amount,   stat2,   amount2,stat3,   amount3, comment
-        1,  Heart of a Lion,        5,strength,       10,                                      For the potion: Strength Potion
+        1,  Heart of a Lion,        5,strength,       10,                                      Increases strength by 10 for 5 turns
         stat - the stat this buff increases
         amount - the amount it increases the stat by
         duration - the amount of turns this buff lasts for
@@ -485,11 +486,13 @@ def load_buff(buff_id: int) -> Buff:
         buff_stat3 = buff_information[DBINDEX_SPELL_BUFFS_STAT3]  # type: str
         buff_amount3 = buff_information[DBINDEX_SPELL_BUFFS_AMOUNT3]  # type: int
         buff_duration = buff_information[DBINDEX_SPELL_BUFFS_DURATION]  # type: int
+        buff_comment = buff_information[DBINDEX_SPELL_BUFFS_COMMENT]  # type: str
 
         #  Create a list of tuples with each buff
         buff_stats_and_amounts = [(buff_stat1, buff_amount1), (buff_stat2, buff_amount2), (buff_stat3, buff_amount3)]
 
-    return Buff(name=buff_name, buff_stats_and_amounts=buff_stats_and_amounts, duration=buff_duration)
+    return Buff(name=buff_name, buff_stats_and_amounts=buff_stats_and_amounts,
+                duration=buff_duration, description=buff_comment)
 
 def load_character_level_stats() -> dict:
     """
