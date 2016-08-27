@@ -4,7 +4,6 @@ from command_handler import handle_main_commands, print_live_monsters, print_liv
 from zones.zone import Zone
 from items import Weapon
 from zones.elwynn_forest import ElwynnForest
-from buffs import Buff  # TEST PURPOSES
 GAME_VERSION = '0.0.4 ALPHA'
 ZONES = {"Elwynn Forest": ElwynnForest()}
 

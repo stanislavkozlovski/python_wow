@@ -24,7 +24,8 @@ from database_info import \
      DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MIN_GOLD_REWARD,
      DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MAX_GOLD_REWARD,
 
-     DBINDEX_SPELL_BUFFS_NAME, DBINDEX_SPELL_BUFFS_STAT, DBINDEX_SPELL_BUFFS_AMOUNT, DBINDEX_SPELL_BUFFS_DURATION,
+     DBINDEX_SPELL_BUFFS_NAME, DBINDEX_SPELL_BUFFS_DURATION, DBINDEX_SPELL_BUFFS_STAT1, DBINDEX_SPELL_BUFFS_AMOUNT1,
+     DBINDEX_SPELL_BUFFS_STAT2, DBINDEX_SPELL_BUFFS_AMOUNT2, DBINDEX_SPELL_BUFFS_STAT3, DBINDEX_SPELL_BUFFS_AMOUNT3,
 
      DBINDEX_LEVELUP_STATS_LEVEL, DBINDEX_LEVELUP_STATS_HEALTH, DBINDEX_LEVELUP_STATS_MANA,
      DBINDEX_LEVELUP_STATS_STRENGTH, DBINDEX_LEVELUP_STATS_ARMOR,
@@ -460,13 +461,14 @@ def load_item(item_ID: int):
 def load_buff(buff_id: int) -> Buff:
     """
     Loads a buff from the DB table spells_buffs, whose contents are the following:
-    entry,             name,     stat,   amount,    duration, comment
-        1,  Heart of a Lion, strength,       10,           5,For the potion: Strength Potion
+    entry,             name, duration,    stat,   amount,   stat2,   amount2,stat3,   amount3, comment
+        1,  Heart of a Lion,        5,strength,       10,                                      For the potion: Strength Potion
         stat - the stat this buff increases
         amount - the amount it increases the stat by
         duration - the amount of turns this buff lasts for
     This buff increases your strength by 10 for 5 turns.
 
+    Load the information about the buff, convert it to an class Buff object and return it
     :param buff_id: the buff entry in spells_buffs
     :return: A instance of class Buff
     """
@@ -476,11 +478,18 @@ def load_buff(buff_id: int) -> Buff:
         buff_information = cursor.fetchone()
 
         buff_name = buff_information[DBINDEX_SPELL_BUFFS_NAME]  # type: str
-        buff_stat = buff_information[DBINDEX_SPELL_BUFFS_STAT]  # type: str
-        buff_amount = buff_information[DBINDEX_SPELL_BUFFS_AMOUNT]  # type: int
+        buff_stat1 = buff_information[DBINDEX_SPELL_BUFFS_STAT1]  # type: str
+        buff_amount1 = buff_information[DBINDEX_SPELL_BUFFS_AMOUNT1]  # type: int
+        buff_stat2 = buff_information[DBINDEX_SPELL_BUFFS_STAT2]  # type: str
+        buff_amount2 = buff_information[DBINDEX_SPELL_BUFFS_AMOUNT2]  # type: int
+        buff_stat3 = buff_information[DBINDEX_SPELL_BUFFS_STAT3]  # type: str
+        buff_amount3 = buff_information[DBINDEX_SPELL_BUFFS_AMOUNT3]  # type: int
         buff_duration = buff_information[DBINDEX_SPELL_BUFFS_DURATION]  # type: int
 
-    return Buff(name=buff_name, amount=buff_amount, buff_type=buff_stat, duration=buff_duration)
+        #  Create a list of tuples with each buff
+        buff_stats_and_amounts = [(buff_stat1, buff_amount1), (buff_stat2, buff_amount2), (buff_stat3, buff_amount3)]
+
+    return Buff(name=buff_name, buff_stats_and_amounts=buff_stats_and_amounts, duration=buff_duration)
 
 def load_character_level_stats() -> dict:
     """
