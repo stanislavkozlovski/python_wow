@@ -4,7 +4,7 @@ from command_handler import handle_main_commands, print_live_monsters, print_liv
 from zones.zone import Zone
 from items import Weapon
 from zones.elwynn_forest import ElwynnForest
-GAME_VERSION = '0.0.4 ALPHA'
+GAME_VERSION = '0.0.45 ALPHA'
 ZONES = {"Elwynn Forest": ElwynnForest()}
 
 

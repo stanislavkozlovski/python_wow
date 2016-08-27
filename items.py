@@ -34,5 +34,8 @@ class Potion(Item):
     def __str__(self):
         return "{} - Potion ({})".format(self.name, self.buff)
 
+    def get_buff_name(self) -> str:
+        return self.buff.name
+
     def consume(self, character):
         character.add_buff(self.buff)

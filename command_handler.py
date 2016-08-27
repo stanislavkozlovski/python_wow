@@ -172,6 +172,15 @@ def handle_open_inventory_command(character):
             item, _ = character.inventory.get(item_name, (None, None))
 
             character.equip_item(item)
+        elif "use" in command:
+            """ Consumes a consumable item"""
+            item_name = command[4:]
+
+            # failsafe check if the item is in the inventory of the player. if it's not it will return a None object,
+            # which will not pass the if checks in the consume_item method
+            item, _ = character.inventory.get(item_name, (None, None))
+
+            character.consume_item(item)
 
 
 def handle_go_to_command(command: str, character, zone_object: Zone):

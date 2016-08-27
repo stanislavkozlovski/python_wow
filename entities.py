@@ -4,7 +4,7 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 
 import random
 
-from items import Weapon, Item
+from items import  Item, Weapon, Potion
 from loader import (load_creature_xp_rewards, load_character_level_stats,
                     load_character_xp_requirements, load_creature_gold_reward,
                     load_loot_table, load_item, load_vendor_inventory)
@@ -308,6 +308,28 @@ class Character(LivingThing):
                 self.inventory[eq_weapon.name] = eq_weapon, 1
 
             self.equip_weapon(item)
+
+    def consume_item(self, item: Item):
+        """
+        This method consumes a consumable item and processes the item's effect
+        :param item: an instance of class Item
+        """
+        if isinstance(item, Potion):
+            potion = item # type: Potion
+            potion_in_inventory, count = self.inventory[potion.name]
+
+            # remove the potion we're consuming from the inventory
+            if count == 1:  # remove from the inventory
+                del self.inventory[potion.name]
+            else:  # reduce it's count
+                self.inventory[potion.name] = potion_in_inventory, count - 1
+
+            print("{char_name} drinks {pot_name} and is afflicted by {buff_name}".format(char_name=self.name,
+                                                                                         pot_name=potion.name,
+                                                                                         buff_name=potion.get_buff_name()))
+            # call the potion's consume method
+            potion.consume(self)
+
 
     def equip_weapon(self, weapon: Weapon):
         print("{} has equipped Weapon {}".format(self.name, weapon.name))

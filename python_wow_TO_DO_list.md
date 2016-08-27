@@ -25,6 +25,7 @@
 - [x] Add Quests that require items
 - [x] Refactor function parameter names in the command_handler and information_printer modules
 - [x] Add Buffs to the game
+- [x] Add Potions to the game
 
 # Low Priority TODOs
 - Add more monsters and subzones
@@ -49,6 +50,5 @@
 - Add another class of choice. (Mage is on my mind)
 - Add DoTs to the game
 - Add Quest item rewards
-- Add Potions to the game
 - Add the ability to save the character
 - Add a scripted NPC to the game

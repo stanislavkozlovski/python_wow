@@ -94,6 +94,8 @@ def pac_opened_inventory():
     """Prints all possible commands that the player can use while his inventory is opened"""
     print("\tequip [Item Name]")
     print("\t\tEquips the item\n")
+    print("\tuse [Consumable Item Name]")
+    print("\t\tUses up the item and activates it's effect.\n")
     print("\texit")
     print("\t\tCloses the inventory\n")
     print("\t?")
