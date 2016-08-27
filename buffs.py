@@ -5,6 +5,7 @@ This module holds information about all kinds of buffs that are applied to an en
 - DoTs
 etc
 """
+from damage import Damage
 KEY_BUFF_TYPE_ARMOR = "armor"
 KEY_BUFF_TYPE_STRENGTH = "strength"
 KEY_BUFF_TYPE_HEALTH = "health"
@@ -21,7 +22,7 @@ class Buff:
 
     def __init__(self, name: str, buff_stats_and_amounts: list, duration: int, description: str):
         """
-        Buff(10, armor, 3) will increase your armor by 10 for 3 turns
+        Buff(10, [(armor, 3), (None, None), (None, None)) will increase your armor by 10 for 3 turns
 
         :param amount: the amount we are going to increase by
         :param buff_stats_and_amounts: A list of tuples, each tuple holding (1,2)
@@ -65,4 +66,22 @@ class Buff:
                 buffed_attributes[buff_type] = buff_amount
 
         return  buffed_attributes
+
+
+# Damage over time debuff
+class DoT:
+
+    def __init__(self, name: str, damage_tick: Damage, duration: int):
+        """
+        Dots(Fireball, 5, 2) will damage you for 5 at the start of each turn for 2 turns.
+        :param name:
+        :param damage_tick: the damage it will deal to you every turn
+        :param duration: How many turns this DoT will be active for
+        """
+        self.name = name
+        self.damage = damage_tick  # type: Damage
+        self.duration = duration
+
+    def __str__(self):
+        return "{} - Deals {} damage every turn for {} turns".format(self.name, self.damage, self.duration)
 
