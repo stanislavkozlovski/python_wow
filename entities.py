@@ -270,20 +270,20 @@ class Character(LivingThing):
         dots_to_remove = []  # type: list of Buffs
 
         # filter the DoTs from the character's buffs, iterate through active DoTs and reduce duration
-        for DoT in list(filter(lambda buff: isinstance(buff, DoT), self.buffs.keys())):
+        for dot in list(filter(lambda buff: isinstance(buff, DoT), self.buffs.keys())):
             # activate DoT effect
-            # TODO: self.take_dot_proc()
+            self.take_dot_proc(dot)
             # reduce duration by 1 turn
-            turns_left = self.buffs[DoT]
+            turns_left = self.buffs[dot]
             turns_left -= 1
-            self.buffs[DoT] = turns_left
+            self.buffs[dot] = turns_left
 
             if not turns_left:  # if it is expired
-                dots_to_remove.append(DoT)
+                dots_to_remove.append(dot)
 
         # remove the buffs
-        for DoT in dots_to_remove:
-            self.remove_buff(DoT)
+        for dot in dots_to_remove:
+            self.remove_buff(dot)
 
     def end_turn_update(self):
         """
@@ -402,7 +402,21 @@ class Character(LivingThing):
         self.health -= damage
         self.check_if_dead()
 
-    def _apply_armor_reduction(self, damage: Damage, attacker_level: int):
+    def take_dot_proc(self, dot: DoT):
+        """ this method damages the character for the dot's proc"""
+        dot_proc_damage = dot.damage  # type: Damage
+
+        if dot_proc_damage.phys_dmg:  # if there is physical damage in the DoT, apply armor reduction
+            dot_proc_damage =  self._apply_armor_reduction(damage=dot_proc_damage,
+                                                                    attacker_level=self.level)
+
+        print("{char_name} suffers {dot_dmg} from {dot_name}!".format(char_name=self.name,
+                                                                             dot_dmg=dot_proc_damage,
+                                                                             dot_name=dot.name))
+        self.health -= dot_proc_damage
+        self.check_if_dead()
+
+    def _apply_armor_reduction(self, damage: Damage, attacker_level: int) -> Damage:
         """
         This method applies the armor reduction to a blow, the formula is as follows:
         Percentage to Reduce = Armor / (Armor + 400 + 85 * Attacker_Level)
@@ -413,7 +427,7 @@ class Character(LivingThing):
         damage_to_deduct = damage.phys_dmg * reduction_percentage
         reduced_damage = damage.phys_dmg - damage_to_deduct
 
-        return Damage(phys_dmg=reduced_damage)
+        return Damage(phys_dmg=reduced_damage, magic_dmg=damage.magic_dmg)
 
     def _apply_buff(self, buff: Buff):
         """ Add the buff to the character's stats"""
@@ -483,8 +497,11 @@ class Character(LivingThing):
     def remove_buff(self, buff: Buff):
         """ Method that handles when a buff is removed/expired"""
         del self.buffs[buff]
-        self._deapply_buff(buff)
-        print("Buff {} has expired from {}.".format(buff.name, self.name))
+        if isinstance(buff, Buff):
+            self._deapply_buff(buff)
+            print("Buff {} has expired from {}.".format(buff.name, self.name))
+        elif isinstance(buff, DoT):
+            print("DoT {} has expired from {}.".format(buff.name, self.name))
 
     def add_buff(self, buff: Buff):
         """ Method that handles when a buff is added to the player

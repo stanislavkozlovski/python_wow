@@ -41,9 +41,11 @@
 - Add command to print item information (that is in the vendor, inventory and loot table)
 - Store player's attributes (mana,hp etc) in a dictionary (easier application of buffs that way, will remove if checks)
 - Move the logic that checks for buff's/dot's expiry in the start/end turn method of Character to their own methods.
+
 # TODOs
 - Add documentation!
 - Refactor Buff classes, make Buff a base class for all kinds of buffs/dots/debuffs
+- Create a method in Character that calculates the level difference damage reduction/increase and apply it to DoTs
 - Add spell cooldowns and a way to handle them
 - Add some kind of armor item type (Head, etc)
 - Add a stat of your choice to the game.

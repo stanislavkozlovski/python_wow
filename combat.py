@@ -31,8 +31,10 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
     while character.is_in_combat():
         # We start off the combat with the monster dealing the first blow
         if not will_end_turn:  # skip attack if the turn has not ended
+            # skip turn based things
             will_end_turn = True
         else:
+            character.start_turn_update()
             monster.attack(character)
 
         if not character.is_alive():
@@ -55,7 +57,6 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
 
         if will_end_turn:
             character.end_turn_update()
-            pass
 
         if not monster.is_alive():
             print("{0} has slain {1}!".format(character.name, monster.name))
