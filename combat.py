@@ -34,8 +34,11 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
             # skip turn based things
             will_end_turn = True
         else:
+            monster.start_turn_update()
             character.start_turn_update()
-            monster.attack(character)
+
+            if monster.is_alive():
+                monster.attack(character)
 
         if not character.is_alive():
             monster.leave_combat()
@@ -56,6 +59,7 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
                 will_end_turn = False  # skip the next attack, don't count this iteration as a turn and load a command again
 
         if will_end_turn:
+            monster.end_turn_update()
             character.end_turn_update()
 
         if not monster.is_alive():
