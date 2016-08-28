@@ -28,6 +28,9 @@ from database_info import \
      DBINDEX_SPELL_BUFFS_STAT2, DBINDEX_SPELL_BUFFS_AMOUNT2, DBINDEX_SPELL_BUFFS_STAT3, DBINDEX_SPELL_BUFFS_AMOUNT3,
      DBINDEX_SPELL_BUFFS_COMMENT,
 
+     DBINDEX_SPELL_DOTS_ENTRY, DBINDEX_SPELL_DOTS_NAME, DBINDEX_SPELL_DOTS_DAMAGE_PER_TICK, DBINDEX_SPELL_DOTS_DURATION,
+     DBINDEX_SPELL_DOTS_DAMAGE_SCHOOL, DBINDEX_SPELL_DOTS_COMMENT,
+
      DBINDEX_LEVELUP_STATS_LEVEL, DBINDEX_LEVELUP_STATS_HEALTH, DBINDEX_LEVELUP_STATS_MANA,
      DBINDEX_LEVELUP_STATS_STRENGTH, DBINDEX_LEVELUP_STATS_ARMOR,
 
@@ -35,7 +38,8 @@ from database_info import \
      )
 from quest import KillQuest, FetchQuest
 import items
-from buffs import Buff
+from buffs import Buff, DoT
+from damage import Damage
 
 
 def load_monsters(zone: str, subzone: str) -> tuple:
@@ -493,6 +497,36 @@ def load_buff(buff_id: int) -> Buff:
 
     return Buff(name=buff_name, buff_stats_and_amounts=buff_stats_and_amounts,
                 duration=buff_duration, description=buff_comment)
+
+def load_dot(dot_id: int) -> DoT:
+    """ Loads a DoT from the spell_dots table, whose contents are the following:
+    entry,      name,    damage_per_tick, damage_school, duration, comment
+        1,   Melting,                 2,          magic,        2,  For the Paladin spell Melting Strike
+    A DoT that does 2 magic damage each tick and lasts for two turns.
+
+    load the information about the DoT, convert it to an instance of class DoT and return it.
+
+    :param dot_id: the entry of the DoT in the spell_dots table
+    """
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT * FROM spell_dots WHERE entry = ?", [dot_id])
+        dot_info = cursor.fetchone()
+
+        dot_name = dot_info[DBINDEX_SPELL_DOTS_NAME]
+        dot_damage_per_tick = dot_info[DBINDEX_SPELL_DOTS_DAMAGE_PER_TICK]
+        dot_damage_school = dot_info[DBINDEX_SPELL_DOTS_DAMAGE_SCHOOL]
+        dot_duration = dot_info[DBINDEX_SPELL_DOTS_DURATION]
+
+        dot_damage = Damage(0,0)  # type: Damage
+
+        if dot_damage_school == "magic":
+            dot_damage = Damage(magic_dmg=dot_damage_per_tick)
+        elif dot_damage_school == "physical":
+            dot_damage = Damage(phys_dmg=dot_damage_per_tick)
+
+    return DoT(name=dot_name, damage_tick=dot_damage, duration=dot_duration)
 
 def load_character_level_stats() -> dict:
     """
