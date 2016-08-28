@@ -37,6 +37,7 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
             monster.start_turn_update()
             character.start_turn_update()
 
+            # TODO: Check monster death here
             if monster.is_alive():
                 monster.attack(character)
 
@@ -54,15 +55,17 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
         if command == 'attack':
             character.attack(monster)
         elif command in available_spells:
-            if not character.spell_handler(command):
-                # Unsuccessful cast
-                will_end_turn = False  # skip the next attack, don't count this iteration as a turn and load a command again
+            # try to execute the spell and return if it managed to or not
+            successful_cast = character.spell_handler(command, monster)
+            if not successful_cast:
+                # skip the next attack, don't count this iteration as a turn and load a command again
+                will_end_turn = False
 
         if will_end_turn:
             monster.end_turn_update()
             character.end_turn_update()
 
-        if not monster.is_alive():
+        if not monster.is_alive():  # TODO: Move this check to a separate function
             print("{0} has slain {1}!".format(character.name, monster.name))
 
             character.award_monster_kill(monster=monster)

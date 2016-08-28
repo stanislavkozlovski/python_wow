@@ -26,6 +26,8 @@
 - [x] Refactor function parameter names in the command_handler and information_printer modules
 - [x] Add Buffs to the game
 - [x] Add Potions to the game
+- [x] Create a spell_dots DB table and load dot information from there. Somehow link that table to paladin_spells_template
+- [x] Add DoTs to the game
 
 # Low Priority TODOs
 - Add more monsters and subzones
@@ -41,6 +43,8 @@
 - Add command to print item information (that is in the vendor, inventory and loot table)
 - Store player's attributes (mana,hp etc) in a dictionary (easier application of buffs that way, will remove if checks)
 - Move the logic that checks for buff's/dot's expiry in the start/end turn method of Character to their own methods.
+- Move the logic that checks if a monster is dead in combat.py to a separate function. This will fix a bug where if a monster dies from a DoT, the loot is not shown after the player enters a command.
+- Move the logic that checks if a player can learn a new spell into it's own method!
 
 # TODOs
 - Add documentation!
@@ -52,8 +56,6 @@
 - Convert heals into their own separate class.
 - Add different kinds of damage
 - Add another class of choice. (Mage is on my mind)
-- Add DoTs to the game
-- Create a spell_dots DB table and load dot information from there. Somehow link that table to paladin_spells_template
 - Add Quest item rewards
 - Add the ability to save the character
 - Add a scripted NPC to the game

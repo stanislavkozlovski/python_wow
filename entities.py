@@ -419,7 +419,7 @@ class Character(LivingThing):
         self.max_damage = weapon.max_damage + (0.1 * self.strength)
 
 
-    def spell_handler(self, command: str):
+    def spell_handler(self, command: str, target: Monster):
         """
         Every class will have different spells, this method will make sure the proper spell is caster
         :param command: the spell name that is to be cast

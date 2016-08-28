@@ -4,7 +4,7 @@ from command_handler import handle_main_commands, print_live_monsters, print_liv
 from zones.zone import Zone
 from items import Weapon
 from zones.elwynn_forest import ElwynnForest
-GAME_VERSION = '0.0.45 ALPHA'
+GAME_VERSION = '0.0.47 ALPHA'
 ZONES = {"Elwynn Forest": ElwynnForest()}
 
 
@@ -19,12 +19,6 @@ def main():
 
     alive_npcs, _ = zone_object.get_cs_npcs()
     alive_monsters, _ = zone_object.get_cs_monsters()
-
-    # DoT TEST
-    from buffs import DoT
-    from damage import Damage
-    main_character.add_buff(DoT(name="FIREBALL", damage_tick=Damage(phys_dmg=1, magic_dmg=2), duration=2))
-    # DoT TEST
 
     print_live_npcs(zone_object, print_all=True)
     print_live_monsters(zone_object)

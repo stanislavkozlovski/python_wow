@@ -6,9 +6,11 @@ from database_info import (
     DBINDEX_PALADIN_SPELLS_TEMPLATE_LEVEL_REQUIRED, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE1,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE2, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE3,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1, DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2,
-    DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3, DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST)
+    DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3, DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST,
+    DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT)
 from entities import Character, Monster
 from damage import Damage
+from loader import load_dot
 
 
 class Paladin(Character):
@@ -24,6 +26,7 @@ class Paladin(Character):
     SOR_TURNS = 0  # Holds the remaining turns for SOR
     KEY_FLASH_OF_LIGHT = "Flash of Light"
     KEY_SEAL_OF_RIGHTEOSNESS = "Seal of Righteousness"
+    KEY_MELTING_STRIKE  = "Melting Strike"
 
     def __init__(self, name: str, health: int = 12, mana: int = 15, strength: int = 4):
         super().__init__(name=name, health=health, mana=mana, strength=strength)
@@ -56,15 +59,14 @@ class Paladin(Character):
         """
         Generator function
             paladin_spells_template table is as follows:
-            ID, Name of Spell, Rank of Spell, Level Required for said Rank, Damage1, Damage2, Damage3, Heal1, Heal2, Heal3, Comment
-            1,Seal of Righteousness,       1,                            1,       2,       0,       0,     0,     0,     0, Seal of Righteousness
+            ID, Name of Spell, Rank of Spell, Level Required for said Rank, Damage1, Damage2, Damage3, Heal1, Heal2, Heal3, Effect, Comment
+            1,Seal of Righteousness,       1,                            1,       2,       0,       0,     0,     0,     0,      0, Seal of Righteousness
             :return: A dictionary holding keys for each row (rank, damage1, damage2 etc.)
         """
 
         with sqlite3.connect(DB_PATH) as connection:
             cursor = connection.cursor()
             # this will return a list of tuples holding information about each spell we have the req level to learn
-
             spell_reader = cursor.execute("SELECT * FROM paladin_spells_template WHERE level_required = ?", [level])
 
             for line in spell_reader:
@@ -79,6 +81,7 @@ class Paladin(Character):
                 heal_2 = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2])
                 heal_3 = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3])
                 mana_cost = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST])
+                effect = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT]
 
                 spell['name'] = name
                 spell['rank'] = rank
@@ -89,6 +92,7 @@ class Paladin(Character):
                 spell['heal_2'] = heal_2
                 spell['heal_3'] = heal_3
                 spell['mana_cost'] = mana_cost
+                spell['effect'] = effect
 
                 yield spell
 
@@ -99,7 +103,7 @@ class Paladin(Character):
             self._update_seal_of_righteousness(spell)
 
     # SPELLS
-    def spell_handler(self, command: str) -> bool:
+    def spell_handler(self, command: str, target: Monster) -> bool:
         """
 
         :param command: Command telling you which spell to use
@@ -109,6 +113,8 @@ class Paladin(Character):
             return self.spell_seal_of_righteousness()
         elif command == 'fol':
             return self.spell_flash_of_light()
+        elif command == 'ms':
+            return self.spell_melting_strike(target=target)
 
         print("Unsuccessful cast")
         return False  # if we do not go into any spell
@@ -172,6 +178,23 @@ class Paladin(Character):
                                                                                          overheal))
             else:
                 print("Flash of Light healed {0} for {1:.2f}.".format(self.name, heal_amount))
+
+        return cast_is_successful
+
+    def spell_melting_strike(self, target: Monster):
+        """ Damages the enemy for DAMAGE1 damage and puts a DoT effect, the index of which is EFFECT
+        :return successful cast or not"""
+        mana_cost = self.learned_spells[self.KEY_MELTING_STRIKE]['mana_cost']
+        damage = Damage(phys_dmg=self.learned_spells[self.KEY_MELTING_STRIKE]['damage_1'])
+        dot = load_dot(self.learned_spells[self.KEY_MELTING_STRIKE]['effect'])
+        cast_is_successful = self._check_enough_mana(mana_cost)
+
+        if cast_is_successful:
+            self.mana -= mana_cost
+            # damage the target and add the DoT
+            print("Melting Strike damages {} for {}!".format(target.name, damage))
+            target.take_attack(damage)
+            target.add_buff(dot)
 
         return cast_is_successful
 

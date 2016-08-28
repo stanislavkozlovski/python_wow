@@ -124,6 +124,14 @@ def print_paladin_abilities_in_combat(character: Paladin):
     print("'\t\t\tLasts three turns and adds {0} damage to each of your auto attacks\n".format(
         character.learned_spells['Seal of Righteousness'][
             'damage_on_swing']))  # TODO: rename damage_on_swing to damage_1
+
+    if "Melting Strike" in character.learned_spells.keys():
+        print("\tms")
+        print("\t\tCasts Melting Strike")
+        print("\t\t\tMana Cost: {}".format(character.learned_spells['Melting Strike']['mana_cost']))
+        print("\t\t\tDamages an enemy for {} damage and adds a damage over time effect to it.\n".format(
+            character.learned_spells['Melting Strike']['damage_1']))
+
     if "Flash of Light" in character.learned_spells.keys():
         print("\tfol")
         print("\t\tCasts Flash of Light")
@@ -143,6 +151,9 @@ def get_available_paladin_abilities(character: Paladin):
 
     if "Flash of Light" in character.learned_spells.keys():
         available_spells.add('fol')
+
+    if "Melting Strike" in character.learned_spells.keys():
+        available_spells.add('ms')
 
     # TODO: Add a method in paladin that returns this set
     return available_spells
