@@ -53,6 +53,7 @@
 - Add different kinds of damage
 - Add another class of choice. (Mage is on my mind)
 - Add DoTs to the game
+- Create a spell_dots DB table and load dot information from there. Somehow link that table to paladin_spells_template
 - Add Quest item rewards
 - Add the ability to save the character
 - Add a scripted NPC to the game
