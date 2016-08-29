@@ -37,9 +37,11 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
             monster.start_turn_update()
             character.start_turn_update()
 
-            # TODO: Check monster death here
             if monster.is_alive():
                 monster.attack(character)
+            else:  # monster has died, most probably from a DoT
+                handle_monster_death(character, monster, alive_monsters, guid_name_set, monster_GUID)
+                break
 
         if not character.is_alive():
             monster.leave_combat()
@@ -65,16 +67,29 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
             monster.end_turn_update()
             character.end_turn_update()
 
-        if not monster.is_alive():  # TODO: Move this check to a separate function
-            print("{0} has slain {1}!".format(character.name, monster.name))
+        if not monster.is_alive():
+            handle_monster_death(character, monster, alive_monsters, guid_name_set, monster_GUID)
+            break
 
-            character.award_monster_kill(monster=monster)
-            character.leave_combat()  # will exit the loop
 
-            del alive_monsters[monster_GUID]  # removes the monster from the dictionary
-            guid_name_set.remove((monster_GUID, monster.name))  # remove it from the set used for looking up
-            # handle loot
-            handle_loot(character, monster)
+def handle_monster_death(character: Character, monster: Monster, alive_monsters: dict, guid_name_set: set, monster_GUID: int):
+    """
+    This function is called when a monster has just died
+    :param character: the player's character
+    :param monster: the monster that has died
+    :param alive_monsters:Dictionary with the alive monsters in the subzone the player is in
+    :param guid_name_set: Set which holds the name of each monster_GUID
+    """
+    print("{0} has slain {1}!".format(character.name, monster.name))
+
+    character.award_monster_kill(monster=monster)
+    character.leave_combat()  # will exit the loop
+
+    del alive_monsters[monster_GUID]  # removes the monster from the dictionary
+    guid_name_set.remove((monster_GUID, monster.name))  # remove it from the set used for looking up
+
+    # handle loot
+    handle_loot(character, monster)
 
 
 def handle_loot(character: Character, monster: Monster):
