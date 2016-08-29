@@ -163,6 +163,18 @@ class LivingThing:
         self.health = self.max_health
         self.mana = self.max_mana
 
+    def _handle_overheal(self) -> float:
+        """
+        This method handles when a character is overhealed, by returning his health to his maximum possible health and
+        returning the overheal amount
+        :return: The amount we have overhealed for
+        """
+        overheal = self.health - self.max_health
+
+        self.health = self.max_health
+
+        return overheal
+
     def check_if_dead(self):
         if self.health <= 0:
             self._die()

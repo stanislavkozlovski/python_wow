@@ -178,8 +178,7 @@ class Paladin(Character):
             self.mana -= mana_cost
 
             if self.health > self.max_health:  # check for overheal
-                overheal = self.health - self.max_health
-                self.health = self.max_health
+                overheal = self._handle_overheal()
                 print("Flash of Light healed {0} for {1:.2f} ({2:.2f} Overheal).".format(self.name,
                                                                                          heal - overheal,
                                                                                          overheal))
