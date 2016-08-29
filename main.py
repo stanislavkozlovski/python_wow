@@ -17,7 +17,9 @@ def main():
     print("Character {0} created!".format(main_character.name))
 
     zone_object = get_zone_object(main_character.current_zone)  # type: Zone
-
+    main_character._level_up()
+    main_character._level_up()
+    main_character._level_up()
     alive_npcs, _ = zone_object.get_cs_npcs()
     alive_monsters, _ = zone_object.get_cs_monsters()
 

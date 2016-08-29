@@ -34,6 +34,7 @@
 - [x] Create a method in Character that calculates the level difference damage reduction/increase and apply it to DoTs
 - [x] Print in colors
 - [x] Refactor Buff classes, make Buff a base class for all kinds of buffs/dots/debuffs
+- [x] Convert heals into their own separate class.
 
 # Low Priority TODOs
 - Add more content(monster, zone/subzones, npcs, items, vendors, spells and etc)
@@ -52,9 +53,14 @@
 - Add spell cooldowns and a way to handle them
 - Add some kind of armor item type (Head, etc)
 - Add a stat of your choice to the game.
-- Convert heals into their own separate class.
 - Add different kinds of damage
 - Add another class of choice. (Mage is on my mind)
 - Add Quest item rewards
 - Add the ability to save the character
 - Add a scripted NPC to the game
+- Implement absoprtion shield in the game
+- Implement HoTs (heal over time effects)
+- Add Holyheal
+- Add NatureHeal
+- Add ProtectiveHeal
+- Create more damage classes, each with it's own flavour. (Destruction leaves off a DoT, Sinister has a chance to strike again, Merciless has a chance to crit and others without flavor (holy, frost, fire etc))
