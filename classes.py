@@ -10,6 +10,7 @@ from database_info import (
     DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT)
 from entities import Character, Monster
 from damage import Damage
+from heal import Heal
 from loader import load_dot
 
 
@@ -168,24 +169,25 @@ class Paladin(Character):
         :return successful cast or not
         """
         mana_cost = self.learned_spells['Flash of Light']['mana_cost']
-        heal_amount = self.learned_spells['Flash of Light']['heal_1']
+        heal = Heal(heal_amount=self.learned_spells['Flash of Light']['heal_1'])
 
         cast_is_successful = self._check_enough_mana(mana_cost)
 
         if cast_is_successful:
-            self.health += heal_amount
+            self.health += heal
             self.mana -= mana_cost
 
             if self.health > self.max_health:  # check for overheal
                 overheal = self.health - self.max_health
                 self.health = self.max_health
                 print("Flash of Light healed {0} for {1:.2f} ({2:.2f} Overheal).".format(self.name,
-                                                                                         heal_amount - overheal,
+                                                                                         heal - overheal,
                                                                                          overheal))
             else:
-                print("Flash of Light healed {0} for {1:.2f}.".format(self.name, heal_amount))
+                print("Flash of Light healed {0} for {1}.".format(self.name, heal))
 
         return cast_is_successful
+
 
     def spell_melting_strike(self, target: Monster):
         """ Damages the enemy for DAMAGE1 damage and puts a DoT effect, the index of which is EFFECT
