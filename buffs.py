@@ -11,16 +11,25 @@ KEY_BUFF_TYPE_STRENGTH = "strength"
 KEY_BUFF_TYPE_HEALTH = "health"
 KEY_BUFF_TYPE_MANA = "mana"
 
+# the base class for all buffs/dots/debuffs
+class StatusEffect:
+    def __init__(self, name: str, duration: int):
+        self.name = name
+        self.duration = duration  # measured in turns
+
+    def __str__(self):
+        return "Default Status Effect"
+
 
 # Standard Buff that increases X stat for Y minutes (in our case: turns)
-class Buff:
+class BeneficialBuff(StatusEffect):
     # this dictionary will hold the meaningful information of what buff we give
     buff_amounts = {KEY_BUFF_TYPE_ARMOR: 0,
                     KEY_BUFF_TYPE_STRENGTH: 0,
                     KEY_BUFF_TYPE_HEALTH: 0,
                     KEY_BUFF_TYPE_MANA: 0}  # type: dict
 
-    def __init__(self, name: str, buff_stats_and_amounts: list, duration: int, description: str):
+    def __init__(self, name: str, buff_stats_and_amounts: list, duration: int):
         """
         Buff(10, [(armor, 3), (None, None), (None, None)) will increase your armor by 10 for 3 turns
 
@@ -30,14 +39,44 @@ class Buff:
             2 - the amount we are going to buff it by (int) 10
         :param duration: How many turns this buff will be active for, type: int
         """
-        self.name = name
+        super().__init__(name, duration)
         self.buff_stats_and_amounts = buff_stats_and_amounts
-        self.duration = duration  # measured in turns
-        self.description = description
         self._manage_buff_types(buff_stats_and_amounts)  # updates buff_amounts
+        # a list which holds tuples of the buffed attributes (will be used for __str__)
+        self.non_empty_buffs = list(filter(lambda kv: kv[1] is not 0, self.buff_amounts.items()))
 
     def __str__(self):
-        return self.description
+        """ Depending on the amount of stats it buffs, print out a different message"""
+        non_empty_buffs_count = len(self.non_empty_buffs)
+
+        if non_empty_buffs_count == 1:
+            increased_attribute, value = self.non_empty_buffs[0]
+            return "Increases {} by {} for {} turns.".format(increased_attribute, value, self.duration)
+        elif non_empty_buffs_count == 2:
+            increased_attribute, value = self.non_empty_buffs[0]
+            increased_attribute2, value2 = self.non_empty_buffs[1]
+
+            return "Increases {attribute1} by {value1} and {attribute2}" \
+                    " by {value2} for {dur} turns.".format(attribute1=increased_attribute,
+                                                          value1=value,
+                                                          attribute2=increased_attribute2,
+                                                          value2=value2,
+                                                          dur=self.duration)
+        elif non_empty_buffs_count == 3:
+            increased_attribute, value = self.non_empty_buffs[0]
+            increased_attribute2, value2 = self.non_empty_buffs[1]
+            increased_attribute3, value3 = self.non_empty_buffs[2]
+
+            return "Increases {attribute1} by {value1}, {attribute2}" \
+                " by {value2} and {attribute3} by {value3} for {dur} turns.".format(attribute1=increased_attribute,
+                                                                                      value1=value,
+                                                                                      attribute2=increased_attribute2,
+                                                                                      value2=value2,
+                                                                                      attribute3=increased_attribute3,
+                                                                                      value3=value3,
+                                                                                      dur=self.duration)
+        else:
+            return ""
 
     def _manage_buff_types(self, buff_list: list):
         """
@@ -69,7 +108,7 @@ class Buff:
 
 
 # Damage over time debuff
-class DoT:
+class DoT(StatusEffect):
 
     def __init__(self, name: str, damage_tick: Damage, duration: int, caster_lvl: int):
         """
@@ -79,9 +118,8 @@ class DoT:
         :param duration: How many turns this DoT will be active for
         :param caster_lvl: the level of the caster
         """
-        self.name = name
+        super().__init__(name, duration, "dad")
         self.damage = damage_tick  # type: Damage
-        self.duration = duration
         self.level = caster_lvl
 
     def __str__(self):

@@ -26,10 +26,10 @@ from database_info import \
 
      DBINDEX_SPELL_BUFFS_NAME, DBINDEX_SPELL_BUFFS_DURATION, DBINDEX_SPELL_BUFFS_STAT1, DBINDEX_SPELL_BUFFS_AMOUNT1,
      DBINDEX_SPELL_BUFFS_STAT2, DBINDEX_SPELL_BUFFS_AMOUNT2, DBINDEX_SPELL_BUFFS_STAT3, DBINDEX_SPELL_BUFFS_AMOUNT3,
-     DBINDEX_SPELL_BUFFS_COMMENT,
 
-     DBINDEX_SPELL_DOTS_ENTRY, DBINDEX_SPELL_DOTS_NAME, DBINDEX_SPELL_DOTS_DAMAGE_PER_TICK, DBINDEX_SPELL_DOTS_DURATION,
-     DBINDEX_SPELL_DOTS_DAMAGE_SCHOOL, DBINDEX_SPELL_DOTS_COMMENT,
+
+     DBINDEX_SPELL_DOTS_NAME, DBINDEX_SPELL_DOTS_DAMAGE_PER_TICK, DBINDEX_SPELL_DOTS_DURATION,
+     DBINDEX_SPELL_DOTS_DAMAGE_SCHOOL,
 
      DBINDEX_LEVELUP_STATS_LEVEL, DBINDEX_LEVELUP_STATS_HEALTH, DBINDEX_LEVELUP_STATS_MANA,
      DBINDEX_LEVELUP_STATS_STRENGTH, DBINDEX_LEVELUP_STATS_ARMOR,
@@ -38,7 +38,7 @@ from database_info import \
      )
 from quest import KillQuest, FetchQuest
 import items
-from buffs import Buff, DoT
+from buffs import BeneficialBuff, DoT
 from damage import Damage
 
 
@@ -455,7 +455,7 @@ def load_item(item_ID: int):
                                 min_damage=item_min_dmg, max_damage=item_max_dmg)
         elif item_type == 'potion':
             buff_id = item_template_info[DBINDEX_ITEM_TEMPLATE_EFFECT]  # type: int
-            item_buff_effect = load_buff(buff_id)  # type: Buff
+            item_buff_effect = load_buff(buff_id)  # type: BeneficialBuff
 
             return items.Potion(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price,
                                 buff=item_buff_effect)
@@ -463,7 +463,7 @@ def load_item(item_ID: int):
             raise Exception("Unsupported item type {}".format(item_type))
 
 
-def load_buff(buff_id: int) -> Buff:
+def load_buff(buff_id: int) -> BeneficialBuff:
     """
     Loads a buff from the DB table spells_buffs, whose contents are the following:
     entry,             name, duration,    stat,   amount,   stat2,   amount2,stat3,   amount3, comment
@@ -490,13 +490,13 @@ def load_buff(buff_id: int) -> Buff:
         buff_stat3 = buff_information[DBINDEX_SPELL_BUFFS_STAT3]  # type: str
         buff_amount3 = buff_information[DBINDEX_SPELL_BUFFS_AMOUNT3]  # type: int
         buff_duration = buff_information[DBINDEX_SPELL_BUFFS_DURATION]  # type: int
-        buff_comment = buff_information[DBINDEX_SPELL_BUFFS_COMMENT]  # type: str
+
 
         #  Create a list of tuples with each buff
         buff_stats_and_amounts = [(buff_stat1, buff_amount1), (buff_stat2, buff_amount2), (buff_stat3, buff_amount3)]
 
-    return Buff(name=buff_name, buff_stats_and_amounts=buff_stats_and_amounts,
-                duration=buff_duration, description=buff_comment)
+    return BeneficialBuff(name=buff_name, buff_stats_and_amounts=buff_stats_and_amounts,
+                          duration=buff_duration)
 
 def load_dot(dot_id: int, level: int) -> DoT:
     """ Loads a DoT from the spell_dots table, whose contents are the following:

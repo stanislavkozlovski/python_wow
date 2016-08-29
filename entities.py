@@ -11,7 +11,7 @@ from loader import (load_creature_xp_rewards, load_character_level_stats,
                     load_loot_table, load_item, load_vendor_inventory)
 from quest import Quest
 from damage import Damage
-from buffs import Buff, DoT
+from buffs import BeneficialBuff, DoT
 
 # dictionary that holds information about how much XP a monster of a certain level should award the player.
 # key: level(int), value: xp reward(int)
@@ -106,7 +106,7 @@ class LivingThing:
         buffs_to_remove = []  # type: list of Buffs
 
         # iterate through active buffs and reduce duration
-        for buff in list(filter(lambda buff: isinstance(buff, Buff), self.buffs.keys())):
+        for buff in list(filter(lambda buff: isinstance(buff, BeneficialBuff), self.buffs.keys())):
             # reduce duration by 1 turn
             turns_left = self.buffs[buff]
             turns_left -= 1
@@ -119,23 +119,23 @@ class LivingThing:
         for buff in buffs_to_remove:
             self.remove_buff(buff)
 
-    def remove_buff(self, buff: Buff):
+    def remove_buff(self, buff: BeneficialBuff):
         """ Method that handles when a buff is removed/expired"""
         del self.buffs[buff]
-        if isinstance(buff, Buff):
+        if isinstance(buff, BeneficialBuff):
             self._deapply_buff(buff)
             print("Buff {} has expired from {}.".format(buff.name, self.name))
         elif isinstance(buff, DoT):
             print("DoT {} has expired from {}.".format(buff.name, self.name))
 
-    def add_buff(self, buff: Buff):
+    def add_buff(self, buff: BeneficialBuff):
         """ Method that handles when a buff is added to the player
         also adds DoTs to the list"""
         self.buffs[buff] = buff.duration
-        if isinstance(buff, Buff):
+        if isinstance(buff, BeneficialBuff):
             self._apply_buff(buff)
 
-    def _apply_buff(self, buff: Buff):
+    def _apply_buff(self, buff: BeneficialBuff):
         """ Add the buff to the living thing's stats"""
         buff_attributes = buff.get_buffed_attributes()  # type: dict
 
@@ -146,7 +146,7 @@ class LivingThing:
             elif buff_type == "mana":
                 self.max_mana += buff_amount
 
-    def _deapply_buff(self, buff: Buff):
+    def _deapply_buff(self, buff: BeneficialBuff):
         """ Remove the buff from the living thing's stats"""
         buff_attributes = buff.get_buffed_attributes()  # type: dict
 
@@ -522,7 +522,7 @@ class Character(LivingThing):
 
         return Damage(phys_dmg=reduced_damage, magic_dmg=damage.magic_dmg)
 
-    def _apply_buff(self, buff: Buff):
+    def _apply_buff(self, buff: BeneficialBuff):
         """ Add the buff to the character's stats"""
         buff_attributes = buff.get_buffed_attributes()  # type: dict
 
@@ -537,7 +537,7 @@ class Character(LivingThing):
             elif buff_type == "armor":
                 self.armor += buff_amount
 
-    def _deapply_buff(self, buff: Buff):
+    def _deapply_buff(self, buff: BeneficialBuff):
         """ Remove the buff from the character's stats"""
         buff_attributes = buff.get_buffed_attributes()  # type: dict
 

@@ -33,6 +33,7 @@
 - [x] Move the logic that checks for buff's/dot's expiry in the start/end turn method of LivingEntity to their own methods.
 - [x] Create a method in Character that calculates the level difference damage reduction/increase and apply it to DoTs
 - [x] Print in colors
+- [x] Refactor Buff classes, make Buff a base class for all kinds of buffs/dots/debuffs
 
 # Low Priority TODOs
 - Add more content(monster, zone/subzones, npcs, items, vendors, spells and etc)
@@ -48,7 +49,6 @@
 
 # TODOs
 - Add documentation!
-- Refactor Buff classes, make Buff a base class for all kinds of buffs/dots/debuffs
 - Add spell cooldowns and a way to handle them
 - Add some kind of armor item type (Head, etc)
 - Add a stat of your choice to the game.

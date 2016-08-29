@@ -1,7 +1,7 @@
 """
 This holds the classes for every kind of item in the game
 """
-from buffs import Buff
+from buffs import BeneficialBuff
 from termcolor import colored
 
 
@@ -29,7 +29,7 @@ class Weapon(Item):
 
 class Potion(Item):
     """ Consumable item that gives a buff to the player"""
-    def __init__(self, name: str, buy_price: int, sell_price: int,  buff: Buff, quest_ID: int=0,):
+    def __init__(self, name: str, buy_price: int, sell_price: int, buff: BeneficialBuff, quest_ID: int=0, ):
         super().__init__(name, buy_price, sell_price, quest_ID)
         self.buff = buff
 
