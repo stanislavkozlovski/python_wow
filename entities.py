@@ -60,12 +60,23 @@ class LivingThing:
         """
         Here we handle all things that are turn based and dependant on the STAR tof the turn,
         For now: Damage over time effects only (DoT)
-
-        buff durations - go through the buffs, filter the DoTs, reduce their duration and if they are expired, add them to a list.
-        after iterating through the DoTs, go through each  one that is expired and remove it
         """
+        self._update_dots()
 
-        dots_to_remove = []  # type: list of Buffs
+    def end_turn_update(self):
+        """
+        Here we handle all things that are turn based,
+        For now: buff durations only
+        """
+        self._update_buffs()
+
+    def _update_dots(self):
+        """
+        This method goes through all the DoT effects on the entity, activates their tick, reduces their duration
+        and, if the are expired, adds them to a list which holds DoTs that should be removed(expired) from the character.
+        After iterating through all of the active DoTs, we remove every DoT that is in the list.
+        """
+        dots_to_remove = []  # type: list of DoTs
 
         # filter the DoTs from the character's buffs, iterate through active DoTs and reduce duration
         for dot in list(filter(lambda buff: isinstance(buff, DoT), self.buffs.keys())):
@@ -83,14 +94,13 @@ class LivingThing:
         for dot in dots_to_remove:
             self.remove_buff(dot)
 
-    def end_turn_update(self):
+    def _update_buffs(self):
         """
-        Here we handle all things that are turn based,
-        For now: buff durations only
-        buff durations - go through the buffs, reduce their duration and if they are expired, add them to a list.
-        after iterating through the buffs, go through each  one that is expired and remove it
+        This method goes through all the Buffs on the netity, reduces their duration
+        and, if they are expired (0 duration) adds them to a list which holds Buffs that should be removed (are expired)
+        from the character.
+        After iterating through all of the active Buffs, we remove every Buff that is in the list
         """
-
         buffs_to_remove = []  # type: list of Buffs
 
         # iterate through active buffs and reduce duration
