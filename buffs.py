@@ -71,16 +71,18 @@ class Buff:
 # Damage over time debuff
 class DoT:
 
-    def __init__(self, name: str, damage_tick: Damage, duration: int):
+    def __init__(self, name: str, damage_tick: Damage, duration: int, caster_lvl: int):
         """
         Dots(Fireball, 5, 2) will damage you for 5 at the start of each turn for 2 turns.
         :param name:
         :param damage_tick: the damage it will deal to you every turn
         :param duration: How many turns this DoT will be active for
+        :param caster_lvl: the level of the caster
         """
         self.name = name
         self.damage = damage_tick  # type: Damage
         self.duration = duration
+        self.level = caster_lvl
 
     def __str__(self):
         return "{} - Deals {} damage every turn for {} turns".format(self.name, self.damage, self.duration)

@@ -498,7 +498,7 @@ def load_buff(buff_id: int) -> Buff:
     return Buff(name=buff_name, buff_stats_and_amounts=buff_stats_and_amounts,
                 duration=buff_duration, description=buff_comment)
 
-def load_dot(dot_id: int) -> DoT:
+def load_dot(dot_id: int, level: int) -> DoT:
     """ Loads a DoT from the spell_dots table, whose contents are the following:
     entry,      name,    damage_per_tick, damage_school, duration, comment
         1,   Melting,                 2,          magic,        2,  For the Paladin spell Melting Strike
@@ -507,6 +507,7 @@ def load_dot(dot_id: int) -> DoT:
     load the information about the DoT, convert it to an instance of class DoT and return it.
 
     :param dot_id: the entry of the DoT in the spell_dots table
+    :param level: the level of the caster
     """
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
@@ -526,7 +527,7 @@ def load_dot(dot_id: int) -> DoT:
         elif dot_damage_school == "physical":
             dot_damage = Damage(phys_dmg=dot_damage_per_tick)
 
-    return DoT(name=dot_name, damage_tick=dot_damage, duration=dot_duration)
+    return DoT(name=dot_name, damage_tick=dot_damage, duration=dot_duration, caster_lvl=level)
 
 def load_character_level_stats() -> dict:
     """

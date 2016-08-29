@@ -192,7 +192,7 @@ class Paladin(Character):
         :return successful cast or not"""
         mana_cost = self.learned_spells[self.KEY_MELTING_STRIKE]['mana_cost']
         damage = Damage(phys_dmg=self.learned_spells[self.KEY_MELTING_STRIKE]['damage_1'])
-        dot = load_dot(self.learned_spells[self.KEY_MELTING_STRIKE]['effect'])
+        dot = load_dot(self.learned_spells[self.KEY_MELTING_STRIKE]['effect'], level=self.level)
         cast_is_successful = self._check_enough_mana(mana_cost)
 
         if cast_is_successful:
