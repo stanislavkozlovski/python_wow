@@ -170,13 +170,19 @@ class LivingThing:
         """ this method damages the entity for the dot's proc"""
         dot_proc_damage = dot.damage  # type: Damage
 
+        # due to the way Damage handles addition, subtraction and multiplication, the _calculate_level_difference_damage
+        # method below works fine with Damage type
+        # noinspection PyTypeChecker
+        dot_proc_damage = self._calculate_level_difference_damage(damage_to_deal=dot_proc_damage, target_level=dot.level,
+                                                                  inverse=True)
+
         print("{entity_name} suffers {dot_dmg} from {dot_name}!".format(entity_name=self.name,
                                                                              dot_dmg=dot_proc_damage,
                                                                              dot_name=dot.name))
         self.health -= dot_proc_damage
         self.check_if_dead()
 
-    def _calculate_level_difference_damage(self, damage_to_deal: int, target_level: int) -> int:
+    def _calculate_level_difference_damage(self, damage_to_deal: int, target_level: int, inverse: bool=False) -> int:
         """
         This method calculates the difference in damage according to the entity and the target's levels.
         For each level the target has above the Entity (self), the Entity's damage is reduced by 10%
@@ -186,18 +192,31 @@ class LivingThing:
             The entity(self) would deal 50% more damage, resulting in a 15 damage swing, because of the 5 levels he has
             above the target
         :param target_level: The level of the target we want to attack
+        :param inverse: If true, this means that we want to inverse this method, meaning we're not the one dealing
+                        damage, but the one receiving it. Therefore we need to inverse the calculation, where if  the
+                        level_difference < 0 (target is bigger level) we need to increase the damage and vice-versa
         :return: the damage as an int
         """
         level_difference = self.level - target_level
         percentage_mod = (abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
 
-        # 10% more or less damage for each level that differs
-        if level_difference == 0:
-            pass
-        elif level_difference < 0:  # target is bigger level
-            damage_to_deal -= damage_to_deal * percentage_mod  # -X%
-        elif level_difference > 0:  # entity is bigger level
-            damage_to_deal += damage_to_deal * percentage_mod  # +X%
+        if inverse:  # we take damage calculation
+            # 10% more or less damage for each level that differs
+            if level_difference == 0:
+                pass
+            elif level_difference < 0:  # target is bigger level
+                damage_to_deal += damage_to_deal * percentage_mod  # -X%
+            elif level_difference > 0:  # entity is bigger level
+                damage_to_deal -= damage_to_deal * percentage_mod  # +X%
+
+        elif not inverse:  # we deal damage calculation
+            # 10% more or less damage for each level that differs
+            if level_difference == 0:
+                pass
+            elif level_difference < 0:  # target is bigger level
+                damage_to_deal -= damage_to_deal * percentage_mod  # -X%
+            elif level_difference > 0:  # entity is bigger level
+                damage_to_deal += damage_to_deal * percentage_mod  # +X%
 
         return damage_to_deal
 
