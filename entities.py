@@ -33,12 +33,13 @@ class LivingThing:
     This is the base class for all things _alive - characters, monsters and etc.
     """
 
-    def __init__(self, name: str, health: int = 1, mana: int = 1):
+    def __init__(self, name: str, health: int = 1, mana: int = 1, level: int = 1):
         self.name = name
         self.health = health
         self.max_health = health
         self.mana = mana
         self.max_mana = mana
+        self.level = level
         self._alive = True
         self._in_combat = False
         self.buffs = {}  # dict Key: an instance of class Buff, Value: The turns it has left to be active, int
@@ -175,6 +176,31 @@ class LivingThing:
         self.health -= dot_proc_damage
         self.check_if_dead()
 
+    def _calculate_level_difference_damage(self, damage_to_deal: int, target_level: int) -> int:
+        """
+        This method calculates the difference in damage according to the entity and the target's levels.
+        For each level the target has above the Entity (self), the Entity's damage is reduced by 10%
+        Vice-versa, for each level the Entity has above the Target, the Entity's damage is increased by 10%
+
+        ex: self.level = 10, target_level = 5, damage_to_deal = 10
+            The entity(self) would deal 50% more damage, resulting in a 15 damage swing, because of the 5 levels he has
+            above the target
+        :param target_level: The level of the target we want to attack
+        :return: the damage as an int
+        """
+        level_difference = self.level - target_level
+        percentage_mod = (abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
+
+        # 10% more or less damage for each level that differs
+        if level_difference == 0:
+            pass
+        elif level_difference < 0:  # target is bigger level
+            damage_to_deal -= damage_to_deal * percentage_mod  # -X%
+        elif level_difference > 0:  # entity is bigger level
+            damage_to_deal += damage_to_deal * percentage_mod  # +X%
+
+        return damage_to_deal
+
     def _die(self):
         self._alive = False
 
@@ -190,7 +216,7 @@ class FriendlyNPC(LivingThing):
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
                  max_damage: int = 1, quest_relation_id = 0, loot_table_ID: int = 0, gossip: str = 'Hello'):
-        super().__init__(name, health, mana)
+        super().__init__(name, health, mana, level)
         self.level = level
         self.min_damage = min_damage
         self.max_damage = max_damage
@@ -253,7 +279,7 @@ class VendorNPC(FriendlyNPC):
 class Monster(LivingThing):
     def __init__(self, monster_id: int, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
                  max_damage: int = 1, quest_relation_id=0, loot_table_ID: int = 0, gossip = ''):
-        super().__init__(name, health, mana)
+        super().__init__(name, health, mana, level)
         self.monster_id = monster_id
         self.level = level
         self.min_damage = min_damage
@@ -273,17 +299,10 @@ class Monster(LivingThing):
                                                    min_dmg=self.min_damage, max_dmg=self.max_damage)
 
     def get_auto_attack_damage(self, target_level: int):
-        level_difference = self.level - target_level
-        percentage_mod = (abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
-
-        damage_to_deal = random.randint(int(self.min_damage), int(self.max_damage) + 1)
-        # 10% more or less damage for each level that differs
-        if level_difference == 0:
-            pass
-        elif level_difference < 0:  # character is bigger level
-            damage_to_deal -= damage_to_deal * percentage_mod  # -X%
-        elif level_difference > 0:  # monster is bigger level
-            damage_to_deal += damage_to_deal * percentage_mod  # +X%
+        # get the base auto attack damage
+        damage_to_deal = random.randint(self.min_damage, self.max_damage + 1)
+        # factor in the level difference
+        self._calculate_level_difference_damage(damage_to_deal, target_level)
 
         return Damage(phys_dmg=damage_to_deal)
 
@@ -352,12 +371,11 @@ class Character(LivingThing):
     KEY_LEVEL_STATS_ARMOR = 'armor'
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1):
-        super().__init__(name, health, mana)
+        super().__init__(name, health, mana, level=1)
         self.strength = strength
         self.min_damage = 0
         self.max_damage = 1
         self.equipped_weapon = Weapon(name="Starter Weapon")
-        self.level = 1
         self.experience = 0
         self.xp_req_to_level = 400
         self.armor = 75
@@ -438,17 +456,10 @@ class Character(LivingThing):
         pass
 
     def get_auto_attack_damage(self, target_level: int) -> Damage:
-        level_difference = self.level - target_level
-        percentage_mod = (abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
-
+        # get the base auto attack damage
         damage_to_deal = random.randint(int(self.min_damage), int(self.max_damage) + 1)
-        # 10% more or less damage for each level that differs
-        if level_difference == 0:
-            pass
-        elif level_difference < 0:  # monster is bigger level
-            damage_to_deal -= damage_to_deal * percentage_mod  # -X%
-        elif level_difference > 0:  # character is bigger level
-            damage_to_deal += damage_to_deal * percentage_mod  # +X%
+        # factor in the level difference
+        damage_to_deal = self._calculate_level_difference_damage(damage_to_deal, target_level)
 
         return Damage(phys_dmg=damage_to_deal)
 
