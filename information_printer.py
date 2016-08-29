@@ -95,8 +95,9 @@ def print_loot_table(monster_loot: dict):
 
     if "gold" in monster_loot.keys():
         # print the gold separately so it always comes up on top
-        print("\t{} gold".format(monster_loot['gold']))
+        print(colored("\t{} gold".format(monster_loot['gold']), color="yellow"))
 
     for item_name, item in monster_loot.items():  # type: dict
         if item_name is not "gold":
             print("\t{}".format(item))
+

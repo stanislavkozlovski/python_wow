@@ -3,6 +3,7 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 """
 
 import random
+from termcolor import colored
 
 from items import  Item, Weapon, Potion
 from loader import (load_creature_xp_rewards, load_character_level_stats,
@@ -240,12 +241,13 @@ class FriendlyNPC(LivingThing):
         self.min_damage = min_damage
         self.max_damage = max_damage
         self.gossip = gossip
+        self.colored_name = colored(self.name, color="green")
 
     def __str__(self):
-        return "{npc_name}".format(npc_name=self.name)
+        return "{npc_name}".format(npc_name=self.colored_name)
 
     def talk(self, player_name: str):
-        print("{npc_name} says: {msg}".format(npc_name=self.name, msg=self.gossip.replace("$N", player_name)))
+        print("{npc_name} says: {msg}".format(npc_name=self.colored_name, msg=self.gossip.replace("$N", player_name)))
 
 
 class VendorNPC(FriendlyNPC):
@@ -260,7 +262,7 @@ class VendorNPC(FriendlyNPC):
         self.inventory = load_vendor_inventory(self.entry)  # type: dict: key-item_name(str), value: tuple(item object, count)
 
     def __str__(self):
-        return "{npc_name} <Vendor>".format(npc_name=self.name)
+        return "{npc_name} <Vendor>".format(npc_name=self.colored_name)
 
     def print_inventory(self):
         print("{}'s items for sale:".format(self.name))
@@ -311,8 +313,9 @@ class Monster(LivingThing):
         self.loot = {"gold": self._gold_to_give}  # dict Key: str, Value: Item class object
 
     def __str__(self):
+        colored_name = colored(self.name, color="red")
         return "Creature Level {level} {name} - {hp}/{max_hp} HP | {mana}/{max_mana} Mana | " \
-               "{min_dmg}-{max_dmg} Damage".format(level=self.level, name=self.name,
+               "{min_dmg}-{max_dmg} Damage".format(level=self.level, name=colored_name,
                                                    hp=self.health, max_hp=self.max_health,
                                                    mana=self.mana, max_mana=self.max_mana,
                                                    min_dmg=self.min_damage, max_dmg=self.max_damage)

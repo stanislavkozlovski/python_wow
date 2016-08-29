@@ -31,13 +31,13 @@
 - [x] Move the logic that checks if a player can learn a new spell into it's own method!
 - [x] Move the logic that checks if a monster is dead in combat.py to a separate function. This will fix a bug where if a monster dies from a DoT, the loot is not shown after the player enters a command.
 - [x] Move the logic that checks for buff's/dot's expiry in the start/end turn method of LivingEntity to their own methods.
+- [x] Create a method in Character that calculates the level difference damage reduction/increase and apply it to DoTs
+- [x] Print in colors
 
 # Low Priority TODOs
-- Add more monsters and subzones
+- Add more content(monster, zone/subzones, npcs, items, vendors, spells and etc)
 - Add list with last twenty prints, clear the console and rewrite again whenever a command has been added
 - Add Talents System
-- Print in colors
-- Add more spells to the existing classes
 
 # Small TODOs
 - Print Equipment
@@ -49,7 +49,6 @@
 # TODOs
 - Add documentation!
 - Refactor Buff classes, make Buff a base class for all kinds of buffs/dots/debuffs
-- Create a method in Character that calculates the level difference damage reduction/increase and apply it to DoTs
 - Add spell cooldowns and a way to handle them
 - Add some kind of armor item type (Head, etc)
 - Add a stat of your choice to the game.

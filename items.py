@@ -2,6 +2,7 @@
 This holds the classes for every kind of item in the game
 """
 from buffs import Buff
+from termcolor import colored
 
 
 class Item:
@@ -12,7 +13,7 @@ class Item:
         self.quest_ID = quest_ID
 
     def __str__(self):
-        return "{} - Miscellaneous Item".format(self.name)
+        return colored("{}".format(self.name), color="grey") + " - Miscellaneous Item"
 
 
 class Weapon(Item):
@@ -22,7 +23,8 @@ class Weapon(Item):
         self.max_damage = max_damage
 
     def __str__(self):
-        return "{} - Weapon ({}-{} damage)".format(self.name, self.min_damage, self.max_damage)
+        return colored("{}".format(self.name), color="green") +  "- Weapon ({}-{}) damage".format(self.min_damage,
+                                                                                                  self.max_damage)
 
 
 class Potion(Item):
@@ -32,7 +34,7 @@ class Potion(Item):
         self.buff = buff
 
     def __str__(self):
-        return "{} - Potion ({})".format(self.name, self.buff)
+        return colored("{}".format(self.name), color="cyan") + " - Potion ({})".format(self.buff)
 
     def get_buff_name(self) -> str:
         return self.buff.name
