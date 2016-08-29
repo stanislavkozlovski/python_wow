@@ -20,8 +20,7 @@ class Paladin(Character):
             Seal of Righteousness
                 Deals X damage on each attack, needs to be activated first
     """
-    learned_spells = {"Seal of Righteousness": {"damage1": 2, "mana_cost": 4, "rank": 1}
-                      }
+    learned_spells = {}
     SOR_ACTIVE = False  # Seal of Righteousness trigger
     SOR_TURNS = 0  # Holds the remaining turns for SOR
     KEY_FLASH_OF_LIGHT = "Flash of Light"
@@ -32,6 +31,7 @@ class Paladin(Character):
         super().__init__(name=name, health=health, mana=mana, strength=strength)
         self.min_damage = 1
         self.max_damage = 3
+        self._lookup_and_handle_new_spells()
 
     def leave_combat(self):
         super().leave_combat()
@@ -39,7 +39,13 @@ class Paladin(Character):
 
     def _level_up(self):
         super()._level_up()
+        self._lookup_and_handle_new_spells()
 
+    def _lookup_and_handle_new_spells(self):
+        """
+        This method looks up all the new available spells to learn or update their ranks and does so
+        accordingly
+        """
         for available_spell in self._lookup_available_spells_to_learn(
                 self.level):  # generator that returns dictionaries holding spell attributes
 
