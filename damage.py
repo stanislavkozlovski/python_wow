@@ -25,3 +25,35 @@ class Damage:
 
     def __rsub__(self, other):
         return other - (self.phys_dmg + self.magic_dmg)
+
+    def __isub__(self, other: tuple):
+        other_phys, other_magic = 0, 0  # type: int
+        # unpack other damage
+        if isinstance(other, tuple):
+            other_phys, other_magic = other
+        elif isinstance(other, Damage):
+            other_phys = other.phys_dmg
+            other_magic = other.magic_dmg
+
+        # does not let the numbers get negative
+        modified_phys_damage = max(self.phys_dmg - other_phys, 0)
+        modified_magic_damage = max(self.magic_dmg - other_magic, 0)
+
+        return Damage(phys_dmg=modified_phys_damage,
+                      magic_dmg=modified_magic_damage)
+
+    def __iadd__(self, other: tuple):
+        other_phys, other_magic = 0, 0  # type: int
+        # unpack other damage
+        if isinstance(other, tuple):
+            other_phys, other_magic = other
+        elif isinstance(other, Damage):
+            other_phys = other.phys_dmg
+            other_magic = other.magic_dmg
+
+        return Damage(phys_dmg=self.phys_dmg + other_phys,
+                      magic_dmg=self.magic_dmg + other_magic)
+
+    def __mul__(self, other: float):
+        return Damage(phys_dmg=(other * self.phys_dmg),
+                      magic_dmg=(other * self.magic_dmg))
