@@ -15,6 +15,7 @@ def main():
     starter_weapon = Weapon(name="Starter Weapon", min_damage=1, max_damage=3)
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))
+
     zone_object = get_zone_object(main_character.current_zone)  # type: Zone
 
     alive_npcs, _ = zone_object.get_cs_npcs()
@@ -35,12 +36,13 @@ def get_zone_object(zone: str):
 
 
 def welcome_print():
+    print("*"*50)
     print("WELCOME TO PYTHON WOW VERSION: {0}".format(GAME_VERSION))
     print("A simple console RPG game inspired by the Warcraft universe!")
     print()
     print("Type ? to see a list of available commands.")
+    print("*" * 50)
     print()
-
 
 if __name__ == '__main__':
     main()
