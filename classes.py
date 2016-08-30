@@ -147,8 +147,7 @@ class Paladin(Character):
             return 0
         else:
             self.SOR_TURNS -= 1
-            # TODO: Load damage from DB
-            return self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['damage1']  # damage from SOR
+            return self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['damage_1']  # damage from SOR
 
     def _update_seal_of_righteousness(self, new_rank: dict):
         """ Updates the values of the spell in the learned_spells dictionary"""
@@ -156,7 +155,7 @@ class Paladin(Character):
         rank = new_rank['rank']
         mana_cost = new_rank['mana_cost']
 
-        self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['damage1'] = damage_on_swing
+        self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['damage_1'] = damage_on_swing
         self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['rank'] = rank
         self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['mana_cost'] = mana_cost
 
@@ -188,7 +187,7 @@ class Paladin(Character):
 
 
     def spell_melting_strike(self, target: Monster):
-        """ Damages the enemy for DAMAGE1 damage and puts a DoT effect, the index of which is EFFECT
+        """ Damages the enemy for DAMAGE_1 damage and puts a DoT effect, the index of which is EFFECT
         :return successful cast or not"""
         mana_cost = self.learned_spells[self.KEY_MELTING_STRIKE]['mana_cost']
         damage = Damage(phys_dmg=self.learned_spells[self.KEY_MELTING_STRIKE]['damage_1'])
