@@ -292,6 +292,17 @@ class VendorNPC(FriendlyNPC):
         """
         return item_name in self.inventory.keys()
 
+    def get_item(self, item_name: str) -> Item:
+        """
+        USED ONLY FOR PRINTING/TESTING PURPOSES
+        Returns the item we want to get from the vendor,
+        """
+        if self.has_item(item_name):
+            return self.inventory[item_name][0]  # returns the item object
+        else:
+            print("{vendor} does not have {item} for sale.".format(vendor=self.name, item=item_name))
+            return None
+
     def get_item_price(self, item_name: str) -> int:
         """Returns the price the vendor sells the item for"""
         item, _ = self.inventory[item_name]

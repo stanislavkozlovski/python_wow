@@ -36,6 +36,8 @@
 - [x] Refactor Buff classes, make Buff a base class for all kinds of buffs/dots/debuffs
 - [x] Convert heals into their own separate class.
 - [x] Add Quest item rewards
+- [x] Fix a bug in fetch quests where they don't remove their required items from your inventory
+- [x] Add command to print item information (that is in the vendor dialogue)
 
 # Low Priority TODOs
 - Add more content(monster, zone/subzones, npcs, items, vendors, spells and etc)
@@ -46,9 +48,8 @@
 - Print Equipment
 - Print Stats (hp, mana, xp and everything else at once)
 - Add item gossip text
-- Add command to print item information (that is in the vendor, inventory and loot table)
+- Add "take all" command when looting creatures to take all the loot at once.
 - Store player's attributes (mana,hp etc) in a dictionary (easier application of buffs that way, will remove if checks)
-- Fix a bug in fetch quests where they don't remove their required items from your inventory
 
 # TODOs
 - Add documentation!
