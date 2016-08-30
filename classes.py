@@ -79,16 +79,16 @@ class Paladin(Character):
             for line in spell_reader:
                 spell = {}
                 name = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_NAME]
-                rank = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_RANK])
-                level_req = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_LEVEL_REQUIRED])
-                damage_1 = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE1])
-                damage_2 = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE2])
-                damage_3 = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE3])
-                heal_1 = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1])
-                heal_2 = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2])
-                heal_3 = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3])
-                mana_cost = int(line[DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST])
-                effect = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT]
+                rank = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_RANK]  # type: int
+                level_req = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_LEVEL_REQUIRED]  # type: int
+                damage_1 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE1]  # type: int
+                damage_2 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE2]  # type: int
+                damage_3 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE3]  # type: int
+                heal_1 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1]  # type: int
+                heal_2 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2]  # type: int
+                heal_3 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3]  # type: int
+                mana_cost = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST]  # type: int
+                effect = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT]  # type: int
 
                 spell['name'] = name
                 spell['rank'] = rank
@@ -132,18 +132,18 @@ class Paladin(Character):
          Lasts for three turns
         :return: boolean indicating if the cast was successful or not
         """
-        cast_is_successful = self._check_enough_mana(self.learned_spells['Seal of Righteousness']["mana_cost"])
+        cast_is_successful = self._check_enough_mana(self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]["mana_cost"])
 
         if cast_is_successful:
             self.SOR_ACTIVE = True
             self.SOR_TURNS = 3
-            print("{0} activates Seal of Righteousness!".format(self.name))
+            print("{0} activates {spell}!".format(self.name, spell=self.KEY_SEAL_OF_RIGHTEOSNESS))
         return cast_is_successful
 
     def _spell_seal_of_righteousness_attack(self):
         if self.SOR_TURNS == 0:  # fade spell
             self.SOR_ACTIVE = False
-            print("Seal of Righteousness has faded from {}".format(self.name))
+            print("{spell} has faded from {tar}".format(spell=self.KEY_SEAL_OF_RIGHTEOSNESS, tar=self.name))
             return 0
         else:
             self.SOR_TURNS -= 1
@@ -160,7 +160,7 @@ class Paladin(Character):
         self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['rank'] = rank
         self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['mana_cost'] = mana_cost
 
-        print("Spell Seal of Righteousness has been updated to rank {}!".format(rank))
+        print("Spell {spell} has been updated to rank {rank}!".format(spell=self.KEY_SEAL_OF_RIGHTEOSNESS, rank=rank))
         print("*" * 20)
 
     def spell_flash_of_light(self):
@@ -168,8 +168,8 @@ class Paladin(Character):
         Heals the paladin for a certain amount
         :return successful cast or not
         """
-        mana_cost = self.learned_spells['Flash of Light']['mana_cost']
-        heal = Heal(heal_amount=self.learned_spells['Flash of Light']['heal_1'])
+        mana_cost = self.learned_spells[self.KEY_FLASH_OF_LIGHT]['mana_cost']
+        heal = Heal(heal_amount=self.learned_spells[self.KEY_FLASH_OF_LIGHT]['heal_1'])
 
         cast_is_successful = self._check_enough_mana(mana_cost)
 
@@ -179,11 +179,10 @@ class Paladin(Character):
 
             if self.health > self.max_health:  # check for overheal
                 overheal = self._handle_overheal()
-                print("Flash of Light healed {0} for {1:.2f} ({2:.2f} Overheal).".format(self.name,
-                                                                                         heal - overheal,
-                                                                                         overheal))
+                print("{spell} healed {tar} for {heal:.2f} ({ovheal:.2f} Overheal).".format(
+                    spell=self.KEY_FLASH_OF_LIGHT, tar=self.name, heal=heal-overheal, ovheal=overheal))
             else:
-                print("Flash of Light healed {0} for {1}.".format(self.name, heal))
+                print("{spell} healed {tar} for {heal}.".format(spell=self.KEY_FLASH_OF_LIGHT, tar=self.name, heal=heal))
 
         return cast_is_successful
 
@@ -199,7 +198,7 @@ class Paladin(Character):
         if cast_is_successful:
             self.mana -= mana_cost
             # damage the target and add the DoT
-            print("Melting Strike damages {} for {}!".format(target.name, damage))
+            print("{spell} damages {tar} for {dmg}!".format(spell=self.KEY_MELTING_STRIKE, tar=target.name, dmg=damage))
             target.take_attack(damage)
             target.add_buff(dot)
 
@@ -241,8 +240,8 @@ class Paladin(Character):
         sor_damage = attacker_swing[1]  # if the seal isn't active the damage will be 0
 
         if sor_damage:
-            print("{0} attacks {1} for {2} from Seal of Righteousness!".format(self.name, victim.name,
-                                                                                          auto_attack))
+            print("{0} attacks {1} for {2} from {sor}!".format(self.name, victim.name,
+                                                               auto_attack, sor=self.KEY_SEAL_OF_RIGHTEOSNESS))
         else:
             print("{0} attacks {1} for {2}!".format(self.name, victim.name, auto_attack))
 
