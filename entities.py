@@ -12,6 +12,7 @@ from loader import (load_creature_xp_rewards, load_character_level_stats,
 from quest import Quest, FetchQuest
 from damage import Damage
 from buffs import BeneficialBuff, DoT
+from exceptions import ItemNotInInventoryError
 
 # dictionary that holds information about how much XP a monster of a certain level should award the player.
 # key: level(int), value: xp reward(int)
@@ -698,8 +699,9 @@ class Character(LivingThing):
             :param item_count: the count we want to remove, ex: we may want to remove 2 Wolf Meats, as opposed to one
             :param remove_all: simply removes all the items, with this variable set to True, item_count is useless"""
         if item_name not in self.inventory.keys():
-            # TODO: Raise custom exception
-            pass
+            raise ItemNotInInventoryError("{item_name} is not in {char_name}'s inventory!".format(item_name=item_name,
+                                                                                                  char_name=self.name),
+                                          inventory=self.inventory, item_name=item_name)
 
         if remove_all:
             del self.inventory[item_name]
