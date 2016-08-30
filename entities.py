@@ -9,7 +9,7 @@ from items import  Item, Weapon, Potion
 from loader import (load_creature_xp_rewards, load_character_level_stats,
                     load_character_xp_requirements, load_creature_gold_reward,
                     load_loot_table, load_item, load_vendor_inventory)
-from quest import Quest
+from quest import Quest, FetchQuest
 from damage import Damage
 from buffs import BeneficialBuff, DoT
 
@@ -419,7 +419,7 @@ class Character(LivingThing):
         self._LEVEL_STATS = load_character_level_stats()
         self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements()
         self.quest_log = {}
-        self.inventory = {"gold": 0} # dict Key: str, Value: Item class object
+        self.inventory = {"gold": 0} # dict Key: str, Value: tuple(Item class instance, Item Count)
 
     def equip_item(self, item: Item):
         """
@@ -610,6 +610,10 @@ class Character(LivingThing):
         item_reward = quest.give_item_rewards()
         xp_reward = quest.give_reward()
 
+        if isinstance(quest, FetchQuest):
+            # if we just completed a fetch quest, we need to remove the required items for the quest
+            self._remove_fetch_quest_required_items(quest)
+
         print("Quest {} is completed! XP awarded: {}!".format(quest.name, quest.xp_reward))
         if isinstance(item_reward, Item):
             print("{} is awarded {} from the quest {}!".format(self.name, item_reward.name, quest.name))
@@ -622,6 +626,11 @@ class Character(LivingThing):
         del self.quest_log[quest.ID]  # remove from quest log
 
         self._award_experience(xp_reward)
+
+    def _remove_fetch_quest_required_items(self, quest: FetchQuest):
+        item_name, count = quest.required_item, quest.required_item_count
+
+        self._remove_item_from_inventory(item_name=item_name, item_count=count)
 
     def _award_experience(self, xp_reward: int):
         """ Method that awards experience to the player and checks if he levels up"""
@@ -683,6 +692,29 @@ class Character(LivingThing):
             self.quest_log[item_quest_id] = temp_quest
 
             self._check_if_quest_completed(temp_quest)
+
+    def _remove_item_from_inventory(self, item_name: str, item_count: int = 1, remove_all: bool = False):
+        """ This method removes the specified item from the player's inventory
+            :param item_count: the count we want to remove, ex: we may want to remove 2 Wolf Meats, as opposed to one
+            :param remove_all: simply removes all the items, with this variable set to True, item_count is useless"""
+        if item_name not in self.inventory.keys():
+            # TODO: Raise custom exception
+            pass
+
+        if remove_all:
+            del self.inventory[item_name]
+        else:
+            item, count_in_inventory = self.inventory[item_name]
+
+            # subtract the number of items we're removing from the number we have
+            resulting_count = count_in_inventory - item_count
+
+            if resulting_count <= 0:
+                # if it's 0 or less, remove the key/value pair
+                del self.inventory[item_name]
+            else:
+                # if we have items left, simply reduce their count
+                self.inventory[item_name] = item, resulting_count
 
     def check_if_levelup(self):
         if self.experience >= self.xp_req_to_level:
