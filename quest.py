@@ -1,5 +1,5 @@
 class Quest:
-    def __init__(self, quest_name: str, quest_id, xp_reward: int,
+    def __init__(self, quest_name: str, quest_id, xp_reward: int, item_reward_dict: dict, reward_choice_enabled: bool,
                  level_required: int, is_completed: bool = False):
         self.name = quest_name
         self.ID = quest_id
@@ -26,9 +26,10 @@ class KillQuest(Quest):
     """
     Standard kill X of Y quest
     """
-    def __init__(self, quest_name: str, quest_id, required_monster: str, xp_reward: int,
-                 level_required: int, required_kills: int, is_completed: bool = False):
-        super().__init__(quest_name, quest_id, xp_reward, level_required, is_completed)
+    def __init__(self, quest_name: str, quest_id, required_monster: str, xp_reward: int, item_reward_dict: dict,
+                 reward_choice_enabled: bool, level_required: int, required_kills: int, is_completed: bool = False):
+        super().__init__(quest_name, quest_id, xp_reward, item_reward_dict, reward_choice_enabled, level_required,
+                         is_completed)
         self.required_monster = required_monster
         self.required_kills = required_kills
         self.kills = 0
@@ -57,9 +58,10 @@ class FetchQuest(Quest):
     """
     Standard obtain X of Y quest
     """
-    def __init__(self, quest_name: str, quest_id, required_item: str, xp_reward: int,
-                 level_required: int, required_item_count: int, is_completed: bool = False):
-        super().__init__(quest_name, quest_id, xp_reward, level_required, is_completed)
+    def __init__(self, quest_name: str, quest_id, required_item: str, xp_reward: int, item_reward_dict: dict,
+                 reward_choice_enabled: bool, level_required: int, required_item_count: int, is_completed: bool = False):
+        super().__init__(quest_name, quest_id, xp_reward, item_reward_dict, reward_choice_enabled,
+                         level_required, is_completed)
         self.required_item = required_item
         self.required_item_count = required_item_count
 

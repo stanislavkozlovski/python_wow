@@ -18,6 +18,8 @@ from database_info import \
      DBINDEX_QUEST_TEMPLATE_ENTRY, DBINDEX_QUEST_TEMPLATE_NAME, DBINDEX_QUEST_TEMPLATE_TYPE,
      DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED, DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED,
      DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED, DBINDEX_QUEST_TEMPLATE_XP_REWARD, DBINDEX_QUEST_TEMPLATE_ITEM_REQUIRED,
+     DBINDEX_QUEST_TEMPLATE_ITEM_REWARD1, DBINDEX_QUEST_TEMPLATE_ITEM_REWARD2, DBINDEX_QUEST_TEMPLATE_ITEM_REWARD3,
+     DBINDEX_QUEST_TEMPLATE_ITEM_CHOICE_ENABLED,
 
      DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP,
 
@@ -231,6 +233,13 @@ entry,            name,    type, required_level,           monster_required,  it
                 zone,           sub_zone,   xp_reward, comment
        Elwynn Forest,   Northshire Valley,        300, Our First Quest!
 
+       item_reward1, item_reward2, item_reward3, item_choice_enabled
+                  1,            2,         Null,                False
+
+    item_rewardX is the item's entry in the item_template table. We can have up to 3 (three) rewards from a quest.
+    item_choice_enabled is a boolean which indicates if we get all the items or have to choose one particular item
+    from the ones available
+
     Type decides what kind of quests it is.
     killquest = kill X amount of monster_required
     fetchquest = obtain X amount of item_required.
@@ -259,6 +268,14 @@ entry,            name,    type, required_level,           monster_required,  it
             quest_item_required = row[DBINDEX_QUEST_TEMPLATE_ITEM_REQUIRED]  # type: str
             quest_amount_required = row[DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED]  # type: int
             quest_xp_reward = row[DBINDEX_QUEST_TEMPLATE_XP_REWARD]  # type: int
+            quest_item_reward1_id = row[DBINDEX_QUEST_TEMPLATE_ITEM_REWARD1]  # type: int
+            quest_item_reward2_id = row[DBINDEX_QUEST_TEMPLATE_ITEM_REWARD2]  # type: int
+            quest_item_reward3_id = row[DBINDEX_QUEST_TEMPLATE_ITEM_REWARD3]  # type: int
+            quest_item_choice_enabled = row[DBINDEX_QUEST_TEMPLATE_ITEM_CHOICE_ENABLED]  # type: bool
+
+            item_rewards = load_quest_item_rewards(qitem1_id=quest_item_reward1_id,
+                                                   qitem2_id=quest_item_reward2_id,
+                                                   qitem3_id=quest_item_reward3_id)  # type: dict
 
             #  create the quest object according to it's type
             if quest_type == "killquest":
@@ -267,6 +284,8 @@ entry,            name,    type, required_level,           monster_required,  it
                                                    required_monster=quest_monster_required,
                                                    required_kills=quest_amount_required,
                                                    xp_reward=quest_xp_reward,
+                                                   item_reward_dict=item_rewards,
+                                                   reward_choice_enabled=quest_item_choice_enabled,
                                                    level_required=quest_level_requirement)
             elif quest_type == "fetchquest":
                 quest_list[quest_name] = FetchQuest(quest_name=quest_name,
@@ -274,9 +293,30 @@ entry,            name,    type, required_level,           monster_required,  it
                                                    required_item=quest_item_required,
                                                    required_item_count=quest_amount_required,
                                                    xp_reward=quest_xp_reward,
+                                                   item_reward_dict=item_rewards,
+                                                   reward_choice_enabled=quest_item_choice_enabled,
                                                    level_required=quest_level_requirement)
 
     return quest_list
+
+
+def load_quest_item_rewards(qitem1_id: int, qitem2_id: int, qitem3_id: int) -> dict:
+    """ This function loads all the items that the quest rewards and returns a
+        Dictionary: Key: Item Name, Value: instance of class Item"""
+    item_rewards_dict = {}  # type: dict
+    if qitem1_id:
+        qitem1 = load_item(qitem1_id)  # type: Item
+        item_rewards_dict[qitem1.name] = qitem1  # add to the dictionary
+
+        if qitem2_id:
+            qitem2 = load_item(qitem2_id)  # type: Item
+            item_rewards_dict[qitem2.name] = qitem2
+
+            if qitem3_id:
+                qitem3 = load_item(qitem3_id)  #type: Item
+                item_rewards_dict[qitem3.name] = qitem3
+
+    return item_rewards_dict
 
 
 def load_creature_xp_rewards() -> dict:
