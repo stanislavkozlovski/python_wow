@@ -101,3 +101,13 @@ def print_loot_table(monster_loot: dict):
         if item_name is not "gold":
             print("\t{}".format(item))
 
+
+def print_quest_item_choices(quest_item_rewards: dict):
+    """ This function prints the item rewards from a quest from which the player can only pick one """
+
+    print("You must choose to take one of the following items:")
+    for item in quest_item_rewards.values():
+        if item:
+            print("\t {}".format(item))
+    print()
+

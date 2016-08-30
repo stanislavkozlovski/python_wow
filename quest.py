@@ -6,6 +6,8 @@ class Quest:
         self.xp_reward = xp_reward
         self.is_completed = is_completed
         self.required_level = level_required
+        self.item_rewards = item_reward_dict  # dictionary for the rewards key: item name, value: item object
+        self.reward_choice_enabled = reward_choice_enabled  # type: bool
 
     def update_kills(self):
         """ This method updates the required kills if the quest is a KillQuest"""
@@ -20,6 +22,18 @@ class Quest:
 
     def give_reward(self):
         return self.xp_reward
+
+    def give_item_rewards(self):
+        """ this method gives the player his items, or if he has to choose one, opens up the window where
+        he makes the choice and gives him that item.
+        This method is called from the Character class in entities.py"""
+        from command_handler import handle_quest_item_choice
+
+        if self.reward_choice_enabled:
+            return handle_quest_item_choice(self.item_rewards)
+        else:
+            # return a list of all the instances of Item
+            return list(filter(lambda x: x is not None,  self.item_rewards.values()))
 
 
 class KillQuest(Quest):

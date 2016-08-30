@@ -35,6 +35,7 @@
 - [x] Print in colors
 - [x] Refactor Buff classes, make Buff a base class for all kinds of buffs/dots/debuffs
 - [x] Convert heals into their own separate class.
+- [x] Add Quest item rewards
 
 # Low Priority TODOs
 - Add more content(monster, zone/subzones, npcs, items, vendors, spells and etc)
@@ -47,6 +48,7 @@
 - Add item gossip text
 - Add command to print item information (that is in the vendor, inventory and loot table)
 - Store player's attributes (mana,hp etc) in a dictionary (easier application of buffs that way, will remove if checks)
+- Fix a bug in fetch quests where they don't remove their required items from your inventory
 
 # TODOs
 - Add documentation!
@@ -55,7 +57,6 @@
 - Add a stat of your choice to the game.
 - Add different kinds of damage
 - Add another class of choice. (Mage is on my mind)
-- Add Quest item rewards
 - Add the ability to save the character
 - Add a scripted NPC to the game
 - Implement absoprtion shield in the game

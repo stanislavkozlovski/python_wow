@@ -3,7 +3,7 @@ This module will handle the player's commands
 """
 from zones.zone import Zone
 from commands import pac_main_ooc, pac_map_directions, pac_in_combat, pac_vendor_dialogue, pac_opened_inventory
-from information_printer import (print_live_npcs, print_live_monsters,
+from information_printer import (print_live_npcs, print_live_monsters, print_quest_item_choices,
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar)
 
 
@@ -199,6 +199,30 @@ def handle_go_to_command(command: str, character, zone_object: Zone):
     else:
         print("No such destination as {} that is connected to your current subzone.".format(destination))
 
+
+def handle_quest_item_choice(item_rewards: dict):
+    """
+    This function opens a window where the player selects which item he wants to take from the quest
+    :param item_rewards: a dictionary key: item name, value: instance of class Item
+    :return: an instance of Item (the item object the player selected)
+    """
+    print_quest_item_choices(item_rewards)
+
+    while True:
+        command = input()
+
+        if "choose" in command:
+            """ Takes the item the player chooses """
+            item_name = command[7:]
+
+            if item_name in item_rewards.keys():
+                return item_rewards[item_name]
+            else:
+                print("No such item as ", item_name)
+        elif command == "?":
+            print("Available commands:")
+            print("\tchoose [Item Name]")
+            print("\t\tTakes the item\n")
 
 # IN COMBAT COMMANDS
 # COMMANDS THAT DO NOT END THE TURN

@@ -234,10 +234,10 @@ entry,            name,    type, required_level,           monster_required,  it
        Elwynn Forest,   Northshire Valley,        300, Our First Quest!
 
        item_reward1, item_reward2, item_reward3, item_choice_enabled
-                  1,            2,         Null,                False
+                  1,            2,         Null,                0
 
     item_rewardX is the item's entry in the item_template table. We can have up to 3 (three) rewards from a quest.
-    item_choice_enabled is a boolean which indicates if we get all the items or have to choose one particular item
+    item_choice_enabled is a boolean (1=true, 0=false) which indicates if we get all the items or have to choose one particular item
     from the ones available
 
     Type decides what kind of quests it is.
@@ -271,7 +271,7 @@ entry,            name,    type, required_level,           monster_required,  it
             quest_item_reward1_id = row[DBINDEX_QUEST_TEMPLATE_ITEM_REWARD1]  # type: int
             quest_item_reward2_id = row[DBINDEX_QUEST_TEMPLATE_ITEM_REWARD2]  # type: int
             quest_item_reward3_id = row[DBINDEX_QUEST_TEMPLATE_ITEM_REWARD3]  # type: int
-            quest_item_choice_enabled = row[DBINDEX_QUEST_TEMPLATE_ITEM_CHOICE_ENABLED]  # type: bool
+            quest_item_choice_enabled = bool(row[DBINDEX_QUEST_TEMPLATE_ITEM_CHOICE_ENABLED])  # type: bool
 
             item_rewards = load_quest_item_rewards(qitem1_id=quest_item_reward1_id,
                                                    qitem2_id=quest_item_reward2_id,

@@ -607,8 +607,17 @@ class Character(LivingThing):
             self._complete_quest(quest)
 
     def _complete_quest(self, quest: Quest):
-        print("Quest {} is completed! XP awarded: {}!".format(quest.name, quest.xp_reward))
+        item_reward = quest.give_item_rewards()
         xp_reward = quest.give_reward()
+
+        print("Quest {} is completed! XP awarded: {}!".format(quest.name, quest.xp_reward))
+        if isinstance(item_reward, Item):
+            print("{} is awarded {} from the quest {}!".format(self.name, item_reward.name, quest.name))
+            self.award_item(item_reward)
+        elif isinstance(item_reward, list):
+            for item in item_reward:
+                print("{} is awarded {} from the quest {}!".format(self.name, item.name, quest.name))
+                self.award_item(item)
 
         del self.quest_log[quest.ID]  # remove from quest log
 
@@ -664,8 +673,8 @@ class Character(LivingThing):
             item, item_count = self.inventory[item.name]
             self.inventory[item.name] = (item, item_count + item_count)
 
-        # if the item is related to a quest and if we have that quest
-        if item_quest_id and item_quest_id in self.quest_log:
+        if item_quest_id and item_quest_id in self.quest_log and not self.quest_log[item_quest_id].is_completed:
+            # if the item is related to a quest and if we have that quest and said quest is not completed
             temp_quest = self.quest_log[item_quest_id]
 
             # have the quest check if the player has enough items to complete it
