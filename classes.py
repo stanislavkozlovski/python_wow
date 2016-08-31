@@ -148,6 +148,7 @@ class Paladin(Character):
                               and self._check_spell_cooldown(self.KEY_SEAL_OF_RIGHTEOSNESS))
 
         if cast_is_successful:
+            self.mana -= mana_cost
             self._spell_trigger_cd(self.KEY_SEAL_OF_RIGHTEOSNESS)
             self.SOR_ACTIVE = True
             self.SOR_TURNS = 3
