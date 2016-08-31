@@ -111,3 +111,12 @@ def print_quest_item_choices(quest_item_rewards: dict):
             print("\t {}".format(item))
     print()
 
+
+def welcome_print(game_version: str):
+    print("*"*50)
+    print("WELCOME TO PYTHON WOW VERSION: {0}".format(game_version))
+    print("A simple console RPG game inspired by the Warcraft universe!")
+    print()
+    print("Type ? to see a list of available commands.")
+    print("*" * 50)
+    print()

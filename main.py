@@ -1,6 +1,7 @@
 import classes
 
-from command_handler import handle_main_commands, print_live_monsters, print_live_npcs
+from command_handler import handle_main_commands
+from information_printer import print_live_monsters, print_live_npcs, welcome_print
 from zones.zone import Zone
 from items import Weapon
 from zones.elwynn_forest import ElwynnForest
@@ -9,8 +10,8 @@ ZONES = {"Elwynn Forest": ElwynnForest()}
 
 
 def main():
-    welcome_print()
-
+    welcome_print(GAME_VERSION)
+    
     main_character = classes.Paladin(name="Netherblood")
     starter_weapon = Weapon(name="Starter Weapon", min_damage=1, max_damage=3)
     main_character.equip_weapon(starter_weapon)
@@ -23,6 +24,8 @@ def main():
 
     print_live_npcs(zone_object, print_all=True)
     print_live_monsters(zone_object)
+
+    # main game loop
     while True:
         handle_main_commands(main_character, zone_object)
 
@@ -34,15 +37,6 @@ def get_zone_object(zone: str):
     """
     return ZONES[zone]
 
-
-def welcome_print():
-    print("*"*50)
-    print("WELCOME TO PYTHON WOW VERSION: {0}".format(GAME_VERSION))
-    print("A simple console RPG game inspired by the Warcraft universe!")
-    print()
-    print("Type ? to see a list of available commands.")
-    print("*" * 50)
-    print()
 
 if __name__ == '__main__':
     main()
