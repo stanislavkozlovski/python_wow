@@ -40,6 +40,7 @@
 - [x] Add command to print item information (that is in the vendor dialogue)
 - [x] Add "take all" command when looting creatures to take all the loot at once.
 - [x] Add Holyheal
+- [x] Add ProtectiveHeal
 
 # Low Priority TODOs
 - Add more content(monster, zone/subzones, npcs, items, vendors, spells and etc)
@@ -65,5 +66,4 @@
 - Implement absoprtion shield in the game
 - Implement HoTs (heal over time effects)
 - Add NatureHeal
-- Add ProtectiveHeal
 - Create more damage classes, each with it's own flavour. (Destruction leaves off a DoT, Sinister has a chance to strike again, Merciless has a chance to crit and others without flavor (holy, frost, fire etc))

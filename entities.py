@@ -244,7 +244,7 @@ class LivingThing:
 
     def _apply_damage_absorption(self, damage: Damage) -> Damage:
         """
-        This method subtract the absorption (if any) from the damage
+        This method subtracts the absorption (if any) from the damage
         :return Tuple(Damage, absorbed(float)
         """
 

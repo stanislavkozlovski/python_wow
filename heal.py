@@ -82,4 +82,34 @@ class ProtectiveHeal(Heal):
     The idea with protective heal is that every such heal leaves off a slight absorption shield on the target, absorbing
     a % of the original heal.
     """
-    pass # TODO: IMPLEMENT
+    ABSORB_PERCENTAGE = 30  # 30% of the damage will come up as a shield
+
+    def __init__(self, heal_amount: float, target):
+        super().__init__(heal_amount)
+        self.target = target
+        self.shield = self._calculate_shield()
+
+    def __str__(self):
+        return "{0:.2f} ({1:.2f} shield}".format(self.heal_amount, self.shield)
+
+    def __add__(self, other):
+        self._apply_shield()
+        return other + self.heal_amount
+
+    def __radd__(self, other):
+        self._apply_shield()
+        return other + self.heal_amount
+
+    def __iadd__(self, other: float) -> float:
+        self._apply_shield()
+        return other + self.heal_amount
+
+    def _calculate_shield(self) -> float:
+        return round((self.ABSORB_PERCENTAGE / 100) * self.heal_amount, 2)
+
+    def _apply_shield(self):
+        """
+        This method calculates the shield we would get from the heal and applies it to our target!
+        :return:
+        """
+        self.target.absorption_shield += self.shield

@@ -85,7 +85,7 @@ class Damage:
         This method subtracts the absorbed damage from our damage
         The magical damage always gets absorbed first!
         :param absorption_shield: a float indicating how much damage should get absorbed
-        :return: What's left of the absorption, how much phys dmg we absorbed, how much magic dmg we absorbed
+        :return: What's left of the absorption
         """
 
         # subtract magic damage
