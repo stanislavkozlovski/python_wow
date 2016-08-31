@@ -11,6 +11,7 @@ KEY_BUFF_TYPE_STRENGTH = "strength"
 KEY_BUFF_TYPE_HEALTH = "health"
 KEY_BUFF_TYPE_MANA = "mana"
 
+
 # the base class for all buffs/dots/debuffs
 class StatusEffect:
     def __init__(self, name: str, duration: int):
@@ -118,7 +119,7 @@ class DoT(StatusEffect):
         :param duration: How many turns this DoT will be active for
         :param caster_lvl: the level of the caster
         """
-        super().__init__(name, duration, "dad")
+        super().__init__(name, duration)
         self.damage = damage_tick  # type: Damage
         self.level = caster_lvl
 
