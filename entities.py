@@ -453,6 +453,10 @@ class Character(LivingThing):
         self.quest_log = {}
         self.inventory = {"gold": 0} # dict Key: str, Value: tuple(Item class instance, Item Count)
 
+    def start_turn_update(self):
+        super().start_turn_update()
+        self.update_spell_cooldowns()
+
     def equip_item(self, item: Item):
         """
         This method equips an item to the character and handles the appropriate change in inventory following the equip
@@ -500,7 +504,6 @@ class Character(LivingThing):
                                                                                          buff_name=potion.get_buff_name()))
             # call the potion's consume method
             potion.consume(self)
-
 
     def equip_weapon(self, weapon: Weapon):
         print("{} has equipped Weapon {}".format(self.name, weapon.name))
@@ -804,6 +807,15 @@ class Character(LivingThing):
 
     def _lookup_next_xp_level_req(self):
         return self._REQUIRED_XP_TO_LEVEL[self.level]
+
+    def update_spell_cooldowns(self):
+        """
+        This method is called at the start of every turn
+        It reduces the active cooldowns of our spells by 1, because a turn has passed
+        """
+        # lambda expression to reduce every value by 1 if it's not 0
+        self.spell_cooldowns = dict(map(lambda x: (x[0], x[1] - 1 if x[1] != 0 else 0),
+                                        self.spell_cooldowns.items()))
 
     def get_class(self) -> str:
         """Returns the class of the character as a string"""

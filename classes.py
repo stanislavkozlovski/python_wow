@@ -94,6 +94,7 @@ class Paladin(Character):
                 mana_cost = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST]  # type: int
                 effect = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT]  # type: int
                 cooldown = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_COOLDOWN]  # type: int
+                cooldown = cooldown if cooldown else 0  # if we get a None, we turn it into 0
 
                 spell['name'] = name
                 spell['rank'] = rank

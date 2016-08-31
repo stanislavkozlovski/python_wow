@@ -41,6 +41,7 @@
 - [x] Add "take all" command when looting creatures to take all the loot at once.
 - [x] Add Holyheal
 - [x] Add ProtectiveHeal
+- [x] Add spell cooldowns and a way to handle them
 
 # Low Priority TODOs
 - Add more content(monster, zone/subzones, npcs, items, vendors, spells and etc)
@@ -56,7 +57,6 @@
 
 # TODOs
 - Add documentation!
-- Add spell cooldowns and a way to handle them
 - Add some kind of armor item type (Head, etc)
 - Add a stat of your choice to the game.
 - Add different kinds of damage
