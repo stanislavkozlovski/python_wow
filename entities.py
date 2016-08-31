@@ -367,7 +367,7 @@ class Monster(LivingThing):
         # get the base auto attack damage
         damage_to_deal = random.randint(self.min_damage, self.max_damage + 1)
         # factor in the level difference
-        self._calculate_level_difference_damage(damage_to_deal, target_level)
+        damage_to_deal = self._calculate_level_difference_damage(damage_to_deal, target_level)
 
         return Damage(phys_dmg=damage_to_deal)
 
