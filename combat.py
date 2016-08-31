@@ -98,7 +98,26 @@ def handle_loot(character: Character, monster: Monster):
     while True:
         command = input()
 
-        if "take" in command:
+        if command == "take all":
+            # takes everything
+
+            gold = monster.give_loot("gold")
+            if gold:  # if it's successful
+                character.award_gold(gold)
+                print("{char_name} has looted {gold_amount} gold.".format(char_name=character.name,
+                                                                          gold_amount=gold))
+
+            monster_loot = list(monster.loot.keys())  # list of strings, the item's names
+            for item_name in monster_loot:
+                # loop through them and get every one
+                item = monster.give_loot(item_name=item_name)
+
+                if item:  # if the loot is successful
+                    character.award_item(item=item)
+                    print("{char_name} has looted {item_name}.".format(char_name=character.name,
+                                                                       item_name=item_name))
+
+        elif "take" in command:
             item_name = command[5:]
 
             if item_name == "gold":
@@ -115,12 +134,6 @@ def handle_loot(character: Character, monster: Monster):
                     character.award_item(item=item)
                     print("{char_name} has looted {item_name}.".format(char_name=character.name,
                                                                        item_name=item_name))
-
-            if not monster.loot:  # if the loot is empty, exit the loot window
-                print('-' * 40)
-                break
-
-            print_loot_table(monster.loot)  # print the updated table each time we take something
         elif command == "?":
             pac_looting()
         elif command == "exit":  # end the looting process
@@ -128,6 +141,12 @@ def handle_loot(character: Character, monster: Monster):
             break
         else:
             print("Invalid command.")
+
+        if not monster.loot:  # if the loot is empty, exit the loot window
+            print('-' * 40)
+            break
+
+        print_loot_table(monster.loot)  # print the updated table each time we take something
 
 
 # returns a set with a list of allowed commands (you can't cast a spell you haven't learned yet)

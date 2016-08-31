@@ -82,6 +82,8 @@ def pac_looting():
     """Prints all possible commands the player can use while looting a creature"""
     print()
     print("Available commands:")
+    print("\ttake all")
+    print("\t\tLoots everything that has dropped.\n")
     print("\ttake gold")
     print("\t\tLoots the gold dropped from the monster.\n")
     print("\ttake [item_name]")
