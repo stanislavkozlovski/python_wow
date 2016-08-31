@@ -176,6 +176,11 @@ class LivingThing:
 
         return overheal
 
+    def _subtract_health(self, damage: Damage):
+        """ This method is called whenever the health of the LivingThing is damaged """
+        self.health -= damage
+        self.check_if_dead()
+
     def check_if_dead(self):
         if self.health <= 0:
             self._die()
@@ -193,8 +198,7 @@ class LivingThing:
         print("{entity_name} suffers {dot_dmg} from {dot_name}!".format(entity_name=self.name,
                                                                              dot_dmg=dot_proc_damage,
                                                                              dot_name=dot.name))
-        self.health -= dot_proc_damage
-        self.check_if_dead()
+        self._subtract_health(dot_proc_damage)
 
     def _calculate_level_difference_damage(self, damage_to_deal: int, target_level: int, inverse: bool=False) -> int:
         """
@@ -358,8 +362,7 @@ class Monster(LivingThing):
         victim.take_attack(self.name, monster_swing, self.level)
 
     def take_attack(self, damage: Damage):
-        self.health -= damage
-        self.check_if_dead()
+        self._subtract_health(damage)
 
     def _drop_loot(self):
         """
@@ -516,9 +519,7 @@ class Character(LivingThing):
         damage = self._apply_armor_reduction(damage, attacker_level)
 
         print("{0} attacks {1} for {2}!".format(monster_name, self.name, damage))
-        self.health -= damage
-        self.check_if_dead()
-
+        self._subtract_health(damage)
     def take_dot_proc(self, dot: DoT):
         """ this method damages the character for the dot's proc"""
         dot_proc_damage = dot.damage  # type: Damage
@@ -530,8 +531,7 @@ class Character(LivingThing):
         print("{char_name} suffers {dot_dmg} from {dot_name}!".format(char_name=self.name,
                                                                              dot_dmg=dot_proc_damage,
                                                                              dot_name=dot.name))
-        self.health -= dot_proc_damage
-        self.check_if_dead()
+        self._subtract_health(dot_proc_damage)
 
     def _apply_armor_reduction(self, damage: Damage, attacker_level: int) -> Damage:
         """
