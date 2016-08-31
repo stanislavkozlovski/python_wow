@@ -42,6 +42,7 @@ class LivingThing:
         self.mana = mana
         self.max_mana = mana
         self.level = level
+        self.absorption_shield = 0
         self._alive = True
         self._in_combat = False
         self.buffs = {}  # dict Key: an instance of class Buff, Value: The turns it has left to be active, int
@@ -178,6 +179,7 @@ class LivingThing:
 
     def _subtract_health(self, damage: Damage):
         """ This method is called whenever the health of the LivingThing is damaged """
+
         self.health -= damage
         self.check_if_dead()
 
@@ -194,6 +196,8 @@ class LivingThing:
         # noinspection PyTypeChecker
         dot_proc_damage = self._calculate_level_difference_damage(damage_to_deal=dot_proc_damage, target_level=dot.level,
                                                                   inverse=True)
+        # noinspection PyTypeChecker
+        dot_proc_damage = self._apply_damage_absorption(damage=dot_proc_damage)
 
         print("{entity_name} suffers {dot_dmg} from {dot_name}!".format(entity_name=self.name,
                                                                              dot_dmg=dot_proc_damage,
@@ -238,6 +242,17 @@ class LivingThing:
 
         return damage_to_deal
 
+    def _apply_damage_absorption(self, damage: Damage) -> Damage:
+        """
+        This method subtract the absorption (if any) from the damage
+        :return Tuple(Damage, absorbed(float)
+        """
+
+        if self.absorption_shield:  # if there is anything to absord
+            # lowers the damage and returns our shield
+            self.absorption_shield = damage.handle_absorption(self.absorption_shield)
+
+        return damage
     def _die(self):
         self._alive = False
 
@@ -362,6 +377,7 @@ class Monster(LivingThing):
         victim.take_attack(self.name, monster_swing, self.level)
 
     def take_attack(self, damage: Damage):
+        self._apply_damage_absorption(damage)
         self._subtract_health(damage)
 
     def _drop_loot(self):
@@ -517,16 +533,20 @@ class Character(LivingThing):
 
     def take_attack(self, monster_name:str, damage: Damage, attacker_level: int):
         damage = self._apply_armor_reduction(damage, attacker_level)
+        damage = self._apply_damage_absorption(damage)
 
         print("{0} attacks {1} for {2}!".format(monster_name, self.name, damage))
         self._subtract_health(damage)
+
     def take_dot_proc(self, dot: DoT):
         """ this method damages the character for the dot's proc"""
         dot_proc_damage = dot.damage  # type: Damage
 
         if dot_proc_damage.phys_dmg:  # if there is physical damage in the DoT, apply armor reduction
-            dot_proc_damage =  self._apply_armor_reduction(damage=dot_proc_damage,
+            dot_proc_damage = self._apply_armor_reduction(damage=dot_proc_damage,
                                                                     attacker_level=self.level)
+        if self.absorption_shield:  # if we have a shield
+            dot_proc_damage = self._apply_damage_absorption(dot_proc_damage)
 
         print("{char_name} suffers {dot_dmg} from {dot_name}!".format(char_name=self.name,
                                                                              dot_dmg=dot_proc_damage,

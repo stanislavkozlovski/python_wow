@@ -8,8 +8,10 @@ class Damage:
     def __init__(self, phys_dmg: float=0, magic_dmg: float=0):
         self.phys_dmg = round(phys_dmg, 1)
         self.magic_dmg = round(magic_dmg, 1)
+        self.phys_absorbed, self.magic_absorbed = 0, 0
 
     def __str__(self):
+        # TODO: Handle absorption in print
         if self.phys_dmg and self.magic_dmg:
             return "{phys_dmg} physical and {magic_dmg} magical damage".format(phys_dmg=self.phys_dmg,
                                                                               magic_dmg=self.magic_dmg)
@@ -57,3 +59,37 @@ class Damage:
     def __mul__(self, other: float):
         return Damage(phys_dmg=(other * self.phys_dmg),
                       magic_dmg=(other * self.magic_dmg))
+
+    def handle_absorption(self, absorption_shield: float):
+        """
+        This method subtracts the absorbed damage from our damage
+        The magical damage always gets absorbed first!
+        :param absorption_shield: a float indicating how much damage should get absorbed
+        :return: What's left of the absorption, how much phys dmg we absorbed, how much magic dmg we absorbed
+        """
+
+        # subtract magic damage
+        if absorption_shield >= self.magic_dmg:
+            # shield is bigger
+            absorption_shield -= self.magic_dmg
+            self.magic_absorbed = self.magic_dmg
+            self.magic_dmg = 0
+
+            # subtract physical damage
+            if absorption_shield >= self.phys_dmg:
+                # shield is bigger
+                absorption_shield -= self.phys_dmg
+                self.phys_absorbed = self.phys_dmg
+                self.phys_dmg = 0
+            else:
+                #shield is smaller
+                self.phys_dmg -= absorption_shield
+                self.phys_absorbed = absorption_shield
+                absorption_shield = 0
+        else:
+            # shield is smaller than magic_dmg, we won't get to absorb phys at all
+            self.magic_dmg -= absorption_shield
+            self.magic_absorbed = absorption_shield
+            absorption_shield = 0
+
+        return absorption_shield
