@@ -68,15 +68,23 @@ def print_available_quests(available_quests: dict, players_level: int):
 
 
 def print_in_combat_stats(player, monster):
-    print("Character {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(player.name, player.health,
-                                                                          player.max_health,
-                                                                          player.mana,
-                                                                          player.max_mana))
+    player_shield = "."  # serves as a dot if there is not a shield
+    if player.absorption_shield:
+        player_shield = " | {} shield.".format(player.absorption_shield)
 
+    print("Character {0} is at {1:.2f}/{2} health | {3}/{4} mana{5}".format(player.name, player.health,
+                                                                            player.max_health,
+                                                                            player.mana,
+                                                                            player.max_mana,
+                                                                            player_shield))
 
-    print("Monster {0} is at {1:.2f}/{2} health | {3}/{4} mana.".format(monster.name, monster.health,
-                                                                        monster.max_health, monster.mana,
-                                                                        monster.max_mana))
+    monster_shield = "."  # server as a dot if there is not a shield
+    if monster.absorption_shield:
+        monster_shield = " | {} shield.".format(monster.absorption_shield)
+    print("Monster {0} is at {1:.2f}/{2} health | {3}/{4} mana{5}".format(monster.name, monster.health,
+                                                                          monster.max_health, monster.mana,
+                                                                          monster.max_mana,
+                                                                          monster_shield))
 
 
 def print_character_xp_bar(player):

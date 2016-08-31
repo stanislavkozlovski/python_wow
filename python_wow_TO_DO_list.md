@@ -39,6 +39,7 @@
 - [x] Fix a bug in fetch quests where they don't remove their required items from your inventory
 - [x] Add command to print item information (that is in the vendor dialogue)
 - [x] Add "take all" command when looting creatures to take all the loot at once.
+- [x] Add Holyheal
 
 # Low Priority TODOs
 - Add more content(monster, zone/subzones, npcs, items, vendors, spells and etc)
@@ -50,6 +51,7 @@
 - Print Stats (hp, mana, xp and everything else at once)
 - Add item gossip text
 - Store player's attributes (mana,hp etc) in a dictionary (easier application of buffs that way, will remove if checks)
+- Fix bug where when we attack a monster, the monster's absorption does not get printed.
 
 # TODOs
 - Add documentation!
@@ -62,7 +64,6 @@
 - Add a scripted NPC to the game
 - Implement absoprtion shield in the game
 - Implement HoTs (heal over time effects)
-- Add Holyheal
 - Add NatureHeal
 - Add ProtectiveHeal
 - Create more damage classes, each with it's own flavour. (Destruction leaves off a DoT, Sinister has a chance to strike again, Merciless has a chance to crit and others without flavor (holy, frost, fire etc))
