@@ -11,14 +11,34 @@ class Damage:
         self.phys_absorbed, self.magic_absorbed = 0, 0
 
     def __str__(self):
-        # TODO: Handle absorption in print
-        if self.phys_dmg and self.magic_dmg:
-            return "{phys_dmg} physical and {magic_dmg} magical damage".format(phys_dmg=self.phys_dmg,
-                                                                              magic_dmg=self.magic_dmg)
-        elif self.phys_dmg:
-            return "{phys_dmg} physical damage".format(phys_dmg=self.phys_dmg)
-        elif self.magic_dmg:
-            return "{magic_dmg} magical damage".format(magic_dmg=self.magic_dmg)
+        """
+        Have two separate strings for physical damage and magical damage.
+        Fill them if we have such damages and modify them if there is absorption
+        Then, return what's appropriate
+        """
+        phys_dmg_print = ""
+        if self.phys_dmg:
+            phys_dmg_print = "{phys_dmg} physical damage".format(phys_dmg=self.phys_dmg)
+
+        if self.phys_absorbed:
+            phys_dmg_print = "{phys_dmg} physical damage ({absorbed} absorbed)".format(phys_dmg=self.phys_dmg,
+                                                                                       absorbed=self.phys_absorbed)
+
+
+        magic_dmg_print = ""
+        if self.magic_dmg:
+            magic_dmg_print = "{magic_dmg} magical damage".format(magic_dmg=self.magic_dmg)
+
+        if self.magic_absorbed:
+            magic_dmg_print = "{magic_dmg} magical damage ({absorbed} absorbed)".format(magic_dmg=self.magic_dmg,
+                                                                                        absorbed=self.magic_absorbed)
+
+        if phys_dmg_print and magic_dmg_print:
+            return "{phys} and {magic}".format(phys=phys_dmg_print, magic=magic_dmg_print)
+        elif phys_dmg_print:
+            return phys_dmg_print
+        elif magic_dmg_print:
+            return magic_dmg_print
         else:
             return "0 damage"
 
