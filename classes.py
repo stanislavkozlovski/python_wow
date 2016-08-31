@@ -61,6 +61,7 @@ class Paladin(Character):
         print("You have learned a new spell - {}".format(spell['name']))
 
         self.learned_spells[spell['name']] = spell
+        self.spell_cooldowns[spell['name']] = 0
 
     def _lookup_available_spells_to_learn(self, level: int):
         """
@@ -132,7 +133,9 @@ class Paladin(Character):
          Lasts for three turns
         :return: boolean indicating if the cast was successful or not
         """
-        cast_is_successful = self._check_enough_mana(self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]["mana_cost"])
+        mana_cost = self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]["mana_cost"]
+        cast_is_successful = (self._check_enough_mana(mana_cost)
+                              and self._check_spell_cooldown(self.KEY_SEAL_OF_RIGHTEOSNESS))
 
         if cast_is_successful:
             self.SOR_ACTIVE = True
@@ -170,7 +173,8 @@ class Paladin(Character):
         mana_cost = self.learned_spells[self.KEY_FLASH_OF_LIGHT]['mana_cost']
         heal = HolyHeal(heal_amount=self.learned_spells[self.KEY_FLASH_OF_LIGHT]['heal_1'])
 
-        cast_is_successful = self._check_enough_mana(mana_cost)
+        cast_is_successful = (self._check_enough_mana(mana_cost)
+                              and self._check_spell_cooldown(spell_name=self.KEY_FLASH_OF_LIGHT))
 
         if cast_is_successful:
             self.health += heal
@@ -185,14 +189,14 @@ class Paladin(Character):
 
         return cast_is_successful
 
-
     def spell_melting_strike(self, target: Monster):
         """ Damages the enemy for DAMAGE_1 damage and puts a DoT effect, the index of which is EFFECT
         :return successful cast or not"""
         mana_cost = self.learned_spells[self.KEY_MELTING_STRIKE]['mana_cost']
         damage = Damage(phys_dmg=self.learned_spells[self.KEY_MELTING_STRIKE]['damage_1'])
         dot = load_dot(self.learned_spells[self.KEY_MELTING_STRIKE]['effect'], level=self.level)
-        cast_is_successful = self._check_enough_mana(mana_cost)
+        cast_is_successful = (self._check_enough_mana(mana_cost)
+                              and self._check_spell_cooldown(self.KEY_MELTING_STRIKE))
 
         if cast_is_successful:
             self.mana -= mana_cost
@@ -254,6 +258,23 @@ class Paladin(Character):
             return False
         else:
             return True
+
+    def _check_spell_cooldown(self, spell_name: str) -> bool:
+        """
+        Check if we can cast the spell or if it's on CD
+        if it's on cooldown: return FALSE
+        if it's not on cooldown: return TRUE
+        """
+        turns_left = self.spell_cooldowns[spell_name]
+
+        if turns_left:
+            if turns_left == 1:
+                print("{} is on cooldown for {} more turn!".format(spell_name, turns_left))
+            else:
+                print("{} is on cooldown for {} more turns!".format(spell_name, turns_left))
+            return False
+
+        return True
 
     def get_class(self):
         return 'paladin'

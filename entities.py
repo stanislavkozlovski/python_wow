@@ -434,6 +434,7 @@ class Character(LivingThing):
     KEY_LEVEL_STATS_MANA = 'mana'
     KEY_LEVEL_STATS_STRENGTH = 'strength'
     KEY_LEVEL_STATS_ARMOR = 'armor'
+    spell_cooldowns = {}  # dictionary that holds Key: Spell Name(str), Value: It's cooldown in turns (int)
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1):
         super().__init__(name, health, mana, level=1)
