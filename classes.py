@@ -7,7 +7,7 @@ from database_info import (
     DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE2, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE3,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1, DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3, DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST,
-    DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT)
+    DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT, DBINDEX_PALADIN_SPELLS_TEMPLATE_COOLDOWN)
 from entities import Character, Monster
 from damage import Damage
 from heal import HolyHeal
@@ -67,8 +67,11 @@ class Paladin(Character):
         """
         Generator function
             paladin_spells_template table is as follows:
-            ID, Name of Spell, Rank of Spell, Level Required for said Rank, Damage1, Damage2, Damage3, Heal1, Heal2, Heal3, Effect, Comment
-            1,Seal of Righteousness,       1,                            1,       2,       0,       0,     0,     0,     0,      0, Seal of Righteousness
+            ID, Name of Spell, Rank of Spell, Level Required for said Rank, Damage1, Damage2, Damage3, Heal1, Heal2, Heal3, Effect, Cooldown, Comment
+            1,Seal of Righteousness,       1,                            1,       2,       0,       0,     0,     0,     0,      0,        0,Seal of Righteousness
+            effect is a special effect according to the spell, only Melting Strike has one for now and it serves as the
+            entry in spell_dots
+            cooldown is the amount of turns it takes for this spell to be ready again after being cast
             :return: A dictionary holding keys for each row (rank, damage1, damage2 etc.)
         """
 
@@ -90,6 +93,7 @@ class Paladin(Character):
                 heal_3 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3]  # type: int
                 mana_cost = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST]  # type: int
                 effect = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT]  # type: int
+                cooldown = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_COOLDOWN]  # type: int
 
                 spell['name'] = name
                 spell['rank'] = rank
@@ -101,6 +105,7 @@ class Paladin(Character):
                 spell['heal_3'] = heal_3
                 spell['mana_cost'] = mana_cost
                 spell['effect'] = effect
+                spell['cooldown'] = cooldown
 
                 yield spell
 
