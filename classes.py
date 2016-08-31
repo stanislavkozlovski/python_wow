@@ -116,6 +116,11 @@ class Paladin(Character):
             self._update_seal_of_righteousness(spell)
 
     # SPELLS
+    def _spell_trigger_cd(self, spell_name: str):
+        """ This method triggers the cooldown after a spell has been cast"""
+        spell_cd = self.learned_spells[spell_name]['cooldown']  # type: int
+        self.spell_cooldowns[spell_name] = spell_cd
+
     def spell_handler(self, command: str, target: Monster) -> bool:
         """
 
@@ -143,6 +148,7 @@ class Paladin(Character):
                               and self._check_spell_cooldown(self.KEY_SEAL_OF_RIGHTEOSNESS))
 
         if cast_is_successful:
+            self._spell_trigger_cd(self.KEY_SEAL_OF_RIGHTEOSNESS)
             self.SOR_ACTIVE = True
             self.SOR_TURNS = 3
             print("{0} activates {spell}!".format(self.name, spell=self.KEY_SEAL_OF_RIGHTEOSNESS))
@@ -184,6 +190,7 @@ class Paladin(Character):
         if cast_is_successful:
             self.health += heal
             self.mana -= mana_cost
+            self._spell_trigger_cd(self.KEY_FLASH_OF_LIGHT)
 
             if self.health > self.max_health:  # check for overheal
                 overheal = self._handle_overheal()
@@ -205,6 +212,7 @@ class Paladin(Character):
 
         if cast_is_successful:
             self.mana -= mana_cost
+            self._spell_trigger_cd(self.KEY_MELTING_STRIKE)
             # damage the target and add the DoT
             print("{spell} damages {tar} for {dmg}!".format(spell=self.KEY_MELTING_STRIKE, tar=target.name, dmg=damage))
             target.take_attack(damage)
