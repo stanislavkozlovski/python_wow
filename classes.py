@@ -10,7 +10,7 @@ from database_info import (
     DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT)
 from entities import Character, Monster
 from damage import Damage
-from heal import Heal
+from heal import HolyHeal
 from loader import load_dot
 
 
@@ -168,7 +168,7 @@ class Paladin(Character):
         :return successful cast or not
         """
         mana_cost = self.learned_spells[self.KEY_FLASH_OF_LIGHT]['mana_cost']
-        heal = Heal(heal_amount=self.learned_spells[self.KEY_FLASH_OF_LIGHT]['heal_1'])
+        heal = HolyHeal(heal_amount=self.learned_spells[self.KEY_FLASH_OF_LIGHT]['heal_1'])
 
         cast_is_successful = self._check_enough_mana(mana_cost)
 
