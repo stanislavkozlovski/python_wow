@@ -1,5 +1,5 @@
 """
-A Module that will take care of loading creatures that are in the Elwynn Forest zone
+A Module that will take care of loading creatures that are in the Northshire Abbey zone
 This is created so that we don't have to load the creatures every time we change zones AND
 to have dead creatures stay dead, not be reloaded
 
@@ -8,15 +8,17 @@ the cs in cs_alive_monsters and similar names stands for Current Subzone
 from zones.zone import Zone, SubZone
 
 
-class ElwynnForest(Zone):
+class NorthshireAbbey(Zone):
     # the _map that shows us where we can go from our current subzone
     zone_map = {"Northshire Valley": ["Northshire Vineyards"],
-                "Northshire Vineyards": ["Northshire Valley"]}
-    zone_name = "Elwynn Forest"
+                "Northshire Vineyards": ["Northshire Valley", "A Peculiar Hut"],
+                "A Peculiar Hut": ["Northshire Vineyards"]}
+    zone_name = "Northshire Abbey"
     starter_subzone = "Northshire Valley"
     # dictionary that will hold the subzone class objects
     loaded_zones = {"Northshire Valley": None,
-                    "Northshire Vineyards": None}
+                    "Northshire Vineyards": None,
+                    "A Peculiar Hut": None}
 
     def __init__(self):
         super().__init__()
@@ -67,6 +69,10 @@ class ElwynnForest(Zone):
             self.loaded_zones[subzone] = NorthshireVineyards(name=subzone,
                                                              parent_zone_name=self.zone_name,
                                                              zone_map=self.zone_map[subzone])
+        elif subzone == "A Peculiar Hut":
+            self.loaded_zones[subzone] = PeculiarHut(name=subzone,
+                                                     parent_zone_name=self.zone_name,
+                                                     zone_map=self.zone_map[subzone])
 
 
 class NorthshireValley(SubZone):
@@ -74,4 +80,8 @@ class NorthshireValley(SubZone):
 
 
 class NorthshireVineyards(SubZone):
+    pass
+
+
+class PeculiarHut(SubZone):
     pass

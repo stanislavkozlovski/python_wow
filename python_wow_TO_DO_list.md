@@ -57,13 +57,19 @@
 
 # TODOs
 - Add documentation!
+- Add entry to A Peculiar Hut possible only if you've killed Garrick Padfoot
+- Add scripted event (brotherhood traitors talking) in A Peculiar Hut
 - Add some kind of armor item type (Head, etc)
-- Add a stat of your choice to the game.
-- Add different kinds of damage
 - Add another class of choice. (Mage is on my mind)
+- Sell option to sell items to vendors
+- Add armor to monsters
+- Monster gossip on attack
 - Add the ability to save the character
+
 - Add a scripted NPC to the game
-- Implement absoprtion shield in the game
+
 - Implement HoTs (heal over time effects)
 - Add NatureHeal
+
+- Add different kinds of damage
 - Create more damage classes, each with it's own flavour. (Destruction leaves off a DoT, Sinister has a chance to strike again, Merciless has a chance to crit and others without flavor (holy, frost, fire etc))

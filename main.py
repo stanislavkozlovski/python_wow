@@ -4,9 +4,9 @@ from command_handler import handle_main_commands
 from information_printer import print_live_monsters, print_live_npcs, welcome_print
 from zones.zone import Zone
 from items import Weapon
-from zones.elwynn_forest import ElwynnForest
-GAME_VERSION = '0.0.49 ALPHA'
-ZONES = {"Elwynn Forest": ElwynnForest()}
+from zones.northshire_abbey import NorthshireAbbey
+GAME_VERSION = '0.0.4.9.1 ALPHA'
+ZONES = {"Northshire Abbey": NorthshireAbbey()}
 
 
 def main():

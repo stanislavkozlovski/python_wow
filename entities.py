@@ -451,7 +451,7 @@ class Character(LivingThing):
         self.attributes[self.KEY_ARMOR] = 75
         self.attributes[self.KEY_AGILITY] = agility
         self.attributes[self.KEY_STRENGTH] = strength
-        self.current_zone = "Elwynn Forest"
+        self.current_zone = "Northshire Abbey"
         self.current_subzone = "Northshire Valley"
         # A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
         self._LEVEL_STATS = load_character_level_stats()
@@ -533,7 +533,7 @@ class Character(LivingThing):
 
         # current formula for damage is: wep_dmg * 0.4 * strength
         strength = self.attributes[self.KEY_STRENGTH]
-        self.min_damage = self.equpped_weapon.min_damage + (0.4 * strength)
+        self.min_damage = self.equipped_weapon.min_damage + (0.4 * strength)
         self.max_damage = self.equipped_weapon.max_damage + (0.4 * strength)
 
 
