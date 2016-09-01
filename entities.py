@@ -432,19 +432,21 @@ class Character(LivingThing):
     # keys are used to access the level_stats dictionary that holds information on stats to update on each level up
     KEY_LEVEL_STATS_HEALTH = 'health'
     KEY_LEVEL_STATS_MANA = 'mana'
-    KEY_LEVEL_STATS_STRENGTH = 'strength'
-    KEY_LEVEL_STATS_ARMOR = 'armor'
+    KEY_STRENGTH = 'strength'
+    KEY_ARMOR = 'armor'
     spell_cooldowns = {}  # dictionary that holds Key: Spell Name(str), Value: It's cooldown in turns (int)
+    attributes = {KEY_STRENGTH: 0, KEY_ARMOR: 0}  # dictionary holding attributes, KEY: strength, Value: 5
+
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1):
         super().__init__(name, health, mana, level=1)
-        self.strength = strength
         self.min_damage = 0
         self.max_damage = 1
         self.equipped_weapon = Weapon(name="Starter Weapon")
         self.experience = 0
         self.xp_req_to_level = 400
-        self.armor = 75
+        self.attributes[self.KEY_ARMOR] = 75
+        self.attributes[self.KEY_STRENGTH] = strength
         self.current_zone = "Elwynn Forest"
         self.current_subzone = "Northshire Valley"
         # A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
@@ -512,8 +514,9 @@ class Character(LivingThing):
 
     def _calculate_damage(self, weapon: Weapon):
         # current formula for damage is: wep_dmg * 0.1 * strength
-        self.min_damage = weapon.min_damage + (0.1 * self.strength)
-        self.max_damage = weapon.max_damage + (0.1 * self.strength)
+        strength = self.attributes[self.KEY_STRENGTH]
+        self.min_damage = weapon.min_damage + (0.1 * strength)
+        self.max_damage = weapon.max_damage + (0.1 * strength)
 
 
     def spell_handler(self, command: str, target: Monster):
@@ -564,7 +567,9 @@ class Character(LivingThing):
         :param damage: the raw damage
         :return: the damage with the applied reduction
         """
-        reduction_percentage = self.armor / (self.armor + 400 + 85 * attacker_level)
+        armor = self.attributes[self.KEY_ARMOR]
+
+        reduction_percentage = armor / (armor + 400 + 85 * attacker_level)
         damage_to_deduct = damage.phys_dmg * reduction_percentage
         reduced_damage = damage.phys_dmg - damage_to_deduct
 
@@ -580,10 +585,9 @@ class Character(LivingThing):
                 self.max_health += buff_amount
             elif buff_type == "mana":
                 self.max_mana += buff_amount
-            elif buff_type == "strength":
-                self.strength += buff_amount
-            elif buff_type == "armor":
-                self.armor += buff_amount
+            else:
+                self.attributes[buff_type] += buff_amount
+
 
     def _deapply_buff(self, buff: BeneficialBuff):
         """ Remove the buff from the character's stats"""
@@ -597,10 +601,8 @@ class Character(LivingThing):
             elif buff_type == "mana":
                 # TODO: Reduce mana method to reduce active mana too
                 self.max_mana -= buff_amount
-            elif buff_type == "strength":
-                self.strength -= buff_amount
-            elif buff_type == "armor":
-                self.armor -= buff_amount
+            else:
+                self.attributes[buff_type] -= buff_amount
 
     def _die(self):
         super()._die()
@@ -766,13 +768,13 @@ class Character(LivingThing):
         # access the dictionary holding the appropriate value increases for each level
         hp_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_HEALTH]
         mana_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_MANA]
-        strength_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_STRENGTH]
-        armor_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_ARMOR]
+        strength_increase_amount = current_level_stats[self.KEY_STRENGTH]
+        armor_increase_amount = current_level_stats[self.KEY_ARMOR]
 
         self.max_health += hp_increase_amount
         self.max_mana += mana_increase_amount
-        self.strength += strength_increase_amount
-        self.armor += armor_increase_amount
+        self.attributes[self.KEY_STRENGTH] += strength_increase_amount
+        self.attributes[self.KEY_ARMOR] += armor_increase_amount
         self._regenerate()  # regen to full hp/mana
 
         print('*' * 20)

@@ -42,6 +42,7 @@
 - [x] Add Holyheal
 - [x] Add ProtectiveHeal
 - [x] Add spell cooldowns and a way to handle them
+- [x] Store player's attributes (mana,hp etc) in a dictionary (easier application of buffs that way, will remove if checks)
 
 # Low Priority TODOs
 - Add more content(monster, zone/subzones, npcs, items, vendors, spells and etc)
@@ -52,7 +53,6 @@
 - Print Equipment
 - Print Stats (hp, mana, xp and everything else at once)
 - Add item gossip text
-- Store player's attributes (mana,hp etc) in a dictionary (easier application of buffs that way, will remove if checks)
 - Fix bug where when we attack a monster, the monster's absorption does not get printed.
 
 # TODOs
