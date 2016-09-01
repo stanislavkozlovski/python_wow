@@ -386,6 +386,9 @@ class Monster(LivingThing):
         populates the creature's self.loot dictionary that will hold the dropped loot
         """
         # loot_list is a list of tuples containing (item_ID(int), drop_chance(1-100))
+        if not self.loot_table_ID:
+            return
+
         loot_list = load_loot_table(monster_loot_table_ID=self.loot_table_ID)
 
         for item_ID, item_drop_chance in loot_list:
