@@ -5,7 +5,7 @@ from information_printer import print_live_monsters, print_live_npcs, welcome_pr
 from zones.zone import Zone
 from items import Weapon
 from zones.elwynn_forest import ElwynnForest
-GAME_VERSION = '0.0.48 ALPHA'
+GAME_VERSION = '0.0.49 ALPHA'
 ZONES = {"Elwynn Forest": ElwynnForest()}
 
 

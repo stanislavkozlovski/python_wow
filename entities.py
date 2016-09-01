@@ -490,6 +490,8 @@ class Character(LivingThing):
 
             self.equip_weapon(item)
 
+        self._calculate_stats_formulas()  # always recalculate formulas when adding an item
+
     def consume_item(self, item: Item):
         """
         This method consumes a consumable item and processes the item's effect
@@ -514,13 +516,25 @@ class Character(LivingThing):
     def equip_weapon(self, weapon: Weapon):
         print("{} has equipped Weapon {}".format(self.name, weapon.name))
         self.equipped_weapon = weapon
-        self._calculate_damage(self.equipped_weapon)
+        self._calculate_stats_formulas()
 
-    def _calculate_damage(self, weapon: Weapon):
-        # current formula for damage is: wep_dmg * 0.1 * strength
+    def _calculate_stats_formulas(self):
+        """
+        Whenever we level up or equip an item, our stats are changed.
+        According to that change, we need to recalculate the formulas in which those stats are used in.
+        """
+
+        # formula for agility is: for each point of agility, add 2.5 armor and 0.5 strength
+        agility = self.attributes[self.KEY_AGILITY]
+        self.attributes[self.KEY_STRENGTH] += agility * 0.5
+        self.attributes[self.KEY_ARMOR] += agility * 2.5
+
+        "Now we need to update our damage, because the strength might have been changed"
+
+        # current formula for damage is: wep_dmg * 0.4 * strength
         strength = self.attributes[self.KEY_STRENGTH]
-        self.min_damage = weapon.min_damage + (0.4 * strength)
-        self.max_damage = weapon.max_damage + (0.4 * strength)
+        self.min_damage = self.equpped_weapon.min_damage + (0.4 * strength)
+        self.max_damage = self.equipped_weapon.max_damage + (0.4 * strength)
 
 
     def spell_handler(self, command: str, target: Monster):
@@ -592,6 +606,10 @@ class Character(LivingThing):
             else:
                 self.attributes[buff_type] += buff_amount
 
+            self._calculate_stats_formulas()  # always recalculate the formulas when stats are changed
+
+
+
 
     def _deapply_buff(self, buff: BeneficialBuff):
         """ Remove the buff from the character's stats"""
@@ -607,6 +625,8 @@ class Character(LivingThing):
                 self.max_mana -= buff_amount
             else:
                 self.attributes[buff_type] -= buff_amount
+
+            self._calculate_stats_formulas()  # always recalculate the formulas when stats are changed
 
     def _die(self):
         super()._die()
@@ -781,7 +801,7 @@ class Character(LivingThing):
         self.attributes[self.KEY_STRENGTH] += strength_increase_amount
         self.attributes[self.KEY_ARMOR] += armor_increase_amount
         self.attributes[self.KEY_AGILITY] += agility_increase_amount
-        self._calculate_damage(self.equipped_weapon)
+        self._calculate_stats_formulas()  # recalculate formulas with stats
         self._regenerate()  # regen to full hp/mana
 
         print('*' * 20)
