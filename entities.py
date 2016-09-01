@@ -781,6 +781,7 @@ class Character(LivingThing):
         self.attributes[self.KEY_STRENGTH] += strength_increase_amount
         self.attributes[self.KEY_ARMOR] += armor_increase_amount
         self.attributes[self.KEY_AGILITY] += agility_increase_amount
+        self._calculate_damage(self.equipped_weapon)
         self._regenerate()  # regen to full hp/mana
 
         print('*' * 20)
