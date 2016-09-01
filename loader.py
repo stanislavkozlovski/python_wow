@@ -34,7 +34,7 @@ from database_info import \
      DBINDEX_SPELL_DOTS_DAMAGE_SCHOOL,
 
      DBINDEX_LEVELUP_STATS_LEVEL, DBINDEX_LEVELUP_STATS_HEALTH, DBINDEX_LEVELUP_STATS_MANA,
-     DBINDEX_LEVELUP_STATS_STRENGTH, DBINDEX_LEVELUP_STATS_ARMOR,
+     DBINDEX_LEVELUP_STATS_STRENGTH, DBINDEX_LEVELUP_STATS_AGILITY, DBINDEX_LEVELUP_STATS_ARMOR,
 
      DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
      )
@@ -572,13 +572,14 @@ def load_dot(dot_id: int, level: int) -> DoT:
 def load_character_level_stats() -> dict:
     """
     Read the table file holding information about the amount of stats you should get according to the level you've attained
-    1 - level; 2 - hp; 3 - mana; 4 - strength; 5 - armor;
+    1 - level; 2 - hp; 3 - mana; 4 - strength; 5 - agility, 6 - armor;
     :returns A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
     """
     key_level_stats_health = 'health'
     key_level_stats_mana = 'mana'
     key_level_stats_strength = 'strength'
     key_level_stats_armor = 'armor'
+    key_level_stats_agility = 'agility'
 
     level_stats = {}
     with sqlite3.connect(DB_PATH) as connection:
@@ -592,11 +593,13 @@ def load_character_level_stats() -> dict:
             hp = line[DBINDEX_LEVELUP_STATS_HEALTH]   # type: int
             mana = line[DBINDEX_LEVELUP_STATS_MANA]  # type: int
             strength = line[DBINDEX_LEVELUP_STATS_STRENGTH]  # type: int
+            agility = line[DBINDEX_LEVELUP_STATS_AGILITY]
             armor = line[DBINDEX_LEVELUP_STATS_ARMOR]  # type: int
 
             level_dict[key_level_stats_health] = hp
             level_dict[key_level_stats_mana] = mana
             level_dict[key_level_stats_strength] = strength
+            level_dict[key_level_stats_agility] = agility
             level_dict[key_level_stats_armor] = armor
 
             level_stats[level] = level_dict

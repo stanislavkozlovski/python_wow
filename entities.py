@@ -437,11 +437,11 @@ class Character(LivingThing):
     KEY_LEVEL_STATS_MANA = 'mana'
     KEY_STRENGTH = 'strength'
     KEY_ARMOR = 'armor'
+    KEY_AGILITY = 'agility'
     spell_cooldowns = {}  # dictionary that holds Key: Spell Name(str), Value: It's cooldown in turns (int)
-    attributes = {KEY_STRENGTH: 0, KEY_ARMOR: 0}  # dictionary holding attributes, KEY: strength, Value: 5
+    attributes = {KEY_STRENGTH: 0, KEY_ARMOR: 0, KEY_AGILITY: 0}  # dictionary holding attributes, KEY: strength, Value: 5
 
-
-    def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1):
+    def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1):
         super().__init__(name, health, mana, level=1)
         self.min_damage = 0
         self.max_damage = 1
@@ -449,6 +449,7 @@ class Character(LivingThing):
         self.experience = 0
         self.xp_req_to_level = 400
         self.attributes[self.KEY_ARMOR] = 75
+        self.attributes[self.KEY_AGILITY] = agility
         self.attributes[self.KEY_STRENGTH] = strength
         self.current_zone = "Elwynn Forest"
         self.current_subzone = "Northshire Valley"
@@ -772,12 +773,14 @@ class Character(LivingThing):
         hp_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_HEALTH]
         mana_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_MANA]
         strength_increase_amount = current_level_stats[self.KEY_STRENGTH]
+        agility_increase_amount = current_level_stats[self.KEY_AGILITY]
         armor_increase_amount = current_level_stats[self.KEY_ARMOR]
 
         self.max_health += hp_increase_amount
         self.max_mana += mana_increase_amount
         self.attributes[self.KEY_STRENGTH] += strength_increase_amount
         self.attributes[self.KEY_ARMOR] += armor_increase_amount
+        self.attributes[self.KEY_AGILITY] += agility_increase_amount
         self._regenerate()  # regen to full hp/mana
 
         print('*' * 20)
@@ -786,6 +789,7 @@ class Character(LivingThing):
         print("Health Points increased by {}".format(hp_increase_amount))
         print("Mana Points increased by {}".format(mana_increase_amount))
         print("Strength Points increased by {}".format(strength_increase_amount))
+        print("Agility Points increased by {}".format(agility_increase_amount))
         print('*' * 20)
 
     def print_quest_log(self):
