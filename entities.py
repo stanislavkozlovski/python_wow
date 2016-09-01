@@ -518,8 +518,8 @@ class Character(LivingThing):
     def _calculate_damage(self, weapon: Weapon):
         # current formula for damage is: wep_dmg * 0.1 * strength
         strength = self.attributes[self.KEY_STRENGTH]
-        self.min_damage = weapon.min_damage + (0.1 * strength)
-        self.max_damage = weapon.max_damage + (0.1 * strength)
+        self.min_damage = weapon.min_damage + (0.4 * strength)
+        self.max_damage = weapon.max_damage + (0.4 * strength)
 
 
     def spell_handler(self, command: str, target: Monster):
