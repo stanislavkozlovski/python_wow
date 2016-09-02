@@ -9,6 +9,7 @@ from zones.zone import Zone, SubZone
 
 
 class NorthshireAbbey(Zone):
+    GUID_GARRY_PADFOOT = 14  # The GUID of Garry Padfoot
     # the _map that shows us where we can go from our current subzone
     zone_map = {"Northshire Valley": ["Northshire Vineyards"],
                 "Northshire Vineyards": ["Northshire Valley", "A Peculiar Hut"],
@@ -44,6 +45,13 @@ class NorthshireAbbey(Zone):
                 # Before moving:
                 # update the information for our current in case we've killed monsters or done quests for example
                 self._update_subzone_attributes(current_subzone)
+
+                if destination == "A Peculiar Hut":
+                    # this means we are in Northshire Vineyards
+                    if self.GUID_GARRY_PADFOOT in self.cs_alive_monsters.keys():  # if garry padfoot is alive
+                        print("Garrick Padfoot is blocking the way.")
+                        return 0
+
 
                 if not self.loaded_zones[destination]:  # if we don't have the destination's attributes loaded load them
                     self._load_zone(destination)

@@ -192,6 +192,11 @@ def handle_open_inventory_command(character):
 def handle_go_to_command(command: str, character, zone_object: Zone):
     destination = command[6:]
 
+    """
+    move_player will usually return a boolean if we can initiate the move or not.
+    However, there's a special case: If it returns 0, it means that we cannot initiate the move and that the
+    printing is handled by the method itself.
+    """
     valid_move = zone_object.move_player(character.current_subzone, destination)
 
     if valid_move:
@@ -202,7 +207,7 @@ def handle_go_to_command(command: str, character, zone_object: Zone):
         print("Moved to {0}".format(character.current_subzone))
         print_live_npcs(zone_object, print_all=True)
         print_live_monsters(zone_object)
-    else:
+    elif isinstance(valid_move, bool) and not valid_move:  # see comment above on why we check if it's a bool
         print("No such destination as {} that is connected to your current subzone.".format(destination))
 
 
