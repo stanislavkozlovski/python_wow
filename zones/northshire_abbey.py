@@ -82,6 +82,13 @@ class NorthshireAbbey(Zone):
                                                      parent_zone_name=self.zone_name,
                                                      zone_map=self.zone_map[subzone])
 
+    def engage_zone_entered_script(self, character):
+        subzone = character.current_subzone
+
+        if subzone == "A Peculiar Hut" and not self.loaded_zones[subzone].has_loaded_on_zone_entry_script():
+            # only A Peculiar Hut has a script that starts on the first entry
+            self.loaded_zones[subzone].load_on_zone_entry_script(character)
+
 
 class NorthshireValley(SubZone):
     pass
@@ -92,4 +99,46 @@ class NorthshireVineyards(SubZone):
 
 
 class PeculiarHut(SubZone):
-    pass
+    GUID_BROTHER_PAXTON = 15
+    GUID_BROTHER_HASKEL = 16
+
+    def __init__(self, name: str, parent_zone_name: str, zone_map: list):
+        super().__init__(name, parent_zone_name, zone_map)
+
+    def load_on_zone_entry_script(self, character):
+        from time import sleep
+        import combat
+
+        # TODO: Move to a separate module
+        self.loaded_on_zone_entry_script = True
+
+        print("*" * 40)
+        print("Brother Haskel says: Everything is going according to plan, I have set you up a meeting with the Archbishop in three weeks.")
+        sleep(3)
+        print("Brother Paxton says: It will be an honor for me.")
+        sleep(2.5)
+        print("Brother Haskel says: All these years have led to this, you have better be prepared, Pax.")
+        sleep(3)
+        print("Brother Paxton says: I did not spend ten years in Ravenholdt for nothing. Benedictus' end will bring forth a massive expedition to avenge him, I only fear if the Brotherhood will be able to withstand it.")
+        sleep(4)
+        print("Brother Haskel says: I have complete trust in Edwin's plans. Your sacrifice will play a key role in our mission and for that you have my respect.")
+        sleep(3)
+        print("{char_name} says: Unbelievable, the two of you work for the Defias?!".format(char_name=character.name))
+        sleep(2.5)
+
+        # engage combat with Paxton
+        brother_paxton = self._alive_monsters[self.GUID_BROTHER_PAXTON]
+        combat.engage_combat(character, brother_paxton, self._alive_monsters, self._monster_guid_name_set, self.GUID_BROTHER_PAXTON)
+
+        print("Brother Haskel says: You have not seen the last of the Brotherhood, {char_name}!".format(char_name=character.name))
+        sleep(2)
+        print("Haskel drops a smoke bomb!")
+        sleep(0.5)
+        print("Smoke fills the hut...")
+        sleep(2)
+        print("When the smoke clears, you see that the traitor is nowhere in sight...")
+        print()
+
+        del self._alive_monsters[self.GUID_BROTHER_HASKEL]
+        self._monster_guid_name_set.remove((self.GUID_BROTHER_HASKEL, "Brother Haskel"))
+

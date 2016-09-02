@@ -43,6 +43,8 @@
 - [x] Add ProtectiveHeal
 - [x] Add spell cooldowns and a way to handle them
 - [x] Store player's attributes (mana,hp etc) in a dictionary (easier application of buffs that way, will remove if checks)
+- [x] Add entry to A Peculiar Hut possible only if you've killed Garrick Padfoot
+- [x] Add scripted event (brotherhood traitors talking) in A Peculiar Hut
 
 # Low Priority TODOs
 - Add more content(monster, zone/subzones, npcs, items, vendors, spells and etc)
@@ -57,8 +59,6 @@
 
 # TODOs
 - Add documentation!
-- Add entry to A Peculiar Hut possible only if you've killed Garrick Padfoot
-- Add scripted event (brotherhood traitors talking) in A Peculiar Hut
 - Add some kind of armor item type (Head, etc)
 - Add another class of choice. (Mage is on my mind)
 - Sell option to sell items to vendors
