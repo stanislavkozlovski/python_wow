@@ -80,8 +80,19 @@ class Zone:
         """
         return self.cs_map
 
+    def engage_zone_entered_script(self, character):
+        """
+        if there is a script to do when you've entered the zone, here is where you put it
+        :param subzone:
+        :return:
+        """
+        pass
+
 
 class SubZone:
+    # tracks if we've loaded a script on zone entry, doesn't matter if we have a script to load or not
+    loaded_on_zone_entry_script = False
+
     def __init__(self, name: str, parent_zone_name: str, zone_map: list):
         self.name = name
         self.parent_zone_name = parent_zone_name
@@ -90,6 +101,17 @@ class SubZone:
         self._alive_monsters, self._monster_guid_name_set = load_monsters(self.parent_zone_name, self.name)
         self._alive_npcs, self._npc_guid_name_set = load_npcs(self.parent_zone_name, self.name)
         self._quest_list = load_quests(self.parent_zone_name, self.name)
+
+    def load_on_zone_entry_script(self, character):
+        """
+        This loads and executes the script we have for the zone
+        each zone is left to implement it's own unique script here or import
+        it from some module
+        """
+        pass
+
+    def has_loaded_on_zone_entry_script(self) -> bool:
+        return self.loaded_on_zone_entry_script
 
     def get_monsters(self):
         """
@@ -112,6 +134,9 @@ class SubZone:
         """
         return self._quest_list
 
+    def get_map_directions(self):  # return the zone _map holding the connections of sub_zones
+        return self._map
+
     def update_monsters(self, alive_monsters: dict, guid_name_set: set):
         self._alive_monsters = alive_monsters
         self._monster_guid_name_set = guid_name_set
@@ -123,5 +148,3 @@ class SubZone:
     def update_quests(self, quests: dict):
         self._quest_list = quests
 
-    def get_map_directions(self):  # return the zone _map holding the connections of sub_zones
-        return self._map

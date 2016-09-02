@@ -205,6 +205,9 @@ def handle_go_to_command(command: str, character, zone_object: Zone):
 
         # update _map directions
         print("Moved to {0}".format(character.current_subzone))
+
+        zone_object.engage_zone_entered_script(character) # engage a script if there is one
+
         print_live_npcs(zone_object, print_all=True)
         print_live_monsters(zone_object)
     elif isinstance(valid_move, bool) and not valid_move:  # see comment above on why we check if it's a bool
