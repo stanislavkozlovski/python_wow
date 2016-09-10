@@ -430,6 +430,22 @@ class Monster(LivingThing):
             (2,5) meaning this creature should give from 2-5 gold, picked at random"""
         return random.randint(min_max_gold[0], min_max_gold[1])
 
+    def say_gossip(self):
+        if self.gossip:
+            intonation = ''  # type: str
+            punctuation_mark = self.gossip[-1]
+
+            if punctuation_mark == '!':
+                intonation = 'yells'
+            elif punctuation_mark == '?':
+                intonation = 'asks'
+            else:
+                intonation = 'says'
+
+            print("{monster} {verb}: {gossip}".format(monster=self.name,
+                                                      verb=intonation,
+                                                      gossip=self.gossip))
+
 
 class Character(LivingThing):
     # keys are used to access the level_stats dictionary that holds information on stats to update on each level up
