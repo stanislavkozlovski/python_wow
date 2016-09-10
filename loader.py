@@ -109,6 +109,8 @@ def load_monsters(zone: str, subzone: str) -> tuple:
             creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID]  # type: int
             if not creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID] is None else 0)
 
+            creature_template_gossip = creature_template_info[DBINDEX_CREATURE_TEMPLATE_GOSSIP]  # type: str
+
             # save into the set
             guid_name_set.add((creature_guid, creature_template_name))
             # save into the dict
@@ -120,7 +122,8 @@ def load_monsters(zone: str, subzone: str) -> tuple:
                                                    min_damage=creature_template_min_dmg,
                                                    max_damage=creature_template_max_dmg,
                                                    quest_relation_id=creature_template_quest_relation_ID,
-                                                   loot_table_ID=creature_template_loot_table_ID)
+                                                   loot_table_ID=creature_template_loot_table_ID,
+                                                   gossip=creature_template_gossip)
 
 
 
