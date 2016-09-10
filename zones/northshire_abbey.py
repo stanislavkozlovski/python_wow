@@ -6,6 +6,7 @@ to have dead creatures stay dead, not be reloaded
 the cs in cs_alive_monsters and similar names stands for Current Subzone
 """
 from zones.zone import Zone, SubZone
+from scripts.zones.northshire_abbey.a_peculiar_hut.haskel_paxton_conversation import script as on_entry_script
 
 
 class NorthshireAbbey(Zone):
@@ -106,39 +107,5 @@ class PeculiarHut(SubZone):
         super().__init__(name, parent_zone_name, zone_map)
 
     def load_on_zone_entry_script(self, character):
-        from time import sleep
-        import combat
-
-        # TODO: Move to a separate module
         self.loaded_on_zone_entry_script = True
-
-        print("*" * 40)
-        print("Brother Haskel says: Everything is going according to plan, I have set you up a meeting with the Archbishop in three weeks.")
-        sleep(3)
-        print("Brother Paxton says: It will be an honor for me.")
-        sleep(2.5)
-        print("Brother Haskel says: All these years have led to this, you have better be prepared, Pax.")
-        sleep(3)
-        print("Brother Paxton says: I did not spend ten years in Ravenholdt for nothing. Benedictus' end will bring forth a massive expedition to avenge him, I only fear if the Brotherhood will be able to withstand it.")
-        sleep(4)
-        print("Brother Haskel says: I have complete trust in Edwin's plans. Your sacrifice will play a key role in our mission and for that you have my respect.")
-        sleep(3)
-        print("{char_name} says: Unbelievable, the two of you work for the Defias?!".format(char_name=character.name))
-        sleep(2.5)
-
-        # engage combat with Paxton
-        brother_paxton = self._alive_monsters[self.GUID_BROTHER_PAXTON]
-        combat.engage_combat(character, brother_paxton, self._alive_monsters, self._monster_guid_name_set, self.GUID_BROTHER_PAXTON)
-
-        print("Brother Haskel says: You have not seen the last of the Brotherhood, {char_name}!".format(char_name=character.name))
-        sleep(2)
-        print("Haskel drops a smoke bomb!")
-        sleep(0.5)
-        print("Smoke fills the hut...")
-        sleep(2)
-        print("When the smoke clears, you see that the traitor is nowhere in sight...")
-        print()
-
-        del self._alive_monsters[self.GUID_BROTHER_HASKEL]
-        self._monster_guid_name_set.remove((self.GUID_BROTHER_HASKEL, "Brother Haskel"))
-
+        on_entry_script(self, character)
