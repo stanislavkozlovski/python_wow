@@ -45,6 +45,7 @@
 - [x] Store player's attributes (mana,hp etc) in a dictionary (easier application of buffs that way, will remove if checks)
 - [x] Add entry to A Peculiar Hut possible only if you've killed Garrick Padfoot
 - [x] Add scripted event (brotherhood traitors talking) in A Peculiar Hut
+- [x] Monster gossip on attack
 
 # Low Priority TODOs
 - Add more content(monster, zone/subzones, npcs, items, vendors, spells and etc)
@@ -63,7 +64,6 @@
 - Add another class of choice. (Mage is on my mind)
 - Sell option to sell items to vendors
 - Add armor to monsters
-- Monster gossip on attack
 - Add the ability to save the character
 
 - Add a scripted NPC to the game

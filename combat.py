@@ -27,6 +27,10 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
 
     character.enter_combat()
     monster.enter_combat()
+    if(monster.gossip):  # if the monster has gossip
+        from time import sleep
+        monster.say_gossip()
+        sleep(2)
 
     while character.is_in_combat():
         # We start off the combat with the monster dealing the first blow
