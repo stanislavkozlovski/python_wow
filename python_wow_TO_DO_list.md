@@ -70,6 +70,6 @@
 
 - Implement HoTs (heal over time effects)
 - Add NatureHeal
-
+- Create one shared creature_default DB table holding all the default values for creatures at a certain level (gold, xp, armor)
 - Add different kinds of damage
 - Create more damage classes, each with it's own flavour. (Destruction leaves off a DoT, Sinister has a chance to strike again, Merciless has a chance to crit and others without flavor (holy, frost, fire etc))

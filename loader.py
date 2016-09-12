@@ -24,7 +24,8 @@ from database_info import \
      DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP,
 
      DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MIN_GOLD_REWARD,
-     DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MAX_GOLD_REWARD,
+     DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MAX_GOLD_REWARD, DBINDEX_CREATURE_DEFAULT_ARMOR_LEVEL,
+     DBINDEX_CREATURE_DEFAULT_ARMOR_ARMOR,
 
      DBINDEX_SPELL_BUFFS_NAME, DBINDEX_SPELL_BUFFS_DURATION, DBINDEX_SPELL_BUFFS_STAT1, DBINDEX_SPELL_BUFFS_AMOUNT1,
      DBINDEX_SPELL_BUFFS_STAT2, DBINDEX_SPELL_BUFFS_AMOUNT2, DBINDEX_SPELL_BUFFS_STAT3, DBINDEX_SPELL_BUFFS_AMOUNT3,
@@ -348,6 +349,34 @@ def load_creature_xp_rewards() -> dict:
             xp_reward_dict[level] = xp_reward
 
     return xp_reward_dict
+
+
+def load_creature_default_armor() -> dict:
+    """
+        Load the default armor that a creature should have at a certain level.
+        The table's contents are as follows:
+        Level, Armor
+            1,     50
+            2,     65
+            etc...
+
+        :return: A dictionary as follows: Key: Level, Value: Armor
+                                                   1,         50
+        """
+
+    default_armor_dict = {}
+
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        default_armor_reader = cursor.execute("SELECT * FROM creature_default_armor")
+
+        for line in default_armor_reader:
+            level = line[DBINDEX_CREATURE_DEFAULT_ARMOR_LEVEL]
+            armor = line[DBINDEX_CREATURE_DEFAULT_ARMOR_ARMOR]
+
+            default_armor_dict[level] = armor
+
+    return default_armor_reader
 
 
 def load_creature_gold_reward() -> dict:
