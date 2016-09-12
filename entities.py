@@ -34,7 +34,7 @@ class LivingThing:
     """
     This is the base class for all things _alive - characters, monsters and etc.
     """
-
+    KEY_ARMOR = 'armor';
     def __init__(self, name: str, health: int = 1, mana: int = 1, level: int = 1):
         self.name = name
         self.health = health
@@ -43,6 +43,7 @@ class LivingThing:
         self.max_mana = mana
         self.level = level
         self.absorption_shield = 0
+        self.attributes = {self.KEY_ARMOR: 0}
         self._alive = True
         self._in_combat = False
         self.buffs = {}  # dict Key: an instance of class Buff, Value: The turns it has left to be active, int
@@ -160,6 +161,22 @@ class LivingThing:
             elif buff_type == "mana":
                 # TODO: Reduce mana method to reduce active mana too
                 self.max_mana -= buff_amount
+
+
+    def _apply_armor_reduction(self, damage: Damage, attacker_level: int) -> Damage:
+        """
+        This method applies the armor reduction to a blow, the formula is as follows:
+        Percentage to Reduce = Armor / (Armor + 400 + 85 * Attacker_Level)
+        :param damage: the raw damage
+        :return: the damage with the applied reduction
+        """
+        armor = self.attributes[self.KEY_ARMOR]
+
+        reduction_percentage = armor / (armor + 400 + 85 * attacker_level)
+        damage_to_deduct = damage.phys_dmg * reduction_percentage
+        reduced_damage = damage.phys_dmg - damage_to_deduct
+
+        return Damage(phys_dmg=reduced_damage, magic_dmg=damage.magic_dmg)
 
     def _regenerate(self):
         self.health = self.max_health
@@ -342,18 +359,20 @@ class VendorNPC(FriendlyNPC):
 
 class Monster(LivingThing):
     def __init__(self, monster_id: int, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id=0, loot_table_ID: int = 0, gossip = ''):
+                 max_damage: int = 1, quest_relation_id=0, loot_table_ID: int = 0, armor: int=0, gossip = ''):
         super().__init__(name, health, mana, level)
         self.monster_id = monster_id
         self.level = level
         self.min_damage = min_damage
         self.max_damage = max_damage
         self.xp_to_give = lookup_xp_reward(self.level)
+        self.attributes[self.KEY_ARMOR] = armor
         self.gossip = gossip
         self._gold_to_give = self._calculate_gold_reward(lookup_gold_reward(self.level))
         self.quest_relation_ID = quest_relation_id
         self.loot_table_ID = loot_table_ID
         self.loot = {"gold": self._gold_to_give}  # dict Key: str, Value: Item class object
+        # TODO: Add defualt monster armor for their level
 
     def __str__(self):
         colored_name = colored(self.name, color="red")
@@ -376,8 +395,9 @@ class Monster(LivingThing):
 
         victim.take_attack(self.name, monster_swing, self.level)
 
-    def take_attack(self, damage: Damage):
-        self._apply_damage_absorption(damage)
+    def take_attack(self, damage: Damage, attacker_level: int):
+        damage = self._apply_armor_reduction(damage, attacker_level)
+        damage = self._apply_damage_absorption(damage)
         self._subtract_health(damage)
 
     def _drop_loot(self):
@@ -593,21 +613,6 @@ class Character(LivingThing):
                                                                              dot_dmg=dot_proc_damage,
                                                                              dot_name=dot.name))
         self._subtract_health(dot_proc_damage)
-
-    def _apply_armor_reduction(self, damage: Damage, attacker_level: int) -> Damage:
-        """
-        This method applies the armor reduction to a blow, the formula is as follows:
-        Percentage to Reduce = Armor / (Armor + 400 + 85 * Attacker_Level)
-        :param damage: the raw damage
-        :return: the damage with the applied reduction
-        """
-        armor = self.attributes[self.KEY_ARMOR]
-
-        reduction_percentage = armor / (armor + 400 + 85 * attacker_level)
-        damage_to_deduct = damage.phys_dmg * reduction_percentage
-        reduced_damage = damage.phys_dmg - damage_to_deduct
-
-        return Damage(phys_dmg=reduced_damage, magic_dmg=damage.magic_dmg)
 
     def _apply_buff(self, buff: BeneficialBuff):
         """ Add the buff to the character's stats"""

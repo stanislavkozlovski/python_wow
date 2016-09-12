@@ -217,7 +217,7 @@ class Paladin(Character):
             self._spell_trigger_cd(self.KEY_MELTING_STRIKE)
             # damage the target and add the DoT
             print("{spell} damages {tar} for {dmg}!".format(spell=self.KEY_MELTING_STRIKE, tar=target.name, dmg=damage))
-            target.take_attack(damage)
+            target.take_attack(damage, self.level)
             target.add_buff(dot)
 
         return cast_is_successful
@@ -263,7 +263,7 @@ class Paladin(Character):
         else:
             print("{0} attacks {1} for {2}!".format(self.name, victim.name, auto_attack))
 
-        victim.take_attack(auto_attack)
+        victim.take_attack(auto_attack, self.level)
 
     def _check_enough_mana(self, mana_cost: int) -> bool:
         """
