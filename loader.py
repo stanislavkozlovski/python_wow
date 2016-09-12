@@ -8,6 +8,7 @@ from database_info import \
      DBINDEX_CREATURE_TEMPLATE_MIN_DMG, DBINDEX_CREATURE_TEMPLATE_MAX_DMG,
      DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID, DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID,
      DBINDEX_CREATURE_TEMPLATE_GOSSIP, DBINDEX_CREATURE_TEMPLATE_ENTRY, DBINDEX_CREATURE_TEMPLATE_TYPE,
+     DBINDEX_CREATURE_TEMPLATE_ARMOR,
 
      DBINDEX_NPC_VENDOR_ITEM_COUNT, DBINDEX_NPC_VENDOR_ITEM_ID, DBINDEX_NPC_VENDOR_PRICE,
 
@@ -58,8 +59,8 @@ def load_monsters(zone: str, subzone: str) -> tuple:
 
         creature_template table is as follows:
 
-        creature entry, creature name,      type,   level, hp, mana, min_dmg, max_dmg, quest_relation_ID, loot_table,ID,      gossip
-                    1, Zimbab       ,   "monster"       1, 10,   10,       2,       4                  1,             1, "Hey there"
+        creature entry, creature name,      type,   level, hp, mana, armor, min_dmg, max_dmg, quest_relation_ID, loot_table,ID,      gossip
+                    1, Zimbab       ,   "monster"       1, 10,   10,   50,       2,       4                  1,             1, "Hey there"
 
         type is "monster" meaning this is a hostile NPC
         Creature Level: 1 Zimbab, HP: 10, MANA: 10, Damage: 2-4.
@@ -100,6 +101,7 @@ def load_monsters(zone: str, subzone: str) -> tuple:
             creature_template_health = creature_template_info[DBINDEX_CREATURE_TEMPLATE_HEALTH]  # type: int
             creature_template_mana = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MANA]  # type: int
             creature_template_min_dmg = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MIN_DMG]  # type: int
+            creature_template_armor = creature_template_info[DBINDEX_CREATURE_TEMPLATE_ARMOR]
             creature_template_max_dmg = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MAX_DMG]  # type: int
 
             creature_template_quest_relation_ID = (
@@ -119,6 +121,7 @@ def load_monsters(zone: str, subzone: str) -> tuple:
                                                    name=creature_template_name,
                                                    health=creature_template_health,
                                                    mana=creature_template_mana,
+                                                   armor=creature_template_armor,
                                                    level=creature_template_level,
                                                    min_damage=creature_template_min_dmg,
                                                    max_damage=creature_template_max_dmg,
