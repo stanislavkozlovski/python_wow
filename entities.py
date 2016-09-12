@@ -8,7 +8,7 @@ from termcolor import colored
 from items import  Item, Weapon, Potion
 from loader import (load_creature_xp_rewards, load_character_level_stats,
                     load_character_xp_requirements, load_creature_gold_reward,
-                    load_loot_table, load_item, load_vendor_inventory)
+                    load_loot_table, load_item, load_vendor_inventory, load_creature_default_armor)
 from quest import Quest, FetchQuest
 from damage import Damage
 from buffs import BeneficialBuff, DoT
@@ -18,7 +18,7 @@ from exceptions import ItemNotInInventoryError
 # key: level(int), value: xp reward(int)
 CREATURE_XP_REWARD_DICTIONARY = load_creature_xp_rewards()
 CREATURE_GOLD_REWARD_DICTIONARY = load_creature_gold_reward()
-
+CREATURE_DEFAULT_ARMOR_DICTIONARY = load_creature_default_armor()
 
 def lookup_xp_reward(level: int) -> int:
     """ Return the appropriate XP reward associated with the given level"""
@@ -28,6 +28,10 @@ def lookup_xp_reward(level: int) -> int:
 def lookup_gold_reward(level: int) -> tuple:
     """ Return a tuple that has the minimum and maximum gold amount a creature of certain level should give"""
     return CREATURE_GOLD_REWARD_DICTIONARY[level]
+
+def lookup_default_creature_armor(level: int) -> int:
+    """ Return the default armor value that a monster of the given level should have"""
+    return CREATURE_DEFAULT_ARMOR_DICTIONARY[level]
 
 
 class LivingThing:
@@ -366,7 +370,7 @@ class Monster(LivingThing):
         self.min_damage = min_damage
         self.max_damage = max_damage
         self.xp_to_give = lookup_xp_reward(self.level)
-        self.attributes[self.KEY_ARMOR] = armor
+        self.attributes[self.KEY_ARMOR] = armor if armor else lookup_default_creature_armor(self.level)
         self.gossip = gossip
         self._gold_to_give = self._calculate_gold_reward(lookup_gold_reward(self.level))
         self.quest_relation_ID = quest_relation_id
