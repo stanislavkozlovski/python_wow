@@ -379,7 +379,7 @@ def load_creature_default_armor() -> dict:
 
             default_armor_dict[level] = armor
 
-    return default_armor_reader
+    return default_armor_dict
 
 
 def load_creature_gold_reward() -> dict:
