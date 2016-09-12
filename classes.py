@@ -257,11 +257,12 @@ class Paladin(Character):
         # the sor_damage below is used just to check for printing
         sor_damage = attacker_swing[1]  # if the seal isn't active the damage will be 0
 
+        auto_attack_print = victim.get_take_attack_damage(auto_attack, self.level)
         if sor_damage:
             print("{0} attacks {1} for {2} from {sor}!".format(self.name, victim.name,
-                                                               auto_attack, sor=self.KEY_SEAL_OF_RIGHTEOSNESS))
+                                                               auto_attack_print, sor=self.KEY_SEAL_OF_RIGHTEOSNESS))
         else:
-            print("{0} attacks {1} for {2}!".format(self.name, victim.name, auto_attack))
+            print("{0} attacks {1} for {2}!".format(self.name, victim.name, auto_attack_print))
 
         victim.take_attack(auto_attack, self.level)
 

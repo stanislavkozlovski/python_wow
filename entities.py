@@ -400,6 +400,12 @@ class Monster(LivingThing):
         damage = self._apply_damage_absorption(damage)
         self._subtract_health(damage)
 
+    def get_take_attack_damage(self, damage: Damage, attacker_level: int) -> Damage:
+        """ this method returns the damage that the monster will suffer after taking into account
+        armor and absorption. This is used for printing the result
+        Currently: Only armor reduction and damage absorption is applied."""
+        return self._apply_damage_absorption(self._apply_armor_reduction(damage, attacker_level))
+
     def _drop_loot(self):
         """
         This method gets the loot the monster can drop, rolls the dice on each drop chance and
