@@ -28,19 +28,31 @@ class Paladin(Character):
     KEY_SEAL_OF_RIGHTEOSNESS = "Seal of Righteousness"
     KEY_MELTING_STRIKE  = "Melting Strike"
 
-    def __init__(self, name: str, health: int = 12, mana: int = 15, strength: int = 4):
+    def __init__(self, name: str, level: int = 1, health: int = 12, mana: int = 15, strength: int = 4):
         super().__init__(name=name, health=health, mana=mana, strength=strength)
         self.min_damage = 1
         self.max_damage = 3
         self._lookup_and_handle_new_spells()
 
+        if level > 1: self._level_up(to_level=level)
+
+
     def leave_combat(self):
         super().leave_combat()
         self.SOR_ACTIVE = False  # Remove SOR aura
 
-    def _level_up(self):
-        super()._level_up()
-        self._lookup_and_handle_new_spells()
+    def _level_up(self, to_level: int=0):
+        """ This method levels the character up, if we're given a to_level we need to level up until we get to that level"""
+        if to_level:
+            # level up multiple times
+            for i in range(self.level, to_level):
+                self._level_up()
+            self.xp_req_to_level = self._lookup_next_xp_level_req()
+        else:
+            # level up once
+            super()._level_up()
+            self._lookup_and_handle_new_spells()
+
 
     def _lookup_and_handle_new_spells(self):
         """
