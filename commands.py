@@ -70,6 +70,8 @@ def pac_in_combat(character):
 def pac_vendor_dialogue():
     print("\tbuy [Item Name]")
     print("\t\tBuys the item from the vendor.\n")
+    print("\tsell [Item Name]")
+    print("\t\tSells the item to the vendor.\n")
     print("\t[Item Name] info")
     print("\t\tDisplays information about the item.\n")
     print("\texit")

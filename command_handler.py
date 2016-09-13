@@ -145,6 +145,10 @@ def handle_vendor_sale(character, vendor):
                     print("You do not have enough gold to buy {}!\n".format(item))
             else:
                 print("{} does not have {} in stock.".format(vendor.name, item))
+        elif 'sell ' in command:
+            item = command[5:]  # name of the item
+            if character.has_item(item):
+                character.sell_item(item)
         elif 'info' in command:
             item_name = command[:-5] # name of item
 
