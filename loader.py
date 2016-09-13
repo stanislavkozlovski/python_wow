@@ -1,7 +1,11 @@
 import sqlite3
 
 from database_info import \
-    (DB_PATH, DBINDEX_CREATURES_GUID, DBINDEX_CREATURES_CREATURE_ID,
+    (DB_PATH,
+
+     DBINDEX_SAVED_CHARACTER_NAME, DBINDEX_SAVED_CHARACTER_CLASS, DBINDEX_SAVED_CHARACTER_LEVEL,
+
+     DBINDEX_CREATURES_GUID, DBINDEX_CREATURES_CREATURE_ID,
 
      DBINDEX_CREATURE_TEMPLATE_NAME, DBINDEX_CREATURE_TEMPLATE_LEVEL,
      DBINDEX_CREATURE_TEMPLATE_HEALTH, DBINDEX_CREATURE_TEMPLATE_MANA,
@@ -603,6 +607,26 @@ def load_dot(dot_id: int, level: int) -> DoT:
             dot_damage = Damage(phys_dmg=dot_damage_per_tick)
 
     return DoT(name=dot_name, damage_tick=dot_damage, duration=dot_duration, caster_lvl=level)
+
+def load_saved_character(name: str):
+    """
+    This function loads the information about a saved chacacter in the saved_character DB table.
+    """
+    # TODO: Create character
+    from classes import Paladin
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        sv_char_reader = cursor.execute("SELECT * FROM saved_character WHERE name = ?", [name]).fetchone()
+
+        char_name = sv_char_reader[DBINDEX_SAVED_CHARACTER_NAME]
+        char_class = sv_char_reader[DBINDEX_SAVED_CHARACTER_CLASS]
+        char_level = sv_char_reader[DBINDEX_SAVED_CHARACTER_LEVEL]
+
+        if char_class == 'Paladin':
+            return Paladin(name=name, level=char_level)
+        else:
+            raise Exception("Unsupported class - {}".format(char_class))
+
 
 def load_character_level_stats() -> dict:
     """

@@ -5,14 +5,22 @@ from information_printer import print_live_monsters, print_live_npcs, welcome_pr
 from zones.zone import Zone
 from items import Weapon
 from zones.northshire_abbey import NorthshireAbbey
-GAME_VERSION = '0.0.4.9.1 ALPHA'
+GAME_VERSION = '0.0.4.9.4 ALPHA'
 ZONES = {"Northshire Abbey": NorthshireAbbey()}
 
+# TODO: CURRENT TASK:Add the ability to save/load the character
+#  Subtasks
+
+# TODO: Add a prompt where you choose if you want to create a new character or save one
+# TODO: Move the load character to another module
+# TODO: Save/load the quests you've done
+# TODO: Save/load special monsters that you've killed
+# TODO: Save/load scripts that you've seen
 
 def main():
     welcome_print(GAME_VERSION)
-
-    main_character = classes.Paladin(name="Netherblood")
+    from loader import load_saved_character
+    main_character = load_saved_character(name='Netherblood')
     starter_weapon = Weapon(name="Starter Weapon", min_damage=1, max_damage=3)
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))
