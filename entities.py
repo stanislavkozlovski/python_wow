@@ -487,7 +487,8 @@ class Character(LivingThing):
     spell_cooldowns = {}  # dictionary that holds Key: Spell Name(str), Value: It's cooldown in turns (int)
     attributes = {KEY_STRENGTH: 0, KEY_ARMOR: 0, KEY_AGILITY: 0}  # dictionary holding attributes, KEY: strength, Value: 5
 
-    def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1):
+    def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1,
+                 loaded_scripts: set=set()):
         super().__init__(name, health, mana, level=1)
         self.min_damage = 0
         self.max_damage = 1
@@ -499,7 +500,7 @@ class Character(LivingThing):
         self.attributes[self.KEY_STRENGTH] = strength
         self.current_zone = "Northshire Abbey"
         self.current_subzone = "Northshire Valley"
-        self.loaded_scripts = set()  # holds the scripts that the character has seen (which should load only once)
+        self.loaded_scripts = loaded_scripts  # holds the scripts that the character has seen (which should load only once)
         # A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
         self._LEVEL_STATS = load_character_level_stats()
         self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements()

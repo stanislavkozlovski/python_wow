@@ -28,8 +28,9 @@ class Paladin(Character):
     KEY_SEAL_OF_RIGHTEOSNESS = "Seal of Righteousness"
     KEY_MELTING_STRIKE  = "Melting Strike"
 
-    def __init__(self, name: str, level: int = 1, health: int = 12, mana: int = 15, strength: int = 4):
-        super().__init__(name=name, health=health, mana=mana, strength=strength)
+    def __init__(self, name: str, level: int = 1, health: int = 12, mana: int = 15, strength: int = 4,
+                 loaded_scripts: set=set()):
+        super().__init__(name=name, health=health, mana=mana, strength=strength, loaded_scripts=loaded_scripts)
         self.min_damage = 1
         self.max_damage = 3
         self._lookup_and_handle_new_spells()

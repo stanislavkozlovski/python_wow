@@ -4,6 +4,9 @@ from database_info import \
     (DB_PATH,
 
      DBINDEX_SAVED_CHARACTER_NAME, DBINDEX_SAVED_CHARACTER_CLASS, DBINDEX_SAVED_CHARACTER_LEVEL,
+     DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID,
+
+     DBINDEX_SC_LOADED_SCRIPTS_SCRIPT_NAME,
 
      DBINDEX_CREATURES_GUID, DBINDEX_CREATURES_CREATURE_ID,
 
@@ -621,12 +624,38 @@ def load_saved_character(name: str):
         char_name = sv_char_reader[DBINDEX_SAVED_CHARACTER_NAME]
         char_class = sv_char_reader[DBINDEX_SAVED_CHARACTER_CLASS]
         char_level = sv_char_reader[DBINDEX_SAVED_CHARACTER_LEVEL]
+        char_loaded_scripts_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID]
 
         if char_class == 'Paladin':
-            return Paladin(name=name, level=char_level)
+            return Paladin(name=name, level=char_level,
+                           loaded_scripts=load_saved_character_loaded_scripts(char_loaded_scripts_ID))
         else:
             raise Exception("Unsupported class - {}".format(char_class))
 
+
+def load_saved_character_loaded_scripts(id: int) -> set:
+    """
+    This function loads all the scripts that a character has loaded, which correspond to the ID of
+     saved_character_loaded_scripts table, which looks like this:
+
+     id,    script_name
+      1,     HASKELL_PRAXTON_CONVERSATION
+
+    :param id: ID identificaton in saved_character_loaded_scripts
+    :return: a set containing all the names -> {HASKEL_PRAXTON_CONVERSATION} in this case
+    """
+    loaded_scripts_set = set()
+
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+
+        loaded_scripts_reader = cursor.execute("SELECT * FROM saved_character_loaded_scripts WHERE id = ?", [id])
+
+        for loaded_script_info in loaded_scripts_reader:
+            loaded_script_name = loaded_script_info[DBINDEX_SC_LOADED_SCRIPTS_SCRIPT_NAME]
+            loaded_scripts_set.add(loaded_script_name)
+
+    return loaded_scripts_set
 
 def load_character_level_stats() -> dict:
     """
