@@ -87,7 +87,7 @@ class NorthshireAbbey(Zone):
     def engage_zone_entered_script(self, character):
         subzone = character.current_subzone
 
-        if subzone == "A Peculiar Hut" and A_PECULIAR_HUT_ENTRY_SCRIPT_NAME not in character.loaded_scripts:
+        if subzone == "A Peculiar Hut" and not character.has_loaded_script(A_PECULIAR_HUT_ENTRY_SCRIPT_NAME):
             # only A Peculiar Hut has a script that starts on the first entry
             character.loaded_script(A_PECULIAR_HUT_ENTRY_SCRIPT_NAME)
             self.loaded_zones[subzone].load_on_zone_entry_script(character)

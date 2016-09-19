@@ -905,6 +905,12 @@ class Character(LivingThing):
         """
         self.loaded_scripts.add(script_name)
 
+    def has_loaded_script(self, script_name: str) -> bool:
+        """
+        Returns a boolean whether the character has loaded the script before or not
+        """
+        return script_name in self.loaded_scripts
+
     def update_spell_cooldowns(self):
         """
         This method is called at the start of every turn
