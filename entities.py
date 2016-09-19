@@ -499,6 +499,7 @@ class Character(LivingThing):
         self.attributes[self.KEY_STRENGTH] = strength
         self.current_zone = "Northshire Abbey"
         self.current_subzone = "Northshire Valley"
+        self.loaded_scripts = set()  # holds the scripts that the character has seen (which should load only once)
         # A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
         self._LEVEL_STATS = load_character_level_stats()
         self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements()
@@ -894,6 +895,15 @@ class Character(LivingThing):
 
     def _lookup_next_xp_level_req(self):
         return self._REQUIRED_XP_TO_LEVEL[self.level]
+
+    def loaded_script(self, script_name: str):
+        """
+        This method is called whenever the character loads a script that should be loaded only once
+        It adds the script's name in the character's loaded_scripts set, which is checked every time a
+        script wants to load. Thus that script will never load again for the same character.
+        :param script_name: the name of the script
+        """
+        self.loaded_scripts.add(script_name)
 
     def update_spell_cooldowns(self):
         """

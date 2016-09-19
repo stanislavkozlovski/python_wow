@@ -90,9 +90,6 @@ class Zone:
 
 
 class SubZone:
-    # tracks if we've loaded a script on zone entry, doesn't matter if we have a script to load or not
-    loaded_on_zone_entry_script = False
-
     def __init__(self, name: str, parent_zone_name: str, zone_map: list):
         self.name = name
         self.parent_zone_name = parent_zone_name
@@ -109,9 +106,6 @@ class SubZone:
         it from some module
         """
         pass
-
-    def has_loaded_on_zone_entry_script(self) -> bool:
-        return self.loaded_on_zone_entry_script
 
     def get_monsters(self):
         """

@@ -1,6 +1,8 @@
 from time import sleep
 import combat
 
+SCRIPT_NAME = "HASKEL_PAXTON_CONVERSATION"
+
 
 def script(subzone, character):
     print("*" * 40)

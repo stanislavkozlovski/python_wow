@@ -6,7 +6,8 @@ to have dead creatures stay dead, not be reloaded
 the cs in cs_alive_monsters and similar names stands for Current Subzone
 """
 from zones.zone import Zone, SubZone
-from scripts.zones.northshire_abbey.a_peculiar_hut.haskel_paxton_conversation import script as on_entry_script
+from scripts.zones.northshire_abbey.a_peculiar_hut.haskel_paxton_conversation import SCRIPT_NAME as A_PECULIAR_HUT_ENTRY_SCRIPT_NAME\
+    , script as A_PECULIAR_HUT_ENTRY_SCRIPT
 
 
 class NorthshireAbbey(Zone):
@@ -86,8 +87,9 @@ class NorthshireAbbey(Zone):
     def engage_zone_entered_script(self, character):
         subzone = character.current_subzone
 
-        if subzone == "A Peculiar Hut" and not self.loaded_zones[subzone].has_loaded_on_zone_entry_script():
+        if subzone == "A Peculiar Hut" and A_PECULIAR_HUT_ENTRY_SCRIPT_NAME not in character.loaded_scripts:
             # only A Peculiar Hut has a script that starts on the first entry
+            character.loaded_script(A_PECULIAR_HUT_ENTRY_SCRIPT_NAME)
             self.loaded_zones[subzone].load_on_zone_entry_script(character)
 
 
@@ -107,5 +109,4 @@ class PeculiarHut(SubZone):
         super().__init__(name, parent_zone_name, zone_map)
 
     def load_on_zone_entry_script(self, character):
-        self.loaded_on_zone_entry_script = True
-        on_entry_script(self, character)
+        A_PECULIAR_HUT_ENTRY_SCRIPT(self, character)
