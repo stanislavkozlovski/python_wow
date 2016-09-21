@@ -657,6 +657,20 @@ def load_saved_character_loaded_scripts(id: int) -> set:
 
     return loaded_scripts_set
 
+def load_saved_character_killed_monsters(id: int) -> set:
+    """
+        This function loads all the monsters that a character has killed's GUIDs, which correspond to the ID of
+         saved_character_killed_monsters table, which looks like this:
+
+         id,    GUID(of monster)
+          1,     14
+          1,      7
+        IMPORTANT: This works only for monsters that by design should not be killed twice if the player restarts the game
+
+        :param id: ID identificaton in saved_character_killed_monsters
+        :return: a set containing all the GUIs -> {14, 7} in this case
+        """
+
 def load_character_level_stats() -> dict:
     """
     Read the table file holding information about the amount of stats you should get according to the level you've attained

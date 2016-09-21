@@ -18,7 +18,7 @@ class Zone:
     cs_map = []
     curr_subzone = ""
 
-    def move_player(self, current_subzone: str, destination: str):
+    def move_player(self, current_subzone: str, destination: str, character):
         """
 
         :param current_subzone: the subzone the character is in
@@ -41,7 +41,7 @@ class Zone:
         # put it back in the loaded_zones dict
         self.loaded_zones[subzone] = temp_sz_object
 
-    def _load_zone(self, subzone: str):
+    def _load_zone(self, subzone: str, dead_monsters: set):
         pass
 
     def _update_attributes(self, subzone: str):
@@ -90,7 +90,7 @@ class Zone:
 
 
 class SubZone:
-    def __init__(self, name: str, parent_zone_name: str, zone_map: list):
+    def __init__(self, name: str, parent_zone_name: str, zone_map: list, dead_monsters: set):
         self.name = name
         self.parent_zone_name = parent_zone_name
         self._map = zone_map  # the _map that shows us where we can go from here
