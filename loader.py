@@ -10,6 +10,8 @@ from database_info import \
 
      DBINDEX_SC_KILLED_MONSTERS_GUID,
 
+     DBINDEX_SC_COMPLETED_QUESTS_NAME,
+
      DBINDEX_CREATURES_GUID, DBINDEX_CREATURES_CREATURE_ID,
 
      DBINDEX_CREATURE_TEMPLATE_NAME, DBINDEX_CREATURE_TEMPLATE_LEVEL,
@@ -667,6 +669,7 @@ def load_saved_character_loaded_scripts(id: int) -> set:
 
     return loaded_scripts_set
 
+
 def load_saved_character_killed_monsters(id: int) -> set:
     """
         This function loads all the monsters that a character has killed's GUIDs, which correspond to the ID of
@@ -692,6 +695,32 @@ def load_saved_character_killed_monsters(id: int) -> set:
             killed_monsters_set.add(sc_killed_monster_GUID)
 
     return killed_monsters_set
+
+
+def load_saved_character_completed_quests(id: int) -> set:
+    """
+    This functions loads all the quests, which correspond to the ID of the saved_character_completed_quests table and
+     that a character has completed. The table looks like this:
+
+     id,  quest_name
+      1,   A Canine Menace
+      1,   Canine-Like Hunger
+
+    :param id: ID identification in the saved_character_completed_quests table
+    :return: a set containing all the names of the completed quests -> {"A Canine Menace", "Canine-Like Hunger"} in this case
+    """
+
+    completed_quests_set = set()
+
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        sc_completed_quests_reader = cursor.execute("SELECT * FROM saved_character_completed_quests WHERE id = ?", [id])
+
+        for completed_quest_info in sc_completed_quests_reader:
+            sc_completed_quest_name = completed_quest_info[DBINDEX_SC_COMPLETED_QUESTS_NAME]  # type: str
+            completed_quests_set.add(sc_completed_quest_name)
+
+    return completed_quests_set
 
 def load_character_level_stats() -> dict:
     """
