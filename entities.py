@@ -363,7 +363,8 @@ class VendorNPC(FriendlyNPC):
 
 class Monster(LivingThing):
     def __init__(self, monster_id: int, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id=0, loot_table_ID: int = 0, armor: int=0, gossip = ''):
+                 max_damage: int = 1, quest_relation_id=0, loot_table_ID: int = 0, armor: int=0, gossip: str='',
+                 respawnable: bool=False):
         super().__init__(name, health, mana, level)
         self.monster_id = monster_id
         self.level = level
@@ -372,6 +373,7 @@ class Monster(LivingThing):
         self.xp_to_give = lookup_xp_reward(self.level)
         self.attributes[self.KEY_ARMOR] = armor if armor else lookup_default_creature_armor(self.level)
         self.gossip = gossip
+        self.respawnable = respawnable  # says if the creature can ever respawn, once killed of course
         self._gold_to_give = self._calculate_gold_reward(lookup_gold_reward(self.level))
         self.quest_relation_ID = quest_relation_id
         self.loot_table_ID = loot_table_ID

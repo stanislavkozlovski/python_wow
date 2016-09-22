@@ -17,7 +17,7 @@ from database_info import \
      DBINDEX_CREATURE_TEMPLATE_MIN_DMG, DBINDEX_CREATURE_TEMPLATE_MAX_DMG,
      DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID, DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID,
      DBINDEX_CREATURE_TEMPLATE_GOSSIP, DBINDEX_CREATURE_TEMPLATE_ENTRY, DBINDEX_CREATURE_TEMPLATE_TYPE,
-     DBINDEX_CREATURE_TEMPLATE_ARMOR,
+     DBINDEX_CREATURE_TEMPLATE_ARMOR, DBINDEX_CREATURE_TEMPLATE_RESPAWNABLE,
 
      DBINDEX_NPC_VENDOR_ITEM_COUNT, DBINDEX_NPC_VENDOR_ITEM_ID, DBINDEX_NPC_VENDOR_PRICE,
 
@@ -126,6 +126,7 @@ def load_monsters(zone: str, subzone: str, character) -> tuple:
             if not creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID] is None else 0)
 
             creature_template_gossip = creature_template_info[DBINDEX_CREATURE_TEMPLATE_GOSSIP]  # type: str
+            creature_template_respawnable = bool(creature_template_info[DBINDEX_CREATURE_TEMPLATE_RESPAWNABLE])
 
             # save into the set
             guid_name_set.add((creature_guid, creature_template_name))
@@ -140,7 +141,8 @@ def load_monsters(zone: str, subzone: str, character) -> tuple:
                                                    max_damage=creature_template_max_dmg,
                                                    quest_relation_id=creature_template_quest_relation_ID,
                                                    loot_table_ID=creature_template_loot_table_ID,
-                                                   gossip=creature_template_gossip)
+                                                   gossip=creature_template_gossip,
+                                                   respawnable=creature_template_respawnable)
 
 
 
