@@ -90,12 +90,13 @@ class Zone:
 
 
 class SubZone:
-    def __init__(self, name: str, parent_zone_name: str, zone_map: list, dead_monsters: set):
+
+    def __init__(self, name: str, parent_zone_name: str, zone_map: list, character):
         self.name = name
         self.parent_zone_name = parent_zone_name
         self._map = zone_map  # the _map that shows us where we can go from here
 
-        self._alive_monsters, self._monster_guid_name_set = load_monsters(self.parent_zone_name, self.name)
+        self._alive_monsters, self._monster_guid_name_set = load_monsters(self.parent_zone_name, self.name, character)
         self._alive_npcs, self._npc_guid_name_set = load_npcs(self.parent_zone_name, self.name)
         self._quest_list = load_quests(self.parent_zone_name, self.name)
 

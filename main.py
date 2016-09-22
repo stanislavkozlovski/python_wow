@@ -6,7 +6,7 @@ from zones.zone import Zone
 from items import Weapon
 from zones.northshire_abbey import NorthshireAbbey
 GAME_VERSION = '0.0.4.9.4 ALPHA'
-ZONES = {"Northshire Abbey": NorthshireAbbey()}
+ZONES = {"Northshire Abbey": None}
 
 # TODO: CURRENT TASK:Add the ability to save/load the character
 #  Subtasks
@@ -24,6 +24,7 @@ def main():
     welcome_print(GAME_VERSION)
     from loader import load_saved_character
     main_character = load_saved_character(name='Netherblood')
+    ZONES["Northshire Abbey"] = NorthshireAbbey(main_character)
     starter_weapon = Weapon(name="Starter Weapon", min_damage=1, max_damage=3)
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))

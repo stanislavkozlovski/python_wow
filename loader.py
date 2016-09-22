@@ -4,7 +4,7 @@ from database_info import \
     (DB_PATH,
 
      DBINDEX_SAVED_CHARACTER_NAME, DBINDEX_SAVED_CHARACTER_CLASS, DBINDEX_SAVED_CHARACTER_LEVEL,
-     DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID,
+     DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID, DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID,
 
      DBINDEX_SC_LOADED_SCRIPTS_SCRIPT_NAME,
 
@@ -55,7 +55,7 @@ from buffs import BeneficialBuff, DoT
 from damage import Damage
 
 
-def load_monsters(zone: str, subzone: str) -> tuple:
+def load_monsters(zone: str, subzone: str, character) -> tuple:
     """
         Gets a query from the creatures table to load all hostile creatures in our current zone
 
@@ -93,6 +93,10 @@ def load_monsters(zone: str, subzone: str) -> tuple:
 
         for creature_info in creatures_reader.fetchall():
             creature_guid = creature_info[DBINDEX_CREATURES_GUID]  # type: int
+
+            if character.has_killed_monster(creature_guid):
+                continue  # do not add the monster to the list if the character has killed him!
+
             creature_id = creature_info[DBINDEX_CREATURES_CREATURE_ID]  # type: int
 
             # This will currently run a query for every monster, meaning if there are 20 of the exact same monsters,
@@ -627,10 +631,12 @@ def load_saved_character(name: str):
         char_class = sv_char_reader[DBINDEX_SAVED_CHARACTER_CLASS]
         char_level = sv_char_reader[DBINDEX_SAVED_CHARACTER_LEVEL]
         char_loaded_scripts_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID]
+        char_killed_monsters_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID]
 
         if char_class == 'Paladin':
             return Paladin(name=name, level=char_level,
-                           loaded_scripts=load_saved_character_loaded_scripts(char_loaded_scripts_ID))
+                           loaded_scripts=load_saved_character_loaded_scripts(char_loaded_scripts_ID),
+                           killed_monsters=load_saved_character_killed_monsters(char_killed_monsters_ID))
         else:
             raise Exception("Unsupported class - {}".format(char_class))
 
@@ -676,7 +682,7 @@ def load_saved_character_killed_monsters(id: int) -> set:
     killed_monsters_set = set()
 
     with sqlite3.connect(DB_PATH) as connection:
-        cursor = connection.cursor
+        cursor = connection.cursor()
         sc_killed_monsters_reader = cursor.execute("SELECT * FROM saved_character_killed_monsters WHERE id = ?", [id])
 
         for killed_monster_info in sc_killed_monsters_reader:

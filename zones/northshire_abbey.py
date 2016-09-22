@@ -23,10 +23,11 @@ class NorthshireAbbey(Zone):
                     "Northshire Vineyards": None,
                     "A Peculiar Hut": None}
 
-    def __init__(self):
+    def __init__(self, character):
         super().__init__()
         subzone_object = NorthshireValley(name="Northshire Valley", parent_zone_name=self.zone_name,
-                                          zone_map=self.zone_map["Northshire Valley"])
+                                          zone_map=self.zone_map["Northshire Valley"],
+                                          character=character)
         self.cs_alive_monsters, self.cs_monsters_guid_name_set = subzone_object.get_monsters()
         self.cs_alive_npcs, self.cs_npcs_guid_name_set = subzone_object.get_npcs()
         self.cs_available_quests = subzone_object.get_quests()
@@ -34,7 +35,7 @@ class NorthshireAbbey(Zone):
         self.curr_subzone = "Northshire Valley"
         self.loaded_zones["Northshire Valley"] = subzone_object
 
-    def move_player(self, current_subzone: str, destination: str):
+    def move_player(self, current_subzone: str, destination: str, character):
         """
 
         :param current_subzone: the subzone the character is in
@@ -56,7 +57,7 @@ class NorthshireAbbey(Zone):
 
 
                 if not self.loaded_zones[destination]:  # if we don't have the destination's attributes loaded load them
-                    self._load_zone(destination)
+                    self._load_zone(destination, character)
 
                 self.curr_subzone = destination
 
@@ -69,20 +70,23 @@ class NorthshireAbbey(Zone):
 
         return False
 
-    def _load_zone(self, subzone: str):
+    def _load_zone(self, subzone: str, character):
         # if we have not loaded the zone before, we need to initialize it's class and put it in the loaded_zones
         if subzone == "Northshire Valley":
             self.loaded_zones[subzone] = NorthshireValley(name=subzone,
                                                           parent_zone_name=self.zone_name,
-                                                          zone_map=self.zone_map[subzone])
+                                                          zone_map=self.zone_map[subzone],
+                                                          character=character)
         elif subzone == "Northshire Vineyards":
             self.loaded_zones[subzone] = NorthshireVineyards(name=subzone,
                                                              parent_zone_name=self.zone_name,
-                                                             zone_map=self.zone_map[subzone])
+                                                             zone_map=self.zone_map[subzone],
+                                                             character=character)
         elif subzone == "A Peculiar Hut":
             self.loaded_zones[subzone] = PeculiarHut(name=subzone,
                                                      parent_zone_name=self.zone_name,
-                                                     zone_map=self.zone_map[subzone])
+                                                     zone_map=self.zone_map[subzone],
+                                                     character=character)
 
     def engage_zone_entered_script(self, character):
         subzone = character.current_subzone
@@ -105,8 +109,8 @@ class PeculiarHut(SubZone):
     GUID_BROTHER_PAXTON = 15
     GUID_BROTHER_HASKEL = 16
 
-    def __init__(self, name: str, parent_zone_name: str, zone_map: list):
-        super().__init__(name, parent_zone_name, zone_map)
+    def __init__(self, name: str, parent_zone_name: str, zone_map: list, character):
+        super().__init__(name, parent_zone_name, zone_map, character)
 
     def load_on_zone_entry_script(self, character):
         A_PECULIAR_HUT_ENTRY_SCRIPT(self, character)
