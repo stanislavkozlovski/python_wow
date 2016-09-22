@@ -490,7 +490,7 @@ class Character(LivingThing):
     attributes = {KEY_STRENGTH: 0, KEY_ARMOR: 0, KEY_AGILITY: 0}  # dictionary holding attributes, KEY: strength, Value: 5
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1,
-                 loaded_scripts: set=set(), killed_monsters: set=set()):
+                 loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=set()):
         super().__init__(name, health, mana, level=1)
         self.min_damage = 0
         self.max_damage = 1
@@ -505,6 +505,7 @@ class Character(LivingThing):
         self.loaded_scripts = loaded_scripts  # holds the scripts that the character has seen (which should load only once)
         self.killed_monsters = killed_monsters  # a set that holds the GUIDs of the creatures that\
         #  the character has killed (and that should not be killable a second time)
+        self.completed_quests = completed_quests  # a set that holds the name of the quests that the character has completed
         # A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
         self._LEVEL_STATS = load_character_level_stats()
         self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements()
@@ -924,6 +925,12 @@ class Character(LivingThing):
         Returns a boolean whether the character has killed the specified monster before
         """
         return monster_GUID in self.killed_monsters
+
+    def has_completed_quest(self, quest_name: str) -> bool:
+        """
+        Returns a boolean whether the character has completed the specified quest before
+        """
+        return quest_name in self.completed_quests
 
     def update_spell_cooldowns(self):
         """

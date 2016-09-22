@@ -98,7 +98,7 @@ class SubZone:
 
         self._alive_monsters, self._monster_guid_name_set = load_monsters(self.parent_zone_name, self.name, character)
         self._alive_npcs, self._npc_guid_name_set = load_npcs(self.parent_zone_name, self.name)
-        self._quest_list = load_quests(self.parent_zone_name, self.name)
+        self._quest_list = load_quests(self.parent_zone_name, self.name, character)
 
     def load_on_zone_entry_script(self, character):
         """

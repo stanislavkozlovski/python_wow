@@ -5,12 +5,14 @@ from database_info import \
 
      DBINDEX_SAVED_CHARACTER_NAME, DBINDEX_SAVED_CHARACTER_CLASS, DBINDEX_SAVED_CHARACTER_LEVEL,
      DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID, DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID,
+     DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID,
 
      DBINDEX_SC_LOADED_SCRIPTS_SCRIPT_NAME,
 
      DBINDEX_SC_KILLED_MONSTERS_GUID,
 
      DBINDEX_SC_COMPLETED_QUESTS_NAME,
+
 
      DBINDEX_CREATURES_GUID, DBINDEX_CREATURES_CREATURE_ID,
 
@@ -247,7 +249,7 @@ def load_npcs(zone: str, subzone: str) -> tuple:
     return npcs_dict, guid_name_set
 
 
-def load_quests(zone: str, subzone:str) -> list:
+def load_quests(zone: str, subzone:str, character) -> list:
     """
     Gets a query from the quest_template table to load all the quests in our current zone.
     Table is as follows:
@@ -286,6 +288,10 @@ entry,            name,    type, required_level,           monster_required,  it
             # save the quest information we'll need
             quest_entry = row[DBINDEX_QUEST_TEMPLATE_ENTRY]  # type: int
             quest_name = row[DBINDEX_QUEST_TEMPLATE_NAME]
+
+            if character.has_completed_quest(quest_name):
+                continue  # do not load the quest into the game if the character has completed it
+
             quest_type = row[DBINDEX_QUEST_TEMPLATE_TYPE]  #  type: str
             quest_level_requirement = row[DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED]  # type: int
             quest_monster_required = row[DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED]  # type: str
@@ -636,11 +642,13 @@ def load_saved_character(name: str):
         char_level = sv_char_reader[DBINDEX_SAVED_CHARACTER_LEVEL]
         char_loaded_scripts_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID]
         char_killed_monsters_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID]
+        char_completed_quests_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID]
 
         if char_class == 'Paladin':
             return Paladin(name=name, level=char_level,
                            loaded_scripts=load_saved_character_loaded_scripts(char_loaded_scripts_ID),
-                           killed_monsters=load_saved_character_killed_monsters(char_killed_monsters_ID))
+                           killed_monsters=load_saved_character_killed_monsters(char_killed_monsters_ID),
+                           completed_quests=load_saved_character_completed_quests(char_completed_quests_ID))
         else:
             raise Exception("Unsupported class - {}".format(char_class))
 
