@@ -8,6 +8,8 @@ from database_info import \
 
      DBINDEX_SC_LOADED_SCRIPTS_SCRIPT_NAME,
 
+     DBINDEX_SC_KILLED_MONSTERS_GUID,
+
      DBINDEX_CREATURES_GUID, DBINDEX_CREATURES_CREATURE_ID,
 
      DBINDEX_CREATURE_TEMPLATE_NAME, DBINDEX_CREATURE_TEMPLATE_LEVEL,
@@ -670,6 +672,18 @@ def load_saved_character_killed_monsters(id: int) -> set:
         :param id: ID identificaton in saved_character_killed_monsters
         :return: a set containing all the GUIs -> {14, 7} in this case
         """
+
+    killed_monsters_set = set()
+
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor
+        sc_killed_monsters_reader = cursor.execute("SELECT * FROM saved_character_killed_monsters WHERE id = ?", [id])
+
+        for killed_monster_info in sc_killed_monsters_reader:
+            sc_killed_monster_GUID = killed_monster_info[DBINDEX_SC_KILLED_MONSTERS_GUID]
+            killed_monsters_set.add(sc_killed_monster_GUID)
+
+    return killed_monsters_set
 
 def load_character_level_stats() -> dict:
     """
