@@ -751,6 +751,8 @@ class Character(LivingThing):
 
         del self.quest_log[quest.ID]  # remove from quest log
 
+        self.completed_quests.add(quest.name)
+
         self._award_experience(xp_reward)
 
     def _remove_fetch_quest_required_items(self, quest: FetchQuest):
