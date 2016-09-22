@@ -762,7 +762,7 @@ class Character(LivingThing):
         self.experience += xp_reward
         self.check_if_levelup()
 
-    def award_monster_kill(self, monster: Monster):
+    def award_monster_kill(self, monster: Monster, monster_GUID: int):
         monster_level = monster.level
         xp_reward = monster.xp_to_give
         monster_quest_ID = monster.quest_relation_ID
@@ -780,6 +780,9 @@ class Character(LivingThing):
             print("XP awarded: {0} + bonus {1} for the level difference!".format(xp_reward, xp_bonus_reward))
         else:
             print("XP awarded: {0}!".format(xp_reward))
+
+        if not monster.respawnable:
+            self.killed_monsters.add(monster_GUID)
 
         self._award_experience(xp_reward + xp_bonus_reward)
 

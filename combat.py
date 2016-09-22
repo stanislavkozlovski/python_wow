@@ -86,7 +86,7 @@ def handle_monster_death(character: Character, monster: Monster, alive_monsters:
     """
     print("{0} has slain {1}!".format(character.name, monster.name))
 
-    character.award_monster_kill(monster=monster)
+    character.award_monster_kill(monster=monster, monster_GUID=monster_GUID)
     character.leave_combat()  # will exit the loop
 
     del alive_monsters[monster_GUID]  # removes the monster from the dictionary

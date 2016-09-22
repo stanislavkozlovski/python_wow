@@ -9,16 +9,15 @@ GAME_VERSION = '0.0.4.9.4 ALPHA'
 ZONES = {"Northshire Abbey": None}
 
 # TODO: CURRENT TASK:Add the ability to save/load the character
+
+
 #  Subtasks
 
-# TODO: Current SUBTASK: Adding the loading of saved_character_killed_monsters and it's implementation in the game
-
-# TODO: Fix Brother Haskel/Paxton in subzone after the script is not loaded (because of it being in saved_character_loaded_scripts)
 # TODO: Add a prompt where you choose if you want to create a new character or save one
 # TODO: Move the load character to another module
 # TODO: Save/load the quests you've done
-# TODO: Save/load special monsters that you've killed
-# TODO: Save/load scripts that you've seen
+# TODO: Save special monsters that you've killed
+# TODO: Save/ scripts that you've seen
 
 def main():
     welcome_print(GAME_VERSION)

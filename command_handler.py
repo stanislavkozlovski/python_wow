@@ -201,7 +201,7 @@ def handle_go_to_command(command: str, character, zone_object: Zone):
     However, there's a special case: If it returns 0, it means that we cannot initiate the move and that the
     printing is handled by the method itself.
     """
-    valid_move = zone_object.move_player(character.current_subzone, destination)
+    valid_move = zone_object.move_player(character.current_subzone, destination, character)
 
     if valid_move:
         # if the move has been successful
