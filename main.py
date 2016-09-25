@@ -5,7 +5,7 @@ from information_printer import print_live_monsters, print_live_npcs, welcome_pr
 from zones.zone import Zone
 from items import Weapon
 from zones.northshire_abbey import NorthshireAbbey
-GAME_VERSION = '0.0.4.9.4 ALPHA'
+GAME_VERSION = '0.0.4.9.5 ALPHA'
 ZONES = {"Northshire Abbey": None}
 
 # TODO: CURRENT TASK:Add the ability to save/load the character

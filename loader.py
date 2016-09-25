@@ -5,7 +5,8 @@ from database_info import \
 
      DBINDEX_SAVED_CHARACTER_NAME, DBINDEX_SAVED_CHARACTER_CLASS, DBINDEX_SAVED_CHARACTER_LEVEL,
      DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID, DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID,
-     DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID,
+     DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID, DBINDEX_SAVED_CHARACTER_INVENTORY_ID,
+     DBINDEX_SAVED_CHARACTER_GOLD,
 
      DBINDEX_SC_LOADED_SCRIPTS_SCRIPT_NAME,
 
@@ -648,12 +649,15 @@ def load_saved_character(name: str):
         char_loaded_scripts_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID]
         char_killed_monsters_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID]
         char_completed_quests_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID]
+        char_inventory_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_INVENTORY_ID]
+        char_gold = sv_char_reader[DBINDEX_SAVED_CHARACTER_GOLD]  # type: int
 
         if char_class == 'Paladin':
             return Paladin(name=name, level=char_level,
                            loaded_scripts=load_saved_character_loaded_scripts(char_loaded_scripts_ID),
                            killed_monsters=load_saved_character_killed_monsters(char_killed_monsters_ID),
-                           completed_quests=load_saved_character_completed_quests(char_completed_quests_ID))
+                           completed_quests=load_saved_character_completed_quests(char_completed_quests_ID),
+                           saved_inventory=load_saved_character_inventory(id=char_inventory_ID, gold=char_gold))
         else:
             raise Exception("Unsupported class - {}".format(char_class))
 
