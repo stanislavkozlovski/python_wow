@@ -9,7 +9,8 @@ from database_info import \
      DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID, DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID,
      DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID, DBINDEX_SAVED_CHARACTER_INVENTORY_ID, DBINDEX_SAVED_CHARACTER_GOLD,
 
-     DB_LOADED_SCRIPTS_TABLE_NAME, DB_KILLED_MONSTERS_TABLE_NAME, DB_COMPLETED_QUESTS_TABLE_NAME)
+     DB_LOADED_SCRIPTS_TABLE_NAME, DB_KILLED_MONSTERS_TABLE_NAME,
+     DB_COMPLETED_QUESTS_TABLE_NAME, DB_INVENTORY_TABLE_NAME)
 
 
 ALLOWED_TABLES_TO_DELETE_FROM = ['saved_character_completed_quests', 'saved_character_inventory',
@@ -95,13 +96,39 @@ def save_completed_quests(id: int, completed_quests: set):
     :param completed_quests: a set containing all the names of the completed quests -> {"A Canine Menace", "Canine-Like Hunger"} in this case
     """
 
-    delete_rows_from_table(table_name=DB_COMPLETED_QUESTS_TABLE_NAME, id=id)
+    delete_rows_from_table(table_name=DB_COMPLETED_QUESTS_TABLE_NAME, id=id)  # delete the old values first
 
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
 
         for quest_name in completed_quests:
             cursor.execute('INSERT INTO {} VALUES (?, ?)'.format(DB_COMPLETED_QUESTS_TABLE_NAME), [id, quest_name])
+
+
+def save_inventory(id: int, inventory: dict):
+    """
+    This function saves the character's inventory into the saved_character_inventory DB table
+    Table sample contents:
+
+        id, item_id, item_count
+     1,       1,        5
+     Meaning the character has 5 Wolf Meats in his inventory
+
+    :param id: the ID we have to save as
+    :param inventory: A dictionary, Key: item_name, Value: tuple(Item class instance, Item Count)
+    """
+
+    delete_rows_from_table(table_name=DB_INVENTORY_TABLE_NAME, id=id)  # delete the old values first
+
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+
+        for item_name in inventory.keys():
+            if item_name != 'gold':
+                item_id = inventory[item_name][0].id  # get the instance of Item's ID
+                item_count = inventory[item_name][1]
+
+                cursor.execute('INSERT INTO {} VALUES (?, ?, ?)'.format(DB_INVENTORY_TABLE_NAME), [id, item_id, item_count])
 
 
 def delete_rows_from_table(table_name: str, id: int):
