@@ -13,6 +13,8 @@ from database_info import \
 
      DBINDEX_SC_COMPLETED_QUESTS_NAME,
 
+     DBINDEX_SC_INVENTORY_ITEM_ID, DBINDEX_SC_INVENTORY_ITEM_COUNT,
+
 
      DBINDEX_CREATURES_GUID, DBINDEX_CREATURES_CREATURE_ID,
 
@@ -732,6 +734,38 @@ def load_saved_character_completed_quests(id: int) -> set:
             completed_quests_set.add(sc_completed_quest_name)
 
     return completed_quests_set
+
+
+def load_saved_character_inventory(id: int, gold: int=0) -> dict:
+    """
+    This function loads all the items that are in the character's inventory, stored in saved_character_inventory, with the
+    corresponding ID to the rows in that table. The table looks like this:
+
+    id, item_id, item_count
+     1,       1,        5
+     Meaning the character has 5 Wolf Meats in his inventory
+
+    :param id: The ID corresponding to the entries in saved_character_inventory
+    :param gold: The amount of gold the character has
+    :return: A dictionary, Key: item_name, Value: tuple(Item class instance, Item Count)
+    """
+
+    loaded_inventory = {"gold": gold}
+
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        sc_inventory_items = cursor.execute("SELECT * FROM saved_character_inventory WHERE id = ?", [id])
+
+        for item_row_info in sc_inventory_items:
+            item_id = item_row_info[DBINDEX_SC_INVENTORY_ITEM_ID]
+            item_count = item_row_info[DBINDEX_SC_INVENTORY_ITEM_COUNT]  # type: int
+
+            item = load_item(item_id)  # type: Item
+
+            loaded_inventory[item.name] = (item, item_count)
+
+    return loaded_inventory
+
 
 def load_character_level_stats() -> dict:
     """
