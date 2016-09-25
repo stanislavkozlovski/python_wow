@@ -25,6 +25,7 @@ from database_info import \
 
      DBINDEX_NPC_VENDOR_ITEM_COUNT, DBINDEX_NPC_VENDOR_ITEM_ID, DBINDEX_NPC_VENDOR_PRICE,
 
+     DBINDEX_ITEM_TEMPLATE_ENTRY,
      DBINDEX_ITEM_TEMPLATE_NAME, DBINDEX_ITEM_TEMPLATE_TYPE, DBINDEX_ITEM_TEMPLATE_BUY_PRICE,
      DBINDEX_ITEM_TEMPLATE_SELL_PRICE, DBINDEX_ITEM_TEMPLATE_MIN_DMG, DBINDEX_ITEM_TEMPLATE_MAX_DMG,
      DBINDEX_ITEM_TEMPLATE_QUEST_ID, DBINDEX_ITEM_TEMPLATE_EFFECT,
@@ -537,6 +538,7 @@ def load_item(item_ID: int):
         cursor.execute("SELECT * FROM item_template WHERE entry = ?", [item_ID])
         item_template_info = cursor.fetchone()
 
+        item_id = item_template_info[DBINDEX_ITEM_TEMPLATE_ENTRY]  # type: int
         item_name = item_template_info[DBINDEX_ITEM_TEMPLATE_NAME]
         item_type = item_template_info[DBINDEX_ITEM_TEMPLATE_TYPE]
         item_buy_price = item_template_info[DBINDEX_ITEM_TEMPLATE_BUY_PRICE]  # type: int
@@ -544,18 +546,19 @@ def load_item(item_ID: int):
 
         if item_type == 'misc':
             item_quest_ID = item_template_info[DBINDEX_ITEM_TEMPLATE_QUEST_ID]
-            return items.Item(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price, quest_ID=item_quest_ID)
+            return items.Item(name=item_name, item_id=item_id, buy_price=item_buy_price, sell_price=item_sell_price,
+                              quest_ID=item_quest_ID)
         elif item_type == 'weapon':
             item_min_dmg = item_template_info[DBINDEX_ITEM_TEMPLATE_MIN_DMG]  # type: int
             item_max_dmg = item_template_info[DBINDEX_ITEM_TEMPLATE_MAX_DMG]  # type: int
 
-            return items.Weapon(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price,
+            return items.Weapon(name=item_name, item_id=item_id, buy_price=item_buy_price, sell_price=item_sell_price,
                                 min_damage=item_min_dmg, max_damage=item_max_dmg)
         elif item_type == 'potion':
             buff_id = item_template_info[DBINDEX_ITEM_TEMPLATE_EFFECT]  # type: int
             item_buff_effect = load_buff(buff_id)  # type: BeneficialBuff
 
-            return items.Potion(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price,
+            return items.Potion(name=item_name, item_id=item_id, buy_price=item_buy_price, sell_price=item_sell_price,
                                 buff=item_buff_effect)
         else:
             raise Exception("Unsupported item type {}".format(item_type))
