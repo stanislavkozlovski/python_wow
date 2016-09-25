@@ -9,7 +9,7 @@ from database_info import \
      DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID, DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID,
      DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID, DBINDEX_SAVED_CHARACTER_INVENTORY_ID, DBINDEX_SAVED_CHARACTER_GOLD,
 
-     DB_LOADED_SCRIPTS_TABLE_NAME)
+     DB_LOADED_SCRIPTS_TABLE_NAME, DB_KILLED_MONSTERS_TABLE_NAME)
 
 
 ALLOWED_TABLES_TO_DELETE_FROM = ['saved_character_completed_quests', 'saved_character_inventory',
@@ -60,6 +60,27 @@ def save_loaded_scripts(id: int, loaded_scripts: set):
         for loaded_script in loaded_scripts:
             cursor.execute('INSERT INTO {} VALUES (?, ?)'.format(DB_LOADED_SCRIPTS_TABLE_NAME), [id, loaded_script])
 
+
+def save_killed_monsters(id: int, killed_monsters: set):
+    """
+    This function saves all the monsters that the character has killed into the saved_character_killed_monsters DB table
+    Table sample contents:
+    id,    GUID(of monster)
+          1,     14
+          1,      7
+    IMPORTANT: This works only for monsters that by design should not be killed twice if the player restarts the game
+
+    :param id:  the ID we have to save as
+    :param killed_monsters: a set containing all the killed monster's GUIDs -> {14, 3, 2}
+    """
+
+    delete_rows_from_table(table_name=DB_KILLED_MONSTERS_TABLE_NAME, id=id)  # delete the old values first
+
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+
+        for monster_guid in killed_monsters:
+            cursor.execute('INSERT INTO {} VALUES (?, ?)'.format(DB_KILLED_MONSTERS_TABLE_NAME), [id, monster_guid])
 
 
 def delete_rows_from_table(table_name: str, id: int):
