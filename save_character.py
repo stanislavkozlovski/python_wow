@@ -7,7 +7,9 @@ from entities import Character
 from database_info import \
     (DB_PATH, DBINDEX_SAVED_CHARACTER_NAME, DBINDEX_SAVED_CHARACTER_CLASS, DBINDEX_SAVED_CHARACTER_LEVEL,
      DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID, DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID,
-     DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID, DBINDEX_SAVED_CHARACTER_INVENTORY_ID, DBINDEX_SAVED_CHARACTER_GOLD)
+     DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID, DBINDEX_SAVED_CHARACTER_INVENTORY_ID, DBINDEX_SAVED_CHARACTER_GOLD,
+
+     DB_LOADED_SCRIPTS_TABLE_NAME)
 
 
 ALLOWED_TABLES_TO_DELETE_FROM = ['saved_character_completed_quests', 'saved_character_inventory',
@@ -37,6 +39,27 @@ def save_character(character: Character):
         else:
             # we have not saved this character before, therefore we need to generate new IDs for the other tables
             pass
+
+
+def save_loaded_scripts(id: int, loaded_scripts: set):
+    """
+    This function saves the character's loaded scripts into the saved_character_loaded_scripts DB table
+    Table sample contents:
+    id,    script_name
+      1,     HASKELL_PRAXTON_CONVERSATION
+
+    :param id: the ID we have to save as
+    :param loaded_scripts: a set containing all the names -> {HASKEL_PRAXTON_CONVERSATION} in this case
+    """
+
+    delete_rows_from_table(table_name=DB_LOADED_SCRIPTS_TABLE_NAME, id=id)  # delete the old values first
+
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+
+        for loaded_script in loaded_scripts:
+            cursor.execute('INSERT INTO {} VALUES (?, ?)'.format(DB_LOADED_SCRIPTS_TABLE_NAME), [id, loaded_script])
+
 
 
 def delete_rows_from_table(table_name: str, id: int):
