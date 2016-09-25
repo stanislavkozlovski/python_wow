@@ -9,7 +9,7 @@ from database_info import \
      DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID, DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID,
      DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID, DBINDEX_SAVED_CHARACTER_INVENTORY_ID, DBINDEX_SAVED_CHARACTER_GOLD,
 
-     DB_LOADED_SCRIPTS_TABLE_NAME, DB_KILLED_MONSTERS_TABLE_NAME)
+     DB_LOADED_SCRIPTS_TABLE_NAME, DB_KILLED_MONSTERS_TABLE_NAME, DB_COMPLETED_QUESTS_TABLE_NAME)
 
 
 ALLOWED_TABLES_TO_DELETE_FROM = ['saved_character_completed_quests', 'saved_character_inventory',
@@ -81,6 +81,27 @@ def save_killed_monsters(id: int, killed_monsters: set):
 
         for monster_guid in killed_monsters:
             cursor.execute('INSERT INTO {} VALUES (?, ?)'.format(DB_KILLED_MONSTERS_TABLE_NAME), [id, monster_guid])
+
+
+def save_completed_quests(id: int, completed_quests: set):
+    """
+    This function saves all the quests that the character has completed into the saved_character_completed_quests DB table
+    Table sample contents:
+    id,  quest_name
+      1,   A Canine Menace
+      1,   Canine-Like Hunger
+
+    :param id: the ID we have to save as
+    :param completed_quests: a set containing all the names of the completed quests -> {"A Canine Menace", "Canine-Like Hunger"} in this case
+    """
+
+    delete_rows_from_table(table_name=DB_COMPLETED_QUESTS_TABLE_NAME, id=id)
+
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+
+        for quest_name in completed_quests:
+            cursor.execute('INSERT INTO {} VALUES (?, ?)'.format(DB_COMPLETED_QUESTS_TABLE_NAME), [id, quest_name])
 
 
 def delete_rows_from_table(table_name: str, id: int):
