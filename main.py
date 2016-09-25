@@ -23,7 +23,7 @@ def main():
     from loader import load_saved_character
     main_character = load_saved_character(name='Netherblood')
     ZONES["Northshire Abbey"] = NorthshireAbbey(main_character)
-    starter_weapon = Weapon(name="Starter Weapon", min_damage=1, max_damage=3)
+    starter_weapon = Weapon(name="Starter Weapon", item_id=0, min_damage=1, max_damage=3)
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))
 
