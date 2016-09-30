@@ -13,10 +13,9 @@ ZONES = {"Northshire Abbey": None}
 
 #  Subtasks
 
-# TODO: Save the character, even on alt-f4
-# TODO: Add a prompt where you choose if you want to create a new character or save one
+# TODO: Save the character (even on alt-f4)
+# TODO: Add a prompt where you choose if you want to create a new character or load one
 # TODO: Move the load character to another module
-# TODO: Save scripts that you've seen
 
 def main():
     welcome_print(GAME_VERSION)

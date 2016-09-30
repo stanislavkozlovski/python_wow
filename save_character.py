@@ -9,12 +9,15 @@ from database_info import \
      DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID, DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID,
      DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID, DBINDEX_SAVED_CHARACTER_INVENTORY_ID, DBINDEX_SAVED_CHARACTER_GOLD,
 
+     DB_SAVED_CHARACTER_TABLE_NAME,
      DB_LOADED_SCRIPTS_TABLE_NAME, DB_KILLED_MONSTERS_TABLE_NAME,
      DB_COMPLETED_QUESTS_TABLE_NAME, DB_INVENTORY_TABLE_NAME)
 
 
 ALLOWED_TABLES_TO_DELETE_FROM = ['saved_character_completed_quests', 'saved_character_inventory',
-                                 'saved_character_killed_monsters', 'saved_character_loaded_scripts']
+                                 'saved_character_killed_monsters', 'saved_character_loaded_scripts',
+                                 'saved_character']
+
 
 def save_character(character: Character):
     """
@@ -24,7 +27,7 @@ def save_character(character: Character):
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
 
-        character_info = cursor.execute("SELECT * FROM saved_character WHERE name = ?", ['Netherblood']).fetchone()
+        character_info = cursor.execute("SELECT * FROM saved_character WHERE name = ?", [character.name]).fetchone()
 
         character_level = character.level  # type: int
         character_class = character.get_class()
@@ -37,9 +40,27 @@ def save_character(character: Character):
             character_killed_monsters_ID = character_info[DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID]
             character_completed_quests_ID = character_info[DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID]
             character_inventory_ID = character_info[DBINDEX_SAVED_CHARACTER_INVENTORY_ID]
+            cursor.execute("DELETE FROM {table_name} WHERE name = ?"  # delete the old table
+                           .format(table_name=DB_SAVED_CHARACTER_TABLE_NAME), [character.name])
         else:
             # we have not saved this character before, therefore we need to generate new IDs for the other tables
-            pass
+            character_loaded_scripts_ID = get_highest_free_id_from_table(DB_LOADED_SCRIPTS_TABLE_NAME)
+            character_killed_monsters_ID = get_highest_free_id_from_table(DB_KILLED_MONSTERS_TABLE_NAME)
+            character_completed_quests_ID = get_highest_free_id_from_table(DB_COMPLETED_QUESTS_TABLE_NAME)
+            character_inventory_ID = get_highest_free_id_from_table(DB_INVENTORY_TABLE_NAME)
+
+        # save the main table
+        cursor.execute("INSERT INTO saved_character VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                       [character.name, character_class, character_level, character_loaded_scripts_ID,
+                        character_killed_monsters_ID, character_completed_quests_ID, character_inventory_ID,
+                        character_gold])
+
+        # save the sub-tables
+        save_loaded_scripts(character_loaded_scripts_ID, character.loaded_scripts)
+        save_killed_monsters(character_killed_monsters_ID, character.killed_monsters)
+        save_completed_quests(character_completed_quests_ID, character.completed_quests)
+        save_inventory(character_inventory_ID, character.inventory)
+
 
 
 def save_loaded_scripts(id: int, loaded_scripts: set):
@@ -147,6 +168,19 @@ def delete_rows_from_table(table_name: str, id: int):
             cursor.execute("DELETE FROM {table_name} WHERE id = ?".format(table_name=table_name), [id])
     else:
         print("You do not have permission to delete from the {} table!".format(table_name))
+
+
+def get_highest_free_id_from_table(table_name: str):
+    """
+    This function returns the highest free unique id from a table
+    This ID is most likely used to insert a new row into it
+    """
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        cursor.execute('SELECT max(id) FROM {}'.format(table_name))
+        max_id = cursor.fetchone()[0]
+
+    return max_id + 1
 
 
 
