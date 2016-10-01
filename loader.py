@@ -652,7 +652,7 @@ def load_saved_character(name: str):
         char_inventory_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_INVENTORY_ID]
         char_gold = sv_char_reader[DBINDEX_SAVED_CHARACTER_GOLD]  # type: int
 
-        if char_class == 'Paladin':
+        if char_class == 'paladin':
             return Paladin(name=name, level=char_level,
                            loaded_scripts=load_saved_character_loaded_scripts(char_loaded_scripts_ID),
                            killed_monsters=load_saved_character_killed_monsters(char_killed_monsters_ID),
