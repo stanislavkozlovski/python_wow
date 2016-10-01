@@ -8,7 +8,8 @@ from information_printer import (print_live_npcs, print_live_monsters, print_que
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar)
 
 
-
+# TODO: Move this function to a new module, something like command_router, which will route appropriate commands to their
+# handlers here!
 def handle_main_commands(main_character, zone_object):
     """
     Get a command from the player and if it's a valid command: run it.
