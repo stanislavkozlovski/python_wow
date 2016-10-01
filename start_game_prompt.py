@@ -54,3 +54,5 @@ def get_choice() -> str:
     while choice not in ['load', 'new']:
         print("{} is not a valid command.".format(choice))
         choice = input()
+
+    return choice
