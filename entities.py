@@ -677,7 +677,7 @@ class Character(LivingThing):
             self.revive()
             print("Character {} has been revived!".format(self.name))
         else:
-            exit()
+            raise SystemExit  # quit the game
 
     def has_enough_gold(self, gold: int) -> bool:
         """
