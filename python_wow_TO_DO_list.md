@@ -60,6 +60,7 @@
 - Add item gossip text
 - Fix bug where when we attack a monster, the monster's absorption does not get printed.
 - Move the functions that choose what to do based on the user's command to a new module, something like command_router, which will route appropriate commands to their handlers in command_handler.py
+- List all saved characters when the user wants to load a character
 
 # TODOs
 - Add documentation!

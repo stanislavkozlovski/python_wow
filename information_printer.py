@@ -120,6 +120,20 @@ def print_quest_item_choices(quest_item_rewards: dict):
     print()
 
 
+def print_available_character_classes():
+    """
+    this function is called when the player is creating a new character. It displays the available classes to pick from and
+    some information about the class
+    """
+    print("| "*20)
+    print("Available classes: \n")
+    print("\tPaladin:")
+    print("\t\tDeals moderate damage")
+    print("\t\tIs hard to kill")
+    print("\t\tCan heal damage")
+    print("| "*20)
+
+
 def welcome_print(game_version: str):
     print("*"*50)
     print("WELCOME TO PYTHON WOW VERSION: {0}".format(game_version))

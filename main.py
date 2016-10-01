@@ -5,8 +5,9 @@ from information_printer import print_live_monsters, print_live_npcs, welcome_pr
 from zones.zone import Zone
 from items import Weapon
 from save_character import save_character
+from start_game_prompt import get_player_character
 from zones.northshire_abbey import NorthshireAbbey
-GAME_VERSION = '0.0.4.9.7 ALPHA'
+GAME_VERSION = '0.0.5 ALPHA'
 ZONES = {"Northshire Abbey": None}
 
 # TODO: CURRENT TASK:Add the ability to save/load the character
@@ -14,14 +15,12 @@ ZONES = {"Northshire Abbey": None}
 
 #  Subtasks
 
-# TODO: Save the character (even on alt-f4)
-# TODO: Add a prompt where you choose if you want to create a new character or load one
 # TODO: Move the load character to another module
 
 def main():
     welcome_print(GAME_VERSION)
     from loader import load_saved_character
-    main_character = load_saved_character(name='Netherblood')
+    main_character = get_player_character()
     atexit.register(on_exit_handler, main_character)
     ZONES["Northshire Abbey"] = NorthshireAbbey(main_character)
     starter_weapon = Weapon(name="Starter Weapon", item_id=0, min_damage=1, max_damage=3)
