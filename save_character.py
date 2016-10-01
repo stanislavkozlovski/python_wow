@@ -61,6 +61,10 @@ def save_character(character: Character):
         save_completed_quests(character_completed_quests_ID, character.completed_quests, cursor)
         save_inventory(character_inventory_ID, character.inventory, cursor)
 
+        print("-" * 40)
+        print("Character {} was saved successfully!".format(character.name))
+        print("-" * 40)
+
 
 def save_loaded_scripts(id: int, loaded_scripts: set, cursor):
     """
