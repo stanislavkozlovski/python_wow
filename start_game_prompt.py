@@ -4,9 +4,12 @@ This module is called on game startup and asks the user if he wants to create a 
 from termcolor import colored
 
 from entities import Character
+from classes import Paladin
+from information_printer import print_available_character_classes
 from loader import load_saved_character
 from exceptions import NoSuchCharacterError
 
+AVAILABLE_CLASSES = ['paladin']
 
 def get_player_character() -> Character:
     """
@@ -22,10 +25,38 @@ def get_player_character() -> Character:
         character = handle_load_character()
     elif choice == 'new':
         # create a new character
-        pass
+        character = handle_create_character()
 
     return character
 
+
+def handle_create_character() -> Character:
+    """ this function handles the creation of a new character"""
+    # 1. Choose class
+    print("You've chosen to create a new character, please pick a class from the list of available classes: ")
+    print_available_character_classes()
+    class_choice = str.lower(input())
+
+    while class_choice not in AVAILABLE_CLASSES:  # check for valid class
+        print("{} is not a valid class!\n".format(class_choice))
+        class_choice = str.lower(input())
+
+    # 2. Choose name
+    print("\nYou've chosen to create a {class_}! Nice going, now pick a name for our {class_}."
+          .format(class_=class_choice))
+
+    # TODO: Format name ex: NeThErBlOOD => Netherblood
+    character_name = input()
+
+    while len(character_name) > 20:  # check for valid name
+        print("Your name cannot be longer than 20 characters.")
+        character_name = input()
+
+    # 3. Create the character object
+    if class_choice == 'paladin':
+        character = Paladin(name=character_name)
+
+    return character
 
 def handle_load_character() -> Character:
     """ this function loads a character from the DB """
