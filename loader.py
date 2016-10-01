@@ -1,4 +1,5 @@
 import sqlite3
+import items
 
 from database_info import \
     (DB_PATH,
@@ -58,7 +59,7 @@ from database_info import \
      DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
      )
 from quest import KillQuest, FetchQuest
-import items
+from exceptions import NoSuchCharacterError
 from buffs import BeneficialBuff, DoT
 from damage import Damage
 
@@ -643,23 +644,26 @@ def load_saved_character(name: str):
         cursor = connection.cursor()
         sv_char_reader = cursor.execute("SELECT * FROM saved_character WHERE name = ?", [name]).fetchone()
 
-        char_name = sv_char_reader[DBINDEX_SAVED_CHARACTER_NAME]
-        char_class = sv_char_reader[DBINDEX_SAVED_CHARACTER_CLASS]
-        char_level = sv_char_reader[DBINDEX_SAVED_CHARACTER_LEVEL]
-        char_loaded_scripts_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID]
-        char_killed_monsters_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID]
-        char_completed_quests_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID]
-        char_inventory_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_INVENTORY_ID]
-        char_gold = sv_char_reader[DBINDEX_SAVED_CHARACTER_GOLD]  # type: int
+        if sv_char_reader:
+            char_class = sv_char_reader[DBINDEX_SAVED_CHARACTER_CLASS]
+            char_level = sv_char_reader[DBINDEX_SAVED_CHARACTER_LEVEL]
+            char_loaded_scripts_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID]
+            char_killed_monsters_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID]
+            char_completed_quests_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID]
+            char_inventory_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_INVENTORY_ID]
+            char_gold = sv_char_reader[DBINDEX_SAVED_CHARACTER_GOLD]  # type: int
 
-        if char_class == 'paladin':
-            return Paladin(name=name, level=char_level,
-                           loaded_scripts=load_saved_character_loaded_scripts(char_loaded_scripts_ID),
-                           killed_monsters=load_saved_character_killed_monsters(char_killed_monsters_ID),
-                           completed_quests=load_saved_character_completed_quests(char_completed_quests_ID),
-                           saved_inventory=load_saved_character_inventory(id=char_inventory_ID, gold=char_gold))
+            if char_class == 'paladin':
+                return Paladin(name=name, level=char_level,
+                               loaded_scripts=load_saved_character_loaded_scripts(char_loaded_scripts_ID),
+                               killed_monsters=load_saved_character_killed_monsters(char_killed_monsters_ID),
+                               completed_quests=load_saved_character_completed_quests(char_completed_quests_ID),
+                               saved_inventory=load_saved_character_inventory(id=char_inventory_ID, gold=char_gold))
+            else:
+                raise Exception("Unsupported class - {}".format(char_class))
         else:
-            raise Exception("Unsupported class - {}".format(char_class))
+            # no such character
+            raise NoSuchCharacterError("There is no saved character by the name of {}!".format(name))
 
 
 def load_saved_character_loaded_scripts(id: int) -> set:

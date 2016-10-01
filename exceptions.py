@@ -15,3 +15,11 @@ class ItemNotInInventoryError(Error):
         self.item_name = item_name
 
         super(Exception, self).__init__(message, inventory, item_name, args)
+
+
+class NoSuchCharacterError(Error):
+    """ This exception is raised whenever we want to load a character that is not saved in the database. """
+    def __init(self, message, name: str, *args):
+        self.char_name = name
+
+        super(Exception, self).__init__(message, name, args)
