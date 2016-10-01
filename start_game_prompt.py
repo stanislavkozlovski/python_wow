@@ -45,9 +45,12 @@ def handle_load_character() -> Character:
 
 
 def get_choice() -> str:
+    new_colored = colored('new', color='magenta')
+    load_colored = colored('load', color='magenta')
     print("*"*50)
     print("Would you like to create a new character or load an already existing character?")
-    print("To create a new character, type \tnew\t and to load an already existing one, type \tload\t")
+    print("To create a new character, type {new} and to load an already existing one, type {load}"
+          .format(new=new_colored, load=load_colored))
 
     choice = input()
 
