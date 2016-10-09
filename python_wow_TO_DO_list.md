@@ -61,7 +61,6 @@
 - Print Stats (hp, mana, xp and everything else at once)
 - Add item gossip text
 - Fix bug where when we attack a monster, the monster's absorption does not get printed.
-- Move the functions that choose what to do based on the user's command to a new module, something like command_router, which will route appropriate commands to their handlers in command_handler.py
 
 
 # TODOs

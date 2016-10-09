@@ -260,28 +260,23 @@ def handle_pan_command(zone_object, print_all: bool=False):
 
 # IN COMBAT COMMANDS
 # COMMANDS THAT DO NOT END THE TURN
-def handle_in_combat_non_ending_turn_commands(command: str, character, monster) -> str:
-    """
-    This function is called whenever the player sends a command while in combat.
-    We go through this while loop to check if the command is any of the ones supported below.
-    If it is, we iterate through the loop and get a new command. We do the same check.
-    If it is not one of the commands, we simply return the command as is.
+def handle_combat_help_command(character):
+    """ this function handles the '?' command when it is entered in combat, displaying the player's
+    available commands """
+    pac_in_combat(character)  # print available commands
 
-    :param command: player's command
-    :param character: Character object
-    :param monster: Monster object
-    :return:
+
+def handle_combat_print_stats_command(character, monster):
     """
-    while True:  # for commands that do not end the turn, like printing the stats or the possible commands
-        if command == '?':
-            pac_in_combat(character)  # print available commands
-        elif command == 'print stats':
-            print_in_combat_stats(character, monster)
-        elif command == 'print xp':
-            print_character_xp_bar(character)
-        else:
-            return command
-        command = input()
+    this function handles the 'print stats' command, showing the stats of the player and the monster he's fighting
+    while in combat.
+    """
+    print_in_combat_stats(character, monster)
+
+
+def handle_combat_print_xp_command(character):
+    """ this function handles the 'print xp' command, showing the player's current experience bar while in combat """
+    print_character_xp_bar(character)
 
 
 def get_guid_by_name(name: str, guid_name_set: set):

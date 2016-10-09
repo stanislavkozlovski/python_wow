@@ -44,3 +44,30 @@ def route_main_commands(main_character, zone_object):
         ch.handle_pam_command(zone_object, print_all=True)
     elif command == 'print all alive npcs':
         ch.handle_pan_command(zone_object, print_all=True)
+
+
+# IN COMBAT COMMANDS
+# COMMANDS THAT DO NOT END THE TURN
+def route_in_combat_non_ending_turn_commands(command: str, character, monster) -> str:
+    """
+    This function is called whenever the player sends a command while in combat.
+    We go through this while loop to check if the command is any of the ones supported below.
+    If it is, we iterate through the loop and get a new command. We do the same check.
+    If it is not one of the commands, we simply return the command as is.
+
+    :param command: player's command
+    :param character: Character object
+    :param monster: Monster object
+    :return:
+    """
+    while True:  # for commands that do not end the turn, like printing the stats or the possible commands
+        if command == '?':
+            ch.handle_combat_help_command(character)  # print available commands
+        elif command == 'print stats':
+            ch.handle_combat_print_stats_command(character, monster)
+        elif command == 'print xp':
+            ch.handle_combat_print_xp_command(character)
+        else:
+            return command
+
+        command = input()

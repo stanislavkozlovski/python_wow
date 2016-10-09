@@ -1,6 +1,6 @@
 from commands import pac_looting,get_available_paladin_abilities
 from entities import Character, Monster
-from command_handler import handle_in_combat_non_ending_turn_commands
+from command_router import route_in_combat_non_ending_turn_commands
 from information_printer import print_loot_table
 
 
@@ -56,7 +56,7 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
 
         command = input()
         # check if the command does not end the turn, if it doesn't the same command gets returned
-        command = handle_in_combat_non_ending_turn_commands(command, character, monster)
+        command = route_in_combat_non_ending_turn_commands(command, character, monster)
 
         if command == 'attack':
             character.attack(monster)
