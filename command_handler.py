@@ -8,48 +8,7 @@ from information_printer import (print_live_npcs, print_live_monsters, print_que
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar)
 
 
-# TODO: Move this function to a new module, something like command_router, which will route appropriate commands to their
 # handlers here!
-def handle_main_commands(main_character, zone_object):
-    """
-    Get a command from the player and if it's a valid command: run it.
-    :param main_character: A Character class object. This is basically the player
-    :param zone_object: A class object of Zone
-    """
-    command = input()
-    if command is '?':
-        pac_main_ooc()  # print available commands in the main loop when out of combat
-    elif command == 'save':
-        save_character(main_character)
-    elif command == 'go to ?':
-        pac_map_directions(possible_routes=zone_object.get_cs_map())
-    elif command == 'print available quests' or command == 'paq':
-        print_available_quests(available_quests=zone_object.get_cs_quests(), players_level=main_character.level)
-    elif command == 'print quest log':
-        main_character.print_quest_log()
-    elif command == 'print inventory':
-        main_character.print_inventory()
-    elif command == "open inventory":
-        handle_open_inventory_command(main_character)
-    elif 'talk to' in command:
-        handle_talk_to_command(command, main_character, zone_object)
-    elif 'buy from' in command:
-        handle_buy_from_command(command, main_character, zone_object)
-    elif 'engage' in command:
-        handle_engage_command(command, main_character, zone_object)
-    elif 'accept' in command:  # accept the quest
-        handle_accept_quest_command(command, main_character, available_quests=zone_object.get_cs_quests())
-    elif 'go to' in command:
-        handle_go_to_command(command, main_character, zone_object)
-    elif command == 'print alive monsters' or command == 'pam':
-        print_live_monsters(zone_object)
-    elif command == 'print alive npcs' or command == 'pan':
-        print_live_npcs(zone_object)
-    elif command == 'print all alive monsters':
-        print_live_monsters(zone_object, print_all=True)
-    elif command == 'print all alive npcs':
-        print_live_npcs(zone_object, print_all=True)
-
 
 def handle_talk_to_command(command:str, character, zone_object: Zone):
     alive_npcs, guid_name_set = zone_object.get_cs_npcs()
@@ -245,6 +204,59 @@ def handle_quest_item_choice(item_rewards: dict):
             print("Available commands:")
             print("\tchoose [Item Name]")
             print("\t\tTakes the item\n")
+
+
+def handle_save_character_command(main_character):
+    """ this function handles the 'save' command"""
+    save_character(main_character)
+
+
+def handle_help_command():
+    """ this function handles the '?' command, displaying the user with all his possible commands"""
+    pac_main_ooc()  # print available commands in the main loop when out of combat
+
+
+def handle_go_to_help_command(zone_object):
+    """ this function handles the 'go to ?' command, displaying the user with all the possible routes he can take"""
+    pac_map_directions(possible_routes=zone_object.get_cs_map())
+
+
+def handle_paq_command(zone_object, main_character):
+    """ this function handles the 'print available quests' or 'paq' command, showing the player all the quests
+    he is eligible to take """
+    print_available_quests(available_quests=zone_object.get_cs_quests(), players_level=main_character.level)
+
+
+def handle_pql_command(main_character):
+    """ this function handles the 'print quest log' or 'pql' command, showing the player all the quests he is
+    currently on """
+    main_character.print_quest_log()
+
+
+def handle_print_inventory_command(main_character):
+    """ this function handles the 'print inventory' command, showing the player's inventory """
+    main_character.print_inventory()
+
+
+def handle_pam_command(zone_object, print_all: bool=False):
+    """
+    this function handles the 'print alive monsters' or 'pam' command, showing the player all the
+    live creatures in his current zone
+    :param print_all: on a default print, we print only 5 alive monsters. If we want to print all of the live monsters
+    in the current zone, this boolean muut be set to True
+    """
+    print_live_monsters(zone_object, print_all)
+
+
+def handle_pan_command(zone_object, print_all: bool=False):
+    """
+    this function handles the 'print alive npcs' or 'pan' command, showing the player all the live NPCs
+    in his current zone
+    :param print_all: on a default print, we print only 5 alive NPCs. If we want to print all of the live monsters
+    in the current zone, this boolean must be set to True
+    """
+    print_live_npcs(zone_object, print_all)
+
 
 # IN COMBAT COMMANDS
 # COMMANDS THAT DO NOT END THE TURN

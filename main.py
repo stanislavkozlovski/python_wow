@@ -1,6 +1,6 @@
 import atexit
 
-from command_handler import handle_main_commands
+from command_router import route_main_commands
 from information_printer import print_live_monsters, print_live_npcs, welcome_print
 from zones.zone import Zone
 from items import Weapon
@@ -37,7 +37,7 @@ def main():
 
     # main game loop
     while True:
-        handle_main_commands(main_character, zone_object)
+        route_main_commands(main_character, zone_object)
 
 
 def get_zone_object(zone: str):
