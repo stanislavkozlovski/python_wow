@@ -1,5 +1,5 @@
 # A console turn-based RPG game inspired by World of Warcraft written in Python 3.
-<img src="http://imgur.com/aPFfeMt" width="100%"></img> 
+<img src="https://i.imgur.com/aPFfeMt.jpg" width="100%"></img> 
 The game itself is a turn based and works through user text commands. The plan is to create a somewhat complex game with good code structure.
 It's still very basic and I suggest that you download it and play around to see what it's about.
 I have never had another project open to contributors before, so if anything is unclear or needs improvement please contact me - familyguyuser192@windowslive.com
