@@ -637,8 +637,15 @@ def load_dot(dot_id: int, level: int) -> DoT:
 def load_saved_character(name: str):
     """
     This function loads the information about a saved chacacter in the saved_character DB table.
+
+       name,   class,  level,  loaded_scripts_ID,  killed_monsters_ID, completed_quests_ID, inventory_ID, gold
+Netherblood, Paladin,     10,                 1,                    1,                   1,            1,   23
+
+    The attributes that end in ID like loaded_scripts_ID are references to other tables.
+
+    For more information:
+    https://github.com/Enether/python_wow/wiki/How-saving-a-Character-works-and-information-about-the-saved_character-database-table.
     """
-    # TODO: Create character
     from classes import Paladin
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
@@ -665,6 +672,25 @@ def load_saved_character(name: str):
             # no such character
             raise NoSuchCharacterError("There is no saved character by the name of {}!".format(name))
 
+
+def load_all_saved_characters_general_info() -> list:
+    """
+    This function loads general information about the saved characters in the DB and returns it as a list of
+    dictionaries to  be easily printable.
+    """
+    saved_characters = []
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        gi_char_reader = cursor.execute("SELECT name, class, level FROM saved_character")
+
+        for char_info in gi_char_reader:
+            char_name = char_info[DBINDEX_SAVED_CHARACTER_NAME]
+            char_class = char_info[DBINDEX_SAVED_CHARACTER_CLASS]
+            char_level = char_info[DBINDEX_SAVED_CHARACTER_LEVEL]
+
+            saved_characters.append({'name': char_name, 'class': char_class, 'level': char_level})
+
+    return saved_characters
 
 def load_saved_character_loaded_scripts(id: int) -> set:
     """

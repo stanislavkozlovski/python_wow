@@ -5,11 +5,12 @@ from termcolor import colored
 
 from entities import Character
 from classes import Paladin
-from information_printer import print_available_character_classes
-from loader import load_saved_character
+from information_printer import print_available_character_classes, print_available_characters_to_load
+from loader import load_saved_character, load_all_saved_characters_general_info
 from exceptions import NoSuchCharacterError
 
 AVAILABLE_CLASSES = ['paladin']
+
 
 def get_player_character() -> Character:
     """
@@ -58,9 +59,13 @@ def handle_create_character() -> Character:
 
     return character
 
+
 def handle_load_character() -> Character:
     """ this function loads a character from the DB """
+    saved_characters_general_info = load_all_saved_characters_general_info()  # list of all the characters available for load
     print("You've chosen to load an existing character, please enter the name of the character you want to load: ")
+    print_available_characters_to_load(saved_characters_general_info)  # print available characters
+
     character_name = input()
 
     try:
