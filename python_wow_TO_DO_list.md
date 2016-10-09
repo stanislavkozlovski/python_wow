@@ -48,8 +48,6 @@
 - [x] Monster gossip on attack
 - [x] Add armor to monsters
 - [x] Sell option to sell items to vendors
-- [x] Add the ability to save the character
-- [x] List all saved characters when the user wants to load a character
 
 # Low Priority TODOs
 - Add more content(monster, zone/subzones, npcs, items, vendors, spells and etc)
@@ -62,13 +60,13 @@
 - Add item gossip text
 - Fix bug where when we attack a monster, the monster's absorption does not get printed.
 - Move the functions that choose what to do based on the user's command to a new module, something like command_router, which will route appropriate commands to their handlers in command_handler.py
-
+- List all saved characters when the user wants to load a character
 
 # TODOs
 - Add documentation!
 - Add some kind of armor item type (Head, etc)
 - Add another class of choice. (Mage is on my mind)
-
+- Add the ability to save the character
 
 - Add a scripted NPC to the game
 

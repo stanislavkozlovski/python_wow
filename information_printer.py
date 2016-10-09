@@ -134,20 +134,6 @@ def print_available_character_classes():
     print("| "*20)
 
 
-def print_available_characters_to_load(characters_list: list):
-    """
-    This function prints all the saved characters in the database that the player can choose to load
-    :param characters_list: A list of dictionaries for each character, holding the keys 'name','class' and 'level'.
-    """
-    if characters_list:
-        print("Available characters to load:")
-        for character in characters_list:
-            print("\t| {name} - {level} {class_}".format(name=character['name'],
-                                                        level=character['level'],
-                                                        class_=character['class']))
-    else:
-        print("No available characters to laod from the DB, enter something to exit this prompt.")
-
 def welcome_print(game_version: str):
     print("*"*50)
     print("WELCOME TO PYTHON WOW VERSION: {0}".format(game_version))
