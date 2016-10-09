@@ -1,17 +1,21 @@
 import sqlite3
+import items
 
 from database_info import \
     (DB_PATH,
 
      DBINDEX_SAVED_CHARACTER_NAME, DBINDEX_SAVED_CHARACTER_CLASS, DBINDEX_SAVED_CHARACTER_LEVEL,
      DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID, DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID,
-     DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID,
+     DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID, DBINDEX_SAVED_CHARACTER_INVENTORY_ID,
+     DBINDEX_SAVED_CHARACTER_GOLD,
 
      DBINDEX_SC_LOADED_SCRIPTS_SCRIPT_NAME,
 
      DBINDEX_SC_KILLED_MONSTERS_GUID,
 
      DBINDEX_SC_COMPLETED_QUESTS_NAME,
+
+     DBINDEX_SC_INVENTORY_ITEM_ID, DBINDEX_SC_INVENTORY_ITEM_COUNT,
 
 
      DBINDEX_CREATURES_GUID, DBINDEX_CREATURES_CREATURE_ID,
@@ -25,6 +29,7 @@ from database_info import \
 
      DBINDEX_NPC_VENDOR_ITEM_COUNT, DBINDEX_NPC_VENDOR_ITEM_ID, DBINDEX_NPC_VENDOR_PRICE,
 
+     DBINDEX_ITEM_TEMPLATE_ENTRY,
      DBINDEX_ITEM_TEMPLATE_NAME, DBINDEX_ITEM_TEMPLATE_TYPE, DBINDEX_ITEM_TEMPLATE_BUY_PRICE,
      DBINDEX_ITEM_TEMPLATE_SELL_PRICE, DBINDEX_ITEM_TEMPLATE_MIN_DMG, DBINDEX_ITEM_TEMPLATE_MAX_DMG,
      DBINDEX_ITEM_TEMPLATE_QUEST_ID, DBINDEX_ITEM_TEMPLATE_EFFECT,
@@ -54,7 +59,7 @@ from database_info import \
      DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
      )
 from quest import KillQuest, FetchQuest
-import items
+from exceptions import NoSuchCharacterError
 from buffs import BeneficialBuff, DoT
 from damage import Damage
 
@@ -537,6 +542,7 @@ def load_item(item_ID: int):
         cursor.execute("SELECT * FROM item_template WHERE entry = ?", [item_ID])
         item_template_info = cursor.fetchone()
 
+        item_id = item_template_info[DBINDEX_ITEM_TEMPLATE_ENTRY]  # type: int
         item_name = item_template_info[DBINDEX_ITEM_TEMPLATE_NAME]
         item_type = item_template_info[DBINDEX_ITEM_TEMPLATE_TYPE]
         item_buy_price = item_template_info[DBINDEX_ITEM_TEMPLATE_BUY_PRICE]  # type: int
@@ -544,18 +550,19 @@ def load_item(item_ID: int):
 
         if item_type == 'misc':
             item_quest_ID = item_template_info[DBINDEX_ITEM_TEMPLATE_QUEST_ID]
-            return items.Item(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price, quest_ID=item_quest_ID)
+            return items.Item(name=item_name, item_id=item_id, buy_price=item_buy_price, sell_price=item_sell_price,
+                              quest_ID=item_quest_ID)
         elif item_type == 'weapon':
             item_min_dmg = item_template_info[DBINDEX_ITEM_TEMPLATE_MIN_DMG]  # type: int
             item_max_dmg = item_template_info[DBINDEX_ITEM_TEMPLATE_MAX_DMG]  # type: int
 
-            return items.Weapon(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price,
+            return items.Weapon(name=item_name, item_id=item_id, buy_price=item_buy_price, sell_price=item_sell_price,
                                 min_damage=item_min_dmg, max_damage=item_max_dmg)
         elif item_type == 'potion':
             buff_id = item_template_info[DBINDEX_ITEM_TEMPLATE_EFFECT]  # type: int
             item_buff_effect = load_buff(buff_id)  # type: BeneficialBuff
 
-            return items.Potion(name=item_name, buy_price=item_buy_price, sell_price=item_sell_price,
+            return items.Potion(name=item_name, item_id=item_id, buy_price=item_buy_price, sell_price=item_sell_price,
                                 buff=item_buff_effect)
         else:
             raise Exception("Unsupported item type {}".format(item_type))
@@ -637,20 +644,26 @@ def load_saved_character(name: str):
         cursor = connection.cursor()
         sv_char_reader = cursor.execute("SELECT * FROM saved_character WHERE name = ?", [name]).fetchone()
 
-        char_name = sv_char_reader[DBINDEX_SAVED_CHARACTER_NAME]
-        char_class = sv_char_reader[DBINDEX_SAVED_CHARACTER_CLASS]
-        char_level = sv_char_reader[DBINDEX_SAVED_CHARACTER_LEVEL]
-        char_loaded_scripts_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID]
-        char_killed_monsters_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID]
-        char_completed_quests_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID]
+        if sv_char_reader:
+            char_class = sv_char_reader[DBINDEX_SAVED_CHARACTER_CLASS]
+            char_level = sv_char_reader[DBINDEX_SAVED_CHARACTER_LEVEL]
+            char_loaded_scripts_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID]
+            char_killed_monsters_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID]
+            char_completed_quests_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID]
+            char_inventory_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_INVENTORY_ID]
+            char_gold = sv_char_reader[DBINDEX_SAVED_CHARACTER_GOLD]  # type: int
 
-        if char_class == 'Paladin':
-            return Paladin(name=name, level=char_level,
-                           loaded_scripts=load_saved_character_loaded_scripts(char_loaded_scripts_ID),
-                           killed_monsters=load_saved_character_killed_monsters(char_killed_monsters_ID),
-                           completed_quests=load_saved_character_completed_quests(char_completed_quests_ID))
+            if char_class == 'paladin':
+                return Paladin(name=name, level=char_level,
+                               loaded_scripts=load_saved_character_loaded_scripts(char_loaded_scripts_ID),
+                               killed_monsters=load_saved_character_killed_monsters(char_killed_monsters_ID),
+                               completed_quests=load_saved_character_completed_quests(char_completed_quests_ID),
+                               saved_inventory=load_saved_character_inventory(id=char_inventory_ID, gold=char_gold))
+            else:
+                raise Exception("Unsupported class - {}".format(char_class))
         else:
-            raise Exception("Unsupported class - {}".format(char_class))
+            # no such character
+            raise NoSuchCharacterError("There is no saved character by the name of {}!".format(name))
 
 
 def load_saved_character_loaded_scripts(id: int) -> set:
@@ -729,6 +742,38 @@ def load_saved_character_completed_quests(id: int) -> set:
             completed_quests_set.add(sc_completed_quest_name)
 
     return completed_quests_set
+
+
+def load_saved_character_inventory(id: int, gold: int=0) -> dict:
+    """
+    This function loads all the items that are in the character's inventory, stored in saved_character_inventory, with the
+    corresponding ID to the rows in that table. The table looks like this:
+
+    id, item_id, item_count
+     1,       1,        5
+     Meaning the character has 5 Wolf Meats in his inventory
+
+    :param id: The ID corresponding to the entries in saved_character_inventory
+    :param gold: The amount of gold the character has
+    :return: A dictionary, Key: item_name, Value: tuple(Item class instance, Item Count)
+    """
+
+    loaded_inventory = {"gold": gold}
+
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        sc_inventory_items = cursor.execute("SELECT * FROM saved_character_inventory WHERE id = ?", [id])
+
+        for item_row_info in sc_inventory_items:
+            item_id = item_row_info[DBINDEX_SC_INVENTORY_ITEM_ID]
+            item_count = item_row_info[DBINDEX_SC_INVENTORY_ITEM_COUNT]  # type: int
+
+            item = load_item(item_id)  # type: Item
+
+            loaded_inventory[item.name] = (item, item_count)
+
+    return loaded_inventory
+
 
 def load_character_level_stats() -> dict:
     """

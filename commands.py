@@ -42,6 +42,8 @@ def pac_main_ooc():
     print("\t\tMoves the character to the selected sub zone.\n")
     print("\tgo to ?")
     print("\t\tShows a list of the reachable sub zones from the one the character is in.\n")
+    print("\tsave")
+    print("\t\tSaves your character to the database.\n")
     print("\t?")
     print("\t\tShows a list of available commands.\n")
 

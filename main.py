@@ -1,11 +1,13 @@
-import classes
+import atexit
 
 from command_handler import handle_main_commands
 from information_printer import print_live_monsters, print_live_npcs, welcome_print
 from zones.zone import Zone
 from items import Weapon
+from save_character import save_character
+from start_game_prompt import get_player_character
 from zones.northshire_abbey import NorthshireAbbey
-GAME_VERSION = '0.0.4.9.4 ALPHA'
+GAME_VERSION = '0.0.5 ALPHA'
 ZONES = {"Northshire Abbey": None}
 
 # TODO: CURRENT TASK:Add the ability to save/load the character
@@ -13,17 +15,15 @@ ZONES = {"Northshire Abbey": None}
 
 #  Subtasks
 
-# TODO: Save the character, even on alt-f4
-# TODO: Add a prompt where you choose if you want to create a new character or save one
 # TODO: Move the load character to another module
-# TODO: Save scripts that you've seen
 
 def main():
     welcome_print(GAME_VERSION)
     from loader import load_saved_character
-    main_character = load_saved_character(name='Netherblood')
+    main_character = get_player_character()
+    atexit.register(on_exit_handler, main_character)
     ZONES["Northshire Abbey"] = NorthshireAbbey(main_character)
-    starter_weapon = Weapon(name="Starter Weapon", min_damage=1, max_damage=3)
+    starter_weapon = Weapon(name="Starter Weapon", item_id=0, min_damage=1, max_damage=3)
     main_character.equip_weapon(starter_weapon)
     print("Character {0} created!".format(main_character.name))
 
@@ -47,6 +47,10 @@ def get_zone_object(zone: str):
     """
     return ZONES[zone]
 
+
+def on_exit_handler(character):
+    """ saves the character when the user quits the game"""
+    save_character(character)
 
 if __name__ == '__main__':
     main()

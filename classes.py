@@ -29,9 +29,10 @@ class Paladin(Character):
     KEY_MELTING_STRIKE  = "Melting Strike"
 
     def __init__(self, name: str, level: int = 1, health: int = 12, mana: int = 15, strength: int = 4,
-                 loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=()):
+                 loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=(),
+                 saved_inventory: dict={"gold": 0}):
         super().__init__(name=name, health=health, mana=mana, strength=strength, loaded_scripts=loaded_scripts,
-                         killed_monsters=killed_monsters, completed_quests=completed_quests)
+                         killed_monsters=killed_monsters, completed_quests=completed_quests, saved_inventory=saved_inventory)
         self.min_damage = 1
         self.max_damage = 3
         self._lookup_and_handle_new_spells()

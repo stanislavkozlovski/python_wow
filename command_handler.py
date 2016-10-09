@@ -2,12 +2,14 @@
 This module will handle the player's commands
 """
 from zones.zone import Zone
+from save_character import save_character
 from commands import pac_main_ooc, pac_map_directions, pac_in_combat, pac_vendor_dialogue, pac_opened_inventory
 from information_printer import (print_live_npcs, print_live_monsters, print_quest_item_choices,
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar)
 
 
-
+# TODO: Move this function to a new module, something like command_router, which will route appropriate commands to their
+# handlers here!
 def handle_main_commands(main_character, zone_object):
     """
     Get a command from the player and if it's a valid command: run it.
@@ -17,6 +19,8 @@ def handle_main_commands(main_character, zone_object):
     command = input()
     if command is '?':
         pac_main_ooc()  # print available commands in the main loop when out of combat
+    elif command == 'save':
+        save_character(main_character)
     elif command == 'go to ?':
         pac_map_directions(possible_routes=zone_object.get_cs_map())
     elif command == 'print available quests' or command == 'paq':

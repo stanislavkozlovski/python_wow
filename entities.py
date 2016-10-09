@@ -490,11 +490,12 @@ class Character(LivingThing):
     attributes = {KEY_STRENGTH: 0, KEY_ARMOR: 0, KEY_AGILITY: 0}  # dictionary holding attributes, KEY: strength, Value: 5
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1,
-                 loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=set()):
+                 loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=set(),
+                 saved_inventory: dict={'gold': 0}):
         super().__init__(name, health, mana, level=1)
         self.min_damage = 0
         self.max_damage = 1
-        self.equipped_weapon = Weapon(name="Starter Weapon")
+        self.equipped_weapon = Weapon(name="Starter Weapon", item_id=0)
         self.experience = 0
         self.xp_req_to_level = 400
         self.attributes[self.KEY_ARMOR] = 75
@@ -510,7 +511,7 @@ class Character(LivingThing):
         self._LEVEL_STATS = load_character_level_stats()
         self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements()
         self.quest_log = {}
-        self.inventory = {"gold": 0} # dict Key: str, Value: tuple(Item class instance, Item Count)
+        self.inventory = saved_inventory # dict Key: str, Value: tuple(Item class instance, Item Count)
 
     def start_turn_update(self):
         super().start_turn_update()
@@ -676,7 +677,7 @@ class Character(LivingThing):
             self.revive()
             print("Character {} has been revived!".format(self.name))
         else:
-            exit()
+            raise SystemExit  # quit the game
 
     def has_enough_gold(self, gold: int) -> bool:
         """

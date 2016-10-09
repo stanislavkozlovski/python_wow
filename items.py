@@ -6,8 +6,9 @@ from termcolor import colored
 
 
 class Item:
-    def __init__(self, name: str, buy_price: int, sell_price: int, quest_ID: int=0):
+    def __init__(self, name: str, item_id: int, buy_price: int, sell_price: int, quest_ID: int=0):
         self.name = name
+        self.id = item_id
         self.buy_price = buy_price
         self.sell_price = sell_price
         self.quest_ID = quest_ID
@@ -17,8 +18,8 @@ class Item:
 
 
 class Weapon(Item):
-    def __init__(self, name: str, buy_price: int = 0, sell_price: int = 0, min_damage: int = 0, max_damage: int = 1):
-        super().__init__(name, buy_price, sell_price)
+    def __init__(self, name: str, item_id: int, buy_price: int = 0, sell_price: int = 0, min_damage: int = 0, max_damage: int = 1):
+        super().__init__(name, item_id, buy_price, sell_price)
         self.min_damage = min_damage
         self.max_damage = max_damage
 
@@ -29,8 +30,8 @@ class Weapon(Item):
 
 class Potion(Item):
     """ Consumable item that gives a buff to the player"""
-    def __init__(self, name: str, buy_price: int, sell_price: int, buff: BeneficialBuff, quest_ID: int=0, ):
-        super().__init__(name, buy_price, sell_price, quest_ID)
+    def __init__(self, name: str, item_id: int, buy_price: int, sell_price: int, buff: BeneficialBuff, quest_ID: int=0, ):
+        super().__init__(name, item_id, buy_price, sell_price, quest_ID)
         self.buff = buff
 
     def __str__(self):
