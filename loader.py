@@ -71,6 +71,12 @@ def parse_int(value) -> int:
     this function is used to parse data from the DB into an integer.
     because a lot of the cells can be empty, we get None as the return type. This function makes sure we
     get 0 if the value is None or empty
+
+    !!! IMPORTANT !!!
+    This is to be added to values where we would not want to cause an exception if they were None(Null), like
+    the amount of gold a character has or the amount of armor an item gives.
+    On other cases, like cells pointing to certain other database IDs, a missing number there makes the row
+    invalid, thus we want to create an exception.
     """
     return int(value or 0)
 
@@ -131,22 +137,20 @@ def load_monsters(zone: str, subzone: str, character) -> tuple:
             # )
             creature_template_name = creature_template_info[DBINDEX_CREATURE_TEMPLATE_NAME]
             creature_template_level = creature_template_info[DBINDEX_CREATURE_TEMPLATE_LEVEL]  # type: int
-            creature_template_health = creature_template_info[DBINDEX_CREATURE_TEMPLATE_HEALTH]  # type: int
-            creature_template_mana = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MANA]  # type: int
+            creature_template_health = parse_int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_HEALTH])  # type: int
+            creature_template_mana = parse_int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MANA])  # type: int
+            creature_template_armor = parse_int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_ARMOR])  # type: int
             creature_template_min_dmg = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MIN_DMG]  # type: int
-            creature_template_armor = creature_template_info[DBINDEX_CREATURE_TEMPLATE_ARMOR]
             creature_template_max_dmg = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MAX_DMG]  # type: int
 
-            creature_template_quest_relation_ID = (
-            creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID]  # type: int
-            if not creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID] is None else 0)
+            creature_template_quest_relation_ID = parse_int(
+                creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID])  # type: int
 
-            creature_template_loot_table_ID = (
-            creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID]  # type: int
-            if not creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID] is None else 0)
+            creature_template_loot_table_ID = parse_int(
+            creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID])  # type: int
 
             creature_template_gossip = creature_template_info[DBINDEX_CREATURE_TEMPLATE_GOSSIP]  # type: str
-            creature_template_respawnable = bool(creature_template_info[DBINDEX_CREATURE_TEMPLATE_RESPAWNABLE])
+            creature_template_respawnable = bool(parse_int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_RESPAWNABLE]))
 
             # save into the set
             guid_name_set.add((creature_guid, creature_template_name))
@@ -224,18 +228,16 @@ def load_npcs(zone: str, subzone: str) -> tuple:
             creature_template_name = creature_template_info[DBINDEX_CREATURE_TEMPLATE_NAME]
             creature_template_type = creature_template_info[DBINDEX_CREATURE_TEMPLATE_TYPE]
             creature_template_level = creature_template_info[DBINDEX_CREATURE_TEMPLATE_LEVEL]  # type: int
-            creature_template_health = creature_template_info[DBINDEX_CREATURE_TEMPLATE_HEALTH]  # type: int
-            creature_template_mana = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MANA]  # type: int
+            creature_template_health = parse_int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_HEALTH])  # type: int
+            creature_template_mana = parse_int(creature_template_info[DBINDEX_CREATURE_TEMPLATE_MANA])  # type: int
             creature_template_min_dmg = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MIN_DMG]  # type: int
             creature_template_max_dmg = creature_template_info[DBINDEX_CREATURE_TEMPLATE_MAX_DMG]  # type: int
 
-            creature_template_quest_relation_ID = (
-            creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID]  # type: int
-            if not creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID] is None else -1)
+            creature_template_quest_relation_ID = parse_int(
+            creature_template_info[DBINDEX_CREATURE_TEMPLATE_QUEST_RELATION_ID])  # type: int
 
-            creature_template_loot_table_ID = (
-            creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID]  # type: int
-            if not creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID] is None else -1)
+            creature_template_loot_table_ID = parse_int(
+            creature_template_info[DBINDEX_CREATURE_TEMPLATE_LOOT_TABLE_ID])  # type: int
 
             creature_template_gossip = creature_template_info[DBINDEX_CREATURE_TEMPLATE_GOSSIP]
 
@@ -309,11 +311,11 @@ entry,            name,    type, required_level,           monster_required,  it
                 continue  # do not load the quest into the game if the character has completed it
 
             quest_type = row[DBINDEX_QUEST_TEMPLATE_TYPE]  #  type: str
-            quest_level_requirement = row[DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED]  # type: int
+            quest_level_requirement = parse_int(row[DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED])  # type: int
             quest_monster_required = row[DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED]  # type: str
             quest_item_required = row[DBINDEX_QUEST_TEMPLATE_ITEM_REQUIRED]  # type: str
-            quest_amount_required = row[DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED]  # type: int
-            quest_xp_reward = row[DBINDEX_QUEST_TEMPLATE_XP_REWARD]  # type: int
+            quest_amount_required = parse_int(row[DBINDEX_QUEST_TEMPLATE_AMOUNT_REQUIRED])  # type: int
+            quest_xp_reward = parse_int(row[DBINDEX_QUEST_TEMPLATE_XP_REWARD])  # type: int
             quest_item_reward1_id = row[DBINDEX_QUEST_TEMPLATE_ITEM_REWARD1]  # type: int
             quest_item_reward2_id = row[DBINDEX_QUEST_TEMPLATE_ITEM_REWARD2]  # type: int
             quest_item_reward3_id = row[DBINDEX_QUEST_TEMPLATE_ITEM_REWARD3]  # type: int
@@ -557,19 +559,19 @@ def load_item(item_ID: int):
         item_id = item_template_info[DBINDEX_ITEM_TEMPLATE_ENTRY]  # type: int
         item_name = item_template_info[DBINDEX_ITEM_TEMPLATE_NAME]
         item_type = item_template_info[DBINDEX_ITEM_TEMPLATE_TYPE]
-        item_buy_price = item_template_info[DBINDEX_ITEM_TEMPLATE_BUY_PRICE]  # type: int
-        item_sell_price = item_template_info[DBINDEX_ITEM_TEMPLATE_SELL_PRICE]  # type: int
+        item_buy_price = parse_int(item_template_info[DBINDEX_ITEM_TEMPLATE_BUY_PRICE])  # type: int
+        item_sell_price = parse_int(item_template_info[DBINDEX_ITEM_TEMPLATE_SELL_PRICE])  # type: int
 
         if item_type == 'misc':
             item_quest_ID = item_template_info[DBINDEX_ITEM_TEMPLATE_QUEST_ID]
             return items.Item(name=item_name, item_id=item_id, buy_price=item_buy_price, sell_price=item_sell_price,
                               quest_ID=item_quest_ID)
         elif item_type == 'weapon':
-            item_health = item_template_info[DBINDEX_ITEM_TEMPLATE_HEALTH]  # type: int
-            item_mana = item_template_info[DBINDEX_ITEM_TEMPLATE_MANA]  # type: int
-            item_armor = item_template_info[DBINDEX_ITEM_TEMPLATE_ARMOR]  # type: int
-            item_strength = item_template_info[DBINDEX_ITEM_TEMPLATE_STRENGTH]  # type: int
-            item_agility = item_template_info[DBINDEX_ITEM_TEMPLATE_AGILITY]  # type: int
+            item_health = parse_int(item_template_info[DBINDEX_ITEM_TEMPLATE_HEALTH])  # type: int
+            item_mana = parse_int(item_template_info[DBINDEX_ITEM_TEMPLATE_MANA])  # type: int
+            item_armor = parse_int(item_template_info[DBINDEX_ITEM_TEMPLATE_ARMOR])  # type: int
+            item_strength = parse_int(item_template_info[DBINDEX_ITEM_TEMPLATE_STRENGTH])  # type: int
+            item_agility = parse_int(item_template_info[DBINDEX_ITEM_TEMPLATE_AGILITY])  # type: int
             attributes = items.create_attributes_dict(bonus_health=item_health, bonus_mana=item_mana,
                                                       armor=item_armor, strength=item_strength, agility=item_agility)
 
@@ -610,12 +612,12 @@ def load_buff(buff_id: int) -> BeneficialBuff:
 
         buff_name = buff_information[DBINDEX_SPELL_BUFFS_NAME]  # type: str
         buff_stat1 = buff_information[DBINDEX_SPELL_BUFFS_STAT1]  # type: str
-        buff_amount1 = buff_information[DBINDEX_SPELL_BUFFS_AMOUNT1]  # type: int
+        buff_amount1 = parse_int(buff_information[DBINDEX_SPELL_BUFFS_AMOUNT1])  # type: int
         buff_stat2 = buff_information[DBINDEX_SPELL_BUFFS_STAT2]  # type: str
-        buff_amount2 = buff_information[DBINDEX_SPELL_BUFFS_AMOUNT2]  # type: int
+        buff_amount2 = parse_int(buff_information[DBINDEX_SPELL_BUFFS_AMOUNT2])  # type: int
         buff_stat3 = buff_information[DBINDEX_SPELL_BUFFS_STAT3]  # type: str
-        buff_amount3 = buff_information[DBINDEX_SPELL_BUFFS_AMOUNT3]  # type: int
-        buff_duration = buff_information[DBINDEX_SPELL_BUFFS_DURATION]  # type: int
+        buff_amount3 = parse_int(buff_information[DBINDEX_SPELL_BUFFS_AMOUNT3])  # type: int
+        buff_duration = parse_int(buff_information[DBINDEX_SPELL_BUFFS_DURATION])  # type: int
 
 
         #  Create a list of tuples with each buff
@@ -679,7 +681,7 @@ Netherblood, Paladin,     10,                 1,                    1,          
             char_killed_monsters_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID]
             char_completed_quests_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID]
             char_inventory_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_INVENTORY_ID]
-            char_gold = sv_char_reader[DBINDEX_SAVED_CHARACTER_GOLD]  # type: int
+            char_gold = parse_int(sv_char_reader[DBINDEX_SAVED_CHARACTER_GOLD])  # type: int
 
             if char_class == 'paladin':
                 return Paladin(name=name, level=char_level,
@@ -813,7 +815,7 @@ def load_saved_character_inventory(id: int, gold: int=0) -> dict:
 
         for item_row_info in sc_inventory_items:
             item_id = item_row_info[DBINDEX_SC_INVENTORY_ITEM_ID]
-            item_count = item_row_info[DBINDEX_SC_INVENTORY_ITEM_COUNT]  # type: int
+            item_count = parse_int(item_row_info[DBINDEX_SC_INVENTORY_ITEM_COUNT])  # type: int
 
             item = load_item(item_id)  # type: Item
 
@@ -843,11 +845,11 @@ def load_character_level_stats() -> dict:
             level_dict = {}
 
             level = line[DBINDEX_LEVELUP_STATS_LEVEL]  # type: int
-            hp = line[DBINDEX_LEVELUP_STATS_HEALTH]   # type: int
-            mana = line[DBINDEX_LEVELUP_STATS_MANA]  # type: int
-            strength = line[DBINDEX_LEVELUP_STATS_STRENGTH]  # type: int
-            agility = line[DBINDEX_LEVELUP_STATS_AGILITY]
-            armor = line[DBINDEX_LEVELUP_STATS_ARMOR]  # type: int
+            hp = parse_int(line[DBINDEX_LEVELUP_STATS_HEALTH])   # type: int
+            mana = parse_int(line[DBINDEX_LEVELUP_STATS_MANA])  # type: int
+            strength = parse_int(line[DBINDEX_LEVELUP_STATS_STRENGTH])  # type: int
+            agility = parse_int(line[DBINDEX_LEVELUP_STATS_AGILITY]) # type: int
+            armor = parse_int(line[DBINDEX_LEVELUP_STATS_ARMOR])  # type: int
 
             level_dict[key_level_stats_health] = hp
             level_dict[key_level_stats_mana] = mana
