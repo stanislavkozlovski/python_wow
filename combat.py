@@ -24,7 +24,6 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
     """
     available_spells = get_available_spells(character)  # Load all of the currently available spells for our character
     will_end_turn = True  # Dictates if we are going to count the iteration of the loop as a turn
-
     character.enter_combat()
     monster.enter_combat()
     if(monster.gossip):  # if the monster has gossip

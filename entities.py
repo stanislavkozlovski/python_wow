@@ -263,15 +263,20 @@ class LivingThing:
 
         return damage_to_deal
 
-    def _apply_damage_absorption(self, damage: Damage) -> Damage:
+    def _apply_damage_absorption(self, damage: Damage, to_print=False) -> Damage:
         """
         This method subtracts the absorption (if any) from the damage
+        :param to_print: A boolean indicating if we want to actually subtract the damage from the shield. If it's true,
+        we're getting the damage for the sole reason to print it only, therefore we should not modify anything
         :return Tuple(Damage, absorbed(float)
         """
 
-        if self.absorption_shield:  # if there is anything to absord
+        if self.absorption_shield:  # if there is anything to absorb
             # lowers the damage and returns our shield
-            self.absorption_shield = damage.handle_absorption(self.absorption_shield)
+            if not to_print:  # we want to modify the shield
+                self.absorption_shield = damage.handle_absorption(self.absorption_shield)
+            else:
+                damage.handle_absorption(self.absorption_shield) # only modify the specific damage in order to print it
 
         return damage
     def _die(self):
@@ -378,7 +383,7 @@ class Monster(LivingThing):
         self.quest_relation_ID = quest_relation_id
         self.loot_table_ID = loot_table_ID
         self.loot = {"gold": self._gold_to_give}  # dict Key: str, Value: Item class object
-        # TODO: Add defualt monster armor for their level
+        # TODO: Add default monster armor for their level
 
     def __str__(self):
         colored_name = colored(self.name, color="red")
@@ -410,7 +415,7 @@ class Monster(LivingThing):
         """ this method returns the damage that the monster will suffer after taking into account
         armor and absorption. This is used for printing the result
         Currently: Only armor reduction and damage absorption is applied."""
-        return self._apply_damage_absorption(self._apply_armor_reduction(damage, attacker_level))
+        return self._apply_damage_absorption(self._apply_armor_reduction(damage, attacker_level), to_print=True)
 
     def _drop_loot(self):
         """

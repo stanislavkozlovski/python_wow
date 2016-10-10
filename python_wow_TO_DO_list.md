@@ -59,9 +59,7 @@
 # Small TODOs
 - Print Equipment
 - Print Stats (hp, mana, xp and everything else at once)
-- Add item gossip text
-- Fix bug where when we attack a monster, the monster's absorption does not get printed.
-
+- Add item gossip text 
 
 # TODOs
 - Add documentation!
