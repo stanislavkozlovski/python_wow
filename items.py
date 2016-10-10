@@ -36,15 +36,24 @@ class Item:
 
 
 class Weapon(Item):
-    def __init__(self, name: str, item_id: int, buy_price: int = 0, sell_price: int = 0, min_damage: int = 0, max_damage: int = 1):
+    def __init__(self, name: str, item_id: int, buy_price: int = 0, sell_price: int = 0, min_damage: int = 0,
+                 max_damage: int = 1, attributes_dict: dict=create_attributes_dict()):
         super().__init__(name, item_id, buy_price, sell_price)
         self.min_damage = min_damage
         self.max_damage = max_damage
+        self.attributes = attributes_dict  # the attributes this item gives on equip
 
     def __str__(self):
         return colored("{}".format(self.name), color="green") +  "- Weapon ({}-{}) damage".format(self.min_damage,
                                                                                                   self.max_damage)
 
+
+class Equipment(Item):
+    """ Any item that can be equipped in an equipment slot, as distinguished from items that can only be
+    carried in the inventory.
+    ex: Headpiece, Shoulderpad, Bracer"""
+    def __init__(self, name: str, item_id: int, buy_price: int=0, sell_price: int=0):
+        pass
 
 class Potion(Item):
     """ Consumable item that gives a buff to the player"""

@@ -65,7 +65,7 @@
 - Add documentation!
 - Add another class of choice. (Mage is on my mind)
 
-
+health,mana,strength,agi,armor
 - Add a scripted NPC to the game
 
 - Implement HoTs (heal over time effects)

@@ -10,16 +10,17 @@ from zones.northshire_abbey import NorthshireAbbey
 GAME_VERSION = '0.0.5 ALPHA'
 ZONES = {"Northshire Abbey": None}
 
-# TODO: CURRENT TASK:Add the ability to save/load the character
+# CURRENT TASK: Add different armor gear for the player
+# - head, shoulders, rings, ETC
 
-
-#  Subtasks
-
-# TODO: Move the load character to another module
+# DONE
+# added the implementation of stats for items and functions/convention to load/pass said stats
+# updated the weapon class
+# NEXT
+# Start adding different pieces
 
 def main():
     welcome_print(GAME_VERSION)
-    from loader import load_saved_character
     main_character = get_player_character()
     atexit.register(on_exit_handler, main_character)
     ZONES["Northshire Abbey"] = NorthshireAbbey(main_character)

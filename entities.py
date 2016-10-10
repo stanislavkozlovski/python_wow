@@ -488,11 +488,13 @@ class Character(LivingThing):
     # keys are used to access the level_stats dictionary that holds information on stats to update on each level up
     KEY_LEVEL_STATS_HEALTH = 'health'
     KEY_LEVEL_STATS_MANA = 'mana'
+    # these keys are used to access the attributes dictionary which holds information on the character's stats
     KEY_STRENGTH = 'strength'
     KEY_ARMOR = 'armor'
     KEY_AGILITY = 'agility'
+    KEY_BONUS_HEALTH = 'bonus_health'
+    KEY_BONUS_MANA = 'bonus_mana'
     spell_cooldowns = {}  # dictionary that holds Key: Spell Name(str), Value: It's cooldown in turns (int)
-    attributes = {KEY_STRENGTH: 0, KEY_ARMOR: 0, KEY_AGILITY: 0}  # dictionary holding attributes, KEY: strength, Value: 5
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1,
                  loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=set(),
@@ -503,9 +505,10 @@ class Character(LivingThing):
         self.equipped_weapon = Weapon(name="Starter Weapon", item_id=0)
         self.experience = 0
         self.xp_req_to_level = 400
-        self.attributes[self.KEY_ARMOR] = 75
-        self.attributes[self.KEY_AGILITY] = agility
-        self.attributes[self.KEY_STRENGTH] = strength
+        self.bonus_health = 0
+        self.bonus_mana = 0
+        self.attributes = {self.KEY_STRENGTH: strength, self.KEY_ARMOR: 75, self.KEY_AGILITY: agility, self.KEY_BONUS_HEALTH: 0,
+                      self.KEY_BONUS_MANA: 0}  # dictionary holding attributes, KEY: strength, Value: 5
         self.current_zone = "Northshire Abbey"
         self.current_subzone = "Northshire Valley"
         self.loaded_scripts = loaded_scripts  # holds the scripts that the character has seen (which should load only once)
@@ -547,6 +550,7 @@ class Character(LivingThing):
             else:  # we don't have such an item in the inventory, we create one
                 self.inventory[eq_weapon.name] = eq_weapon, 1
 
+            self._subtract_attributes(eq_weapon.attributes)  # remove the attributes it has given us
             self.equip_weapon(item)
 
         self._calculate_stats_formulas()  # always recalculate formulas when adding an item
@@ -575,7 +579,27 @@ class Character(LivingThing):
     def equip_weapon(self, weapon: Weapon):
         print("{} has equipped Weapon {}".format(self.name, weapon.name))
         self.equipped_weapon = weapon
+        self._add_attributes(weapon.attributes)
         self._calculate_stats_formulas()
+
+    def _add_attributes(self, attributes: dict):
+        """ this function goes through a dictionary that holds character attributes and adds them
+        with the character's. Called whenever we equip an item
+        We directly apply it to the character's attributes dictionary because we trust that the
+        argument has gone through item.py's create_attributes_dict function"""
+        for attribute_name, attribute_value in attributes.items():
+            self.attributes[attribute_name] += attribute_value
+
+    def _subtract_attributes(self, attributes: dict):
+        """ this function goes through a dictionary that holds character attributes and adds them
+            with the character's. Called whenever we dequip an item
+            We directly apply it to the character's attributes dictionary because we trust that the
+            argument has gone through item.py's create_attributes_dict function"""
+        for attribute_name, attribute_value in attributes.items():
+            # we also trust that the values cannot be negative after the subtraction, because the same amount has
+            # been added beforehand and we currently do not support any features that lower a character's
+            # attributes outside of combat, where he will not be able to dequip an item
+            self.attributes[attribute_name] -= attribute_value
 
     def _calculate_stats_formulas(self):
         """
@@ -583,10 +607,19 @@ class Character(LivingThing):
         According to that change, we need to recalculate the formulas in which those stats are used in.
         """
 
+        # update health according to bonus health
+        self.max_health -= self.bonus_health  # remove the old bonus health
+        self.bonus_health = self.attributes[self.KEY_BONUS_HEALTH]  # update bonus health
+        self.max_health += self.bonus_health  # add bonus health again
+        self.max_mana -= self.bonus_mana
+        self.bonus_mana = self.attributes[self.KEY_BONUS_MANA]
+        self.max_mana += self.bonus_mana
+
         # formula for agility is: for each point of agility, add 2.5 armor and 0.5 strength
         agility = self.attributes[self.KEY_AGILITY]
         self.attributes[self.KEY_STRENGTH] += agility * 0.5
         self.attributes[self.KEY_ARMOR] += agility * 2.5
+
 
         "Now we need to update our damage, because the strength might have been changed"
 
