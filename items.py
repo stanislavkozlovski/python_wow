@@ -4,6 +4,24 @@ This holds the classes for every kind of item in the game
 from buffs import BeneficialBuff
 from termcolor import colored
 
+KEY_BONUS_HEALTH = 'bonus_health'  # TODO: Move these constants to a constants.py module
+KEY_BONUS_MANA = 'bonus_mana'
+KEY_STRENGTH = 'strength'
+KEY_ARMOR = 'armor'
+KEY_AGILITY = 'agility'
+
+
+def create_attributes_dict(bonus_health: int=0, bonus_mana: int=0, armor: int=0, strength: int=0,
+                           agility: int=0) -> dict:
+    """
+    This function takes in stats (attributes) like bonus_health, strength, armor, etc and converts them into a
+    pre-defined dictionary holding all of them. This enables easier passing and application of said attributes
+    :return: a dict like {"strength": 10, "armor": 4}
+    """
+
+    return {KEY_BONUS_HEALTH: bonus_health, KEY_BONUS_MANA: bonus_mana,
+            KEY_ARMOR: armor, KEY_STRENGTH: strength, KEY_AGILITY: agility}
+
 
 class Item:
     def __init__(self, name: str, item_id: int, buy_price: int, sell_price: int, quest_ID: int=0):
