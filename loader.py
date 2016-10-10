@@ -64,6 +64,15 @@ from buffs import BeneficialBuff, DoT
 from damage import Damage
 
 
+def parse_int(value) -> int:
+    """
+    this function is used to parse data from the DB into an integer.
+    because a lot of the cells can be empty, we get None as the return type. This function makes sure we
+    get 0 if the value is None or empty
+    """
+    return int(value or 0)
+
+
 def load_monsters(zone: str, subzone: str, character) -> tuple:
     """
         Gets a query from the creatures table to load all hostile creatures in our current zone
