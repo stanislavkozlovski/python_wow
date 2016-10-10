@@ -63,7 +63,6 @@
 
 # TODOs
 - Add documentation!
-- Add some kind of armor item type (Head, etc)
 - Add another class of choice. (Mage is on my mind)
 
 
@@ -74,3 +73,13 @@
 - Create one shared creature_default DB table holding all the default values for creatures at a certain level (gold, xp, armor)
 - Add different kinds of damage
 - Create more damage classes, each with it's own flavour. (Destruction leaves off a DoT, Sinister has a chance to strike again, Merciless has a chance to crit and others without flavor (holy, frost, fire etc))
+
+# DOING
+- Add some kind of armor item type (Head, etc)
+# SUBTASKS
+- Update the Item Class
+- Update the DB to support such items
+- Create character equipment slots
+- Handle equipping/swapping of such items
+- Handle save/load of a character's equipment
+- Visual stuff, like printing them in a different color, ETC
