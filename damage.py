@@ -18,23 +18,23 @@ class Damage:
         """
         phys_dmg_print = ""
         if self.phys_dmg:
-            phys_dmg_print = "{phys_dmg} physical damage".format(phys_dmg=self.phys_dmg)
+            phys_dmg_print = "{phys_dmg:.2f} physical damage".format(phys_dmg=self.phys_dmg)
 
         if self.phys_absorbed:
-            phys_dmg_print = "{phys_dmg} physical damage ({absorbed} absorbed)".format(phys_dmg=self.phys_dmg,
+            phys_dmg_print = "{phys_dmg:.2f} physical damage ({absorbed:.2f} absorbed)".format(phys_dmg=self.phys_dmg,
                                                                                        absorbed=self.phys_absorbed)
 
 
         magic_dmg_print = ""
         if self.magic_dmg:
-            magic_dmg_print = "{magic_dmg} magical damage".format(magic_dmg=self.magic_dmg)
+            magic_dmg_print = "{magic_dmg:.2f} magical damage".format(magic_dmg=self.magic_dmg)
 
         if self.magic_absorbed:
-            magic_dmg_print = "{magic_dmg} magical damage ({absorbed} absorbed)".format(magic_dmg=self.magic_dmg,
+            magic_dmg_print = "{magic_dmg:.2f} magical damage ({absorbed:.2f} absorbed)".format(magic_dmg=self.magic_dmg,
                                                                                         absorbed=self.magic_absorbed)
 
         if phys_dmg_print and magic_dmg_print:
-            return "{phys} and {magic}".format(phys=phys_dmg_print, magic=magic_dmg_print)
+            return "{phys:.2f} and {magic:.2f}".format(phys=phys_dmg_print, magic=magic_dmg_print)
         elif phys_dmg_print:
             return phys_dmg_print
         elif magic_dmg_print:
