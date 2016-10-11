@@ -148,11 +148,13 @@ def print_available_characters_to_load(characters_list: list):
     else:
         print("No available characters to laod from the DB, enter something to exit this prompt.")
 
+
 def welcome_print(game_version: str):
-    print("*"*50)
-    print("WELCOME TO PYTHON WOW VERSION: {0}".format(game_version))
-    print("A simple console RPG game inspired by the Warcraft universe!")
+    game_version = colored(game_version, attrs=['bold'])
+    print("*"*80)
+    print("WELCOME TO PYTHON WOW VERSION: {0}".format(game_version).center(80, ' '))
+    print("A simple console RPG game".center(70, ' ') + '\n' + "inspired by the {warcraft} universe!".format(warcraft=colored("Warcraft", 'red')).center(80, ' '))
     print()
-    print("Type ? to see a list of available commands.")
-    print("*" * 50)
+    print(colored("Type ? to see a list of available commands.".center(80, ' '), 'yellow'))
+    print("*" * 80)
     print()
