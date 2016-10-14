@@ -16,6 +16,7 @@ ZONES = {"Northshire Abbey": None}
 # DONE
 # added the implementation of stats for items and functions/convention to load/pass said stats
 # updated the weapon class
+
 # NEXT
 # Start adding different pieces
 

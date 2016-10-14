@@ -23,6 +23,27 @@ def create_attributes_dict(bonus_health: int=0, bonus_mana: int=0, armor: int=0,
             KEY_ARMOR: armor, KEY_STRENGTH: strength, KEY_AGILITY: agility}
 
 
+def display_attributes(attributes: dict) -> str:
+    """
+    This function read a dictionary with attributes and returns a string displaying the attributes it gives.
+    A template: {armor} {health} {mana} {strength} {agility}
+    If any are missing, we don't add them
+    """
+    attributes_to_print = []
+
+    if attributes[KEY_ARMOR]:
+        attributes_to_print.append("armor: {}".format(attributes[KEY_ARMOR]))
+    if attributes[KEY_BONUS_HEALTH]:
+        attributes_to_print.append("health: {}".format(attributes[KEY_BONUS_HEALTH]))
+    if attributes[KEY_BONUS_MANA]:
+        attributes_to_print.append("mana: {}".format(attributes[KEY_BONUS_MANA]))
+    if attributes[KEY_STRENGTH]:
+        attributes_to_print.append("strength: {}".format(attributes[KEY_STRENGTH]))
+    if attributes[KEY_AGILITY]:
+        attributes_to_print.append("agility: {}".format(attributes[KEY_AGILITY]))
+
+    return ", ".join(attributes_to_print)
+
 class Item:
     def __init__(self, name: str, item_id: int, buy_price: int, sell_price: int, quest_ID: int=0):
         self.name = name
@@ -52,8 +73,16 @@ class Equipment(Item):
     """ Any item that can be equipped in an equipment slot, as distinguished from items that can only be
     carried in the inventory.
     ex: Headpiece, Shoulderpad, Bracer"""
-    def __init__(self, name: str, item_id: int, buy_price: int=0, sell_price: int=0):
-        pass
+    def __init__(self, name: str, item_id: int, slot: str, attributes_dict: dict=create_attributes_dict(), buy_price: int=0, sell_price: int=0):
+        super().__init__(name, item_id, buy_price, sell_price)
+        self.slot = slot
+        self.attributes = attributes_dict
+
+    def __str__(self):
+        return (colored("{}".format(self.name), color="green")
+               + " - {slot_pos} Equipment Piece: ".format(slot_pos=self.slot)
+               + display_attributes(self.attributes))
+
 
 class Potion(Item):
     """ Consumable item that gives a buff to the player"""
