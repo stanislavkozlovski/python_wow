@@ -73,7 +73,7 @@ class Weapon(Item):
 class Equipment(Item):
     """ Any item that can be equipped in an equipment slot, as distinguished from items that can only be
     carried in the inventory.
-    ex: Headpiece, Shoulderpad, Necklace, Chestpiece, Bracer, Gloves, Belt, Leggings, Boots"""
+    ex: Headpiece, Shoulderpad, Necklace, Chestguard, Bracer, Gloves, Belt, Leggings, Boots"""
     def __init__(self, name: str, item_id: int, slot: str, attributes_dict: dict=create_attributes_dict(), buy_price: int=0, sell_price: int=0):
         super().__init__(name, item_id, buy_price, sell_price)
         self.slot = slot

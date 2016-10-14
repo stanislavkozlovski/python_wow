@@ -81,7 +81,7 @@ health,mana,strength,agi,armor
 # SUBTASKS
 CHECK --------- Update the Item Class ------- CHECK
 CHECK --------- Update the DB to support such items ------- CHECK
-- Create character equipment slots
+CHECK --------- Create character equipment slots ------- CHECK
 - Handle equipping/swapping of such items
 - Handle save/load of a character's equipment
 - Visual stuff, like printing them in a different color, ETC

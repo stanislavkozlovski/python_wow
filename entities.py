@@ -13,6 +13,27 @@ from quest import Quest, FetchQuest
 from damage import Damage
 from buffs import BeneficialBuff, DoT
 from exceptions import ItemNotInInventoryError
+#    ex: Headpiece, Shoulderpad, Necklace, Chestguard, Bracer, Gloves, Belt, Leggings, Boots"""
+
+CHARACTER_EQUIPMENT_HEADPIECE_KEY = 'headpiece'
+CHARACTER_EQUIPMENT_SHOULDERPAD_KEY = 'shoulderpad'
+CHARACTER_EQUIPMENT_NECKLACE_KEY = 'necklace'
+CHARACTER_EQUIPMENT_CHESTGUARD_KEY = 'chestguard'
+CHARACTER_EQUIPMENT_BRACER_KEY = 'bracer'
+CHARACTER_EQUIPMENT_GLOVES_KEY = 'gloves'
+CHARACTER_EQUIPMENT_BELT_KEY = 'belt'
+CHARACTER_EQUIPMENT_LEGGINGS_KEY = 'leggings'
+CHARACTER_EQUIPMENT_BOOTS_KEY = 'boots'
+
+CHARACTER_DEFAULT_EQUIPMENT = {CHARACTER_EQUIPMENT_HEADPIECE_KEY: None,
+                               CHARACTER_EQUIPMENT_SHOULDERPAD_KEY: None,
+                               CHARACTER_EQUIPMENT_NECKLACE_KEY: None,
+                               CHARACTER_EQUIPMENT_CHESTGUARD_KEY: None,
+                               CHARACTER_EQUIPMENT_BRACER_KEY: None,
+                               CHARACTER_EQUIPMENT_GLOVES_KEY: None,
+                               CHARACTER_EQUIPMENT_BELT_KEY: None,
+                               CHARACTER_EQUIPMENT_LEGGINGS_KEY: None,
+                               CHARACTER_EQUIPMENT_BOOTS_KEY: None}
 
 # dictionary that holds information about how much XP a monster of a certain level should award the player.
 # key: level(int), value: xp reward(int)
@@ -498,7 +519,7 @@ class Character(LivingThing):
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1,
                  loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=set(),
-                 saved_inventory: dict={'gold': 0}):
+                 saved_inventory: dict={'gold': 0}, saved_equipment: dict=CHARACTER_DEFAULT_EQUIPMENT):
         super().__init__(name, health, mana, level=1)
         self.min_damage = 0
         self.max_damage = 1
@@ -520,6 +541,7 @@ class Character(LivingThing):
         self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements()
         self.quest_log = {}
         self.inventory = saved_inventory # dict Key: str, Value: tuple(Item class instance, Item Count)
+        self.equipment = saved_equipment # dict Key: Equipment slot, Value: object of class Equipment
 
     def start_turn_update(self):
         super().start_turn_update()
