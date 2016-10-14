@@ -5,7 +5,7 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 import random
 from termcolor import colored
 
-from items import  Item, Weapon, Potion
+from items import  Item, Weapon, Potion, Equipment
 from loader import (load_creature_xp_rewards, load_character_level_stats,
                     load_character_xp_requirements, load_creature_gold_reward,
                     load_loot_table, load_item, load_vendor_inventory, load_creature_default_armor)
@@ -13,7 +13,6 @@ from quest import Quest, FetchQuest
 from damage import Damage
 from buffs import BeneficialBuff, DoT
 from exceptions import ItemNotInInventoryError
-#    ex: Headpiece, Shoulderpad, Necklace, Chestguard, Bracer, Gloves, Belt, Leggings, Boots"""
 
 CHARACTER_EQUIPMENT_HEADPIECE_KEY = 'headpiece'
 CHARACTER_EQUIPMENT_SHOULDERPAD_KEY = 'shoulderpad'
@@ -574,6 +573,28 @@ class Character(LivingThing):
 
             self._subtract_attributes(eq_weapon.attributes)  # remove the attributes it has given us
             self.equip_weapon(item)
+        elif isinstance(item, Equipment):
+            item_in_inventory, count = self.inventory[item.name]
+
+            # remove the item we're equipping from the inventory
+            if count == 1:  # remove from the inventory
+                del self.inventory[item.name]
+            else:  # reduce it's count
+                self.inventory[item.name] = item_in_inventory, count - 1
+
+            # transfer the equipped item back to the inventory
+            # TODO: Handle custom error if there isn't such a slot in the equipment
+            equipped_item = self.equipment[item.slot]  # type: Equipment
+
+            if equipped_item:  # if we had such an item equipped
+                if equipped_item.name in self.inventory.keys():
+                    item_in_inventory, item_count = self.inventory[equipped_item.name]
+                    self.inventory[equipped_item.name] = item_in_inventory, item_count + 1
+                else:  # we don't have such an item in the inventory, we create one
+                    self.inventory[equipped_item.name] = equipped_item, 1
+                self._subtract_attributes(equipped_item.attributes)
+
+            self.equip_gear(item)
 
         self._calculate_stats_formulas()  # always recalculate formulas when adding an item
 
@@ -602,6 +623,13 @@ class Character(LivingThing):
         print("{} has equipped Weapon {}".format(self.name, weapon.name))
         self.equipped_weapon = weapon
         self._add_attributes(weapon.attributes)
+        self._calculate_stats_formulas()
+
+    def equip_gear(self, item: Equipment):
+        """ equip an equipment item like a Headpiece, Shoulderpad, Chestguard and etc."""
+        print("{} has equipped {} {}".format(self.name, item.slot, item.name))
+        self.equipment[item.slot] = item
+        self._add_attributes(item.attributes)
         self._calculate_stats_formulas()
 
     def _add_attributes(self, attributes: dict):
