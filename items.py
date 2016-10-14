@@ -80,7 +80,7 @@ class Equipment(Item):
         self.attributes = attributes_dict
 
     def __str__(self):
-        return (colored("{}".format(self.name), color="green")
+        return (self.name
                 + " - {slot_pos} Equipment: ".format(slot_pos=self.slot[0].upper() + self.slot[1:])
                 + display_attributes(self.attributes))
 

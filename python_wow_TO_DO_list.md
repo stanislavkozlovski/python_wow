@@ -62,6 +62,7 @@
 - Print Equipment
 - Print Stats (hp, mana, xp and everything else at once)
 - Add item gossip text 
+- Convert the equipment dictionary to a class
 
 # TODOs
 - Add documentation!

@@ -5,7 +5,8 @@ from zones.zone import Zone
 from save_character import save_character
 from commands import pac_main_ooc, pac_map_directions, pac_in_combat, pac_vendor_dialogue, pac_opened_inventory
 from information_printer import (print_live_npcs, print_live_monsters, print_quest_item_choices,
-                                 print_available_quests, print_in_combat_stats, print_character_xp_bar)
+                                 print_available_quests, print_in_combat_stats, print_character_xp_bar,
+                                 print_character_equipment)
 
 
 # handlers here!
@@ -236,6 +237,11 @@ def handle_pql_command(main_character):
 def handle_print_inventory_command(main_character):
     """ this function handles the 'print inventory' command, showing the player's inventory """
     main_character.print_inventory()
+
+
+def handle_print_equipment_command(main_character):
+    """ this function handles the 'print equipment' command, showing the player's equipment """
+    print_character_equipment(main_character.equipment)
 
 
 def handle_pam_command(zone_object, print_all: bool=False):

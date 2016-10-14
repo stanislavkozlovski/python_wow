@@ -19,9 +19,11 @@ def route_main_commands(main_character, zone_object):
     elif command == 'go to ?':
         ch.handle_go_to_help_command(zone_object)
     elif command == 'print available quests' or command == 'paq':
-        ch.handle_paq_command()
+        ch.handle_paq_command(main_character, zone_object)
     elif command == 'print quest log' or command == 'pql':
-        ch.handle_pql_command(zone_object, main_character)
+        ch.handle_pql_command(zone_object)
+    elif command == 'print equipment' or command == 'peq':
+        ch.handle_print_equipment_command(main_character)
     elif command == 'print inventory':
         ch.handle_print_inventory_command(main_character)
     elif command == "open inventory":

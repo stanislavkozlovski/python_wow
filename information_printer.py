@@ -67,6 +67,62 @@ def print_available_quests(available_quests: dict, players_level: int):
             print(colored_print)
 
 
+def print_character_equipment(equipment: dict):
+    """
+    Prints the character's equipped in a nice, pretty ordered manner.
+    :param equipment: a strictly-structured dictionary holding the character's equipment
+    """
+    from entities import (CHARACTER_EQUIPMENT_BOOTS_KEY, CHARACTER_EQUIPMENT_BRACER_KEY,
+                          CHARACTER_EQUIPMENT_HEADPIECE_KEY, CHARACTER_EQUIPMENT_CHESTGUARD_KEY,
+                          CHARACTER_EQUIPMENT_NECKLACE_KEY, CHARACTER_EQUIPMENT_LEGGINGS_KEY,
+                          CHARACTER_EQUIPMENT_GLOVES_KEY, CHARACTER_EQUIPMENT_SHOULDERPAD_KEY,
+                          CHARACTER_EQUIPMENT_BELT_KEY)
+    gap_space = 200
+    fill_row = '|' + (' ' * (gap_space-2)) + '|'
+    head_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_HEADPIECE_KEY])
+    shoulder_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_SHOULDERPAD_KEY])
+    necklace_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_NECKLACE_KEY])
+    chest_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_CHESTGUARD_KEY])
+    bracer_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_BRACER_KEY])
+    gloves_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_GLOVES_KEY])
+    belt_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_BELT_KEY])
+    legs_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_LEGGINGS_KEY])
+    boots_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_BOOTS_KEY])
+
+    print("-" * gap_space)
+    print(fill_row)
+    print(head_str + get_gap_between_two_equipment_items(head_str, gloves_str, gap_space) + gloves_str)
+    print(fill_row)
+    print(necklace_str + (' ' * (gap_space - len(necklace_str))))
+    print(fill_row)
+    print(shoulder_str + get_gap_between_two_equipment_items(shoulder_str, belt_str, gap_space) + belt_str)
+    print(fill_row)
+    print(chest_str + get_gap_between_two_equipment_items(chest_str, legs_str, gap_space) + legs_str)
+    print(fill_row)
+    print(bracer_str + get_gap_between_two_equipment_items(bracer_str, boots_str, gap_space))
+    print(fill_row)
+    print("-" * gap_space)
+
+
+
+def get_gap_between_two_equipment_items(first_item_str, second_item_str, gap_length) -> str:
+    """ Specifically made for the print_character_equipment function, because we want to have an
+    even gap between every printed items, we need to do this calculation to get the appropriate
+    amount of whitespace characters in between two items"""
+    return ' ' * (gap_length - (len(first_item_str) + len(second_item_str)))
+
+
+def get_equipment_slot_string(equipment_item) -> str:
+    """
+    This function is called specifically for the print_character_equipment function in information_printer.py
+    Returns the string representation of an Equipment object or returns empty if there is no such item.
+    """
+    if equipment_item:
+        return str(equipment_item)
+
+    return '|empty|'
+
+
 def print_in_combat_stats(player, monster):
     player_shield = "."  # serves as a dot if there is not a shield
     if player.absorption_shield:
