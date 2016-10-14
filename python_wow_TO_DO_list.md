@@ -57,6 +57,8 @@
 - Add Talents System
 
 # Small TODOs
+- Load character in one command, like "load Netherblood"
+- Print inventory command/or do it automatically, once a character modifies something in the inventory (through the open inventory command)
 - Print Equipment
 - Print Stats (hp, mana, xp and everything else at once)
 - Add item gossip text 
@@ -77,8 +79,8 @@ health,mana,strength,agi,armor
 # DOING
 - Add some kind of armor item type (Head, etc)
 # SUBTASKS
-- Update the Item Class
-- Update the DB to support such items
+CHECK --------- Update the Item Class ------- CHECK
+CHECK --------- Update the DB to support such items ------- CHECK
 - Create character equipment slots
 - Handle equipping/swapping of such items
 - Handle save/load of a character's equipment

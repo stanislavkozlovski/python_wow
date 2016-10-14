@@ -44,6 +44,7 @@ def display_attributes(attributes: dict) -> str:
 
     return ", ".join(attributes_to_print)
 
+
 class Item:
     def __init__(self, name: str, item_id: int, buy_price: int, sell_price: int, quest_ID: int=0):
         self.name = name
@@ -72,7 +73,7 @@ class Weapon(Item):
 class Equipment(Item):
     """ Any item that can be equipped in an equipment slot, as distinguished from items that can only be
     carried in the inventory.
-    ex: Headpiece, Shoulderpad, Bracer"""
+    ex: Headpiece, Shoulderpad, Necklace, Chestpiece, Bracer, Gloves, Belt, Leggings, Boots"""
     def __init__(self, name: str, item_id: int, slot: str, attributes_dict: dict=create_attributes_dict(), buy_price: int=0, sell_price: int=0):
         super().__init__(name, item_id, buy_price, sell_price)
         self.slot = slot
@@ -80,8 +81,8 @@ class Equipment(Item):
 
     def __str__(self):
         return (colored("{}".format(self.name), color="green")
-               + " - {slot_pos} Equipment Piece: ".format(slot_pos=self.slot)
-               + display_attributes(self.attributes))
+                + " - {slot_pos} Equipment: ".format(slot_pos=self.slot[0].upper() + self.slot[1:])
+                + display_attributes(self.attributes))
 
 
 class Potion(Item):

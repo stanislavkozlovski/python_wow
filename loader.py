@@ -34,7 +34,7 @@ from database_info import \
      DBINDEX_ITEM_TEMPLATE_SELL_PRICE, DBINDEX_ITEM_TEMPLATE_MIN_DMG, DBINDEX_ITEM_TEMPLATE_MAX_DMG,
      DBINDEX_ITEM_TEMPLATE_QUEST_ID, DBINDEX_ITEM_TEMPLATE_EFFECT, DBINDEX_ITEM_TEMPLATE_HEALTH,
      DBINDEX_ITEM_TEMPLATE_MANA, DBINDEX_ITEM_TEMPLATE_ARMOR, DBINDEX_ITEM_TEMPLATE_AGILITY,
-     DBINDEX_ITEM_TEMPLATE_STRENGTH,
+     DBINDEX_ITEM_TEMPLATE_STRENGTH, DBINDEX_ITEM_TEMPLATE_SUB_TYPE,
 
      DBINDEX_QUEST_TEMPLATE_ENTRY, DBINDEX_QUEST_TEMPLATE_NAME, DBINDEX_QUEST_TEMPLATE_TYPE,
      DBINDEX_QUEST_TEMPLATE_LEVEL_REQUIRED, DBINDEX_QUEST_TEMPLATE_MONSTER_REQUIRED,
@@ -449,6 +449,7 @@ def load_creature_gold_reward() -> dict:
 
     return gold_rewards_dict
 
+
 def load_vendor_inventory(creature_entry: int) -> dict:
     """
     This function loads all the items that a certain vendor should sell.
@@ -538,16 +539,16 @@ def load_item(item_ID: int):
     """
     Load an item from item_template, convert it to a object of Class Item and return it
     The item_template table is as follows:
-    entry,      name, type,  armor, health, mana, strength, agility, buy_price, sell_price, min_dmg, max_dmg, quest_ID, effect
-        1,'Wolf Pelt','misc', Null,   Null, Null,     Null,    Null,         1,          1,     Null, Null  ,        1,      0
+    entry,      name, type,  subtype, armor, health, mana, strength, agility, buy_price, sell_price, min_dmg, max_dmg, quest_ID, effect
+        1,'Wolf Pelt','misc', Null, Null,   Null, Null,     Null,    Null,         1,          1,     Null, Null  ,        1,      0
     The item is of type misc, making us use the default class Item. It is also collected for the quest with ID 1
 
-    entry,             name,    type,  armor, health, mana, strength, agility,  buy_price, sell_price, min_dmg, max_dmg, quest_ID, effect
-      100, 'Arcanite Reaper', 'weapon',     0,     0,    0,        0,       0,        125,          100,     56,      128,        0,      0
+    entry,             name,    type, subtype,  armor, health, mana, strength, agility,  buy_price, sell_price, min_dmg, max_dmg, quest_ID, effect
+      100, 'Arcanite Reaper', 'weapon',   Null,  0,     0,    0,        0,       0,        125,          100,     56,      128,        0,      0
     This item is of type weapon, making us use the class Weapon to create it
 
-    entry,             name,    type,   armor, health, mana, strength, agility, buy_price, sell_price, min_dmg, max_dmg, quest_ID, effect
-        4,'Strength Potion', 'potion',    Null,   Null, Null,    Null,    Null,         1,           1,    Null,    Null,        0,      1
+    entry,             name,    type,   subtype, armor, health, mana, strength, agility, buy_price, sell_price, min_dmg, max_dmg, quest_ID, effect
+        4,'Strength Potion', 'potion',    Null, Null,   Null, Null,    Null,    Null,         1,           1,    Null,    Null,        0,      1
     This item is of type Potion and when consumed gives off the effect (spell_buffs table entry) 1
     :returns a class object, depending on what the type is
     """
@@ -581,6 +582,18 @@ def load_item(item_ID: int):
             return items.Weapon(name=item_name, item_id=item_id, attributes_dict=attributes,
                                 buy_price=item_buy_price, sell_price=item_sell_price,
                                 min_damage=item_min_dmg, max_damage=item_max_dmg)
+        elif item_type == 'equipment':
+            item_health = parse_int(item_template_info[DBINDEX_ITEM_TEMPLATE_HEALTH])  # type: int
+            item_mana = parse_int(item_template_info[DBINDEX_ITEM_TEMPLATE_MANA])  # type: int
+            item_armor = parse_int(item_template_info[DBINDEX_ITEM_TEMPLATE_ARMOR])  # type: int
+            item_strength = parse_int(item_template_info[DBINDEX_ITEM_TEMPLATE_STRENGTH])  # type: int
+            item_agility = parse_int(item_template_info[DBINDEX_ITEM_TEMPLATE_AGILITY])  # type: int
+            attributes = items.create_attributes_dict(bonus_health=item_health, bonus_mana=item_mana,
+                                                      armor=item_armor, strength=item_strength, agility=item_agility)
+            item_slot = item_template_info[DBINDEX_ITEM_TEMPLATE_SUB_TYPE]
+
+            return items.Equipment(name=item_name, item_id=item_id, slot=item_slot, attributes_dict=attributes,
+                                   buy_price=item_buy_price, sell_price=item_sell_price)
         elif item_type == 'potion':
             buff_id = item_template_info[DBINDEX_ITEM_TEMPLATE_EFFECT]  # type: int
             item_buff_effect = load_buff(buff_id)  # type: BeneficialBuff
