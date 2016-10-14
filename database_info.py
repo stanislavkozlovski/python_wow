@@ -28,6 +28,7 @@ DBINDEX_SAVED_CHARACTER_INVENTORY_ID = 7
 DBINDEX_SAVED_CHARACTER_GOLD = 8
 
 # saved_character_equipment table
+DB_SC_EQUIPMENT_TABLE_NAME = 'saved_character_equipment'
 DBINDEX_SC_EQUIPMENT_ID = 0
 DBINDEX_SC_EQUIPMENT_HEADPIECE_ID  = 1
 DBINDEX_SC_EQUIPMENT_SHOULDERPAD_ID = 2
@@ -40,23 +41,23 @@ DBINDEX_SC_EQUIPMENT_LEGGINGS_ID = 8
 DBINDEX_SC_EQUIPMENT_BOOTS_ID = 9
 
 # saved_character_loaded_scripts
-DB_LOADED_SCRIPTS_TABLE_NAME = 'saved_character_loaded_scripts'
+DB_SC_LOADED_SCRIPTS_TABLE_NAME = 'saved_character_loaded_scripts'
 DBINDEX_SC_LOADED_SCRIPTS_ID = 0
 DBINDEX_SC_LOADED_SCRIPTS_SCRIPT_NAME = 1
 
 # saved_character_killed_monsters table
-DB_KILLED_MONSTERS_TABLE_NAME = 'saved_character_killed_monsters'
+DB_SC_KILLED_MONSTERS_TABLE_NAME = 'saved_character_killed_monsters'
 DBINDEX_SC_KILLED_MONSTERS_ID = 0
 DBINDEX_SC_KILLED_MONSTERS_GUID = 1
 
 # saved_character_inventory
-DB_INVENTORY_TABLE_NAME = 'saved_character_inventory'
+DB_SC_INVENTORY_TABLE_NAME = 'saved_character_inventory'
 DBINDEX_SC_INVENTORY_ID = 0
 DBINDEX_SC_INVENTORY_ITEM_ID = 1
 DBINDEX_SC_INVENTORY_ITEM_COUNT = 2
 
 # saved_character_completed_quests table
-DB_COMPLETED_QUESTS_TABLE_NAME = 'saved_character_completed_quests'
+DB_SC_COMPLETED_QUESTS_TABLE_NAME = 'saved_character_completed_quests'
 DBINDEX_SC_COMPLETED_QUESTS_ID = 0
 DBINDEX_SC_COMPLETED_QUESTS_NAME = 1
 

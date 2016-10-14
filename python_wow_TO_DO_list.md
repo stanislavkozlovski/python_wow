@@ -84,5 +84,5 @@ CHECK --------- Update the DB to support such items ------- CHECK
 CHECK --------- Create character equipment slots ------- CHECK
 CHECK --------- Handle equipping/swapping of such items  ------- CHECK
 CHECK --------- Handle load of a character's equipment ------ CHECK
-- Handle save of a character's equipment
+CHECK --------- Handle save of a character's equipment ------ CHECK
 - Visual stuff, like printing them in a different color, ETC

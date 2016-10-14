@@ -2,21 +2,26 @@
 This module will take care for saving a character to the database
 """
 import sqlite3
+from items import Item
 
-from entities import Character
+from entities import (Character, CHARACTER_EQUIPMENT_BELT_KEY, CHARACTER_EQUIPMENT_BOOTS_KEY,
+                      CHARACTER_EQUIPMENT_CHESTGUARD_KEY, CHARACTER_EQUIPMENT_SHOULDERPAD_KEY,
+                      CHARACTER_EQUIPMENT_HEADPIECE_KEY, CHARACTER_EQUIPMENT_NECKLACE_KEY,
+                      CHARACTER_EQUIPMENT_BRACER_KEY, CHARACTER_EQUIPMENT_GLOVES_KEY, CHARACTER_EQUIPMENT_LEGGINGS_KEY)
 from database_info import \
     (DB_PATH,
      DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID, DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID,
      DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID, DBINDEX_SAVED_CHARACTER_INVENTORY_ID,
+     DBINDEX_SAVED_CHARACTER_EQUIPMENT_ID,
 
      DB_SAVED_CHARACTER_TABLE_NAME,
-     DB_LOADED_SCRIPTS_TABLE_NAME, DB_KILLED_MONSTERS_TABLE_NAME,
-     DB_COMPLETED_QUESTS_TABLE_NAME, DB_INVENTORY_TABLE_NAME)
+     DB_SC_LOADED_SCRIPTS_TABLE_NAME, DB_SC_KILLED_MONSTERS_TABLE_NAME, DB_SC_EQUIPMENT_TABLE_NAME,
+     DB_SC_COMPLETED_QUESTS_TABLE_NAME, DB_SC_INVENTORY_TABLE_NAME)
 
 
 ALLOWED_TABLES_TO_DELETE_FROM = ['saved_character_completed_quests', 'saved_character_inventory',
                                  'saved_character_killed_monsters', 'saved_character_loaded_scripts',
-                                 'saved_character']
+                                 'saved_character_equipment', 'saved_character']
 
 
 def save_character(character: Character):
@@ -40,19 +45,21 @@ def save_character(character: Character):
             character_killed_monsters_ID = character_info[DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID]
             character_completed_quests_ID = character_info[DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID]
             character_inventory_ID = character_info[DBINDEX_SAVED_CHARACTER_INVENTORY_ID]
+            character_equipment_ID = character_info[DBINDEX_SAVED_CHARACTER_EQUIPMENT_ID]
             cursor.execute("DELETE FROM {table_name} WHERE name = ?"  # delete the old table
                            .format(table_name=DB_SAVED_CHARACTER_TABLE_NAME), [character.name])
         else:
             # we have not saved this character before, therefore we need to generate new IDs for the other tables
-            character_loaded_scripts_ID = get_highest_free_id_from_table(DB_LOADED_SCRIPTS_TABLE_NAME, cursor)
-            character_killed_monsters_ID = get_highest_free_id_from_table(DB_KILLED_MONSTERS_TABLE_NAME, cursor)
-            character_completed_quests_ID = get_highest_free_id_from_table(DB_COMPLETED_QUESTS_TABLE_NAME, cursor)
-            character_inventory_ID = get_highest_free_id_from_table(DB_INVENTORY_TABLE_NAME, cursor)
+            character_loaded_scripts_ID = get_highest_free_id_from_table(DB_SC_LOADED_SCRIPTS_TABLE_NAME, cursor)
+            character_killed_monsters_ID = get_highest_free_id_from_table(DB_SC_KILLED_MONSTERS_TABLE_NAME, cursor)
+            character_completed_quests_ID = get_highest_free_id_from_table(DB_SC_COMPLETED_QUESTS_TABLE_NAME, cursor)
+            character_inventory_ID = get_highest_free_id_from_table(DB_SC_INVENTORY_TABLE_NAME, cursor)
+            character_equipment_ID = get_highest_free_id_from_table(DB_SC_EQUIPMENT_TABLE_NAME, cursor)
 
         # save the main table
-        cursor.execute("INSERT INTO saved_character VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        cursor.execute("INSERT INTO saved_character VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                        [character.name, character_class, character_level, character_loaded_scripts_ID,
-                        character_killed_monsters_ID, character_completed_quests_ID, character_inventory_ID,
+                        character_killed_monsters_ID, character_completed_quests_ID, character_equipment_ID, character_inventory_ID,
                         character_gold])
 
         # save the sub-tables
@@ -60,6 +67,7 @@ def save_character(character: Character):
         save_killed_monsters(character_killed_monsters_ID, character.killed_monsters, cursor)
         save_completed_quests(character_completed_quests_ID, character.completed_quests, cursor)
         save_inventory(character_inventory_ID, character.inventory, cursor)
+        save_equipment(character_equipment_ID, character.equipment, cursor)
 
         print("-" * 40)
         print("Character {} was saved successfully!".format(character.name))
@@ -77,10 +85,10 @@ def save_loaded_scripts(id: int, loaded_scripts: set, cursor):
     :param loaded_scripts: a set containing all the names -> {HASKEL_PRAXTON_CONVERSATION} in this case
     """
 
-    delete_rows_from_table(table_name=DB_LOADED_SCRIPTS_TABLE_NAME, id=id, cursor=cursor)  # delete the old values first
+    delete_rows_from_table(table_name=DB_SC_LOADED_SCRIPTS_TABLE_NAME, id=id, cursor=cursor)  # delete the old values first
 
     for loaded_script in loaded_scripts:
-        cursor.execute('INSERT INTO {} VALUES (?, ?)'.format(DB_LOADED_SCRIPTS_TABLE_NAME), [id, loaded_script])
+        cursor.execute('INSERT INTO {} VALUES (?, ?)'.format(DB_SC_LOADED_SCRIPTS_TABLE_NAME), [id, loaded_script])
 
 
 def save_killed_monsters(id: int, killed_monsters: set, cursor):
@@ -96,10 +104,10 @@ def save_killed_monsters(id: int, killed_monsters: set, cursor):
     :param killed_monsters: a set containing all the killed monster's GUIDs -> {14, 3, 2}
     """
 
-    delete_rows_from_table(table_name=DB_KILLED_MONSTERS_TABLE_NAME, id=id, cursor=cursor)  # delete the old values first
+    delete_rows_from_table(table_name=DB_SC_KILLED_MONSTERS_TABLE_NAME, id=id, cursor=cursor)  # delete the old values first
 
     for monster_guid in killed_monsters:
-        cursor.execute('INSERT INTO {} VALUES (?, ?)'.format(DB_KILLED_MONSTERS_TABLE_NAME), [id, monster_guid])
+        cursor.execute('INSERT INTO {} VALUES (?, ?)'.format(DB_SC_KILLED_MONSTERS_TABLE_NAME), [id, monster_guid])
 
 
 def save_completed_quests(id: int, completed_quests: set, cursor):
@@ -114,10 +122,10 @@ def save_completed_quests(id: int, completed_quests: set, cursor):
     :param completed_quests: a set containing all the names of the completed quests -> {"A Canine Menace", "Canine-Like Hunger"} in this case
     """
 
-    delete_rows_from_table(table_name=DB_COMPLETED_QUESTS_TABLE_NAME, id=id, cursor=cursor)  # delete the old values first
+    delete_rows_from_table(table_name=DB_SC_COMPLETED_QUESTS_TABLE_NAME, id=id, cursor=cursor)  # delete the old values first
 
     for quest_name in completed_quests:
-        cursor.execute('INSERT INTO {} VALUES (?, ?)'.format(DB_COMPLETED_QUESTS_TABLE_NAME), [id, quest_name])
+        cursor.execute('INSERT INTO {} VALUES (?, ?)'.format(DB_SC_COMPLETED_QUESTS_TABLE_NAME), [id, quest_name])
 
 
 def save_inventory(id: int, inventory: dict, cursor):
@@ -133,14 +141,42 @@ def save_inventory(id: int, inventory: dict, cursor):
     :param inventory: A dictionary, Key: item_name, Value: tuple(Item class instance, Item Count)
     """
 
-    delete_rows_from_table(table_name=DB_INVENTORY_TABLE_NAME, id=id, cursor=cursor)  # delete the old values first
+    delete_rows_from_table(table_name=DB_SC_INVENTORY_TABLE_NAME, id=id, cursor=cursor)  # delete the old values first
 
     for item_name in inventory.keys():
         if item_name != 'gold':
             item_id = inventory[item_name][0].id  # get the instance of Item's ID
             item_count = inventory[item_name][1]
 
-            cursor.execute('INSERT INTO {} VALUES (?, ?, ?)'.format(DB_INVENTORY_TABLE_NAME), [id, item_id, item_count])
+            cursor.execute('INSERT INTO {} VALUES (?, ?, ?)'.format(DB_SC_INVENTORY_TABLE_NAME), [id, item_id, item_count])
+
+
+def save_equipment(id: int, equipment: dict, cursor):
+    """
+    This function saves the character's equipment into the saved_character_equipment DB table
+    Table sample contents:
+
+    id, headpiece_id, shoulderpad_id, necklace_id, chestguard_id, bracer_id, gloves_id, belt_id, leggings_id, boots_id
+     1,           11,             12,        Null,            13,      Null,      Null,    Null,        Null,     Null
+    :param id: the ID corresponding to the entry in saved_character_equipment
+    :param equipment: the dictionary holding the equipped item for each character equipment slot
+    """
+
+    delete_rows_from_table(table_name=DB_SC_EQUIPMENT_TABLE_NAME, id=id, cursor=cursor)  # delete the old values first
+
+    headpiece_id = get_item_id_or_none(equipment[CHARACTER_EQUIPMENT_HEADPIECE_KEY])
+    shoulderpad_id = get_item_id_or_none(equipment[CHARACTER_EQUIPMENT_SHOULDERPAD_KEY])
+    necklace_id = get_item_id_or_none(equipment[CHARACTER_EQUIPMENT_NECKLACE_KEY])
+    chestguard_id = get_item_id_or_none(equipment[CHARACTER_EQUIPMENT_CHESTGUARD_KEY])
+    bracer_id = get_item_id_or_none(equipment[CHARACTER_EQUIPMENT_BRACER_KEY])
+    gloves_id = get_item_id_or_none(equipment[CHARACTER_EQUIPMENT_GLOVES_KEY])
+    belt_id = get_item_id_or_none(equipment[CHARACTER_EQUIPMENT_BELT_KEY])
+    leggings_id = get_item_id_or_none(equipment[CHARACTER_EQUIPMENT_LEGGINGS_KEY])
+    boots_id = get_item_id_or_none(equipment[CHARACTER_EQUIPMENT_BOOTS_KEY])
+
+    cursor.execute('INSERT INTO {} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'.format(DB_SC_EQUIPMENT_TABLE_NAME),
+                   [id, headpiece_id,shoulderpad_id, necklace_id, chestguard_id, bracer_id, gloves_id, belt_id,
+                    leggings_id, boots_id])
 
 
 def delete_rows_from_table(table_name: str, id: int, cursor):
@@ -167,6 +203,16 @@ def get_highest_free_id_from_table(table_name: str, cursor):
     max_id = cursor.fetchone()[0]
 
     return max_id + 1
+
+def get_item_id_or_none(item):
+    """
+    This function returns the item_id of an item.
+    We check if the item we're given is None. If it is None, we return None
+    """
+    if isinstance(item, Item):
+        return item.id
+
+    return None
 
 
 

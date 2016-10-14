@@ -15,7 +15,7 @@ def route_main_commands(main_character, zone_object):
     if command is '?':
         ch.handle_help_command()
     elif command == 'save':
-        ch.handle_save_character_command()
+        ch.handle_save_character_command(main_character)
     elif command == 'go to ?':
         ch.handle_go_to_help_command(zone_object)
     elif command == 'print available quests' or command == 'paq':
