@@ -191,7 +191,7 @@ def delete_rows_from_table(table_name: str, id: int, cursor):
     if table_name in ALLOWED_TABLES_TO_DELETE_FROM:
         cursor.execute("DELETE FROM {table_name} WHERE id = ?".format(table_name=table_name), [id])
     else:
-        print("You do not have permission to delete from the {} table!".format(table_name))
+        raise Exception("You do not have permission to delete from the {} table!".format(table_name))
 
 
 def get_highest_free_id_from_table(table_name: str, cursor):
