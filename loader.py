@@ -6,8 +6,12 @@ from database_info import \
 
      DBINDEX_SAVED_CHARACTER_NAME, DBINDEX_SAVED_CHARACTER_CLASS, DBINDEX_SAVED_CHARACTER_LEVEL,
      DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID, DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID,
-     DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID, DBINDEX_SAVED_CHARACTER_INVENTORY_ID,
-     DBINDEX_SAVED_CHARACTER_GOLD,
+     DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID, DBINDEX_SAVED_CHARACTER_EQUIPMENT_ID,
+     DBINDEX_SAVED_CHARACTER_INVENTORY_ID, DBINDEX_SAVED_CHARACTER_GOLD,
+
+     DBINDEX_SC_EQUIPMENT_BOOTS_ID, DBINDEX_SC_EQUIPMENT_LEGGINGS_ID, DBINDEX_SC_EQUIPMENT_BELT_ID,
+     DBINDEX_SC_EQUIPMENT_GLOVES_ID, DBINDEX_SC_EQUIPMENT_BRACER_ID, DBINDEX_SC_EQUIPMENT_CHESTGUARD_ID,
+     DBINDEX_SC_EQUIPMENT_SHOULDERPAD_ID, DBINDEX_SC_EQUIPMENT_NECKLACE_ID, DBINDEX_SC_EQUIPMENT_HEADPIECE_ID,
 
      DBINDEX_SC_LOADED_SCRIPTS_SCRIPT_NAME,
 
@@ -552,6 +556,9 @@ def load_item(item_ID: int):
     This item is of type Potion and when consumed gives off the effect (spell_buffs table entry) 1
     :returns a class object, depending on what the type is
     """
+    if item_ID <= 0 or item_ID is None:
+        raise Exception("There is no such item with an ID that's 0 or negative!")
+
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM item_template WHERE entry = ?", [item_ID])
@@ -693,6 +700,7 @@ Netherblood, Paladin,     10,                 1,                    1,          
             char_loaded_scripts_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID]
             char_killed_monsters_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID]
             char_completed_quests_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID]
+            char_equipment_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_EQUIPMENT_ID]
             char_inventory_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_INVENTORY_ID]
             char_gold = parse_int(sv_char_reader[DBINDEX_SAVED_CHARACTER_GOLD])  # type: int
 
@@ -701,7 +709,8 @@ Netherblood, Paladin,     10,                 1,                    1,          
                                loaded_scripts=load_saved_character_loaded_scripts(char_loaded_scripts_ID),
                                killed_monsters=load_saved_character_killed_monsters(char_killed_monsters_ID),
                                completed_quests=load_saved_character_completed_quests(char_completed_quests_ID),
-                               saved_inventory=load_saved_character_inventory(id=char_inventory_ID, gold=char_gold))
+                               saved_inventory=load_saved_character_inventory(id=char_inventory_ID, gold=char_gold),
+                               saved_equipment=load_saved_character_equipment(id=char_equipment_ID))
             else:
                 raise Exception("Unsupported class - {}".format(char_class))
         else:
@@ -836,6 +845,43 @@ def load_saved_character_inventory(id: int, gold: int=0) -> dict:
 
     return loaded_inventory
 
+
+def load_saved_character_equipment(id: int) -> dict:
+    """
+    This function loads all the items that are equipped on a saved_character, stored in the saved_character_equipment
+    database table, with the corresponding row ID. The table looks like this:
+
+    id, headpiece_id, shoulderpad_id, necklace_id, chestguard_id, bracer_id, gloves_id, belt_id, leggings_id, boots_id
+     1,           11,             12,        None,            13,      Null,      Null,    Null,        Null,     Null
+    :param id: the ID corresponding to the entry in saved_character_equipment
+    :return: an equipment dictionary following a strict structure, created through modifying the DEFAULT_EQUIPMENT
+             in entities.py
+    """
+    from entities import (CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_EQUIPMENT_BOOTS_KEY, CHARACTER_EQUIPMENT_LEGGINGS_KEY,
+    CHARACTER_EQUIPMENT_BELT_KEY, CHARACTER_EQUIPMENT_GLOVES_KEY, CHARACTER_EQUIPMENT_BRACER_KEY,
+    CHARACTER_EQUIPMENT_CHESTGUARD_KEY, CHARACTER_EQUIPMENT_HEADPIECE_KEY, CHARACTER_EQUIPMENT_NECKLACE_KEY,
+    CHARACTER_EQUIPMENT_SHOULDERPAD_KEY)
+
+    saved_equipment = CHARACTER_DEFAULT_EQUIPMENT
+
+    with sqlite3.connect(DB_PATH) as connection:
+        cursor = connection.cursor()
+        # fetch the IDs of each item from the DB
+        saved_equipment_info = cursor.execute("SELECT * FROM saved_character_equipment WHERE id = ?", [id]).fetchone()
+        # convert the list of IDs to a list of Equipment objects. (also have None for each empty slot)
+        saved_equipment_info = [load_item(id) if id is not None else None for id in saved_equipment_info]
+
+        saved_equipment[CHARACTER_EQUIPMENT_BOOTS_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_BOOTS_ID]
+        saved_equipment[CHARACTER_EQUIPMENT_LEGGINGS_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_LEGGINGS_ID]
+        saved_equipment[CHARACTER_EQUIPMENT_BELT_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_BELT_ID]
+        saved_equipment[CHARACTER_EQUIPMENT_GLOVES_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_GLOVES_ID]
+        saved_equipment[CHARACTER_EQUIPMENT_BRACER_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_BRACER_ID]
+        saved_equipment[CHARACTER_EQUIPMENT_CHESTGUARD_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_CHESTGUARD_ID]
+        saved_equipment[CHARACTER_EQUIPMENT_SHOULDERPAD_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_SHOULDERPAD_ID]
+        saved_equipment[CHARACTER_EQUIPMENT_NECKLACE_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_NECKLACE_ID]
+        saved_equipment[CHARACTER_EQUIPMENT_HEADPIECE_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_HEADPIECE_ID]
+
+    return saved_equipment
 
 def load_character_level_stats() -> dict:
     """

@@ -541,6 +541,7 @@ class Character(LivingThing):
         self.quest_log = {}
         self.inventory = saved_inventory # dict Key: str, Value: tuple(Item class instance, Item Count)
         self.equipment = saved_equipment # dict Key: Equipment slot, Value: object of class Equipment
+        self._handle_load_saved_equipment()  # add up the attributes for our saved_equipment
 
     def start_turn_update(self):
         super().start_turn_update()
@@ -623,14 +624,12 @@ class Character(LivingThing):
         print("{} has equipped Weapon {}".format(self.name, weapon.name))
         self.equipped_weapon = weapon
         self._add_attributes(weapon.attributes)
-        self._calculate_stats_formulas()
 
     def equip_gear(self, item: Equipment):
         """ equip an equipment item like a Headpiece, Shoulderpad, Chestguard and etc."""
         print("{} has equipped {} {}".format(self.name, item.slot, item.name))
         self.equipment[item.slot] = item
         self._add_attributes(item.attributes)
-        self._calculate_stats_formulas()
 
     def _add_attributes(self, attributes: dict):
         """ this function goes through a dictionary that holds character attributes and adds them
@@ -639,6 +638,7 @@ class Character(LivingThing):
         argument has gone through item.py's create_attributes_dict function"""
         for attribute_name, attribute_value in attributes.items():
             self.attributes[attribute_name] += attribute_value
+        self._calculate_stats_formulas()
 
     def _subtract_attributes(self, attributes: dict):
         """ this function goes through a dictionary that holds character attributes and adds them
@@ -650,6 +650,7 @@ class Character(LivingThing):
             # been added beforehand and we currently do not support any features that lower a character's
             # attributes outside of combat, where he will not be able to dequip an item
             self.attributes[attribute_name] -= attribute_value
+        self._calculate_stats_formulas()
 
     def _calculate_stats_formulas(self):
         """
@@ -936,6 +937,14 @@ class Character(LivingThing):
             else:
                 # if we have items left, simply reduce their count
                 self.inventory[item_name] = item, resulting_count
+
+    def _handle_load_saved_equipment(self):
+        """
+        This function is used to add the attributes of all the character's equipment.
+        NOTE: This is used only on the initial character load
+        """
+        for item in filter(lambda item: item is not None, self.equipment.values()):
+            self._add_attributes(item.attributes)
 
     def check_if_levelup(self):
         if self.experience >= self.xp_req_to_level:

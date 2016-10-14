@@ -8,7 +8,7 @@ from database_info import (
     DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1, DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3, DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT, DBINDEX_PALADIN_SPELLS_TEMPLATE_COOLDOWN)
-from entities import Character, Monster
+from entities import Character, Monster, CHARACTER_DEFAULT_EQUIPMENT
 from damage import Damage
 from heal import HolyHeal
 from loader import load_dot
@@ -30,9 +30,10 @@ class Paladin(Character):
 
     def __init__(self, name: str, level: int = 1, health: int = 12, mana: int = 15, strength: int = 4,
                  loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=(),
-                 saved_inventory: dict={"gold": 0}):
+                 saved_inventory: dict={"gold": 0}, saved_equipment: dict=CHARACTER_DEFAULT_EQUIPMENT):
         super().__init__(name=name, health=health, mana=mana, strength=strength, loaded_scripts=loaded_scripts,
-                         killed_monsters=killed_monsters, completed_quests=completed_quests, saved_inventory=saved_inventory)
+                         killed_monsters=killed_monsters, completed_quests=completed_quests,
+                         saved_inventory=saved_inventory, saved_equipment=saved_equipment)
         self.min_damage = 1
         self.max_damage = 3
         self._lookup_and_handle_new_spells()
