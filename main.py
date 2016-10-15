@@ -7,7 +7,7 @@ from items import Weapon
 from save_character import save_character
 from start_game_prompt import get_player_character
 from zones.northshire_abbey import NorthshireAbbey
-GAME_VERSION = '0.0.5.9 ALPHA'
+GAME_VERSION = '0.0.6 ALPHA'
 ZONES = {"Northshire Abbey": None}
 
 def main():

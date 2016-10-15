@@ -92,7 +92,7 @@ def print_character_equipment(equipment: dict):
     print(create_fill_row_string(slot1='Head', slot2='Hands', gap_space=gap_space))
     print(head_str + get_gap_between_two_equipment_items(head_str, gloves_str, gap_space) + gloves_str)
     print(create_fill_row_string(slot1='Neck', slot2='', gap_space=gap_space))
-    print(necklace_str + (' ' * (gap_space - len(necklace_str) - 1)) + '|')
+    print(necklace_str + get_gap_between_two_equipment_items(necklace_str, '|', gap_space) + '|')
     print(create_fill_row_string(slot1='Shoulder', slot2='Waist', gap_space=gap_space))
     print(shoulder_str + get_gap_between_two_equipment_items(shoulder_str, belt_str, gap_space) + belt_str)
     print(create_fill_row_string(slot1='Chest', slot2='Legs', gap_space=gap_space))
@@ -110,10 +110,11 @@ def get_gap_between_two_equipment_items(first_item_str, second_item_str, gap_len
     """ Specifically made for the print_character_equipment function, because we want to have an
     even gap between every printed items, we need to do this calculation to get the appropriate
     amount of whitespace characters in between two items"""
+    empty_values = ['|empty|', '', ' ', '|']
     extra_colored_len = 0
-    if first_item_str != '|empty|':
+    if first_item_str not in empty_values:
         extra_colored_len += 9  # extra length of the termcolor colored function on the str
-    if second_item_str != '|empty|':
+    if second_item_str not in empty_values:
         extra_colored_len += 9
 
     return ' ' * (extra_colored_len + gap_length - (len(first_item_str) + len(second_item_str)))

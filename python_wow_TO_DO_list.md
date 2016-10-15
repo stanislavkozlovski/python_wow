@@ -50,6 +50,7 @@
 - [x] Sell option to sell items to vendors
 - [x] Add the ability to save the character
 - [x] List all saved characters when the user wants to load a character
+- [x] Add some kind of armor item type (Head, etc)
 
 # Low Priority TODOs
 - Add more content(monster, zone/subzones, npcs, items, vendors, spells and etc)
@@ -77,13 +78,3 @@ health,mana,strength,agi,armor
 - Add different kinds of damage
 - Create more damage classes, each with it's own flavour. (Destruction leaves off a DoT, Sinister has a chance to strike again, Merciless has a chance to crit and others without flavor (holy, frost, fire etc))
 
-# DOING
-- Add some kind of armor item type (Head, etc)
-# SUBTASKS
-CHECK --------- Update the Item Class ------- CHECK
-CHECK --------- Update the DB to support such items ------- CHECK
-CHECK --------- Create character equipment slots ------- CHECK
-CHECK --------- Handle equipping/swapping of such items  ------- CHECK
-CHECK --------- Handle load of a character's equipment ------ CHECK
-CHECK --------- Handle save of a character's equipment ------ CHECK
-- Visual stuff, like printing them in a different color, ETC
