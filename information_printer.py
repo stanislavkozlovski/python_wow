@@ -78,7 +78,6 @@ def print_character_equipment(equipment: dict):
                           CHARACTER_EQUIPMENT_GLOVES_KEY, CHARACTER_EQUIPMENT_SHOULDERPAD_KEY,
                           CHARACTER_EQUIPMENT_BELT_KEY)
     gap_space = 200
-    fill_row = '|' + (' ' * (gap_space-2)) + '|'
     head_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_HEADPIECE_KEY])
     shoulder_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_SHOULDERPAD_KEY])
     necklace_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_NECKLACE_KEY])
@@ -90,26 +89,34 @@ def print_character_equipment(equipment: dict):
     boots_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_BOOTS_KEY])
 
     print("-" * gap_space)
-    print(fill_row)
+    print(create_fill_row_string(slot1='Head', slot2='Hands', gap_space=gap_space))
     print(head_str + get_gap_between_two_equipment_items(head_str, gloves_str, gap_space) + gloves_str)
-    print(fill_row)
-    print(necklace_str + (' ' * (gap_space - len(necklace_str))))
-    print(fill_row)
+    print(create_fill_row_string(slot1='Neck', slot2='', gap_space=gap_space))
+    print(necklace_str + (' ' * (gap_space - len(necklace_str) - 1)) + '|')
+    print(create_fill_row_string(slot1='Shoulder', slot2='Waist', gap_space=gap_space))
     print(shoulder_str + get_gap_between_two_equipment_items(shoulder_str, belt_str, gap_space) + belt_str)
-    print(fill_row)
+    print(create_fill_row_string(slot1='Chest', slot2='Legs', gap_space=gap_space))
     print(chest_str + get_gap_between_two_equipment_items(chest_str, legs_str, gap_space) + legs_str)
-    print(fill_row)
-    print(bracer_str + get_gap_between_two_equipment_items(bracer_str, boots_str, gap_space))
-    print(fill_row)
+    print(create_fill_row_string(slot1='Wrist', slot2='Feet', gap_space=gap_space))
+    print(bracer_str + get_gap_between_two_equipment_items(bracer_str, boots_str, gap_space) + boots_str)
     print("-" * gap_space)
 
 
+def create_fill_row_string(slot1: str, slot2: str, gap_space: int):
+    """ creates a gap with variable spaces according to the length of the slot string """
+    return '|' + slot1 + (' ' * (gap_space-(2 + len(slot1) + len(slot2)))) + slot2 + '|'
 
 def get_gap_between_two_equipment_items(first_item_str, second_item_str, gap_length) -> str:
     """ Specifically made for the print_character_equipment function, because we want to have an
     even gap between every printed items, we need to do this calculation to get the appropriate
     amount of whitespace characters in between two items"""
-    return ' ' * (gap_length - (len(first_item_str) + len(second_item_str)))
+    extra_colored_len = 0
+    if first_item_str != '|empty|':
+        extra_colored_len += 9  # extra length of the termcolor colored function on the str
+    if second_item_str != '|empty|':
+        extra_colored_len += 9
+
+    return ' ' * (extra_colored_len + gap_length - (len(first_item_str) + len(second_item_str)))
 
 
 def get_equipment_slot_string(equipment_item) -> str:
