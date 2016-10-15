@@ -901,7 +901,7 @@ class Character(LivingThing):
         else:
             # if there is such an item, simply update it's count by one
             item, item_count = self.inventory[item.name]
-            self.inventory[item.name] = (item, item_count + item_count)
+            self.inventory[item.name] = (item, item_count + 1)
 
         if item_quest_id and item_quest_id in self.quest_log and not self.quest_log[item_quest_id].is_completed:
             # if the item is related to a quest and if we have that quest and said quest is not completed
