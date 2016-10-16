@@ -21,9 +21,13 @@ def get_player_character() -> Character:
     character = None  # the variable that will hold the character
     choice = get_choice()  # type: str
 
-    if choice == 'load':
+    if choice[:4] == 'load':
         # load a character from the DB
-        character = handle_load_character()
+        if choice == 'load':
+            character = handle_load_character()
+        else:
+            # user wants to directly load a character, like 'load Netherblood'
+            character = load_character(choice[5:])
     elif choice == 'new':
         # create a new character
         character = handle_create_character()
@@ -61,13 +65,17 @@ def handle_create_character() -> Character:
 
 
 def handle_load_character() -> Character:
-    """ this function loads a character from the DB """
+    """ this function displays all the available characters to load and reads the user's input, afterwards returns the loaded character"""
     saved_characters_general_info = load_all_saved_characters_general_info()  # list of all the characters available for load
     print("You've chosen to load an existing character, please enter the name of the character you want to load: ")
     print_available_characters_to_load(saved_characters_general_info)  # print available characters
 
-    character_name = input()
+    character_name = input(">Enter character name: ")
+    return load_character(character_name)
 
+
+def load_character(character_name: str) -> Character:
+    """ this function loads a character from the DB"""
     try:
         character = load_saved_character(character_name)
     except NoSuchCharacterError:
@@ -89,8 +97,7 @@ def get_choice() -> str:
           .format(new=new_colored, load=load_colored))
 
     choice = input()
-
-    while choice not in ['load', 'new']:
+    while choice not in ['load', 'new'] and choice[:4] != 'load':
         print("{} is not a valid command.".format(choice))
         choice = input()
 

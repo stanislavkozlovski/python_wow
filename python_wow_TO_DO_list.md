@@ -58,7 +58,6 @@
 - Add Talents System
 
 # Small TODOs
-- Load character in one command, like "load Netherblood"
 - Print Stats (hp, mana, xp and everything else at once)
 - Add item gossip text 
 - Convert the equipment dictionary to a class
