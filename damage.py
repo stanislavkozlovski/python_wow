@@ -34,7 +34,7 @@ class Damage:
                                                                                         absorbed=self.magic_absorbed)
 
         if phys_dmg_print and magic_dmg_print:
-            return "{phys:.2f} and {magic:.2f}".format(phys=phys_dmg_print, magic=magic_dmg_print)
+            return "{phys} and {magic}".format(phys=phys_dmg_print, magic=magic_dmg_print)
         elif phys_dmg_print:
             return phys_dmg_print
         elif magic_dmg_print:
