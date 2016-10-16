@@ -59,8 +59,6 @@
 
 # Small TODOs
 - Load character in one command, like "load Netherblood"
-- Print inventory command/or do it automatically, once a character modifies something in the inventory (through the open inventory command)
-- Print Equipment
 - Print Stats (hp, mana, xp and everything else at once)
 - Add item gossip text 
 - Convert the equipment dictionary to a class
@@ -68,10 +66,7 @@
 # TODOs
 - Add documentation!
 - Add another class of choice. (Mage is on my mind)
-
-health,mana,strength,agi,armor
 - Add a scripted NPC to the game
-
 - Implement HoTs (heal over time effects)
 - Add NatureHeal
 - Create one shared creature_default DB table holding all the default values for creatures at a certain level (gold, xp, armor)

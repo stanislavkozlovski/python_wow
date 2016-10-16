@@ -130,10 +130,12 @@ def handle_open_inventory_command(character):
     character.print_inventory()
 
     while True:
-        print(">inventory ", end='')
-        command = input()
+        command = input(">inventory ")
+        to_print = True
+
         if command == "?":
             pac_opened_inventory()
+            to_print = False
         elif command == "exit":
             print("-" * 40)
             break
@@ -155,6 +157,15 @@ def handle_open_inventory_command(character):
             item, _ = character.inventory.get(item_name, (None, None))
 
             character.consume_item(item)
+
+        if to_print:  # we've tried to modify the inventory in some way
+            """ item and item_name are assigned if we manage to pass this if check """
+            if item:
+                # we've modified the inventory (consumed/equipped an item)
+                character.print_inventory()
+            else:
+                # we've tried to modify the inventory but unsuccessfuly, therefore item is None
+                print("{item_name} is not in your inventory.".format(item_name=item_name))
 
 
 def handle_go_to_command(command: str, character, zone_object: Zone):
