@@ -6,9 +6,8 @@ import random
 from termcolor import colored
 
 from items import  Item, Weapon, Potion, Equipment
-from loader import (load_creature_xp_rewards, load_character_level_stats,
-                    load_character_xp_requirements, load_creature_gold_reward,
-                    load_loot_table, load_item, load_vendor_inventory, load_creature_default_armor)
+from loader import (load_creature_defaults, load_character_level_stats,
+                    load_character_xp_requirements, load_loot_table, load_item, load_vendor_inventory)
 from quest import Quest, FetchQuest
 from damage import Damage
 from buffs import BeneficialBuff, DoT
@@ -34,24 +33,26 @@ CHARACTER_DEFAULT_EQUIPMENT = {CHARACTER_EQUIPMENT_HEADPIECE_KEY: None,
                                CHARACTER_EQUIPMENT_LEGGINGS_KEY: None,
                                CHARACTER_EQUIPMENT_BOOTS_KEY: None}
 
-# dictionary that holds information about how much XP a monster of a certain level should award the player.
-# key: level(int), value: xp reward(int)
-CREATURE_XP_REWARD_DICTIONARY = load_creature_xp_rewards()
-CREATURE_GOLD_REWARD_DICTIONARY = load_creature_gold_reward()
-CREATURE_DEFAULT_ARMOR_DICTIONARY = load_creature_default_armor()
+
+# Dictionary: Key: The Level of the NPC. Value: A dictionary holding keys for the default XP reward, default armor
+# and default min/max gold_reward for a given NPC
+CREATURE_DEFAULTS_DICTIONARY = load_creature_defaults()
+
 
 def lookup_xp_reward(level: int) -> int:
     """ Return the appropriate XP reward associated with the given level"""
-    return CREATURE_XP_REWARD_DICTIONARY[level]
+    return CREATURE_DEFAULTS_DICTIONARY[level]['xp_reward']
 
 
 def lookup_gold_reward(level: int) -> tuple:
     """ Return a tuple that has the minimum and maximum gold amount a creature of certain level should give"""
-    return CREATURE_GOLD_REWARD_DICTIONARY[level]
+    return (CREATURE_DEFAULTS_DICTIONARY[level]['min_gold_reward'],
+            CREATURE_DEFAULTS_DICTIONARY[level]['max_gold_reward'])
+
 
 def lookup_default_creature_armor(level: int) -> int:
     """ Return the default armor value that a monster of the given level should have"""
-    return CREATURE_DEFAULT_ARMOR_DICTIONARY[level]
+    return CREATURE_DEFAULTS_DICTIONARY[level]['armor']
 
 
 class LivingThing:

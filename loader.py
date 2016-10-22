@@ -46,11 +46,9 @@ from database_info import \
      DBINDEX_QUEST_TEMPLATE_ITEM_REWARD1, DBINDEX_QUEST_TEMPLATE_ITEM_REWARD2, DBINDEX_QUEST_TEMPLATE_ITEM_REWARD3,
      DBINDEX_QUEST_TEMPLATE_ITEM_CHOICE_ENABLED,
 
-     DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP,
-
-     DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_LEVEL, DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MIN_GOLD_REWARD,
-     DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MAX_GOLD_REWARD, DBINDEX_CREATURE_DEFAULT_ARMOR_LEVEL,
-     DBINDEX_CREATURE_DEFAULT_ARMOR_ARMOR,
+     DBINDEX_CREATURE_DEFAULTS_ARMOR,
+     DBINDEX_CREATURE_DEFAULTS_CREATURE_LEVEL, DBINDEX_CREATURE_DEFAULTS_XP_REWARD,
+     DBINDEX_CREATURE_DEFAULTS_MIN_GOLD_REWARD, DBINDEX_CREATURE_DEFAULTS_MAX_GOLD_REWARD,
 
      DBINDEX_SPELL_BUFFS_NAME, DBINDEX_SPELL_BUFFS_DURATION, DBINDEX_SPELL_BUFFS_STAT1, DBINDEX_SPELL_BUFFS_AMOUNT1,
      DBINDEX_SPELL_BUFFS_STAT2, DBINDEX_SPELL_BUFFS_AMOUNT2, DBINDEX_SPELL_BUFFS_STAT3, DBINDEX_SPELL_BUFFS_AMOUNT3,
@@ -371,87 +369,39 @@ def load_quest_item_rewards(qitem1_id: int, qitem2_id: int, qitem3_id: int) -> d
     return item_rewards_dict
 
 
-def load_creature_xp_rewards() -> dict:
+def load_creature_defaults() -> dict:
     """
-    Load the default XP that is to be given from the creature.
-    The table's contents are as follows:
-    Entry, Level, Experience to give
-    1,         1,     50 Meaning a creature that is level 1 will give 50 XP
-    2,         2,     75 Gives 75 XP
-    etc...
-
-    :return: A dictionary as follows: Key: Level, Value: XP Reward
-                                               1,               50
-    """
-
-    xp_reward_dict = {}
-
-    with sqlite3.connect(DB_PATH) as connection:
-        cursor = connection.cursor()
-        def_xp_rewards_reader = cursor.execute("SELECT * FROM creature_default_xp_rewards")
-
-        for line in def_xp_rewards_reader:
-            level = line[DBINDEX_CREATURE_DEFAULT_XP_REWARDS_LEVEL]  # type: int
-            xp_reward = line[DBINDEX_CREATURE_DEFAULT_XP_REWARDS_XP]  # type: int
-
-            xp_reward_dict[level] = xp_reward
-
-    return xp_reward_dict
-
-
-def load_creature_default_armor() -> dict:
-    """
-        Load the default armor that a creature should have at a certain level.
+        Load the default values that a creature should have/give at a certain level.
         The table's contents are as follows:
-        Level, Armor
-            1,     50
-            2,     65
-            etc...
+        creature_level, armor, min_gold_reward, max_gold_reward, xp_reward
+                    1,     50,              2,                5,        50
+                    2,     65,              4,                6,        75
+                    etc...
 
-        :return: A dictionary as follows: Key: Level, Value: Armor
-                                                   1,         50
+        :return: A dictionary as follows: Key: Level(ex: 1), Value: Dictionary{'armor': 50,
+                                                                        'min_gold_reward': 2,
+                                                                        'max_gold_reward': 5,
+                                                                        'xp_reward': 50}
         """
 
-    default_armor_dict = {}
+    creature_defaults = {}
 
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
-        default_armor_reader = cursor.execute("SELECT * FROM creature_default_armor")
+        creature_defaults_reader = cursor.execute("SELECT * FROM creature_defaults")
 
-        for line in default_armor_reader:
-            level = line[DBINDEX_CREATURE_DEFAULT_ARMOR_LEVEL]
-            armor = line[DBINDEX_CREATURE_DEFAULT_ARMOR_ARMOR]
+        for line in creature_defaults_reader:
+            level = line[DBINDEX_CREATURE_DEFAULTS_CREATURE_LEVEL]  # type: int
+            armor = line[DBINDEX_CREATURE_DEFAULTS_ARMOR]  # type: int
+            min_gold_reward = line[DBINDEX_CREATURE_DEFAULTS_MIN_GOLD_REWARD]  # type: int
+            max_gold_reward = line[DBINDEX_CREATURE_DEFAULTS_MAX_GOLD_REWARD]  # type: int
+            xp_reward = line[DBINDEX_CREATURE_DEFAULTS_XP_REWARD]  # type: int
 
-            default_armor_dict[level] = armor
+            creature_defaults[level] = {'armor': armor,
+                                        'min_gold_reward': min_gold_reward, 'max_gold_reward':max_gold_reward,
+                                        'xp_reward': xp_reward}
 
-    return default_armor_dict
-
-
-def load_creature_gold_reward() -> dict:
-    """
-    Load the default gold amount that is to be given from the creature according to it's level.
-    The creature_default_gold_reward table's contents are as follows:
-    creature_level, min_gold_reward, max_gold_reward
-                 1,               2,              5 Meaning a creature of level 1 will drop from 2 to 5 gold
-
-    :return: A dictionary - Key: Level(int), Value: Tuple(min_gold(int), max_gold(int))
-                                     1,                 (2,5)
-    """
-
-    gold_rewards_dict = {}
-
-    with sqlite3.connect(DB_PATH) as connection:
-        cursor = connection.cursor()
-        gold_rewards_reader = cursor.execute("SELECT * FROM creature_default_gold_rewards")
-
-        for line in gold_rewards_reader:
-            level = line[DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_LEVEL]  # type: int
-            min_gold_reward = line[DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MIN_GOLD_REWARD]  # type: int
-            max_gold_reward = line[DBINDEX_CREATURE_DEFAULT_GOLD_REWARDS_MAX_GOLD_REWARD]  # type: int
-
-            gold_rewards_dict[level] = (min_gold_reward, max_gold_reward)
-
-    return gold_rewards_dict
+    return creature_defaults
 
 
 def load_vendor_inventory(creature_entry: int) -> dict:
@@ -646,6 +596,7 @@ def load_buff(buff_id: int) -> BeneficialBuff:
     return BeneficialBuff(name=buff_name, buff_stats_and_amounts=buff_stats_and_amounts,
                           duration=buff_duration)
 
+
 def load_dot(dot_id: int, level: int) -> DoT:
     """ Loads a DoT from the spell_dots table, whose contents are the following:
     entry,      name,    damage_per_tick, damage_school, duration, comment
@@ -676,6 +627,9 @@ def load_dot(dot_id: int, level: int) -> DoT:
             dot_damage = Damage(phys_dmg=dot_damage_per_tick)
 
     return DoT(name=dot_name, damage_tick=dot_damage, duration=dot_duration, caster_lvl=level)
+
+"""///////////////////// SAVED_CHARACTER /////////////////////"""
+
 
 def load_saved_character(name: str):
     """
@@ -736,6 +690,7 @@ def load_all_saved_characters_general_info() -> list:
             saved_characters.append({'name': char_name, 'class': char_class, 'level': char_level})
 
     return saved_characters
+
 
 def load_saved_character_loaded_scripts(id: int) -> set:
     """
@@ -882,6 +837,9 @@ def load_saved_character_equipment(id: int) -> dict:
         saved_equipment[CHARACTER_EQUIPMENT_HEADPIECE_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_HEADPIECE_ID]
 
     return saved_equipment
+
+"""///////////////////// SAVED_CHARACTER /////////////////////"""
+
 
 def load_character_level_stats() -> dict:
     """

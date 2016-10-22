@@ -51,6 +51,7 @@
 - [x] Add the ability to save the character
 - [x] List all saved characters when the user wants to load a character
 - [x] Add some kind of armor item type (Head, etc)
+- [x] Create one shared creature_default DB table holding all the default values for creatures at a certain level (gold, xp, armor)
 
 # Low Priority TODOs
 - Add more content(monster, zone/subzones, npcs, items, vendors, spells and etc)
@@ -68,7 +69,6 @@
 - Add a scripted NPC to the game
 - Implement HoTs (heal over time effects)
 - Add NatureHeal
-- Create one shared creature_default DB table holding all the default values for creatures at a certain level (gold, xp, armor)
 - Add different kinds of damage
 - Create more damage classes, each with it's own flavour. (Destruction leaves off a DoT, Sinister has a chance to strike again, Merciless has a chance to crit and others without flavor (holy, frost, fire etc))
 
