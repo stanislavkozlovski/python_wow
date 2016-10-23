@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Basics &#8212; python_wow 0.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="python_wow 0.0.6 documentation" href="index.html" />
+    <link rel="prev" title="Help" href="help.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="basics">
+<h1>Basics<a class="headerlink" href="#basics" title="Permalink to this headline">¶</a></h1>
+<p>For placeholders, this article will use these symbols {}</p>
+</div>
+<div class="section" id="starting-out">
+<h1>Starting out<a class="headerlink" href="#starting-out" title="Permalink to this headline">¶</a></h1>
+<p>When first starting the game, you&#8217;re prompted to create a new character.
+Immediately after creation, you&#8217;re popped into the world and the monsters are shown.
+You have the choice to type &#8221;?&#8221; to see all available commands or engage an attack on a monster with</p>
+<blockquote>
+<div>engage {monsterName}</div></blockquote>
+<dl class="docutils">
+<dt>You swing at the monster using the</dt>
+<dd>attack</dd>
+<dt>command and all is well. Once you kill the monster, loot drops from it.</dt>
+<dd><dl class="first last docutils">
+<dt>Loot dropped:</dt>
+<dd><p class="first">3 gold</p>
+<p>Wolf Meat - Miscellaneous Item</p>
+<p>Wolf Pelt - Miscellaneous Item</p>
+<p class="last">Strength Potion - Potion (Increases strength by 15 for 5 turns.)</p>
+</dd>
+</dl>
+</dd>
+<dt>You can take specific items with the</dt>
+<dd>take {itemName}</dd>
+<dt>command, take everything with the</dt>
+<dd>take all</dd>
+<dt>command or simply exit the menu, using the (you guessed it)</dt>
+<dd>exit</dd>
+</dl>
+<p>command.</p>
+<p>But enough about the action of playing the game, we can go on forever with that, let&#8217;s see how it works under the hood.</p>
+</div>
+<div class="section" id="creating-loading-a-character">
+<h1>Creating/Loading a character<a class="headerlink" href="#creating-loading-a-character" title="Permalink to this headline">¶</a></h1>
+<p>We get the character, which is an object of the class Character (more on that later) with this function in our main.py file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">start_game_prompt</span> <span class="k">import</span> <span class="n">get_player_character</span>
+<span class="n">main_character</span> <span class="o">=</span> <span class="n">get_player_character</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In the start_game_prompt, we handle user input to see if we want to load or create a new character.</p>
+</div>
+<div class="section" id="creating-a-character">
+<h1>Creating a character<a class="headerlink" href="#creating-a-character" title="Permalink to this headline">¶</a></h1>
+<p>The function, stripped down to it&#8217;s essentials:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">handle_create_character</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Character</span><span class="p">:</span>
+    <span class="n">class_choice</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">(</span><span class="nb">input</span><span class="p">())</span>
+
+    <span class="k">while</span> <span class="n">class_choice</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AVAILABLE_CLASSES</span><span class="p">:</span>  <span class="c1"># check for valid class</span>
+        <span class="n">class_choice</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">(</span><span class="nb">input</span><span class="p">())</span>
+
+    <span class="n">character_name</span> <span class="o">=</span> <span class="nb">input</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">class_choice</span> <span class="o">==</span> <span class="s1">&#39;paladin&#39;</span><span class="p">:</span>
+        <span class="n">character</span> <span class="o">=</span> <span class="n">Paladin</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">character_name</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">character</span>
+</pre></div>
+</div>
+<p>Really really straightforward, what we do is create a new Paladin object with default values.
+Part of the Paladin constructor:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">health</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span> <span class="n">mana</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span> <span class="n">strength</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">):</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="loading-a-character">
+<h1>Loading a character<a class="headerlink" href="#loading-a-character" title="Permalink to this headline">¶</a></h1>
+<p>We do this by calling the load_saved_character function from the loader.py file.:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">loader</span> <span class="k">import</span> <span class="n">load_saved_character</span><span class="p">,</span> <span class="n">load_all_saved_characters_general_info</span>
+<span class="n">character</span> <span class="o">=</span> <span class="n">load_saved_character</span><span class="p">(</span><span class="n">character_name</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>I think the docstring to the method explains things fairly well:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This function loads the information about a saved chacacter in the saved_character DB table.</span>
+
+<span class="sd">   name,   class,  level,  loaded_scripts_ID,  killed_monsters_ID, completed_quests_ID, inventory_ID, gold</span>
+<span class="sd">   Netherblood, Paladin,     10,                 1,                    1,                   1,            1,   23</span>
+
+<span class="sd">The attributes that end in ID like loaded_scripts_ID are references to other tables.</span>
+
+<span class="sd">For more information:</span>
+<span class="sd">https://github.com/Enether/python_wow/wiki/How-saving-a-Character-works-and-information-about-the-saved_character-database-table.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>In steps:</p>
+<ol class="arabic">
+<li><p class="first">We query the database and save the IDs used for sub-tables:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sv_char_reader</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM saved_character WHERE name = ?&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="n">char_loaded_scripts_ID</span> <span class="o">=</span> <span class="n">sv_char_reader</span><span class="p">[</span><span class="n">DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID</span><span class="p">]</span>
+<span class="n">char_killed_monsters_ID</span> <span class="o">=</span> <span class="n">sv_char_reader</span><span class="p">[</span><span class="n">DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID</span><span class="p">]</span>
+<span class="n">char_completed_quests_ID</span> <span class="o">=</span> <span class="n">sv_char_reader</span><span class="p">[</span><span class="n">DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID</span><span class="p">]</span>
+<span class="n">char_equipment_ID</span> <span class="o">=</span> <span class="n">sv_char_reader</span><span class="p">[</span><span class="n">DBINDEX_SAVED_CHARACTER_EQUIPMENT_ID</span><span class="p">]</span>
+<span class="n">char_inventory_ID</span> <span class="o">=</span> <span class="n">sv_char_reader</span><span class="p">[</span><span class="n">DBINDEX_SAVED_CHARACTER_INVENTORY_ID</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><dl class="first docutils">
+<dt>Using the IDs, we call a function associated with each sub-table.</dt>
+<dd><ul class="first simple">
+<li>load_saved_character_loaded_scripts returns a set, containing the name of special in-game scripts that the character has already seen, because we do not want him to see them again.</li>
+<li>load_saved_character_killed_monsters returns a set, containing the unique GUID for every special monster that the character has killed. Only monsters that should be killed once in the game are added here.</li>
+<li>load_saved_character_completed_quests returns a set, containing the names of the character&#8217;s completed quests. This, like the previous two, is stored so as to not load the quests in the game again.</li>
+<li>load_saved_character_inventory returns a dictionary, holding the inventory of the player as it is stored in the Character class, Key: item_name, Value: tuple(object of class Item, int item_count)</li>
+<li>load_saved_character_equipment returns a dictionary, holding the equipment of the player as it is stored in the Character class. Key: the equipment&#8217;s slot e.g: &#8220;Shoulderpad&#8221;, Value: an object of class Item</li>
+</ul>
+<p>In the DB, the actual equipment&#8217;s value is stored as the item&#8217;s ID. In the function, we use a list comprehension to convert all the loaded IDs into objects of class Item:</p>
+<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="n">saved_equipment_info</span> <span class="o">=</span> <span class="p">[</span><span class="n">load_item</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">saved_equipment_info</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+</ol>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Basics</a></li>
+<li><a class="reference internal" href="#starting-out">Starting out</a></li>
+<li><a class="reference internal" href="#creating-loading-a-character">Creating/Loading a character</a></li>
+<li><a class="reference internal" href="#creating-a-character">Creating a character</a></li>
+<li><a class="reference internal" href="#loading-a-character">Loading a character</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="help.html" title="previous chapter">Help</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/basics.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Stanislav Kozlovski.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/basics.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
