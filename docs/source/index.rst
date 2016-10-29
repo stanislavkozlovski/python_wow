@@ -17,6 +17,7 @@ Contents:
    
    help
    basics
+   creating, saving and loading a character
 
 
 Indices and tables
