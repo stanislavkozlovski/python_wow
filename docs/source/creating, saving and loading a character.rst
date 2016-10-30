@@ -118,4 +118,4 @@ The functions in there are pretty straightforward, the Character class has sets 
 
 Next:
 
-:any:`character basics`
+:doc:`Character Basics </character basics>`
