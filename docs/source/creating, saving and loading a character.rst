@@ -107,7 +107,7 @@ It is worth noting that before inserting rows into the database, each function c
     else:
         raise Exception("You do not have permission to delete from the {} table!".format(table_name))
 
-Next, we start saving each sub-table::
+Finally, we save each sub-table::
 
     save_loaded_scripts(character_loaded_scripts_ID, character.loaded_scripts, cursor)
     save_killed_monsters(character_killed_monsters_ID, character.killed_monsters, cursor)
@@ -115,4 +115,7 @@ Next, we start saving each sub-table::
     save_inventory(character_inventory_ID, character.inventory, cursor)
 
 The functions in there are pretty straightforward, the Character class has sets for the scripts he's loaded, special monsters he's killed, quests he's completed and inventory he has. In the functions above, we simply iterate through the sets and insert a row for each value.
-    
+
+Next:
+
+:any:`character basics`
