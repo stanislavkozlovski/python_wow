@@ -160,8 +160,74 @@ Taking Damage
 ===============================
 You can't deal damage without taking any::
 
-    def take_attack(self, damage: Damage, attacker_level: int):
-        damage = self._apply_armor_reduction(damage, attacker_level)
+   	def take_attack(self, monster_name:str, damage: Damage, attacker_level: int):
+		damage = self._apply_armor_reduction(damage, attacker_level)
         damage = self._apply_damage_absorption(damage)
+        print("{0} attacks {1} for {2}!".format(monster_name, self.name, damage))
         self._subtract_health(damage)
+
+#. We reduce the damage according to the armor the character has::
+
+ 	def _apply_armor_reduction(self, damage: Damage, attacker_level: int) -> Damage:
+        """
+        This method applies the armor reduction to a blow, the formula is as follows:
+        Percentage to Reduce = Armor / (Armor + 400 + 85 * Attacker_Level)
+        :param damage: the raw damage
+        :return: the damage with the applied reduction
+        """
+        armor = self.attributes[self.KEY_ARMOR]
+        reduction_percentage = armor / (armor + 400 + 85 * attacker_level)  # we get the percentage of damage to reduce
+Important note: We take only the .phys_dmg property of the Damage class and leave the magical damage untouched::
+
+        damage_to_deduct = damage.phys_dmg * reduction_percentage  # get the damage we need to deduct	
+        reduced_damage = damage.phys_dmg - damage_to_deduct  # deduct the damage
+
+        return Damage(phys_dmg=reduced_damage, magic_dmg=damage.magic_dmg)
+
+
+
+#. Then, we direct as much damage as we can to the Character's absorption shield::
+
+    def _apply_damage_absorption(self, damage: Damage, to_print=False) -> Damage:
+        """
+        This method subtracts the absorption (if any) from the damage
+        :param to_print: A boolean indicating if we want to actually subtract the damage from the shield. If it's true,
+        we're getting the damage for the sole reason to print it only, therefore we should not modify anything
+        :return Tuple(Damage, absorbed(float)
+        """
+
+        if self.absorption_shield:  # if there is anything to absorb
+            # lowers the damage and returns our shield
+            if not to_print:  # we want to modify the shield
+                self.absorption_shield = damage.handle_absorption(self.absorption_shield)
+Note: The Damage class has a method that deducts the damage given an absorption shield value. More on that here
+The to_print boolean variable is used when we want to modify the damage variable only to print it later. 
+To stress on it: to_print is True only when the returned variable of _apply_damage_absorption is used for printing exclusively,
+not touching the Character's health/absorption shield at all.::
+            else:
+                damage.handle_absorption(self.absorption_shield) # only modify the specific damage in order to print it
+
+        return damage
+
+#. Finally, we subtract the damage from the Character's health::
+
+    def _subtract_health(self, damage: Damage):
+        """ This method is called whenever the health of the Character is damaged """
+        self.health -= damage
+        self.check_if_dead()
+
+Well, I can't just leave you there without letting you see the check_if_dead method!::
+
+    def check_if_dead(self):
+        if self.health <= 0:
+            self._die()
+
+	####GOES TO####
+    def _die(self):
+        self._alive = False  # super()._die()
+        print("Character {} has died!".format(self.name))
+
+Join us next time where we delve into the zones system of the game and the overall loading of monsters/npcs
+
+:any:`zones`
 
