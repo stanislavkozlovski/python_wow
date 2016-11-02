@@ -1,10 +1,10 @@
 Disclaimer
-==========
+===========
 The following code is heavily commented for presentation purposes. While the real code does have a fair
 bit of comments, they're not as over-abundant and obvious as here.
 
 Character
-===========================
+==========
 
 This is the class for the player's character. The main character of the game.
 It starts off by inheriting another class called LivingThing::
@@ -26,17 +26,17 @@ It starts off by inheriting another class called LivingThing::
                 self.absorption_shield = 0  # holds as an integer the hit
                 #points the LivingThing has as absorption-shield points.  
                 #Basically means how much damage it can absorb until it starts losing health
-                
+
                 self.attributes = {self.KEY_ARMOR: 0}  # a dictionary holding the 
                 #amount of attributes the LivingThing currently has. 
-                
+
                 self._alive = True  # private boolean holding information if the LivingThing is alive
                 self._in_combat = False  # private boolean holding information
                 #if the LivingThing is in combat (fighting with a monster, etc)
                 self.buffs = {}  # dict Key: an instance of class Buff,
                 #Value: The turns it has left to be active, int
                 # buffs is a dictionary holding instances of the class Buff, more on that later.
-                
+
 
 Here is the character class::
 
@@ -127,6 +127,7 @@ Here is the character class::
             
             
 As you can see, lots of stuff. Now let me present some basic functions of the Character class
+
 It's worth noting that whenever we stop fighting a monster (leave combat), we regen back to full hp/mana::
 
     def leave_combat(self):
@@ -160,13 +161,13 @@ Taking Damage
 ===============================
 You can't deal damage without taking any::
 
-   	def take_attack(self, monster_name:str, damage: Damage, attacker_level: int):
-		damage = self._apply_armor_reduction(damage, attacker_level)
+    def take_attack(self, monster_name:str, damage: Damage, attacker_level: int):
+        damage = self._apply_armor_reduction(damage, attacker_level)
         damage = self._apply_damage_absorption(damage)
         print("{0} attacks {1} for {2}!".format(monster_name, self.name, damage))
         self._subtract_health(damage)
 
-#. We reduce the damage according to the armor the character has::
+1. We reduce the damage according to the armor the character has::
 
  	def _apply_armor_reduction(self, damage: Damage, attacker_level: int) -> Damage:
         """
@@ -177,7 +178,10 @@ You can't deal damage without taking any::
         """
         armor = self.attributes[self.KEY_ARMOR]
         reduction_percentage = armor / (armor + 400 + 85 * attacker_level)  # we get the percentage of damage to reduce
-Important note: We take only the .phys_dmg property of the Damage class and leave the magical damage untouched::
+.. note::
+    We take only the .phys_dmg property of the Damage class and leave the magical damage **untouched**
+    
+::
 
         damage_to_deduct = damage.phys_dmg * reduction_percentage  # get the damage we need to deduct	
         reduced_damage = damage.phys_dmg - damage_to_deduct  # deduct the damage
@@ -186,7 +190,7 @@ Important note: We take only the .phys_dmg property of the Damage class and leav
 
 
 
-#. Then, we direct as much damage as we can to the Character's absorption shield::
+2. Then, we direct as much damage as we can to the Character's absorption shield::
 
     def _apply_damage_absorption(self, damage: Damage, to_print=False) -> Damage:
         """
@@ -200,16 +204,19 @@ Important note: We take only the .phys_dmg property of the Damage class and leav
             # lowers the damage and returns our shield
             if not to_print:  # we want to modify the shield
                 self.absorption_shield = damage.handle_absorption(self.absorption_shield)
-Note: The Damage class has a method that deducts the damage given an absorption shield value. More on that here
-The to_print boolean variable is used when we want to modify the damage variable only to print it later. 
-To stress on it: to_print is True only when the returned variable of _apply_damage_absorption is used for printing exclusively,
-not touching the Character's health/absorption shield at all.::
+.. note::
+
+    The Damage class has a method that deducts the damage given an absorption shield value. More on that here
+The to_print boolean variable is used when we want to modify the damage variable only to print it later.
+
+To stress on it: **to_print is True only when the returned variable of _apply_damage_absorption is used for printing exclusively,
+not touching the Character's health/absorption shield at all.**::
             else:
                 damage.handle_absorption(self.absorption_shield) # only modify the specific damage in order to print it
 
         return damage
 
-#. Finally, we subtract the damage from the Character's health::
+3. Finally, we subtract the damage from the Character's health::
 
     def _subtract_health(self, damage: Damage):
         """ This method is called whenever the health of the Character is damaged """
@@ -222,12 +229,11 @@ Well, I can't just leave you there without letting you see the check_if_dead met
         if self.health <= 0:
             self._die()
 
-	####GOES TO####
     def _die(self):
         self._alive = False  # super()._die()
         print("Character {} has died!".format(self.name))
 
 Join us next time where we delve into the zones system of the game and the overall loading of monsters/npcs
 
-:any:`zones`
+:doc:`Zones </zones>`
 

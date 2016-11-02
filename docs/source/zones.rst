@@ -6,15 +6,26 @@ bit of comments, they're not as over-abundant and obvious as here.
 
 Zones
 ==========
-In general, all the Zones are split into SubZones. The actual storage of monsters/npcs is on a subzone basis. In general, 
-the Zone class is sort of a wrapper object that holds all our subzones together and holds the current subzone's information in it.
+
+Long story short
+-----
+In general, all the Zones are split into SubZones. The actual storage of monsters/npcs is on a subzone basis.
+The Zone class is sort of a wrapper object that holds all our subzones together and holds the current subzone's information in it.
+This approach gives us easy access to monsters/etc. of the current subzone we are in and gives us an easy way to store
+information about changes in that subzone when we are not in it.
+
+Long story
+-----
 If you didn't notice, or maybe I didn't show you, we have a pre-defined constant dictionary of ZONES in our main.py::
 
+    "line 11 in main.py"
     ZONES = {"Northshire Abbey": None}
+    "Northshire Abbey is considered the starter zone for every character in the game"
 which we populate with an instance of our starter zone's class Northshire Abbey::
 
+    "line 17 in main.py"
     ZONES["Northshire Abbey"] = NorthshireAbbey(main_character)
-Okay well what the hell is all of this? To understand we delve into the zones folder into the module holding the base classes for zones - zone.py::
+Okay well what the hell is all of this? To understand let's delve into the zones folder in the module holding the base classes for zones - ``zone.py``::
 
     class Zone:
         # the _map that shows us where we can go from our current subzone
@@ -24,8 +35,12 @@ Okay well what the hell is all of this? To understand we delve into the zones fo
         loaded_zones = {}  # dictionary that will hold the subzone class objects
 
         #  the cs in cs_alive_monsters and similar names stands for Current Subzone
-        cs_alive_monsters, cs_monsters_guid_name_set = {}, set()  # the alive monsters in the subzone. More on these here
+The alive monsters/npcs in the subzone. More on these `_alive_monsters and _monster_guid_name_set:`_::
+
+        cs_alive_monsters, cs_monsters_guid_name_set = {}, set() 
         cs_alive_npcs, cs_npcs_guid_name_set = {}, set()  # the alive npcs in the subzone
+::
+
         cs_available_quests = {}  # the subzone's quests that are available to the character. (A quest which the character finished is removed from here)
         # the current subzone's map, a list of string representing to which subzone we can go from the current one
         # this is literally taken from the zone_map dictionary using the curr_subzone as key
@@ -76,14 +91,14 @@ So, ignoring the SubZone class and method for a while, we continue onto the meth
                 # Before moving:
                 # update the information for our current in case we've killed monsters or done quests for example
                 self._update_subzone_attributes(current_subzone)
-Here we update the subzone's attributes before leaving the zone::
+Here we updated the subzone's attributes before leaving the zone
+Next is a hardcoded script to block the player from entering A Peculiar Hut if the Monster Garrick Padfoot is alive::
 
                 if destination == "A Peculiar Hut":
                     # this means we are in Northshire Vineyards
                     if self.GUID_GARRY_PADFOOT in self.cs_alive_monsters.keys():  # if garry padfoot is alive
                         print("Garrick Padfoot is blocking the way.")
                         return 0
-This is a hardcoded script to block the player from entering A Peculiar Hut if the Monster Garrick Padfoot is alive::
 
                 if not self.loaded_zones[destination]:  # if we don't have the destination's attributes loaded load them
                     self._load_zone(destination, character)
@@ -92,10 +107,12 @@ This is a hardcoded script to block the player from entering A Peculiar Hut if t
 
                 # We move, therefore update our attributes
                 self._update_attributes(destination)
-This is different from the update_subzone_attributes method we called above, as this one changes the attributes in the ZONE class
+This is different from the update_subzone_attributes method we called above, as this one changes the attributes in the **ZONE** class.
+Basically loading up the creatures from the subzone we're entering onto our Zone object.
 
 
 To enter a zone, we need to create the class object first. This is where _load_zone comes to help::
+
     def _load_zone(self, subzone: str, character):
         # if we have not loaded the zone before, we need to initialize it's class and put it in the loaded_zones
         if subzone == {ZONENAME}:
@@ -105,7 +122,7 @@ To enter a zone, we need to create the class object first. This is where _load_z
 		                                          character=character)
 This if check is repeated for each subzone in our main Zone.
 
-So... this obviously loads the SubZone class. But what the heck is it? Time to find out::
+So... this obviously loads the SubZone class. But *what the heck* is it? Time to find out!::
 
 	class SubZone:
 	    def __init__(self, name: str, parent_zone_name: str, zone_map: list, character):
@@ -114,23 +131,36 @@ So... this obviously loads the SubZone class. But what the heck is it? Time to f
 		self._map = zone_map  # the _map that shows us where we can go from here
 
 		self._alive_monsters, self._monster_guid_name_set = load_monsters(self.parent_zone_name, self.name, character)
-_alive_monsters and _monster_guid_name_set... ahh... Okay:
-_alive_monsters is a dictionary, the Key of which holds the unique GUID (Database ID) for a given Monster(in the creatures DB table).
-As a value, the _alive_monsters dict holds an object of class Monster associated with that specific monster.
 
-The _monster_guid_name_set is a set of TUPLES, which hold the GUID of a monster and it's name. This is essentially what connects
-a monster's name to it's Monster object in the _alive_monsters dictionary.::
+_alive_monsters and _monster_guid_name_set:
+++++++++++++++++++++++++++++++++++++++++++++
+``_alive_monsters`` is a dictionary, the Key of which holds the unique GUID (Database ID) for a given Monster(in the creatures DB table).
+As a value, the ``_alive_monsters`` dict holds an object of class ``Monster`` associated with that specific monster.
+
+The ``_monster_guid_name_set`` is a set of TUPLES, which hold the GUID of a monster and it's name. This is essentially what connects
+a monster's name to it's ``Monster`` object in the ``_alive_monsters dictionary``.
+
+Examples::
+
+    " in-game print of _alive_monsters "
+    {1: <entities.Monster object at 0x01A853F0>, 2: <entities.Monster object at 0x01A85B30>}
+    " in-game print of _monster_guid_name_set "
+    {(5, 'Wolf'), (2, 'Wolf'), (1, 'Wolf'), (4, 'Wolf'), (3, 'Wolf')}
+::
 
 		self._alive_npcs, self._npc_guid_name_set = load_npcs(self.parent_zone_name, self.name)
-The variables here are analogous to the monsters'::
+The variables here are analogous to the monsters'
+
+::
 
 		self._quest_list = load_quests(self.parent_zone_name, self.name, character)
-_quest_list is a dictionary, thet Key of which holds the name of the quest and it's value is a object of class Quest
+``_quest_list`` is a dictionary, thet Key of which holds the name of the quest and it's value is a object of class ``Quest`` More on Quests here
 
-This is essentially what the SubZone class is. 
-A class with a name that gets loaded with specific monsters/npcs/quests associated with it
-and holds the information for them.
-It has get and set(actually update) methods in it for getting/updating the monsters/npcs/quests but they are not worth showing.
+SubZone summary
++++++++++++++++
+The ``SubZone`` class essentially is a container with a name that gets loaded with 
+specific monsters/npcs/quests associated with it and holds the information for them.
+It has get and set(actually called update) methods in it for getting/updating the monsters/npcs/quests but they are not worth showing here.
 
 
  
