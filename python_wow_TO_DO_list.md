@@ -71,4 +71,4 @@
 - Add NatureHeal
 - Add different kinds of damage
 - Create more damage classes, each with it's own flavour. (Destruction leaves off a DoT, Sinister has a chance to strike again, Merciless has a chance to crit and others without flavor (holy, frost, fire etc))
-
+- fix up private and protected vars/methods
