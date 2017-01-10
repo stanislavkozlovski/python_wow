@@ -4,7 +4,7 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 
 import random
 from termcolor import colored
-
+from database.main import cursor
 from items import  Item, Weapon, Potion, Equipment
 from loader import (load_creature_defaults, load_character_level_stats,
                     load_character_xp_requirements, load_loot_table, load_item, load_vendor_inventory)
@@ -13,6 +13,8 @@ from damage import Damage
 from buffs import BeneficialBuff, DoT
 from exceptions import ItemNotInInventoryError
 
+
+# TODO: Move to constants
 CHARACTER_EQUIPMENT_HEADPIECE_KEY = 'headpiece'
 CHARACTER_EQUIPMENT_SHOULDERPAD_KEY = 'shoulderpad'
 CHARACTER_EQUIPMENT_NECKLACE_KEY = 'necklace'
@@ -36,7 +38,7 @@ CHARACTER_DEFAULT_EQUIPMENT = {CHARACTER_EQUIPMENT_HEADPIECE_KEY: None,
 
 # Dictionary: Key: The Level of the NPC. Value: A dictionary holding keys for the default XP reward, default armor
 # and default min/max gold_reward for a given NPC
-CREATURE_DEFAULTS_DICTIONARY = load_creature_defaults()
+CREATURE_DEFAULTS_DICTIONARY = load_creature_defaults(cursor)
 
 
 def lookup_xp_reward(level: int) -> int:
@@ -336,7 +338,8 @@ class VendorNPC(FriendlyNPC):
                  max_damage: int = 1, quest_relation_id = 0, loot_table_ID: int = 0, gossip: str = 'Hello'):
         super().__init__(name, health, mana, level, min_damage, max_damage, quest_relation_id, loot_table_ID, gossip)
         self.entry = entry
-        self.inventory = load_vendor_inventory(self.entry)  # type: dict: key-item_name(str), value: tuple(item object, count)
+        # TODO: Move
+        self.inventory = load_vendor_inventory(self.entry, cursor)  # type: dict: key-item_name(str), value: tuple(item object, count)
 
     def __str__(self):
         return f'{self.colored_name} <Vendor>'
@@ -440,7 +443,7 @@ class Monster(LivingThing):
         if not self.loot_table_ID:
             return
 
-        loot_list = load_loot_table(monster_loot_table_ID=self.loot_table_ID)
+        loot_list = load_loot_table(monster_loot_table_ID=self.loot_table_ID, cursor=cursor)
 
         for item_ID, item_drop_chance in loot_list:
             '''
@@ -455,7 +458,7 @@ class Monster(LivingThing):
 
             if item_drop_chance >= (random_float * 100):
                 # item has dropped, load it from the DB
-                item = load_item(item_ID)
+                item = load_item(item_ID, cursor)
 
                 self.loot[item.name] = item
 
@@ -527,8 +530,8 @@ class Character(LivingThing):
         #  the character has killed (and that should not be killable a second time)
         self.completed_quests = completed_quests  # a set that holds the name of the quests that the character has completed
         # A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
-        self._LEVEL_STATS = load_character_level_stats()
-        self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements()
+        self._LEVEL_STATS = load_character_level_stats(cursor)
+        self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements(cursor)
         self.quest_log = {}
         self.inventory = saved_inventory # dict Key: str, Value: tuple(Item class instance, Item Count)
         self.equipment = saved_equipment # dict Key: Equipment slot, Value: object of class Equipment

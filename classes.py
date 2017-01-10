@@ -1,5 +1,6 @@
 import sqlite3
 
+from database.main import cursor
 from damage import Damage
 from database.database_info import (
     DB_PATH,
@@ -223,7 +224,7 @@ class Paladin(Character):
         :return successful cast or not"""
         mana_cost = self.learned_spells[self.KEY_MELTING_STRIKE]['mana_cost']
         damage = Damage(phys_dmg=self.learned_spells[self.KEY_MELTING_STRIKE]['damage_1'])
-        dot = load_dot(self.learned_spells[self.KEY_MELTING_STRIKE]['effect'], level=self.level)
+        dot = load_dot(self.learned_spells[self.KEY_MELTING_STRIKE]['effect'], level=self.level, cursor=cursor)
         cast_is_successful = (self._check_enough_mana(mana_cost)
                               and self._check_spell_cooldown(self.KEY_MELTING_STRIKE))
 

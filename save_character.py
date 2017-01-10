@@ -173,7 +173,6 @@ def save_equipment(id: int, equipment: dict, cursor):
                    [id, headpiece_id,shoulderpad_id, necklace_id, chestguard_id, bracer_id, gloves_id, belt_id,
                     leggings_id, boots_id])
 
-
 def delete_rows_from_table(table_name: str, id: int, cursor):
     """
     This function will delete every row in TABLE_NAME with an id of ID
