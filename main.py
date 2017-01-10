@@ -33,7 +33,7 @@ def main():
         route_main_commands(main_character, zone_object)
 
 
-def get_zone_object(zone: str):
+def get_zone_object(zone: str) -> Zone:
     """
     :param zone: The name of the zone
     :return: Returns a class object from the ZONES dictionary

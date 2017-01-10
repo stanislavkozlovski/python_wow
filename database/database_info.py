@@ -1,5 +1,5 @@
 """
-This module holds all kinds of information regarding the database and it's tables.
+This module holds all kinds of information regarding the database and its tables.
 """
 import os
 

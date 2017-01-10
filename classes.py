@@ -1,6 +1,7 @@
 import sqlite3
 
-from database_info import (
+from damage import Damage
+from database.database_info import (
     DB_PATH,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_NAME, DBINDEX_PALADIN_SPELLS_TEMPLATE_RANK,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_LEVEL_REQUIRED, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE1,
@@ -9,7 +10,6 @@ from database_info import (
     DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3, DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT, DBINDEX_PALADIN_SPELLS_TEMPLATE_COOLDOWN)
 from entities import Character, Monster, CHARACTER_DEFAULT_EQUIPMENT
-from damage import Damage
 from heal import HolyHeal
 from loader import load_dot
 

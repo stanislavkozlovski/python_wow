@@ -1,7 +1,9 @@
 import sqlite3
-import items
 
-from database_info import \
+import items
+from buffs import BeneficialBuff, DoT
+from damage import Damage
+from database.database_info import \
     (DB_PATH,
 
      DBINDEX_SAVED_CHARACTER_NAME, DBINDEX_SAVED_CHARACTER_CLASS, DBINDEX_SAVED_CHARACTER_LEVEL,
@@ -62,10 +64,8 @@ from database_info import \
 
      DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
      )
-from quest import KillQuest, FetchQuest
 from exceptions import NoSuchCharacterError
-from buffs import BeneficialBuff, DoT
-from damage import Damage
+from quest import KillQuest, FetchQuest
 
 
 def parse_int(value) -> int:
