@@ -74,7 +74,7 @@ class Paladin(Character):
                 self.learn_new_spell(spell=available_spell)
 
     def learn_new_spell(self, spell: dict):
-        print("You have learned a new spell - {}".format(spell['name']))
+        print(f"You have learned a new spell - {spell['name']}")
 
         self.learned_spells[spell['name']] = spell
         self.spell_cooldowns[spell['name']] = 0
@@ -169,13 +169,13 @@ class Paladin(Character):
             self._spell_trigger_cd(self.KEY_SEAL_OF_RIGHTEOSNESS)
             self.SOR_ACTIVE = True
             self.SOR_TURNS = 3
-            print("{0} activates {spell}!".format(self.name, spell=self.KEY_SEAL_OF_RIGHTEOSNESS))
+            print(f'{self.name} activates {self.KEY_SEAL_OF_RIGHTEOSNESS}!')
         return cast_is_successful
 
     def _spell_seal_of_righteousness_attack(self):
         if self.SOR_TURNS == 0:  # fade spell
             self.SOR_ACTIVE = False
-            print("{spell} has faded from {tar}".format(spell=self.KEY_SEAL_OF_RIGHTEOSNESS, tar=self.name))
+            print(f'{self.KEY_SEAL_OF_RIGHTEOSNESS} has faded from {self.name}')
             return 0
         else:
             self.SOR_TURNS -= 1
@@ -191,7 +191,7 @@ class Paladin(Character):
         self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['rank'] = rank
         self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['mana_cost'] = mana_cost
 
-        print("Spell {spell} has been updated to rank {rank}!".format(spell=self.KEY_SEAL_OF_RIGHTEOSNESS, rank=rank))
+        print(f'Spell {self.KEY_SEAL_OF_RIGHTEOSNESS} has been updated to rank {rank}!')
         print("*" * 20)
 
     def spell_flash_of_light(self):
@@ -212,10 +212,9 @@ class Paladin(Character):
 
             if self.health > self.max_health:  # check for overheal
                 overheal = self._handle_overheal()
-                print("{spell} healed {tar} for {heal:.2f} ({ovheal:.2f} Overheal).".format(
-                    spell=self.KEY_FLASH_OF_LIGHT, tar=self.name, heal=heal-overheal, ovheal=overheal))
+                print(f'{self.KEY_FLASH_OF_LIGHT} healed {self.name} for {heal-overheal:.2f} ({overheal:.2f} Overheal).')
             else:
-                print("{spell} healed {tar} for {heal}.".format(spell=self.KEY_FLASH_OF_LIGHT, tar=self.name, heal=heal))
+                print(f'{self.KEY_FLASH_OF_LIGHT} healed {self.name} for {heal}.')
 
         return cast_is_successful
 
@@ -232,7 +231,7 @@ class Paladin(Character):
             self.mana -= mana_cost
             self._spell_trigger_cd(self.KEY_MELTING_STRIKE)
             # damage the target and add the DoT
-            print("{spell} damages {tar} for {dmg}!".format(spell=self.KEY_MELTING_STRIKE, tar=target.name, dmg=damage))
+            print(f'{self.KEY_MELTING_STRIKE} damages {target.name} for {damage}!')
             target.take_attack(damage, self.level)
             target.add_buff(dot)
 
@@ -275,10 +274,9 @@ class Paladin(Character):
 
         auto_attack_print = victim.get_take_attack_damage(auto_attack, self.level)
         if sor_damage:
-            print("{0} attacks {1} for {2} from {sor}!".format(self.name, victim.name,
-                                                               auto_attack_print, sor=self.KEY_SEAL_OF_RIGHTEOSNESS))
+            print(f'{self.name} attacks {victim.name} for {auto_attack_print} from {self.KEY_SEAL_OF_RIGHTEOSNESS}!')
         else:
-            print("{0} attacks {1} for {2}!".format(self.name, victim.name, auto_attack_print))
+            print(f'{self.name} attacks {victim.name} for {auto_attack_print}!')
 
         victim.take_attack(auto_attack, self.level)
 
@@ -300,10 +298,7 @@ class Paladin(Character):
         turns_left = self.spell_cooldowns[spell_name]
 
         if turns_left:
-            if turns_left == 1:
-                print("{} is on cooldown for {} more turn!".format(spell_name, turns_left))
-            else:
-                print("{} is on cooldown for {} more turns!".format(spell_name, turns_left))
+            print(f'{spell_name} is on cooldown for {turns_left} more turns!')
             return False
 
         return True

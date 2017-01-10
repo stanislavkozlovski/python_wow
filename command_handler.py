@@ -25,7 +25,7 @@ def handle_talk_to_command(command:str, character, zone_object: Zone):
         target = alive_npcs[target_guid]
         target.talk(character.name)
     else:
-        print("Could not find NPC {}.".format(target))
+        print(f'Could not find NPC {target}.')
 
 
 def handle_engage_command(command: str, character, zone_object: Zone):
@@ -51,7 +51,7 @@ def handle_engage_command(command: str, character, zone_object: Zone):
         target = alive_monsters[target_guid]  # convert the string to a Monster object
         engage_combat(character, target, alive_monsters, guid_name_set, target_guid)
     else:
-        print("Could not find creature {}.".format(target))
+        print(f'Could not find creature {target}.')
 
 
 def handle_accept_quest_command(command: str, character, available_quests: dict):
@@ -61,11 +61,11 @@ def handle_accept_quest_command(command: str, character, available_quests: dict)
         quest = available_quests[quest_to_accept]
 
         if character.level >= quest.required_level:
-            print("Accepted Quest - {}".format(quest.name))
+            print(f'Accepted Quest - {quest.name}')
             character.add_quest(quest)
             del available_quests[quest_to_accept]  # removes it from the dictionary
         else:
-            print("You need to be level {} to accept {}".format(quest.required_level, quest.name))
+            print(f'You need to be level {quest.required_level} to accept {quest.name}')
 
     else:
         print("No such quest.")
@@ -86,7 +86,7 @@ def handle_buy_from_command(command: str, character, zone_object: Zone):
         target = alive_npcs[target_guid]
         handle_vendor_sale(character, target)
     else:
-        print("Could not find Vendor {}".format(target))
+        print(f'Could not find Vendor {target}')
 
 
 def handle_vendor_sale(character, vendor):
@@ -102,13 +102,11 @@ def handle_vendor_sale(character, vendor):
                 # check if the player has enough gold
                 if character.has_enough_gold(vendor.get_item_price(item)):
                     character.buy_item(vendor.sell_item(item))
-                    print("{character_name} has bought {item_name} from {vendor_name}!".format(
-                        character_name=character.name, item_name=item, vendor_name=vendor.name
-                    ))
+                    print(f'{character.name} has bought {item} from {vendor.name}!')
                 else:
-                    print("You do not have enough gold to buy {}!\n".format(item))
+                    print(f'You do not have enough gold to buy {item}!\n')
             else:
-                print("{} does not have {} in stock.".format(vendor.name, item))
+                print(f'{vendor.name} does not have {item} in stock.')
         elif 'sell ' in command:
             item = command[5:]  # name of the item
             if character.has_item(item):
@@ -165,7 +163,7 @@ def handle_open_inventory_command(character):
                 character.print_inventory()
             else:
                 # we've tried to modify the inventory but unsuccessfuly, therefore item is None
-                print("{item_name} is not in your inventory.".format(item_name=item_name))
+                print(f'{item_name} is not in your inventory.')
 
 
 def handle_go_to_command(command: str, character, zone_object: Zone):
@@ -183,14 +181,14 @@ def handle_go_to_command(command: str, character, zone_object: Zone):
         character.current_subzone = destination
 
         # update _map directions
-        print("Moved to {0}".format(character.current_subzone))
+        print(f'Moved to {character.current_subzone}')
 
         zone_object.engage_zone_entered_script(character) # engage a script if there is one
 
         print_live_npcs(zone_object, print_all=True)
         print_live_monsters(zone_object)
     elif isinstance(valid_move, bool) and not valid_move:  # see comment above on why we check if it's a bool
-        print("No such destination as {} that is connected to your current subzone.".format(destination))
+        print(f'No such destination as {destination} that is connected to your current subzone.')
 
 
 def handle_quest_item_choice(item_rewards: dict):

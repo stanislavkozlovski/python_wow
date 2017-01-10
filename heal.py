@@ -9,7 +9,7 @@ class Heal:
         self.heal_amount = heal_amount
 
     def __str__(self):
-        return "{0:.2f}".format(self.heal_amount)
+        return f'{self.heal_amount:.2f}'
 
     def __add__(self, other):
         return other + self.heal_amount
@@ -53,8 +53,8 @@ class HolyHeal(Heal):
 
     def __str__(self):
         if self.will_double_heal:
-            return "{0:.2f} crit".format(self.heal_amount)
-        return "{0:.2f}".format(self.heal_amount)
+            return f'{self.heal_amount:.2f} crit'
+        return f'{self.heal_amount:.2f}'
 
     def check_double_heal(self) -> bool:
         """ Uses random odds to calculate if this heal should trigger it's double effect
@@ -90,7 +90,7 @@ class ProtectiveHeal(Heal):
         self.shield = self._calculate_shield()
 
     def __str__(self):
-        return "{0:.2f} ({1:.2f} shield}".format(self.heal_amount, self.shield)
+        return f'{self.heal_amount:.2f} ({self.shield:.2f} shield)'
 
     def __add__(self, other):
         self._apply_shield()

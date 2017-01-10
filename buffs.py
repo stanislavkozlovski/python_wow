@@ -49,33 +49,21 @@ class BeneficialBuff(StatusEffect):
     def __str__(self):
         """ Depending on the amount of stats it buffs, print out a different message"""
         non_empty_buffs_count = len(self.non_empty_buffs)
-
+        # TODO: refactor
         if non_empty_buffs_count == 1:
             increased_attribute, value = self.non_empty_buffs[0]
-            return "Increases {} by {} for {} turns.".format(increased_attribute, value, self.duration)
+            return f'Increases {increased_attribute} by {value} for {self.duration} turns.'
         elif non_empty_buffs_count == 2:
             increased_attribute, value = self.non_empty_buffs[0]
             increased_attribute2, value2 = self.non_empty_buffs[1]
-
-            return "Increases {attribute1} by {value1} and {attribute2}" \
-                    " by {value2} for {dur} turns.".format(attribute1=increased_attribute,
-                                                          value1=value,
-                                                          attribute2=increased_attribute2,
-                                                          value2=value2,
-                                                          dur=self.duration)
+            return f'Increases {increased_attribute} by {value} and {increased_attribute2} by {value2} for {self.duration} turns.'
         elif non_empty_buffs_count == 3:
             increased_attribute, value = self.non_empty_buffs[0]
             increased_attribute2, value2 = self.non_empty_buffs[1]
             increased_attribute3, value3 = self.non_empty_buffs[2]
 
-            return "Increases {attribute1} by {value1}, {attribute2}" \
-                " by {value2} and {attribute3} by {value3} for {dur} turns.".format(attribute1=increased_attribute,
-                                                                                      value1=value,
-                                                                                      attribute2=increased_attribute2,
-                                                                                      value2=value2,
-                                                                                      attribute3=increased_attribute3,
-                                                                                      value3=value3,
-                                                                                      dur=self.duration)
+            return (f"Increases {increased_attribute} by {value}, {increased_attribute2} by {value2}"
+                    f" and {increased_attribute3} by {value3} for {self.duration} turns.")
         else:
             return ""
 
@@ -90,7 +78,7 @@ class BeneficialBuff(StatusEffect):
                 if buff_type in self.buff_amounts.keys():
                     self.buff_amounts[buff_type] = buff_amount
                 else:
-                    raise ValueError("Buff type {} is not supported!".format(buff_type))
+                    raise ValueError(f'Buff type {buff_type} is not supported!')
 
     def get_buffed_attributes(self) -> dict:
         """
@@ -124,5 +112,5 @@ class DoT(StatusEffect):
         self.level = caster_lvl
 
     def __str__(self):
-        return "{} - Deals {} damage every turn for {} turns".format(self.name, self.damage, self.duration)
+        return f'{self.name} - Deals {self.damage} damage every turn for {self.duration} turns'
 

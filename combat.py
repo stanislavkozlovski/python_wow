@@ -48,7 +48,7 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
 
         if not character.is_alive():
             monster.leave_combat()
-            print("{0} has slain character {1}".format(monster.name, character.name))
+            print(f'{monster.name} has slain character {character.name}')
 
             character.prompt_revive()
             break
@@ -83,7 +83,7 @@ def handle_monster_death(character: Character, monster: Monster, alive_monsters:
     :param alive_monsters:Dictionary with the alive monsters in the subzone the player is in
     :param guid_name_set: Set which holds the name of each monster_GUID
     """
-    print("{0} has slain {1}!".format(character.name, monster.name))
+    print(f'{character.name} has slain {monster.name}!')
 
     character.award_monster_kill(monster=monster, monster_GUID=monster_GUID)
     character.leave_combat()  # will exit the loop
@@ -101,14 +101,13 @@ def handle_loot(character: Character, monster: Monster):
     while True:
         command = input()
 
-        if command == "take all":
+        if command == 'take all':
             # takes everything
 
-            gold = monster.give_loot("gold")
+            gold = monster.give_loot('gold')
             if gold:  # if it's successful
                 character.award_gold(gold)
-                print("{char_name} has looted {gold_amount} gold.".format(char_name=character.name,
-                                                                          gold_amount=gold))
+                print(f'{character.name} has looted {gold} gold.')
 
             monster_loot = list(monster.loot.keys())  # list of strings, the item's names
             for item_name in monster_loot:
@@ -117,8 +116,7 @@ def handle_loot(character: Character, monster: Monster):
 
                 if item:  # if the loot is successful
                     character.award_item(item=item)
-                    print("{char_name} has looted {item_name}.".format(char_name=character.name,
-                                                                       item_name=item_name))
+                    print(f'{character.name} has looted {item_name}.')
 
         elif "take" in command:
             item_name = command[5:]
@@ -128,15 +126,13 @@ def handle_loot(character: Character, monster: Monster):
 
                 if gold:  # if it's successful
                     character.award_gold(gold)
-                    print("{char_name} has looted {gold_amount} gold.".format(char_name=character.name,
-                                                                              gold_amount=gold))
+                    print(f'{character.name} has looted {gold} gold.')
             else:  # if we want to take an item
                 item = monster.give_loot(item_name = item_name)
 
                 if item:  # if the loot is successful
                     character.award_item(item=item)
-                    print("{char_name} has looted {item_name}.".format(char_name=character.name,
-                                                                       item_name=item_name))
+                    print(f'{character.name} has looted {item_name}.')
         elif command == "?":
             pac_looting()
         elif command == "exit":  # end the looting process

@@ -17,11 +17,10 @@ def script(subzone, character):
      Benedictus' end will bring forth a massive expedition to avenge him, \
      I only fear if the Brotherhood will be able to withstand it.")
     sleep(4)
-    print(
-        "Brother Haskel says: I have complete trust in Edwin's plans. \
-        Your sacrifice will play a key role in our mission and for that you have my respect.")
+    print("Brother Haskel says: I have complete trust in Edwin's plans."
+          "Your sacrifice will play a key role in our mission and for that you have my respect.")
     sleep(3)
-    print("{char_name} says: Unbelievable, the two of you work for the Defias?!".format(char_name=character.name))
+    print(f'{character.name} says: Unbelievable, the two of you work for the Defias?!')
     sleep(2.5)
 
     # engage combat with Paxton
@@ -29,8 +28,7 @@ def script(subzone, character):
     combat.engage_combat(character, brother_paxton, subzone._alive_monsters, subzone._monster_guid_name_set,
                          subzone.GUID_BROTHER_PAXTON)
 
-    print("Brother Haskel says: You have not seen the last of the Brotherhood, {char_name}!".format(
-        char_name=character.name))
+    print(f"Brother Haskel says: You have not seen the last of the Brotherhood, {character.name}!")
     sleep(2)
     print("Haskel drops a smoke bomb!")
     sleep(0.5)

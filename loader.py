@@ -363,7 +363,7 @@ def load_quest_item_rewards(qitem1_id: int, qitem2_id: int, qitem3_id: int) -> d
             item_rewards_dict[qitem2.name] = qitem2
 
             if qitem3_id:
-                qitem3 = load_item(qitem3_id)  #type: Item
+                qitem3 = load_item(qitem3_id)  #  type: Item
                 item_rewards_dict[qitem3.name] = qitem3
 
     return item_rewards_dict
@@ -558,7 +558,7 @@ def load_item(item_ID: int):
             return items.Potion(name=item_name, item_id=item_id, buy_price=item_buy_price, sell_price=item_sell_price,
                                 buff=item_buff_effect)
         else:
-            raise Exception("Unsupported item type {}".format(item_type))
+            raise Exception(f'Unsupported item type {item_type}')
 
 
 def load_buff(buff_id: int) -> BeneficialBuff:
@@ -666,10 +666,10 @@ Netherblood, Paladin,     10,                 1,                    1,          
                                saved_inventory=load_saved_character_inventory(id=char_inventory_ID, gold=char_gold),
                                saved_equipment=load_saved_character_equipment(id=char_equipment_ID))
             else:
-                raise Exception("Unsupported class - {}".format(char_class))
+                raise Exception(f'Unsupported class - {char_class}')
         else:
             # no such character
-            raise NoSuchCharacterError("There is no saved character by the name of {}!".format(name))
+            raise NoSuchCharacterError(f'There is no saved character by the name of {name}!')
 
 
 def load_all_saved_characters_general_info() -> list:

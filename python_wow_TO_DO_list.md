@@ -64,6 +64,7 @@
 - Convert the equipment dictionary to a class
 
 # TODOs
+- Refactor code from classes to make it more testable. Split functions which do not touch the class attributes. ex: https://www.youtube.com/watch?v=Xu5EhKVZdV8&t=22m30s
 - Add documentation!
 - Add another class of choice. (Mage is on my mind)
 - Add a scripted NPC to the game

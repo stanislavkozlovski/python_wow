@@ -43,18 +43,17 @@ def handle_create_character() -> Character:
     class_choice = str.lower(input())
 
     while class_choice not in AVAILABLE_CLASSES:  # check for valid class
-        print("{} is not a valid class!\n".format(class_choice))
+        print(f'{class_choice} is not a valid class!\n')
         class_choice = str.lower(input())
 
     # 2. Choose name
-    print("\nYou've chosen to create a {class_}! Nice going, now pick a name for our {class_}."
-          .format(class_=class_choice))
+    print(f"\nYou've chosen to create a {class_choice}! Nice going, now pick a name for our {class_choice}.")
 
     # TODO: Format name ex: NeThErBlOOD => Netherblood
     character_name = input()
 
     while len(character_name) > 20:  # check for valid name
-        print("Your name cannot be longer than 20 characters.")
+        print('Your name cannot be longer than 20 characters.')
         character_name = input()
 
     # 3. Create the character object
@@ -92,13 +91,12 @@ def get_choice() -> str:
     new_colored = colored('new', color='magenta')
     load_colored = colored('load', color='magenta')
     print("*"*50)
-    print("Would you like to create a new character or load an already existing character?")
-    print("To create a new character, type {new} and to load an already existing one, type {load}"
-          .format(new=new_colored, load=load_colored))
+    print('Would you like to create a new character or load an already existing character?')
+    print(f'To create a new character, type {new_colored} and to load an already existing one, type {load_colored}')
 
     choice = input()
     while choice not in ['load', 'new'] and choice[:4] != 'load':
-        print("{} is not a valid command.".format(choice))
+        print(f'{choice} is not a valid command.')
         choice = input()
 
     return choice

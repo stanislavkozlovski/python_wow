@@ -60,8 +60,7 @@ def print_available_quests(available_quests: dict, players_level: int):
         if quest.required_level <= players_level:
             print(quest)
         else:
-            quest_information_to_print = "{quest_name} [Requires Level {req_level}]".format(quest_name=quest.name,
-                                                                                            req_level=quest.required_level)
+            quest_information_to_print = f'{quest.name} [Requires Level {quest.required_level}]'
 
             colored_print = colored(quest_information_to_print, "red")
             print(colored_print)
@@ -132,23 +131,18 @@ def get_equipment_slot_string(equipment_item) -> str:
 
 
 def print_in_combat_stats(player, monster):
-    player_shield = "."  # serves as a dot if there is not a shield
+    p_shield_annexation = "."  # serves as a dot if there is not a shield
     if player.absorption_shield:
-        player_shield = " | {:.2f} shield.".format(player.absorption_shield)
+        p_shield_annexation = f' | {player.absorption_shield:.2f} shield.'
 
-    print("Character {0} is at {1:.2f}/{2} health | {3}/{4} mana{5}".format(player.name, player.health,
-                                                                            player.max_health,
-                                                                            player.mana,
-                                                                            player.max_mana,
-                                                                            player_shield))
+    print(f'Character {player.name} is at {player.health:.2f}/{player.max_health} health '
+          f'| {player.mana}/{player.max_mana} mana{p_shield_annexation}')
 
-    monster_shield = "."  # server as a dot if there is not a shield
+    m_shield_annexation = "."  # server as a dot if there is not a shield
     if monster.absorption_shield:
-        monster_shield = " | {:.2f} shield.".format(monster.absorption_shield)
-    print("Monster {0} is at {1:.2f}/{2} health | {3}/{4} mana{5}".format(monster.name, monster.health,
-                                                                          monster.max_health, monster.mana,
-                                                                          monster.max_mana,
-                                                                          monster_shield))
+        m_shield_annexation = f' | {monster.absorption_shield:.2f} shield.'
+    print(f'Monster {monster.name} is at {monster.health:.2f}/{monster.max_health} health '
+          f'| {monster.mana}/{monster.max_mana} mana{m_shield_annexation}')
 
 
 def print_character_xp_bar(player):
@@ -180,7 +174,7 @@ def print_quest_item_choices(quest_item_rewards: dict):
     print("You must choose to take one of the following items:")
     for item in quest_item_rewards.values():
         if item:
-            print("\t {}".format(item))
+            print(f'\t {item}')
     print()
 
 
@@ -206,9 +200,7 @@ def print_available_characters_to_load(characters_list: list):
     if characters_list:
         print("Available characters to load:")
         for character in characters_list:
-            print("\t| {name} - {level} {class_}".format(name=character['name'],
-                                                        level=character['level'],
-                                                        class_=character['class']))
+            print(f"\t| {character['name']} - {character['level']} {character['class']}")
     else:
         print("No available characters to laod from the DB, enter something to exit this prompt.")
 
@@ -216,8 +208,10 @@ def print_available_characters_to_load(characters_list: list):
 def welcome_print(game_version: str):
     game_version = colored(game_version, attrs=['bold'])
     print("*"*80)
-    print("WELCOME TO PYTHON WOW VERSION: {0}".format(game_version).center(80, ' '))
-    print("A simple console RPG game".center(70, ' ') + '\n' + "inspired by the {warcraft} universe!".format(warcraft=colored("Warcraft", 'red')).center(80, ' '))
+    print(f"WELCOME TO PYTHON WOW VERSION: {game_version}".center(80, ' '))
+    print('{0}\n{1}'.format("A simple console RPG game".center(70, ' '),
+                            "inspired by the {warcraft} universe!".format(warcraft=colored("Warcraft", 'red')).center(
+                                80, ' ')))
     print()
     print(colored("Type ? to see a list of available commands.".center(80, ' '), 'yellow'))
     print("*" * 80)

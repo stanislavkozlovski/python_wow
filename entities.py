@@ -152,9 +152,9 @@ class LivingThing:
         del self.buffs[buff]
         if isinstance(buff, BeneficialBuff):
             self._deapply_buff(buff)
-            print("Buff {} has expired from {}.".format(buff.name, self.name))
+            print(f"Buff {buff.name} has expired from {self.name}.")
         elif isinstance(buff, DoT):
-            print("DoT {} has expired from {}.".format(buff.name, self.name))
+            print(f"DoT {buff.name} has expired from {self.name}.")
 
     def add_buff(self, buff: BeneficialBuff):
         """ Method that handles when a buff is added to the player
@@ -241,9 +241,7 @@ class LivingThing:
         # noinspection PyTypeChecker
         dot_proc_damage = self._apply_damage_absorption(damage=dot_proc_damage)
 
-        print("{entity_name} suffers {dot_dmg} from {dot_name}!".format(entity_name=self.name,
-                                                                             dot_dmg=dot_proc_damage,
-                                                                             dot_name=dot.name))
+        print(f'{self.name} suffers {dot_proc_damage} from {dot.name}!')
         self._subtract_health(dot_proc_damage)
 
     def _calculate_level_difference_damage(self, damage_to_deal: int, target_level: int, inverse: bool=False) -> int:
@@ -320,13 +318,13 @@ class FriendlyNPC(LivingThing):
         self.min_damage = min_damage
         self.max_damage = max_damage
         self.gossip = gossip
-        self.colored_name = colored(self.name, color="green")
+        self.colored_name = colored(self.name, color='green')
 
     def __str__(self):
-        return "{npc_name}".format(npc_name=self.colored_name)
+        return f'{self.colored_name}'
 
     def talk(self, player_name: str):
-        print("{npc_name} says: {msg}".format(npc_name=self.colored_name, msg=self.gossip.replace("$N", player_name)))
+        print(f'{self.colored_name} says: {self.gossip.replace("$N", player_name)}')
 
 
 class VendorNPC(FriendlyNPC):
@@ -341,14 +339,12 @@ class VendorNPC(FriendlyNPC):
         self.inventory = load_vendor_inventory(self.entry)  # type: dict: key-item_name(str), value: tuple(item object, count)
 
     def __str__(self):
-        return "{npc_name} <Vendor>".format(npc_name=self.colored_name)
+        return f'{self.colored_name} <Vendor>'
 
     def print_inventory(self):
-        print("{}'s items for sale:".format(self.name))
+        print(f'{self.name}\'s items for sale:')
         for item, item_count in self.inventory.values():
-            print("\t{item_count} {item_name} - {price} gold.".format(item_count=item_count,
-                                                                      item_name=item.name,
-                                                                      price=item.buy_price))
+            print(f'\t{item_count} {item.name} - {item.buy_price} gold.')
 
     def has_item(self, item_name: str) -> bool:
         """
@@ -366,7 +362,7 @@ class VendorNPC(FriendlyNPC):
         if self.has_item(item_name):
             return self.inventory[item_name][0]  # returns the item object
         else:
-            print("{vendor} does not have {item} for sale.".format(vendor=self.name, item=item_name))
+            print(f'{self.name} does not have {item_name} for sale.')
             return None
 
     def get_item_price(self, item_name: str) -> int:
@@ -408,11 +404,8 @@ class Monster(LivingThing):
 
     def __str__(self):
         colored_name = colored(self.name, color="red")
-        return "Creature Level {level} {name} - {hp}/{max_hp} HP | {mana}/{max_mana} Mana | " \
-               "{min_dmg}-{max_dmg} Damage".format(level=self.level, name=colored_name,
-                                                   hp=self.health, max_hp=self.max_health,
-                                                   mana=self.mana, max_mana=self.max_mana,
-                                                   min_dmg=self.min_damage, max_dmg=self.max_damage)
+        return f'Creature Level {self.level} {colored_name} - {self.health}/{self.max_health} HP ' \
+               f'| {self.mana}/{self.max_mana} Mana | {self.min_damage}-{self.max_damage} Damage'
 
     def get_auto_attack_damage(self, target_level: int):
         # get the base auto attack damage
@@ -470,7 +463,7 @@ class Monster(LivingThing):
         """ Returns the item that's looted and removes it from the monster's inventory"""
         if item_name not in self.loot:  # TODO: This should not be checked here
             # unsuccessful loot
-            print("{monster_name} did not drop {item_name}.".format(monster_name=self.name,item_name=item_name))
+            print(f'{self.name} did not drop {item_name}.')
             return False
 
         item = self.loot[item_name] # type: Item
@@ -480,7 +473,7 @@ class Monster(LivingThing):
     def _die(self):
         super()._die()
         self._drop_loot()
-        print("Creature {} has died!".format(self.name))
+        print(f'Creature {self.name} has died!')
 
     def _calculate_gold_reward(self, min_max_gold: tuple) -> int:
         """ Calculate the gold this monster is going to award the player
@@ -490,19 +483,16 @@ class Monster(LivingThing):
 
     def say_gossip(self):
         if self.gossip:
-            intonation = ''  # type: str
             punctuation_mark = self.gossip[-1]
 
             if punctuation_mark == '!':
-                intonation = 'yells'
+                verb = 'yells'
             elif punctuation_mark == '?':
-                intonation = 'asks'
+                verb = 'asks'
             else:
-                intonation = 'says'
+                verb = 'says'
 
-            print("{monster} {verb}: {gossip}".format(monster=self.name,
-                                                      verb=intonation,
-                                                      gossip=self.gossip))
+            print(f'{self.name} {verb}: {self.gossip}')
 
 
 class Character(LivingThing):
@@ -615,20 +605,18 @@ class Character(LivingThing):
             else:  # reduce it's count
                 self.inventory[potion.name] = potion_in_inventory, count - 1
 
-            print("{char_name} drinks {pot_name} and is afflicted by {buff_name}".format(char_name=self.name,
-                                                                                         pot_name=potion.name,
-                                                                                         buff_name=potion.get_buff_name()))
+            print(f'{self.name} drinks {potion.name} and is afflicted by {potion.get_buff_name()}')
             # call the potion's consume method
             potion.consume(self)
 
     def equip_weapon(self, weapon: Weapon):
-        print("{} has equipped Weapon {}".format(self.name, weapon.name))
+        print(f'{self.name} has equipped Weapon {weapon.name}')
         self.equipped_weapon = weapon
         self._add_attributes(weapon.attributes)
 
     def equip_gear(self, item: Equipment):
         """ equip an equipment item like a Headpiece, Shoulderpad, Chestguard and etc."""
-        print("{} has equipped {} {}".format(self.name, item.slot, item.name))
+        print(f'{self.name} has equipped {item.slot} {item.name}')
         self.equipment[item.slot] = item
         self._add_attributes(item.attributes)
 
@@ -704,7 +692,7 @@ class Character(LivingThing):
         damage = self._apply_armor_reduction(damage, attacker_level)
         damage = self._apply_damage_absorption(damage)
 
-        print("{0} attacks {1} for {2}!".format(monster_name, self.name, damage))
+        print(f'{monster_name} attacks {self.name} for {damage}!')
         self._subtract_health(damage)
 
     def take_dot_proc(self, dot: DoT):
@@ -717,9 +705,7 @@ class Character(LivingThing):
         if self.absorption_shield:  # if we have a shield
             dot_proc_damage = self._apply_damage_absorption(dot_proc_damage)
 
-        print("{char_name} suffers {dot_dmg} from {dot_name}!".format(char_name=self.name,
-                                                                             dot_dmg=dot_proc_damage,
-                                                                             dot_name=dot.name))
+        print(f'{self.name} suffers {dot_proc_damage} from {dot.name}!')
         self._subtract_health(dot_proc_damage)
 
     def _apply_buff(self, buff: BeneficialBuff):
@@ -759,13 +745,13 @@ class Character(LivingThing):
 
     def _die(self):
         super()._die()
-        print("Character {} has died!".format(self.name))
+        print(f'Character {self.name} has died!')
 
     def prompt_revive(self):
         print("Do you want to restart? Y/N")
         if input() in 'Yy':
             self.revive()
-            print("Character {} has been revived!".format(self.name))
+            print(f'Character {self.name} has been revived!')
         else:
             raise SystemExit  # quit the game
 
@@ -800,7 +786,7 @@ class Character(LivingThing):
         We give **him** the item and he gives us gold for it
         """
         if not self.inventory[item]:
-            print("You do not have {} in your inventory!".format(item))
+            print(f'You do not have {item} in your inventory!')
             print()
         else:
             item, item_count = self.inventory[item]
@@ -812,7 +798,7 @@ class Character(LivingThing):
                 self.inventory[item] = (item, item_count-1)
 
             gold_award = item.sell_price
-            print("You have sold {} for {} gold.".format(item.name, gold_award))
+            print(f'You have sold {item.name} for {gold_award} gold.')
             print()
             self.award_gold(gold_award)
 
@@ -831,13 +817,13 @@ class Character(LivingThing):
             # if we just completed a fetch quest, we need to remove the required items for the quest
             self._remove_fetch_quest_required_items(quest)
 
-        print("Quest {} is completed! XP awarded: {}!".format(quest.name, quest.xp_reward))
+        print(f'Quest {quest.name} is completed! XP awarded: {quest.xp_reward}!')
         if isinstance(item_reward, Item):
-            print("{} is awarded {} from the quest {}!".format(self.name, item_reward.name, quest.name))
+            print(f'{self.name} is awarded {item_reward.name} from the quest {quest.name}!')
             self.award_item(item_reward)
         elif isinstance(item_reward, list):
             for item in item_reward:
-                print("{} is awarded {} from the quest {}!".format(self.name, item.name, quest.name))
+                print(f'{self.name} is awarded {item.name} from the quest {quest.name}!')
                 self.award_item(item)
 
         del self.quest_log[quest.ID]  # remove from quest log
@@ -871,9 +857,9 @@ class Character(LivingThing):
             xp_bonus_reward += int(xp_reward * percentage_mod)  # convert to int
 
         if xp_bonus_reward:
-            print("XP awarded: {0} + bonus {1} for the level difference!".format(xp_reward, xp_bonus_reward))
+            print(f'XP awarded: {xp_reward} + bonus {xp_bonus_reward} for the level difference!')
         else:
-            print("XP awarded: {0}!".format(xp_reward))
+            print(f'XP awarded: {xp_reward}!')
 
         if not monster.respawnable:
             self.killed_monsters.add(monster_GUID)
@@ -920,8 +906,7 @@ class Character(LivingThing):
             :param item_count: the count we want to remove, ex: we may want to remove 2 Wolf Meats, as opposed to one
             :param remove_all: simply removes all the items, with this variable set to True, item_count is useless"""
         if item_name not in self.inventory.keys():
-            raise ItemNotInInventoryError("{item_name} is not in {char_name}'s inventory!".format(item_name=item_name,
-                                                                                                  char_name=self.name),
+            raise ItemNotInInventoryError(f'{item_name} is not in {self.name}\'s inventory!',
                                           inventory=self.inventory, item_name=item_name)
 
         if remove_all:
@@ -973,23 +958,19 @@ class Character(LivingThing):
         self._regenerate()  # regen to full hp/mana
 
         print('*' * 20)
-        print("Character {0} has leveled up to level {1}!".format(self.name, self.level))
-        print("Armor Points increased by {}".format(armor_increase_amount))
-        print("Health Points increased by {}".format(hp_increase_amount))
-        print("Mana Points increased by {}".format(mana_increase_amount))
-        print("Strength Points increased by {}".format(strength_increase_amount))
-        print("Agility Points increased by {}".format(agility_increase_amount))
+        print(f'Character {self.name} has leveled up to level {self.level}!')
+        print(f'Armor Points increased by {armor_increase_amount}')
+        print(f'Health Points increased by {hp_increase_amount}')
+        print(f'Mana Points increased by {mana_increase_amount}')
+        print(f'Strength Points increased by {strength_increase_amount}')
+        print(f'Agility Points increased by {agility_increase_amount}')
         print('*' * 20)
 
     def print_quest_log(self):
         print("Your quest log:")
 
         for _, quest in self.quest_log.items():
-            print("\t{quest_name} - {monsters_killed}/{required_kills} {monster_name} slain.".format(
-                quest_name=quest.name,
-                monsters_killed=quest.kills,
-                required_kills=quest.needed_kills,
-                monster_name=quest.monster_to_kill))
+            print(f'\t{quest.name} - {quest.kills}/{quest.needed_kills} {quest.monster_to_kill} slain.')
 
         print()
 
@@ -997,11 +978,11 @@ class Character(LivingThing):
         print("Your inventory:")
 
         # print the gold separately so it always comes up on top
-        print("\t{} gold".format(self.inventory['gold']))
+        print(f"\t{self.inventory['gold']} gold")
         for key, item_tuple in self.inventory.items():
-            if key is not "gold":
+            if key is not 'gold':
                 item, item_count = item_tuple
-                print("\t{item_count} {item}".format(item_count=item_count, item=item))
+                print(f'\t{item_count} {item}')
 
     def _lookup_next_xp_level_req(self):
         return self._REQUIRED_XP_TO_LEVEL[self.level]

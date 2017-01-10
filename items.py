@@ -32,15 +32,15 @@ def display_attributes(attributes: dict) -> str:
     attributes_to_print = []
 
     if attributes[KEY_ARMOR]:
-        attributes_to_print.append("armor: {}".format(attributes[KEY_ARMOR]))
+        attributes_to_print.append(f'armor: {attributes[KEY_ARMOR]}')
     if attributes[KEY_BONUS_HEALTH]:
-        attributes_to_print.append("health: {}".format(attributes[KEY_BONUS_HEALTH]))
+        attributes_to_print.append(f'health: {attributes[KEY_BONUS_HEALTH]}')
     if attributes[KEY_BONUS_MANA]:
-        attributes_to_print.append("mana: {}".format(attributes[KEY_BONUS_MANA]))
+        attributes_to_print.append(f'mana: {attributes[KEY_BONUS_MANA]}')
     if attributes[KEY_STRENGTH]:
-        attributes_to_print.append("strength: {}".format(attributes[KEY_STRENGTH]))
+        attributes_to_print.append(f'strength: {attributes[KEY_STRENGTH]}')
     if attributes[KEY_AGILITY]:
-        attributes_to_print.append("agility: {}".format(attributes[KEY_AGILITY]))
+        attributes_to_print.append(f'agility: {attributes[KEY_AGILITY]}')
 
     return ", ".join(attributes_to_print)
 
@@ -54,7 +54,7 @@ class Item:
         self.quest_ID = quest_ID
 
     def __str__(self):
-        return colored("{}".format(self.name), color="grey") + " - Miscellaneous Item"
+        return colored(f'{self.name}', color="grey") + ' - Miscellaneous Item'
 
 
 class Weapon(Item):
@@ -66,8 +66,7 @@ class Weapon(Item):
         self.attributes = attributes_dict  # the attributes this item gives on equip
 
     def __str__(self):
-        return colored("{}".format(self.name), color="green") +  "- Weapon ({}-{}) damage".format(self.min_damage,
-                                                                                                  self.max_damage)
+        return colored(f'{self.name}', color="green") + f'- Weapon ({self.min_damage}-{self.max_damage}) damage'
 
 
 class Equipment(Item):
@@ -81,7 +80,7 @@ class Equipment(Item):
 
     def __str__(self):
         return (colored(self.name, color='green')
-                + " - {slot_pos} Equipment: ".format(slot_pos=self.slot[0].upper() + self.slot[1:])
+                + ' - {slot_pos} Equipment: '.format(slot_pos=self.slot[0].upper() + self.slot[1:])
                 + display_attributes(self.attributes))
 
 
@@ -92,7 +91,7 @@ class Potion(Item):
         self.buff = buff
 
     def __str__(self):
-        return colored("{}".format(self.name), color="cyan") + " - Potion ({})".format(self.buff)
+        return colored(f'{self.name}', color='cyan') + f' - Potion ({self.buff})'
 
     def get_buff_name(self) -> str:
         return self.buff.name
