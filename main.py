@@ -1,5 +1,5 @@
 import atexit
-
+from database.main import cursor
 from command_router import route_main_commands
 from information_printer import print_live_monsters, print_live_npcs, welcome_print
 from zones.zone import Zone
@@ -43,7 +43,7 @@ def get_zone_object(zone: str) -> Zone:
 
 def on_exit_handler(character):
     """ saves the character when the user quits the game"""
-    save_character(character)
+    save_character(character, cursor)
 
 if __name__ == '__main__':
     main()

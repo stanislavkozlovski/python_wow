@@ -1,8 +1,6 @@
 """
 This module will take care for saving a character to the database
 """
-import sqlite3
-
 from database.database_info import \
     (DB_PATH,
      DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID, DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID,
@@ -23,53 +21,50 @@ ALLOWED_TABLES_TO_DELETE_FROM = ['saved_character_completed_quests', 'saved_char
                                  'saved_character_equipment', 'saved_character']
 
 
-def save_character(character: Character):
+def save_character(character: Character, cursor):
     """
     Save the character into the database
     """
 
-    with sqlite3.connect(DB_PATH) as connection:
-        cursor = connection.cursor()
+    character_info = cursor.execute("SELECT * FROM saved_character WHERE name = ?", [character.name]).fetchone()
 
-        character_info = cursor.execute("SELECT * FROM saved_character WHERE name = ?", [character.name]).fetchone()
+    character_level = character.level  # type: int
+    character_class = character.get_class()  # type: str
+    character_gold = character.inventory['gold']  # type: int
 
-        character_level = character.level  # type: int
-        character_class = character.get_class()  # type: str
-        character_gold = character.inventory['gold']  # type: int
+    # see if the character already has it's row (has been saved)
+    if character_info:
+        # we have saved this character before, therefore we have the table IDs
+        character_loaded_scripts_id = character_info[DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID]
+        character_killed_monsters_id = character_info[DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID]
+        character_completed_quests_id = character_info[DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID]
+        character_inventory_id = character_info[DBINDEX_SAVED_CHARACTER_INVENTORY_ID]
+        character_equipment_id = character_info[DBINDEX_SAVED_CHARACTER_EQUIPMENT_ID]
+        cursor.execute(f'DELETE FROM {DB_SAVED_CHARACTER_TABLE_NAME} WHERE name = ?', [character.name])
+    else:
+        # we have not saved this character before, therefore we need to generate new IDs for the other tables
+        character_loaded_scripts_id = get_highest_free_id_from_table(DB_SC_LOADED_SCRIPTS_TABLE_NAME, cursor)
+        character_killed_monsters_id = get_highest_free_id_from_table(DB_SC_KILLED_MONSTERS_TABLE_NAME, cursor)
+        character_completed_quests_id = get_highest_free_id_from_table(DB_SC_COMPLETED_QUESTS_TABLE_NAME, cursor)
+        character_inventory_id = get_highest_free_id_from_table(DB_SC_INVENTORY_TABLE_NAME, cursor)
+        character_equipment_id = get_highest_free_id_from_table(DB_SC_EQUIPMENT_TABLE_NAME, cursor)
 
-        # see if the character already has it's row (has been saved)
-        if character_info:
-            # we have saved this character before, therefore we have the table IDs
-            character_loaded_scripts_id = character_info[DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID]
-            character_killed_monsters_id = character_info[DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID]
-            character_completed_quests_id = character_info[DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID]
-            character_inventory_id = character_info[DBINDEX_SAVED_CHARACTER_INVENTORY_ID]
-            character_equipment_id = character_info[DBINDEX_SAVED_CHARACTER_EQUIPMENT_ID]
-            cursor.execute(f'DELETE FROM {DB_SAVED_CHARACTER_TABLE_NAME} WHERE name = ?', [character.name])
-        else:
-            # we have not saved this character before, therefore we need to generate new IDs for the other tables
-            character_loaded_scripts_id = get_highest_free_id_from_table(DB_SC_LOADED_SCRIPTS_TABLE_NAME, cursor)
-            character_killed_monsters_id = get_highest_free_id_from_table(DB_SC_KILLED_MONSTERS_TABLE_NAME, cursor)
-            character_completed_quests_id = get_highest_free_id_from_table(DB_SC_COMPLETED_QUESTS_TABLE_NAME, cursor)
-            character_inventory_id = get_highest_free_id_from_table(DB_SC_INVENTORY_TABLE_NAME, cursor)
-            character_equipment_id = get_highest_free_id_from_table(DB_SC_EQUIPMENT_TABLE_NAME, cursor)
+    # save the main table
+    cursor.execute('INSERT INTO saved_character VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                   [character.name, character_class, character_level, character_loaded_scripts_id,
+                    character_killed_monsters_id, character_completed_quests_id, character_equipment_id, character_inventory_id,
+                    character_gold])
 
-        # save the main table
-        cursor.execute('INSERT INTO saved_character VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                       [character.name, character_class, character_level, character_loaded_scripts_id,
-                        character_killed_monsters_id, character_completed_quests_id, character_equipment_id, character_inventory_id,
-                        character_gold])
+    # save the sub-tables
+    save_loaded_scripts(character_loaded_scripts_id, character.loaded_scripts, cursor)
+    save_killed_monsters(character_killed_monsters_id, character.killed_monsters, cursor)
+    save_completed_quests(character_completed_quests_id, character.completed_quests, cursor)
+    save_inventory(character_inventory_id, character.inventory, cursor)
+    save_equipment(character_equipment_id, character.equipment, cursor)
 
-        # save the sub-tables
-        save_loaded_scripts(character_loaded_scripts_id, character.loaded_scripts, cursor)
-        save_killed_monsters(character_killed_monsters_id, character.killed_monsters, cursor)
-        save_completed_quests(character_completed_quests_id, character.completed_quests, cursor)
-        save_inventory(character_inventory_id, character.inventory, cursor)
-        save_equipment(character_equipment_id, character.equipment, cursor)
-
-        print("-" * 40)
-        print(f'Character {character.name} was saved successfully!')
-        print("-" * 40)
+    print("-" * 40)
+    print(f'Character {character.name} was saved successfully!')
+    print("-" * 40)
 
 
 def save_loaded_scripts(id: int, loaded_scripts: set, cursor):

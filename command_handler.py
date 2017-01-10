@@ -7,7 +7,7 @@ from commands import pac_main_ooc, pac_map_directions, pac_in_combat, pac_vendor
 from information_printer import (print_live_npcs, print_live_monsters, print_quest_item_choices,
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar,
                                  print_character_equipment)
-
+from database.main import cursor
 
 # handlers here!
 
@@ -218,7 +218,7 @@ def handle_quest_item_choice(item_rewards: dict):
 
 def handle_save_character_command(main_character):
     """ this function handles the 'save' command"""
-    save_character(main_character)
+    save_character(main_character, cursor)
 
 
 def handle_help_command():
