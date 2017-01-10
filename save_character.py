@@ -15,12 +15,14 @@ from entities import (Character, CHARACTER_EQUIPMENT_BELT_KEY, CHARACTER_EQUIPME
                       CHARACTER_EQUIPMENT_HEADPIECE_KEY, CHARACTER_EQUIPMENT_NECKLACE_KEY,
                       CHARACTER_EQUIPMENT_BRACER_KEY, CHARACTER_EQUIPMENT_GLOVES_KEY, CHARACTER_EQUIPMENT_LEGGINGS_KEY)
 from items import Item
+from decorators import db_connection
 
 ALLOWED_TABLES_TO_DELETE_FROM = ['saved_character_completed_quests', 'saved_character_inventory',
                                  'saved_character_killed_monsters', 'saved_character_loaded_scripts',
                                  'saved_character_equipment', 'saved_character']
 
 
+@db_connection
 def save_character(character: Character, cursor):
     """
     Save the character into the database
