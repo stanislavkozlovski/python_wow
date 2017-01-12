@@ -4,6 +4,7 @@ from database.main import Base
 
 
 class Creatures(Base):
+    # TODO: Remove the Type column from this table
     """
     This table holds information about SPECIFIC monsters in the game
     guid - the unique ID of the specific creature
