@@ -425,7 +425,6 @@ def load_vendor_inventory(creature_entry: int, cursor) -> dict:
     """
     vendor_inventory = {}
 
-
     npc_vendor_reader = cursor.execute("SELECT * FROM npc_vendor WHERE creature_entry = ?", [creature_entry])
 
     for npc_vendor_info in npc_vendor_reader:

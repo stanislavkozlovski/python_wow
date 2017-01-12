@@ -4,6 +4,18 @@ from database.main import Base
 
 
 class LootTable(Base):
+    """
+    The loot table of a specific monster.
+    entry - the unique ID of this loot table
+    itemX_ID - the ID of the item this creature can drop
+    itemX_chance - the chance in percentage (0-100%) for the item to drop
+    entry, item1_ID, item1_chance, item2_ID, item2_chance, item3_ID, item3_chance, ... item20_ID, item20_chance
+        1,       4,            55,        3,         30,          0,            0,             0,            0
+    Meaning a creature whose col loot_table_ID from creature_template is equal to 1 has:
+        55% chance to drop Item with ID 4
+        30% chance to drop Item with ID 3
+    Does not drop any more items, because the rest of the rows are 0s.
+    """
     __tablename__ = 'loot_table'
 
     entry = Column(Integer, primary_key=True)
