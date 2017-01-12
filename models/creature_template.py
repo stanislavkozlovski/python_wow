@@ -15,7 +15,8 @@ class CreatureTemplate(Base):
     level - the level of this creature
     hp - the health points of this creature
     mana - the mana points of this creature
-    armor - the armor points of this creature
+    armor - the armor points of this creature NOTE: If not specified, the creature will take the default armor for
+        his level from the creature_defaults table
     min_dmg - the minimum damage this creature does per swing
     max_dmg - the maximum damage this creature does per swing
     quest_relation_id - the id of the quest this creature is related with (if applicable)
