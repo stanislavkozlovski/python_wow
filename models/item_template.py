@@ -33,7 +33,7 @@ class ItemTemplate(Base):
         4,'Strength Potion', 'potion',    Null, Null,   Null, Null,    Null,    Null,         1,           1,    Null,    Null,        0,      1
     This item is of type Potion and when consumed gives off the effect (spell_buffs table entry) 1
     """
-    __table__ = 'item_template'
+    __tablename__ = 'item_template'
 
     entry = Column(Integer, primary_key=True)
     name = Column(String(40), unique=True)
