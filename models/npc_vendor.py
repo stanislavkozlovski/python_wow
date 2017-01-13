@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer
+from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 
 from database.main import Base
 
@@ -23,7 +24,8 @@ class NpcVendor(Base):
     He sells the whole 5 items for 10 gold. He cannot sell 1,2,3 or 4 items, only 5 at once.
     """
     __tablename__ = 'npc_vendor'
-    creature_entry = Column(Integer, primary_key=True)
-    item_id = Column(Integer)
+    creature_entry = Column(Integer, ForeignKey('creature_template.entry'), primary_key=True)
+    item_id = Column(Integer, ForeignKey('item_template.entry'))
+    item = relationship('ItemTemplate')
     item_count = Column(Integer)
     price = Column(Integer)

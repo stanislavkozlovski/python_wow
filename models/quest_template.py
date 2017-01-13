@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy.orm import relationship
 
 from database.main import Base
 
@@ -44,14 +45,18 @@ CONT--          zone,           sub_zone,   xp_reward, comment
     name = Column(String(60))
     type = Column(String(60))
     level_required = Column(Integer)
-    monster_required = Column(String(60))
-    item_required = Column(String(60))
+    monster_required = Column(String(60), ForeignKey('creature_template.name'))
+    item_required = Column(String(60), ForeignKey('item_template.name'))
     amount_required = Column(Integer)
     zone = Column(String(60))
     sub_zone = Column(String(60))
     xp_reward = Column(Integer)
     comment = Column(Text)
-    item_reward1 = Column(Integer)
-    item_reward2 = Column(Integer)
-    item_reward3 = Column(Integer)
+    item_reward1 = Column(Integer, ForeignKey('item_template.entry'))
+    item_reward2 = Column(Integer, ForeignKey('item_template.entry'))
+    item_reward3 = Column(Integer, ForeignKey('item_template.entry'))
     item_choice_enabled = Column(Integer)  # TODO: Change
+
+    reward1 = relationship('ItemTemplate', foreign_keys=[item_reward1])
+    reward2 = relationship('ItemTemplate', foreign_keys=[item_reward2])
+    reward3 = relationship('ItemTemplate', foreign_keys=[item_reward3])

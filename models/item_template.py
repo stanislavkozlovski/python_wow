@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 
 from database.main import Base
 
@@ -48,5 +48,5 @@ class ItemTemplate(Base):
     sell_price = Column(Integer)
     min_dmg = Column(Integer)
     max_dmg = Column(Integer)
-    quest_id = Column(Integer)
+    quest_id = Column(Integer, ForeignKey('quest_template.entry'), nullable=True)
     effect = Column(Integer)

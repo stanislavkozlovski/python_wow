@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 
 from database.main import Base
 
@@ -22,7 +23,8 @@ class Creatures(Base):
     __tablename__ = 'creatures'
 
     guid = Column(Integer, primary_key=True)
-    creature_id = Column(Integer)
+    creature_id = Column(Integer, ForeignKey('creature_template.entry'))
+    creature = relationship('CreatureTemplate')
     type = Column(String(60))
     zone = Column(String(60))
     sub_zone = Column(String(60))

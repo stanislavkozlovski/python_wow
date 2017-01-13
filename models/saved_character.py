@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy.orm import relationship
 
 from database.main import Base
 
@@ -14,53 +15,60 @@ class SavedCharacter(Base):
     """
     __tablename__ = 'saved_character'
 
-    name = Column(String(60), primary_key=True)
+    entry = Column(Integer, primary_key=True)
+    name = Column(String(60))
     character_class = Column('class', String(60))
     level = Column(Integer)
-    loaded_scripts_id = Column(Integer)
-    killed_monsters_id = Column(Integer)
-    completed_quests_id = Column(Integer)
-    equipment_id = Column(Integer)
-    inventory_id = Column(Integer)
+    loaded_scripts_id = Column(Integer, ForeignKey('saved_character_loaded_scripts.saved_character_id'))
+    killed_monsters_id = Column(Integer, ForeignKey('saved_character_killed_monsters.saved_character_id'))
+    completed_quests_id = Column(Integer, ForeignKey('saved_character_completed_quests.saved_character_id'))
+    inventory_id = Column(Integer, ForeignKey('saved_character_inventory.saved_character_id'))
     gold = Column(Integer)
 
+    loaded_scripts = relationship('LoadedScripts', foreign_keys=[loaded_scripts_id], uselist=True)
+    killed_monsters = relationship('KilledMonsters', foreign_keys=[killed_monsters_id], uselist=True)
+    inventory = relationship('Inventory', foreign_keys=[inventory_id], uselist=True)
+    completed_quests = relationship('CompletedQuests', foreign_keys=[completed_quests_id], uselist=True)
+
+    headpiece_id = Column(Integer, ForeignKey('item_template.entry'))
+    shoulderpad_id = Column(Integer, ForeignKey('item_template.entry'))
+    necklace_id = Column(Integer, ForeignKey('item_template.entry'))
+    chestguard_id = Column(Integer, ForeignKey('item_template.entry'))
+    bracer_id = Column(Integer, ForeignKey('item_template.entry'))
+    gloves_id = Column(Integer, ForeignKey('item_template.entry'))
+    belt_id = Column(Integer, ForeignKey('item_template.entry'))
+    leggings_id = Column(Integer, ForeignKey('item_template.entry'))
+    boots_id = Column(Integer, ForeignKey('item_template.entry'))
+
+    headpiece = relationship('ItemTemplate', foreign_keys=[headpiece_id])
+    shoulderpad = relationship('ItemTemplate', foreign_keys=[shoulderpad_id])
+    necklace = relationship('ItemTemplate', foreign_keys=[necklace_id])
+    chestguard = relationship('ItemTemplate', foreign_keys=[chestguard_id])
+    bracer = relationship('ItemTemplate', foreign_keys=[bracer_id])
+    gloves = relationship('ItemTemplate', foreign_keys=[gloves_id])
+    belt = relationship('ItemTemplate', foreign_keys=[belt_id])
+    leggings = relationship('ItemTemplate', foreign_keys=[leggings_id])
+    boots = relationship('ItemTemplate', foreign_keys=[boots_id])
 
 class CompletedQuests(Base):
     """
     This table holds information about the completed quests for a specific character
         id - id of the row (NOT unique)
-        quest_name - the name of the quest that is completed
+        quest_id - the id of the quest that is completed
     Ex:
-    id, quest_name
-     1,   Kill Wolves
-     1,   Kill Bears
-    Meaning that the character whose completed_quests_id points to 1 has completed both quests - Kill Wolves and Kill Bears
+    id, quest_id
+     1,   1
+     1,   2
+    Meaning that the character whose completed_quests_id points to 1 has completed both quests - (1)Kill Wolves and (2)Kill Bears
     """
     # TODO: Holds more completed quests per row to minimize queries
     __tablename__ = 'saved_character_completed_quests'
 
     id = Column(Integer, primary_key=True)
-    quest_name = Column(String)
+    saved_character_id = Column(Integer, ForeignKey('saved_character.entry'))
+    quest_id = Column(String, ForeignKey('quest_template.entry'))
 
-
-class Equipment(Base):
-    """
-    This table holds information about the equipment of a specific character
-        id - the id of the row entry
-        XXX_id - the ID of the item in the item_template
-    """
-    __tablename__ = 'saved_character_equipment'
-
-    id = Column(Integer, primary_key=True)
-    headpiece_id = Column(Integer)
-    shoulderpad_id = Column(Integer)
-    necklace_id = Column(Integer)
-    chestguard_id = Column(Integer)
-    bracer_id = Column(Integer)
-    gloves_id = Column(Integer)
-    belt_id = Column(Integer)
-    leggings_id = Column(Integer)
-    boots_id = Column(Integer)
+    quest = relationship('Quest')
 
 
 class Inventory(Base):
@@ -81,8 +89,11 @@ class Inventory(Base):
     __tablename__ = 'saved_character_inventory'
 
     id = Column(Integer, primary_key=True)
-    item_id = Column(Integer)
+    saved_character_id = Column(Integer, ForeignKey('saved_character.entry'))
+    item_id = Column(Integer, ForeignKey('item_template.entry'), primary_key=True)
     item_count = Column(Integer)
+
+    item = relationship('ItemTemplate')
 
 
 class KilledMonsters(Base):
@@ -100,7 +111,10 @@ class KilledMonsters(Base):
     __tablename__ = 'saved_character_killed_monsters'
 
     id = Column(Integer, primary_key=True)
-    guid = Column(Integer)
+    saved_character_id = Column(Integer, ForeignKey('saved_character.entry'))
+    guid = Column(Integer, ForeignKey('creatures.guid'))
+
+    monster = relationship('Creatures')
 
 
 class LoadedScripts(Base):
@@ -118,4 +132,5 @@ class LoadedScripts(Base):
     __tablename__ = 'saved_character_loaded_scripts'
 
     id = Column(Integer, primary_key=True)
+    saved_character_id = Column(Integer, ForeignKey('saved_character.entry'))
     script_name = Column(Text)

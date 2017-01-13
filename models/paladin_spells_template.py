@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy.orm import relationship
 
 from database.main import Base
 
@@ -15,12 +16,13 @@ class PaladinSpells(Base):
     heal1 - primary heal points given by the spell (if applicable)
     heal2, heal3 - secondary heal points given by the spell (if applicable)
     mana_cost - the mana points this spell costs to cast
-    effect - the ID of the effect given by the spell, depending on the spell specifically. (Only Melting Strike has one for now and it serves as the entry in spell_dots)
+    beneficial_effect - the ID of the beneficial effect given by the spell, in the DB table spell_buffs
+    harmful_effect - the ID of the harmful effect given by the spell, in the DB table spell_dots
     cooldown - the amount of turns it takes for the spell to be ready again after being cast
     comment - just a comment on the spell
     paladin_spells_template table is as follows:
-            ID, Name of Spell, Rank of Spell, Level Required for said Rank, Damage1, Damage2, Damage3, Heal1, Heal2, Heal3, Effect, mana_cost, Cooldown, Comment
-            1,Seal of Righteousness,       1,                            1,       2,       0,       0,     0,     0,     0,      0,        10,        0,Seal of Righteousness
+            ID, Name of Spell, Rank of Spell, Level Required for said Rank, Damage1, Damage2, Damage3, Heal1, Heal2, Heal3, beneficial_effect, harmful_effect, mana_cost, Cooldown, Comment
+            1,Seal of Righteousness,       1,                            1,       2,       0,       0,     0,     0,     0,                 0,              0,       10,         0,  Seal of Righteousness
             :return: A dictionary holding keys for each row (rank, damage1, damage2 etc.)
     """
     __tablename__ = 'paladin_spells_template'
@@ -36,6 +38,10 @@ class PaladinSpells(Base):
     heal2 = Column(Integer)
     heal3 = Column(Integer)
     mana_cost = Column(Integer)
-    effect = Column(Integer)
+    beneficial_effect = Column(Integer, ForeignKey('spell_buffs.entry'))
+    harmful_effect = Column(Integer, ForeignKey('spell_dots.entry'))
     cooldown = Column(Integer)
     comment = Column(Text)
+
+    buff = relationship('Buff')
+    dot = relationship('Dot')

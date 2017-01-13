@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer
+from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 
 from database.main import Base
 
@@ -19,43 +20,82 @@ class LootTable(Base):
     __tablename__ = 'loot_table'
 
     entry = Column(Integer, primary_key=True)
-    item1_id = Column(Integer)
+    item1_id = Column(Integer, ForeignKey('item_template.entry'))
     item1_chance = Column(Integer)
-    item2_id = Column(Integer)
+    item1 = relationship('ItemTemplate', foreign_keys=[item1_id])
+
+    item2_id = Column(Integer, ForeignKey('item_template.entry'))
     item2_chance = Column(Integer)
-    item3_id = Column(Integer)
+    item2 = relationship('ItemTemplate', foreign_keys=[item2_id])
+
+    item3_id = Column(Integer, ForeignKey('item_template.entry'))
     item3_chance = Column(Integer)
-    item4_id = Column(Integer)
+    item3 = relationship('ItemTemplate', foreign_keys=[item3_id])
+
+    item4_id = Column(Integer, ForeignKey('item_template.entry'))
     item4_chance = Column(Integer)
-    item5_id = Column(Integer)
+    item4 = relationship('ItemTemplate', foreign_keys=[item4_id])
+
+    item5_id = Column(Integer, ForeignKey('item_template.entry'))
     item5_chance = Column(Integer)
-    item6_id = Column(Integer)
+    item5 = relationship('ItemTemplate', foreign_keys=[item5_id])
+
+    item6_id = Column(Integer, ForeignKey('item_template.entry'))
     item6_chance = Column(Integer)
-    item7_id = Column(Integer)
+    item6 = relationship('ItemTemplate', foreign_keys=[item6_id])
+
+    item7_id = Column(Integer, ForeignKey('item_template.entry'))
     item7_chance = Column(Integer)
-    item8_id = Column(Integer)
+    item7 = relationship('ItemTemplate', foreign_keys=[item7_id])
+
+    item8_id = Column(Integer, ForeignKey('item_template.entry'))
     item8_chance = Column(Integer)
-    item9_id = Column(Integer)
+    item8 = relationship('ItemTemplate', foreign_keys=[item8_id])
+
+    item9_id = Column(Integer, ForeignKey('item_template.entry'))
     item9_chance = Column(Integer)
-    item10_id = Column(Integer)
+    item9 = relationship('ItemTemplate', foreign_keys=[item9_id])
+
+    item10_id = Column(Integer, ForeignKey('item_template.entry'))
     item10_chance = Column(Integer)
-    item11_id = Column(Integer)
+    item10 = relationship('ItemTemplate', foreign_keys=[item10_id])
+
+    item11_id = Column(Integer, ForeignKey('item_template.entry'))
     item11_chance = Column(Integer)
-    item12_id = Column(Integer)
+    item11 = relationship('ItemTemplate', foreign_keys=[item11_id])
+
+    item12_id = Column(Integer, ForeignKey('item_template.entry'))
     item12_chance = Column(Integer)
-    item13_id = Column(Integer)
+    item12 = relationship('ItemTemplate', foreign_keys=[item12_id])
+
+    item13_id = Column(Integer, ForeignKey('item_template.entry'))
     item13_chance = Column(Integer)
-    item14_id = Column(Integer)
+    item13 = relationship('ItemTemplate', foreign_keys=[item13_id])
+
+    item14_id = Column(Integer, ForeignKey('item_template.entry'))
     item14_chance = Column(Integer)
-    item15_id = Column(Integer)
+    item14 = relationship('ItemTemplate', foreign_keys=[item14_id])
+
+    item15_id = Column(Integer, ForeignKey('item_template.entry'))
     item15_chance = Column(Integer)
-    item16_id = Column(Integer)
+    item15 = relationship('ItemTemplate', foreign_keys=[item15_id])
+
+    item16_id = Column(Integer, ForeignKey('item_template.entry'))
     item16_chance = Column(Integer)
-    item17_id = Column(Integer)
+    item16 = relationship('ItemTemplate', foreign_keys=[item16_id])
+
+    item17_id = Column(Integer, ForeignKey('item_template.entry'))
     item17_chance = Column(Integer)
-    item18_id = Column(Integer)
+    item17 = relationship('ItemTemplate', foreign_keys=[item17_id])
+
+    item18_id = Column(Integer, ForeignKey('item_template.entry'))
     item18_chance = Column(Integer)
-    item19_id = Column(Integer)
+    item18 = relationship('ItemTemplate', foreign_keys=[item18_id])
+
+    item19_id = Column(Integer, ForeignKey('item_template.entry'))
     item19_chance = Column(Integer)
-    item20_id = Column(Integer)
+    item19 = relationship('ItemTemplate', foreign_keys=[item19_id])
+
+    item20_id = Column(Integer, ForeignKey('item_template.entry'))
     item20_chance = Column(Integer)
+    item20 = relationship('ItemTemplate', foreign_keys=[item20_id])
