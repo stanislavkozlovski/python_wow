@@ -15,7 +15,7 @@ class SavedCharacter(Base):
     __tablename__ = 'saved_character'
 
     name = Column(String(60), primary_key=True)
-    character_class = Column(String(60))
+    character_class = Column('class', String(60))
     level = Column(Integer)
     loaded_scripts_id = Column(Integer)
     killed_monsters_id = Column(Integer)
@@ -39,7 +39,7 @@ class CompletedQuests(Base):
     # TODO: Holds more completed quests per row to minimize queries
     __tablename__ = 'saved_character_completed_quests'
 
-    id = Column(Integer)
+    id = Column(Integer, primary_key=True)
     quest_name = Column(String)
 
 
@@ -80,7 +80,7 @@ class Inventory(Base):
     # TODO: Holds more items in the row to minimize queries
     __tablename__ = 'saved_character_inventory'
 
-    id = Column(Integer)
+    id = Column(Integer, primary_key=True)
     item_id = Column(Integer)
     item_count = Column(Integer)
 
@@ -99,7 +99,7 @@ class KilledMonsters(Base):
     # TODO: Hold more killed monsters per row to minimize queries
     __tablename__ = 'saved_character_killed_monsters'
 
-    id = Column(Integer)
+    id = Column(Integer, primary_key=True)
     guid = Column(Integer)
 
 
@@ -117,5 +117,5 @@ class LoadedScripts(Base):
     # TODO: Hold more scripts per row to minimize queries
     __tablename__ = 'saved_character_loaded_scripts'
 
-    id = Column(Integer)
+    id = Column(Integer, primary_key=True)
     script_name = Column(Text)
