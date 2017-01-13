@@ -41,7 +41,6 @@ class Paladin(Character):
 
         if level > 1: self._level_up(to_level=level)
 
-
     def leave_combat(self):
         super().leave_combat()
         self.SOR_ACTIVE = False  # Remove SOR aura
