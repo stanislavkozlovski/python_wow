@@ -582,7 +582,6 @@ def load_buff(buff_id: int, cursor) -> BeneficialBuff:
     buff_amount3 = parse_int(buff_information[DBINDEX_SPELL_BUFFS_AMOUNT3])  # type: int
     buff_duration = parse_int(buff_information[DBINDEX_SPELL_BUFFS_DURATION])  # type: int
 
-
     #  Create a list of tuples with each buff
     buff_stats_and_amounts = [(buff_stat1, buff_amount1), (buff_stat2, buff_amount2), (buff_stat3, buff_amount3)]
 
