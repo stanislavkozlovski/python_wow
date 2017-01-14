@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
+from models.items.item_template import ItemTemplate
 from database.main import Base
 
 
@@ -40,15 +41,15 @@ class SavedCharacter(Base):
     leggings_id = Column(Integer, ForeignKey('item_template.entry'))
     boots_id = Column(Integer, ForeignKey('item_template.entry'))
 
-    headpiece = relationship('ItemTemplate', foreign_keys=[headpiece_id])
-    shoulderpad = relationship('ItemTemplate', foreign_keys=[shoulderpad_id])
-    necklace = relationship('ItemTemplate', foreign_keys=[necklace_id])
-    chestguard = relationship('ItemTemplate', foreign_keys=[chestguard_id])
-    bracer = relationship('ItemTemplate', foreign_keys=[bracer_id])
-    gloves = relationship('ItemTemplate', foreign_keys=[gloves_id])
-    belt = relationship('ItemTemplate', foreign_keys=[belt_id])
-    leggings = relationship('ItemTemplate', foreign_keys=[leggings_id])
-    boots = relationship('ItemTemplate', foreign_keys=[boots_id])
+    headpiece: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[headpiece_id])
+    shoulderpad: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[shoulderpad_id])
+    necklace: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[necklace_id])
+    chestguard: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[chestguard_id])
+    bracer: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[bracer_id])
+    gloves: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[gloves_id])
+    belt: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[belt_id])
+    leggings: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[leggings_id])
+    boots: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[boots_id])
 
     def build_equipment(self) -> {str: 'Item' or None}:
         """
@@ -73,6 +74,11 @@ class SavedCharacter(Base):
         saved_equipment[CHARACTER_EQUIPMENT_SHOULDERPAD_KEY] = self.shoulderpad
         saved_equipment[CHARACTER_EQUIPMENT_NECKLACE_KEY] = self.necklace
         saved_equipment[CHARACTER_EQUIPMENT_HEADPIECE_KEY] = self.headpiece
+
+        # convert the each equipment ItemTemplate to an Item object
+        for slot, item in saved_equipment.items():
+            if item is not None:
+                saved_equipment[slot] = item.convert_to_item_object()
 
         return saved_equipment
 
