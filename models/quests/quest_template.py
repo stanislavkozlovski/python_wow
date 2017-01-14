@@ -1,10 +1,12 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
+from utils.helper import parse_int
+from quest import Quest, FetchQuest, KillQuest
 from database.main import Base
 
 
-class Quest(Base):
+class QuestSchema(Base):
     """
     The quest_template table holds information about quests
 
@@ -60,3 +62,45 @@ CONT--          zone,           sub_zone,   xp_reward, comment
     reward1 = relationship('ItemTemplate', foreign_keys=[reward1_id])
     reward2 = relationship('ItemTemplate', foreign_keys=[reward2_id])
     reward3 = relationship('ItemTemplate', foreign_keys=[reward3_id])
+
+    def convert_to_quest_object(self) -> Quest:
+        """
+        Convert the QuestSchema object to a Quest object
+        The currently supported quest types are:
+            killquest = kill X amount of monster_required
+            fetchquest = obtain X amount of item_required.
+        :return: A KillQuest or FetchQuest object
+        """
+        entry: int = self.entry
+        quest_name: str = self.name
+        quest_type: str = self.type
+        level_requirement: int = parse_int(self.level_required)
+        monster_required: str = self.monster_required
+        item_required: str = self.item_required
+        amount_required: int = parse_int(self.amount_required)
+        xp_reward: int = parse_int(self.xp_reward)
+        item_rewards: {str: 'Item'} = {item.name: item.convert_to_item_object()
+                                       for item in [self.reward1, self.reward2, self.reward3]
+                                       if item is not None}
+        item_choice_enabled = bool(self.item_choice_enabled)
+
+        if quest_type == "killquest":
+            return KillQuest(quest_name=quest_name,
+                             quest_id=entry,
+                             required_monster=monster_required,
+                             required_kills=amount_required,
+                             xp_reward=xp_reward,
+                             item_reward_dict=item_rewards,
+                             reward_choice_enabled=item_choice_enabled,
+                             level_required=level_requirement)
+        elif quest_type == "fetchquest":
+            return FetchQuest(quest_name=quest_name,
+                              quest_id=entry,
+                              required_item=item_required,
+                              required_item_count=amount_required,
+                              xp_reward=xp_reward,
+                              item_reward_dict=item_rewards,
+                              reward_choice_enabled=item_choice_enabled,
+                              level_required=level_requirement)
+        else:
+            raise Exception(f'The quest type {quest_type} is not supported!')

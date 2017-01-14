@@ -122,7 +122,7 @@ class CompletedQuests(Base):
     saved_character_id = Column(Integer, ForeignKey('saved_character.entry'))
     quest_id = Column(String, ForeignKey('quest_template.entry'))
 
-    quest = relationship('Quest')
+    quest = relationship('QuestSchema')
 
 
 class Inventory(Base):
