@@ -50,6 +50,33 @@ class SavedCharacter(Base):
     leggings = relationship('ItemTemplate', foreign_keys=[leggings_id])
     boots = relationship('ItemTemplate', foreign_keys=[boots_id])
 
+    def build_equipment(self) -> {str: 'Item' or None}:
+        """
+        Create a dictionary holding the character's equipment as the Character class holds it
+        :return:
+        """
+        from entities import (CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_EQUIPMENT_BOOTS_KEY,
+                              CHARACTER_EQUIPMENT_LEGGINGS_KEY,
+                              CHARACTER_EQUIPMENT_BELT_KEY, CHARACTER_EQUIPMENT_GLOVES_KEY,
+                              CHARACTER_EQUIPMENT_BRACER_KEY,
+                              CHARACTER_EQUIPMENT_CHESTGUARD_KEY, CHARACTER_EQUIPMENT_HEADPIECE_KEY,
+                              CHARACTER_EQUIPMENT_NECKLACE_KEY,
+                              CHARACTER_EQUIPMENT_SHOULDERPAD_KEY)
+        saved_equipment = CHARACTER_DEFAULT_EQUIPMENT
+
+        saved_equipment[CHARACTER_EQUIPMENT_BOOTS_KEY] = self.boots
+        saved_equipment[CHARACTER_EQUIPMENT_LEGGINGS_KEY] = self.leggings
+        saved_equipment[CHARACTER_EQUIPMENT_BELT_KEY] = self.belt
+        saved_equipment[CHARACTER_EQUIPMENT_GLOVES_KEY] = self.gloves
+        saved_equipment[CHARACTER_EQUIPMENT_BRACER_KEY] = self.bracer
+        saved_equipment[CHARACTER_EQUIPMENT_CHESTGUARD_KEY] = self.chestguard
+        saved_equipment[CHARACTER_EQUIPMENT_SHOULDERPAD_KEY] = self.shoulderpad
+        saved_equipment[CHARACTER_EQUIPMENT_NECKLACE_KEY] = self.necklace
+        saved_equipment[CHARACTER_EQUIPMENT_HEADPIECE_KEY] = self.headpiece
+
+        return saved_equipment
+
+
 class CompletedQuests(Base):
     """
     This table holds information about the completed quests for a specific character
