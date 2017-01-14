@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
+from utils.helper import parse_int
+from entities import FriendlyNPC, VendorNPC
 from database.main import Base
 
 
@@ -28,3 +30,37 @@ class Creatures(Base):
     type = Column(String(60))
     zone = Column(String(60))
     sub_zone = Column(String(60))
+
+    def convert_to_living_thing_object(self) -> 'LivingThing':
+        """ Converts the Creature to whatever object he is according to his type column """
+        entry: int = self.creature_id
+        name: str = self.creature.name
+        type_: str = self.creature.type
+        level: int = parse_int(self.creature.level)
+        health: int = parse_int(self.creature.health)
+        mana: int = parse_int(self.creature.mana)
+        min_dmg: int = parse_int(self.creature.min_dmg)
+        max_dmg: int = parse_int(self.creature.max_dmg)
+        quest_relation_id: int = parse_int(self.creature.quest_relation_id)
+        loot_table_id: int = parse_int(self.creature.loot_table_id)
+        gossip: str = self.creature.gossip
+
+        if type_ == "fnpc":
+            return FriendlyNPC(name=name, health=health,
+                               mana=mana, level=level,
+                               min_damage=min_dmg,
+                               max_damage=max_dmg,
+                               quest_relation_id=quest_relation_id,
+                               loot_table_ID=loot_table_id,
+                               gossip=gossip)
+
+        elif type_ == "vendor":
+            return VendorNPC(name=name, entry=entry,
+                             health=health, mana=mana, level=level,
+                             min_damage=min_dmg,
+                             max_damage=max_dmg,
+                             quest_relation_id=quest_relation_id,
+                             loot_table_ID=loot_table_id,
+                             gossip=gossip)
+        else:
+            raise NotImplementedError()

@@ -1,7 +1,9 @@
 """ This module loads information from the associated models in its folder """
+from sqlalchemy import or_, and_
+
 from database.main import session
 from models.creatures.creatures import Creatures
-from entities import Monster
+from entities import Monster, LivingThing, VendorNPC
 
 
 def load_monsters(zone: str, subzone: str, character) -> tuple:
@@ -41,3 +43,28 @@ def load_monsters(zone: str, subzone: str, character) -> tuple:
 
     print("Monsters loaded!")
     return monsters_dict, guid_name_set
+
+
+def load_npcs(zone: str, subzone: str) -> tuple:
+    """
+    Load all the friendly NPCs in the given zone/subzone
+
+
+        :return: A Dictionary: Key: guid, Value: Object of class entities.py/FriendlyNPC,
+                 A Set of Tuples ((npc GUID, npc Name))
+    """
+
+    npcs_dict: {str: 'FriendlyNPC' or 'VendorNPC'} = {}
+    guid_name_set: {(int, str)} = set()
+
+    print("Loading Friendly NPCs...")
+    loaded_npcs = session.query(Creatures).filter(((Creatures.type == 'fnpc') | (Creatures.type == 'vendor')
+                                                   & (Creatures.zone == zone) & (Creatures.sub_zone == subzone)))
+    for npc_info in loaded_npcs:
+        guid: int = npc_info.guid
+        loaded_npc = npc_info.convert_to_living_thing_object()
+        guid_name_set.add((guid, loaded_npc.name))
+        npcs_dict[guid] = loaded_npc
+
+    print("Friendly NPCs loaded!")
+    return npcs_dict, guid_name_set
