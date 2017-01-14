@@ -56,24 +56,22 @@ class SavedCharacter(Base):
         Create a dictionary holding the character's equipment as the Character class holds it
         :return:
         """
-        from entities import (CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_EQUIPMENT_BOOTS_KEY,
-                              CHARACTER_EQUIPMENT_LEGGINGS_KEY,
+        from entities import (CHARACTER_EQUIPMENT_BOOTS_KEY, CHARACTER_EQUIPMENT_LEGGINGS_KEY,
                               CHARACTER_EQUIPMENT_BELT_KEY, CHARACTER_EQUIPMENT_GLOVES_KEY,
                               CHARACTER_EQUIPMENT_BRACER_KEY,
                               CHARACTER_EQUIPMENT_CHESTGUARD_KEY, CHARACTER_EQUIPMENT_HEADPIECE_KEY,
                               CHARACTER_EQUIPMENT_NECKLACE_KEY,
                               CHARACTER_EQUIPMENT_SHOULDERPAD_KEY)
-        saved_equipment = CHARACTER_DEFAULT_EQUIPMENT
 
-        saved_equipment[CHARACTER_EQUIPMENT_BOOTS_KEY] = self.boots
-        saved_equipment[CHARACTER_EQUIPMENT_LEGGINGS_KEY] = self.leggings
-        saved_equipment[CHARACTER_EQUIPMENT_BELT_KEY] = self.belt
-        saved_equipment[CHARACTER_EQUIPMENT_GLOVES_KEY] = self.gloves
-        saved_equipment[CHARACTER_EQUIPMENT_BRACER_KEY] = self.bracer
-        saved_equipment[CHARACTER_EQUIPMENT_CHESTGUARD_KEY] = self.chestguard
-        saved_equipment[CHARACTER_EQUIPMENT_SHOULDERPAD_KEY] = self.shoulderpad
-        saved_equipment[CHARACTER_EQUIPMENT_NECKLACE_KEY] = self.necklace
-        saved_equipment[CHARACTER_EQUIPMENT_HEADPIECE_KEY] = self.headpiece
+        saved_equipment = {CHARACTER_EQUIPMENT_BOOTS_KEY: self.boots,
+                           CHARACTER_EQUIPMENT_LEGGINGS_KEY: self.leggings,
+                           CHARACTER_EQUIPMENT_BELT_KEY: self.belt,
+                           CHARACTER_EQUIPMENT_GLOVES_KEY: self.gloves,
+                           CHARACTER_EQUIPMENT_BRACER_KEY: self.bracer,
+                           CHARACTER_EQUIPMENT_CHESTGUARD_KEY: self.chestguard,
+                           CHARACTER_EQUIPMENT_SHOULDERPAD_KEY: self.shoulderpad,
+                           CHARACTER_EQUIPMENT_NECKLACE_KEY: self.necklace,
+                           CHARACTER_EQUIPMENT_HEADPIECE_KEY: self.headpiece}
 
         # convert the each equipment ItemTemplate to an Item object
         for slot, item in saved_equipment.items():
