@@ -1,5 +1,8 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 
+from models.spells.loader import load_buff
+from items import create_attributes_dict, Weapon, Equipment, Potion, Item
+from utils.helper import parse_int
 from database.main import Base
 
 
@@ -38,15 +41,56 @@ class ItemTemplate(Base):
     entry = Column(Integer, primary_key=True)
     name = Column(String(40), unique=True)
     type = Column(String(30))
-    sub_type = Column(String(30))
-    armor = Column(Integer)
-    health = Column(Integer)
-    mana = Column(Integer)
-    strength = Column(Integer)
-    agility = Column(Integer)
-    buy_price = Column(Integer)
-    sell_price = Column(Integer)
-    min_dmg = Column(Integer)
-    max_dmg = Column(Integer)
-    quest_id = Column(Integer, ForeignKey('quest_template.entry'), nullable=True)
+    sub_type = Column(String(30), default=None)
+    armor = Column(Integer, default=0)
+    health = Column(Integer, default=0)
+    mana = Column(Integer, default=0)
+    strength = Column(Integer, default=0)
+    agility = Column(Integer, default=0)
+    buy_price = Column(Integer, default=0)
+    sell_price = Column(Integer, default=0)
+    min_dmg = Column(Integer, default=0)
+    max_dmg = Column(Integer, default=0)
+    quest_id = Column(Integer, ForeignKey('quest_template.entry'), nullable=True, default=None)
     effect = Column(Integer)
+
+    def convert_to_item_object(self) -> Item:
+        item_id: int = self.entry
+        item_name: str = self.name
+        item_type: str = self.type
+        item_buy_price: int = parse_int(self.buy_price)
+        item_sell_price: int = parse_int(self.sell_price)
+
+        if item_type == 'misc':
+            item_quest_id = self.quest_id
+            return Item(name=item_name, item_id=item_id, buy_price=item_buy_price, sell_price=item_sell_price,
+                        quest_ID=item_quest_id)
+        elif item_type in ['weapon', 'equipment']:
+            item_health: int = parse_int(self.health)
+            item_mana: int = parse_int(self.mana)
+            item_armor: int = parse_int(self.armor)
+            item_strength: int = parse_int(self.strength)
+            item_agility: int = parse_int(self.agility)
+            attributes: {str: int} = create_attributes_dict(bonus_health=item_health, bonus_mana=item_mana,
+                                                            armor=item_armor, strength=item_strength,
+                                                            agility=item_agility)
+            if item_type == 'weapon':
+                item_min_dmg: int = parse_int(self.min_dmg)
+                item_max_dmg: int = parse_int(self.max_dmg)
+
+                return Weapon(name=item_name, item_id=item_id, attributes_dict=attributes,
+                              buy_price=item_buy_price, sell_price=item_sell_price,
+                              min_damage=item_min_dmg, max_damage=item_max_dmg)
+            else:
+                item_slot: str = self.sub_type
+
+                return Equipment(name=item_name, item_id=item_id, slot=item_slot, attributes_dict=attributes,
+                                 buy_price=item_buy_price, sell_price=item_sell_price)
+        elif item_type == 'potion':
+            buff_id: int = self.effect
+            item_buff_effect: 'BeneficialBuff' = load_buff(buff_id)
+
+            return Potion(name=item_name, item_id=item_id, buy_price=item_buy_price, sell_price=item_sell_price,
+                          buff=item_buff_effect)
+        else:
+            raise Exception(f'Unsupported item type {item_type}')
