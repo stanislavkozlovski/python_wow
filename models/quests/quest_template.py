@@ -52,11 +52,11 @@ CONT--          zone,           sub_zone,   xp_reward, comment
     sub_zone = Column(String(60))
     xp_reward = Column(Integer)
     comment = Column(Text)
-    item_reward1 = Column(Integer, ForeignKey('item_template.entry'))
-    item_reward2 = Column(Integer, ForeignKey('item_template.entry'))
-    item_reward3 = Column(Integer, ForeignKey('item_template.entry'))
+    reward1_id = Column('item_reward1', Integer, ForeignKey('item_template.entry'))
+    reward2_id = Column('item_reward2', Integer, ForeignKey('item_template.entry'))
+    reward3_id = Column('item_reward3', Integer, ForeignKey('item_template.entry'))
     item_choice_enabled = Column(Integer)  # TODO: Change
 
-    reward1 = relationship('ItemTemplate', foreign_keys=[item_reward1])
-    reward2 = relationship('ItemTemplate', foreign_keys=[item_reward2])
-    reward3 = relationship('ItemTemplate', foreign_keys=[item_reward3])
+    reward1 = relationship('ItemTemplate', foreign_keys=[reward1_id])
+    reward2 = relationship('ItemTemplate', foreign_keys=[reward2_id])
+    reward3 = relationship('ItemTemplate', foreign_keys=[reward3_id])
