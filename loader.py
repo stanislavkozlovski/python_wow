@@ -306,7 +306,7 @@ entry,            name,    type, required_level,           monster_required,  it
         quest_entry = row[DBINDEX_QUEST_TEMPLATE_ENTRY]  # type: int
         quest_name = row[DBINDEX_QUEST_TEMPLATE_NAME]
 
-        if character.has_completed_quest(quest_name):
+        if character.has_completed_quest(row[DBINDEX_QUEST_TEMPLATE_ENTRY]):
             continue  # do not load the quest into the game if the character has completed it
 
         quest_type = row[DBINDEX_QUEST_TEMPLATE_TYPE]  #  type: str
