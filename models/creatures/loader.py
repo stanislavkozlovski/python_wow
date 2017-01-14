@@ -6,7 +6,7 @@ from entities import Monster
 
 def load_monsters(zone: str, subzone: str, character) -> tuple:
     """
-        Gets a query from the creatures table to load all hostile creatures in our current zone
+    Loads all the creatures in the given zone
 
         :return: A Dictionary: Key: guid, Value: Object of class entities.py/Monster,
                  A Set of Tuples ((Monster GUID, Monster Name))
@@ -24,7 +24,7 @@ def load_monsters(zone: str, subzone: str, character) -> tuple:
             continue
 
         creature_info = creature.creature
-        monster = Monster(monster_id=creature_info.id,
+        monster = Monster(monster_id=creature_info.entry,
                           name=creature_info.name,
                           health=creature_info.health,
                           mana=creature_info.mana,
