@@ -528,7 +528,7 @@ class Character(LivingThing):
         self.loaded_scripts = loaded_scripts  # holds the scripts that the character has seen (which should load only once)
         self.killed_monsters = killed_monsters  # a set that holds the GUIDs of the creatures that\
         #  the character has killed (and that should not be killable a second time)
-        self.completed_quests = completed_quests  # a set that holds the name of the quests that the character has completed
+        self.completed_quests = completed_quests  # a set that holds the ids of the quests that the character has completed
         # A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
         self._LEVEL_STATS = load_character_level_stats(cursor)
         self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements(cursor)
@@ -831,7 +831,7 @@ class Character(LivingThing):
 
         del self.quest_log[quest.ID]  # remove from quest log
 
-        self.completed_quests.add(quest.name)
+        self.completed_quests.add(quest.ID)
 
         self._award_experience(xp_reward)
 
@@ -1011,11 +1011,11 @@ class Character(LivingThing):
         """
         return monster_GUID in self.killed_monsters
 
-    def has_completed_quest(self, quest_name: str) -> bool:
+    def has_completed_quest(self, quest_id: str) -> bool:
         """
         Returns a boolean whether the character has completed the specified quest before
         """
-        return quest_name in self.completed_quests
+        return quest_id in self.completed_quests
 
     def update_spell_cooldowns(self):
         """
