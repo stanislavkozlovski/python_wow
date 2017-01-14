@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
 from models.items.item_template import ItemTemplate
+from entities import Character
+from classes import Paladin
 from database.main import Base
 
 
@@ -79,6 +81,27 @@ class SavedCharacter(Base):
                 saved_equipment[slot] = item.convert_to_item_object()
 
         return saved_equipment
+
+    def convert_to_character_object(self) -> Character:
+        """ Convert the SavedCharacter object to a Character object to be used in the game"""
+        loaded_scripts: {str} = {script.script_name for script in self.loaded_scripts}
+        killed_monsters: {int} = {monster.guid for monster in self.killed_monsters}
+        completed_quests: {str} = {quest.id for quest in self.completed_quests}
+        inventory: {str: tuple} = {item.item.name: (item.item, item.item_count) for item in self.inventory}
+        inventory['gold'] = self.gold
+        equipment = self.build_equipment()
+        print(equipment)
+
+        if self.character_class == 'paladin':
+            return Paladin(name=self.name,
+                           level=self.level,
+                           loaded_scripts=loaded_scripts,
+                           killed_monsters=killed_monsters,
+                           completed_quests=completed_quests,
+                           saved_inventory=inventory,
+                           saved_equipment=equipment)
+        else:
+            raise Exception(f'Unsupported class - {self.character_class}')
 
 
 class CompletedQuests(Base):
