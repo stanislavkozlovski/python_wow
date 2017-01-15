@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-
-from database.main import Base
+from database.main import Base, session
 
 
 class LootTable(Base):
@@ -99,3 +98,7 @@ class LootTable(Base):
     item20_id = Column(Integer, ForeignKey('item_template.entry'))
     item20_chance = Column(Integer)
     item20 = relationship('ItemTemplate', foreign_keys=[item20_id])
+
+# load all the loot tables in memory so that future SQLAlchemy queries do not access the DB
+# NOTE: Do not do this if the loot tables become more than 500 !
+loot_tables = session.query(LootTable).all()

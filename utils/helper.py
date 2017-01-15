@@ -3,6 +3,7 @@ This module holds helper functions.
 i.e functions that do not serve any specific purpose but are needed in multiple places
 """
 
+
 def parse_int(value) -> int:
     """
     this function is used to parse data from the DB into an integer.

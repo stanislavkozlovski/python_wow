@@ -31,7 +31,7 @@ class Creatures(Base):
     zone = Column(String(60))
     sub_zone = Column(String(60))
 
-    def convert_to_living_thing_object(self) -> 'LivingThing':
+    def convert_to_living_thing_object(self) -> VendorNPC or FriendlyNPC or Monster:
         """ Converts the Creature to whatever object he is according to his type column """
         entry: int = self.creature_id
         name: str = self.creature.name
