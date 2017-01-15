@@ -1,13 +1,12 @@
 """
 This holds the classes for every entity in the game: Monsters and Characters currently
 """
-
 import random
 from termcolor import colored
 from database.main import cursor
-from items import  Item, Weapon, Potion, Equipment
+from items import Item, Weapon, Potion, Equipment
 from loader import (load_creature_defaults, load_character_level_stats,
-                    load_character_xp_requirements, load_loot_table, load_item, load_vendor_inventory)
+                    load_character_xp_requirements, load_item, load_vendor_inventory)
 from quest import Quest, FetchQuest
 from damage import Damage
 from buffs import BeneficialBuff, DoT
@@ -314,7 +313,7 @@ class FriendlyNPC(LivingThing):
     """
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id = 0, loot_table_ID: int = 0, gossip: str = 'Hello'):
+                 max_damage: int = 1, quest_relation_id = 0, loot_table: 'LootTable' = None, gossip: str = 'Hello'):
         super().__init__(name, health, mana, level)
         self.level = level
         self.min_damage = min_damage
@@ -335,8 +334,8 @@ class VendorNPC(FriendlyNPC):
     """
 
     def __init__(self, name: str, entry: int, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id = 0, loot_table_ID: int = 0, gossip: str = 'Hello'):
-        super().__init__(name, health, mana, level, min_damage, max_damage, quest_relation_id, loot_table_ID, gossip)
+                 max_damage: int = 1, quest_relation_id = 0, loot_table: 'LootTable' = None, gossip: str = 'Hello'):
+        super().__init__(name, health, mana, level, min_damage, max_damage, quest_relation_id, loot_table, gossip)
         self.entry = entry
         # TODO: Move
         self.inventory = load_vendor_inventory(self.entry, cursor)  # type: dict: key-item_name(str), value: tuple(item object, count)
@@ -388,7 +387,7 @@ class VendorNPC(FriendlyNPC):
 
 class Monster(LivingThing):
     def __init__(self, monster_id: int, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id=0, loot_table_ID: int = 0, armor: int=0, gossip: str='',
+                 max_damage: int = 1, quest_relation_id=0, loot_table: 'LootTable'=None, armor: int=0, gossip: str='',
                  respawnable: bool=False):
         super().__init__(name, health, mana, level)
         self.monster_id = monster_id
@@ -401,7 +400,7 @@ class Monster(LivingThing):
         self.respawnable = respawnable  # says if the creature can ever respawn, once killed of course
         self._gold_to_give = self._calculate_gold_reward(lookup_gold_reward(self.level))
         self.quest_relation_ID = quest_relation_id
-        self.loot_table_ID = loot_table_ID
+        self.loot_table = loot_table
         self.loot = {"gold": self._gold_to_give}  # dict Key: str, Value: Item class object
         # TODO: Add default monster armor for their level
 
@@ -436,31 +435,14 @@ class Monster(LivingThing):
 
     def _drop_loot(self):
         """
-        This method gets the loot the monster can drop, rolls the dice on each drop chance and
-        populates the creature's self.loot dictionary that will hold the dropped loot
+        This method fills up the self.loot dictionary with the items that have dropped off the monster
         """
-        # loot_list is a list of tuples containing (item_ID(int), drop_chance(1-100))
-        if not self.loot_table_ID:
+        if not self.loot_table:
             return
+        dropped_items: [Item] = self.loot_table.decide_drops()
 
-        loot_list = load_loot_table(monster_loot_table_ID=self.loot_table_ID, cursor=cursor)
-
-        for item_ID, item_drop_chance in loot_list:
-            '''
-            Generate a random float from 0.0 to ~0.9999 with random.random(), then multiply it by 100
-            and compare it to the drop_chance. If the drop_chance is bigger, the item has dropped.
-
-            Example: drop chance is 30% and we roll a random float. There's a 70% chance to get a float that's bigger
-            than 0.3 and a 30% chance to get a float that's smaller. We roll 0.25, multiply it by 100 = 25 and see
-            that the drop chance is bigger, therefore the item should drop.
-            '''
-            random_float = random.random()
-
-            if item_drop_chance >= (random_float * 100):
-                # item has dropped, load it from the DB
-                item = load_item(item_ID, cursor)
-
-                self.loot[item.name] = item
+        for item in dropped_items:
+            self.loot[item.name] = item
 
     def give_loot(self, item_name: str):
         """ Returns the item that's looted and removes it from the monster's inventory"""

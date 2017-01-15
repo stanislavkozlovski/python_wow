@@ -158,48 +158,6 @@ def load_vendor_inventory(creature_entry: int, cursor) -> dict:
 
 
 @db_connection
-def load_loot_table(monster_loot_table_ID: int, cursor):
-    """
-    Load the loot table of a specific monster
-    entry, item1_ID, item1_chance, item2_ID, item2_chance, item3_ID, item3_chance, ... item20_ID, item20_chance
-        1,       4,            55,        3,         30,          0,            0,             0,            0
-    Meaning a creature whose col loot_table_ID from creature_template is equal to 1 has:
-    55% chance to drop Item with ID 4
-    30% chance to drop Item with ID 3
-    Does not drop any more items, because the rest of the rows are 0s.
-
-    :return: A List of Tuples, holding each item's ID and drop chance.
-    Example: [ (4,55), (3,30) ] would be the list for our table row up there
-    """
-    # TODO: Maybe load all of the loot table into a dictionary and store it in memory, or at least store the ones already
-    # TODO: loaded, since sending a query to the DB on each separate monster is inefficient
-
-    loot_list = [] # type: list[tuple]
-
-    cursor.execute("SELECT * FROM loot_table WHERE entry = ?", [monster_loot_table_ID])
-
-    loot_table_info = list(cursor.fetchone())  # load the loot_table row into a list
-    # get an index at which we stop at because there are no further items beyond said index
-    stop_at_idx = loot_table_info.index(0)  # TODO: Try/Catch because this will crash if the loot_table row is full
-
-    if stop_at_idx % 2 == 0:
-        """
-        if we stop at an even index, that means that we're stopping at a itemX_chance row, which means that we
-        have an item with a 0% drop chance and that is against our interests.
-        """
-        raise Exception("loot_table row is invalid!")
-
-    # pack each drop into a tuple containing the item_ID and the chance to drop
-    for idx in range(1, stop_at_idx, 2):
-        item_ID = loot_table_info[idx]
-        item_drop_chance = loot_table_info[idx+1]
-
-        loot_list.append((item_ID, item_drop_chance))
-
-    return loot_list
-
-
-@db_connection
 def load_item(item_ID: int, cursor):
     """
     Load an item from item_template, convert it to a object of Class Item and return it

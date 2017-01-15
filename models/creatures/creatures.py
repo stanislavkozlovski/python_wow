@@ -52,7 +52,7 @@ class Creatures(Base):
                                min_damage=min_dmg,
                                max_damage=max_dmg,
                                quest_relation_id=quest_relation_id,
-                               loot_table_ID=loot_table_id,
+                               loot_table=loot_table,
                                gossip=gossip)
 
         elif type_ == "vendor":
@@ -61,7 +61,7 @@ class Creatures(Base):
                              min_damage=min_dmg,
                              max_damage=max_dmg,
                              quest_relation_id=quest_relation_id,
-                             loot_table_ID=loot_table_id,
+                             loot_table=loot_table,
                              gossip=gossip)
         elif type_ == "monster":
             return Monster(monster_id=entry,
@@ -72,7 +72,7 @@ class Creatures(Base):
                            min_damage=min_dmg,
                            max_damage=max_dmg,
                            quest_relation_id=quest_relation_id,
-                           loot_table_ID=loot_table_id,
+                           loot_table=loot_table,
                            gossip=gossip,
                            respawnable=respawnable)
         else:
