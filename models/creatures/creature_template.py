@@ -48,6 +48,28 @@ class CreatureTemplate(Base):
     max_dmg = Column(Integer)
     quest_relation_id = Column(Integer, ForeignKey('quest_template.entry'))
     loot_table_id = Column(Integer, ForeignKey('loot_table.entry'))
-    loot_table =  relationship('LootTable', foreign_keys=[loot_table_id])
+    loot_table = relationship('LootTable', foreign_keys=[loot_table_id])
+    vendor_inventory = relationship('NpcVendor', uselist=True)
     gossip = Column(Text)
     respawnable = Column(Boolean)
+
+    def build_vendor_inventory(self):
+        """
+        This function loads all the items that a certain vendor should sell.
+            We take them from the self.vendor_inventory list, which holds NpcVendor objects
+
+        :return: A dictionary of Key: "Item Name", Value: Tuple(1,2)
+                                        1 - Item object of class Item from items.py
+                                        2 - The count of the item
+            """
+        vendor_inventory: {str: ('Item', int)} = {}
+
+        for product in self.vendor_inventory:
+            item: 'Item' = product.item.convert_to_item_object()
+            item_count: int = product.item_count
+
+            if product.price:  # check if there is anything set to price that'll make us override
+                item.buy_price = product.price
+            vendor_inventory[item.name] = (item, item_count)
+
+        return vendor_inventory
