@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
 from utils.helper import parse_int
-from entities import FriendlyNPC, VendorNPC
+from entities import FriendlyNPC, VendorNPC, Monster
 from database.main import Base
 
 
@@ -44,6 +44,7 @@ class Creatures(Base):
         quest_relation_id: int = parse_int(self.creature.quest_relation_id)
         loot_table_id: int = parse_int(self.creature.loot_table_id)
         gossip: str = self.creature.gossip
+        respawnable: bool = self.creature.respawnable
 
         if type_ == "fnpc":
             return FriendlyNPC(name=name, health=health,
@@ -62,5 +63,17 @@ class Creatures(Base):
                              quest_relation_id=quest_relation_id,
                              loot_table_ID=loot_table_id,
                              gossip=gossip)
+        elif type_ == "monster":
+            return Monster(monster_id=entry,
+                           name=name,
+                           health=health,
+                           mana=mana,
+                           level=level,
+                           min_damage=min_dmg,
+                           max_damage=max_dmg,
+                           quest_relation_id=quest_relation_id,
+                           loot_table_ID=loot_table_id,
+                           gossip=gossip,
+                           respawnable=respawnable)
         else:
-            raise NotImplementedError()
+            raise Exception(f'{type_} is not a valid creature type!')
