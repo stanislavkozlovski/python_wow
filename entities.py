@@ -3,6 +3,7 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 """
 import random
 from termcolor import colored
+
 from database.main import cursor
 from items import Item, Weapon, Potion, Equipment
 from loader import (load_creature_defaults, load_character_level_stats,
@@ -37,23 +38,6 @@ CHARACTER_DEFAULT_EQUIPMENT = {CHARACTER_EQUIPMENT_HEADPIECE_KEY: None,
 
 # Dictionary: Key: The Level of the NPC. Value: A dictionary holding keys for the default XP reward, default armor
 # and default min/max gold_reward for a given NPC
-CREATURE_DEFAULTS_DICTIONARY = load_creature_defaults(cursor)
-
-
-def lookup_xp_reward(level: int) -> int:
-    """ Return the appropriate XP reward associated with the given level"""
-    return CREATURE_DEFAULTS_DICTIONARY[level]['xp_reward']
-
-
-def lookup_gold_reward(level: int) -> tuple:
-    """ Return a tuple that has the minimum and maximum gold amount a creature of certain level should give"""
-    return (CREATURE_DEFAULTS_DICTIONARY[level]['min_gold_reward'],
-            CREATURE_DEFAULTS_DICTIONARY[level]['max_gold_reward'])
-
-
-def lookup_default_creature_armor(level: int) -> int:
-    """ Return the default armor value that a monster of the given level should have"""
-    return CREATURE_DEFAULTS_DICTIONARY[level]['armor']
 
 
 class LivingThing:
@@ -61,6 +45,7 @@ class LivingThing:
     This is the base class for all things _alive - characters, monsters and etc.
     """
     KEY_ARMOR = 'armor'
+
     def __init__(self, name: str, health: int = 1, mana: int = 1, level: int = 1):
         self.name = name
         self.health = health
@@ -386,22 +371,21 @@ class VendorNPC(FriendlyNPC):
 
 class Monster(LivingThing):
     def __init__(self, monster_id: int, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id=0, loot_table: 'LootTable'=None, armor: int=0, gossip: str='',
+                 max_damage: int = 1, quest_relation_id=0, xp_to_give: int=0, gold_to_give_range: (int, int)=(0,0), loot_table: 'LootTable'=None, armor: int=0, gossip: str='',
                  respawnable: bool=False):
         super().__init__(name, health, mana, level)
         self.monster_id = monster_id
         self.level = level
         self.min_damage = min_damage
         self.max_damage = max_damage
-        self.xp_to_give = lookup_xp_reward(self.level)
-        self.attributes[self.KEY_ARMOR] = armor if armor else lookup_default_creature_armor(self.level)
+        self.xp_to_give = xp_to_give
+        self.attributes[self.KEY_ARMOR] = armor
         self.gossip = gossip
         self.respawnable = respawnable  # says if the creature can ever respawn, once killed of course
-        self._gold_to_give = self._calculate_gold_reward(lookup_gold_reward(self.level))
+        self._gold_to_give = self._calculate_gold_reward(gold_to_give_range)
         self.quest_relation_ID = quest_relation_id
         self.loot_table = loot_table
         self.loot = {"gold": self._gold_to_give}  # dict Key: str, Value: Item class object
-        # TODO: Add default monster armor for their level
 
     def __str__(self):
         colored_name = colored(self.name, color="red")

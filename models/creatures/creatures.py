@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 
 from utils.helper import parse_int
 from entities import FriendlyNPC, VendorNPC, Monster
+from constants import CREATURE_DEFAULT_VALUES
 from database.main import Base
 
 
@@ -33,12 +34,14 @@ class Creatures(Base):
 
     def convert_to_living_thing_object(self) -> VendorNPC or FriendlyNPC or Monster:
         """ Converts the Creature to whatever object he is according to his type column """
+        # TODO: move to creature_template.py
         entry: int = self.creature_id
         name: str = self.creature.name
         type_: str = self.creature.type
         level: int = parse_int(self.creature.level)
         health: int = parse_int(self.creature.health)
         mana: int = parse_int(self.creature.mana)
+        armor: int = parse_int(self.creature.armor)
         min_dmg: int = parse_int(self.creature.min_dmg)
         max_dmg: int = parse_int(self.creature.max_dmg)
         quest_relation_id: int = parse_int(self.creature.quest_relation_id)
@@ -66,15 +69,22 @@ class Creatures(Base):
                              inventory=vendor_inventory,
                              gossip=gossip)
         elif type_ == "monster":
+            gold_to_give_range = (CREATURE_DEFAULT_VALUES[level]['min_gold_reward'],
+                                  CREATURE_DEFAULT_VALUES[level]['max_gold_reward'])
+            xp_to_give = CREATURE_DEFAULT_VALUES[level]['xp_reward']
+            armor = armor if armor else CREATURE_DEFAULT_VALUES[level]['armor']
             return Monster(monster_id=entry,
                            name=name,
                            health=health,
                            mana=mana,
+                           armor=armor,
                            level=level,
                            min_damage=min_dmg,
                            max_damage=max_dmg,
                            quest_relation_id=quest_relation_id,
                            loot_table=loot_table,
+                           xp_to_give=xp_to_give,
+                           gold_to_give_range=gold_to_give_range,
                            gossip=gossip,
                            respawnable=respawnable)
         else:
