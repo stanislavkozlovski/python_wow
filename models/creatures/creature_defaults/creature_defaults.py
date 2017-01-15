@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer
 
-from database.main import Base
+from database.main import Base, session
 
 
 class CreatureDefaults(Base):
