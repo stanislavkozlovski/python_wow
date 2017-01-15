@@ -99,6 +99,14 @@ class LootTable(Base):
     item20_chance = Column(Integer)
     item20 = relationship('ItemTemplate', foreign_keys=[item20_id])
 
+    item_pairs = [(item1, item1_chance), (item2, item2_chance), (item3, item3_chance), (item4, item4_chance),
+                  (item5, item5_chance), (item6, item6_chance), (item7, item7_chance), (item8, item8_chance),
+                  (item9, item9_chance), (item10, item10_chance), (item11, item11_chance), (item12, item12_chance),
+                  (item13, item13_chance), (item14, item14_chance), (item15, item15_chance), (item16, item16_chance),
+                  (item17, item17_chance), (item18, item18_chance), (item19, item19_chance), (item20, item20_chance)]
+    valid_item_pairs = [(item, chance) for item, chance in item_pairs if item and chance]
+
+
 # load all the loot tables in memory so that future SQLAlchemy queries do not access the DB
 # NOTE: Do not do this if the loot tables become more than 500 !
 loot_tables = session.query(LootTable).all()
