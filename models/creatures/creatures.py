@@ -42,7 +42,7 @@ class Creatures(Base):
         min_dmg: int = parse_int(self.creature.min_dmg)
         max_dmg: int = parse_int(self.creature.max_dmg)
         quest_relation_id: int = parse_int(self.creature.quest_relation_id)
-        loot_table_id: int = parse_int(self.creature.loot_table_id)
+        loot_table: 'LootTable' = self.creature.loot_table
         gossip: str = self.creature.gossip
         respawnable: bool = self.creature.respawnable
 

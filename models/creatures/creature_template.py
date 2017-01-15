@@ -48,5 +48,6 @@ class CreatureTemplate(Base):
     max_dmg = Column(Integer)
     quest_relation_id = Column(Integer, ForeignKey('quest_template.entry'))
     loot_table_id = Column(Integer, ForeignKey('loot_table.entry'))
+    loot_table =  relationship('LootTable', foreign_keys=[loot_table_id])
     gossip = Column(Text)
     respawnable = Column(Boolean)
