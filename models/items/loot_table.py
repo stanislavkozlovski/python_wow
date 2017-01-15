@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+import random
+
 from database.main import Base, session
 
 
@@ -99,12 +101,38 @@ class LootTable(Base):
     item20_chance = Column(Integer)
     item20 = relationship('ItemTemplate', foreign_keys=[item20_id])
 
-    item_pairs = [(item1, item1_chance), (item2, item2_chance), (item3, item3_chance), (item4, item4_chance),
-                  (item5, item5_chance), (item6, item6_chance), (item7, item7_chance), (item8, item8_chance),
-                  (item9, item9_chance), (item10, item10_chance), (item11, item11_chance), (item12, item12_chance),
-                  (item13, item13_chance), (item14, item14_chance), (item15, item15_chance), (item16, item16_chance),
-                  (item17, item17_chance), (item18, item18_chance), (item19, item19_chance), (item20, item20_chance)]
-    valid_item_pairs = [(item, chance) for item, chance in item_pairs if item and chance]
+    def decide_drops(self) -> ['Item']:
+        """
+        This method gets the loot that has dropped, rolls the dice on each drop
+        to decide if it should drop or not
+        :return: A list of the Item objects that have dropped
+        """
+        item_pairs = [(self.item1, self.item1_chance), (self.item2, self.item2_chance), (self.item3, self.item3_chance), (self.item4, self.item4_chance),
+                      (self.item5, self.item5_chance), (self.item6, self.item6_chance), (self.item7, self.item7_chance), (self.item8, self.item8_chance),
+                      (self.item9, self.item9_chance), (self.item10, self.item10_chance), (self.item11, self.item11_chance), (self.item12, self.item12_chance),
+                      (self.item13, self.item13_chance), (self.item14, self.item14_chance), (self.item15, self.item15_chance),
+                      (self.item16, self.item16_chance),
+                      (self.item17, self.item17_chance), (self.item18, self.item18_chance), (self.item19, self.item19_chance),
+                      (self.item20, self.item20_chance)]
+        valid_item_pairs = [(item, chance) for item, chance in item_pairs if item is not None and chance != 0]
+        dropped_items = []
+
+        for item, drop_chance in valid_item_pairs:
+            '''
+            Generate a random float from 0.0 to ~0.9999 with random.random(), then multiply it by 100
+            and compare it to the drop_chance. If the drop_chance is bigger, the item has dropped.
+
+            Example: drop chance is 30% and we roll a random float. There's a 70% chance to get a float that's bigger
+            than 0.3 and a 30% chance to get a float that's smaller. Therefore if we get 0.3 and below,
+             the 30% chance has been satisfied.
+            We roll 0.25, multiply it by 100 = 25 and see
+            that the drop chance is bigger, therefore the item should drop.
+            '''
+            random_roll: float = random.random()
+            if drop_chance >= (random_roll * 100):
+                dropped_items.append(item.convert_to_item_object())
+
+        return dropped_items
 
 
 # load all the loot tables in memory so that future SQLAlchemy queries do not access the DB

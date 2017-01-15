@@ -1,7 +1,5 @@
 from models.items.item_template import ItemTemplate
 
-from loader import parse_int
-
 from database.main import session
 
 
@@ -15,4 +13,3 @@ def load_item(item_id: int):
     item_template_info: ItemTemplate = session.query(ItemTemplate).get(item_id)
 
     return item_template_info.convert_to_item_object()
-
