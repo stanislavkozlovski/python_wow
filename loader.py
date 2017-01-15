@@ -157,6 +157,7 @@ def load_vendor_inventory(creature_entry: int, cursor) -> dict:
     return vendor_inventory
 
 
+
 @db_connection
 def load_item(item_ID: int, cursor):
     """
@@ -295,46 +296,6 @@ def load_dot(dot_id: int, level: int, cursor) -> DoT:
 
 
 @db_connection
-def load_saved_character(name: str, cursor):
-    """
-    This function loads the information about a saved chacacter in the saved_character DB table.
-
-       name,   class,  level,  loaded_scripts_ID,  killed_monsters_ID, completed_quests_ID, inventory_ID, gold
-Netherblood, Paladin,     10,                 1,                    1,                   1,            1,   23
-
-    The attributes that end in ID like loaded_scripts_ID are references to other tables.
-
-    For more information:
-    https://github.com/Enether/python_wow/wiki/How-saving-a-Character-works-and-information-about-the-saved_character-database-table.
-    """
-    from classes import Paladin
-    sv_char_reader = cursor.execute("SELECT * FROM saved_character WHERE name = ?", [name]).fetchone()
-
-    if sv_char_reader:
-        char_class = sv_char_reader[DBINDEX_SAVED_CHARACTER_CLASS]
-        char_level = sv_char_reader[DBINDEX_SAVED_CHARACTER_LEVEL]
-        char_loaded_scripts_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_LOADED_SCRIPTS_TABLE_ID]
-        char_killed_monsters_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_KILLED_MONSTERS_ID]
-        char_completed_quests_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_COMPLETED_QUESTS_ID]
-        char_equipment_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_EQUIPMENT_ID]
-        char_inventory_ID = sv_char_reader[DBINDEX_SAVED_CHARACTER_INVENTORY_ID]
-        char_gold = parse_int(sv_char_reader[DBINDEX_SAVED_CHARACTER_GOLD])  # type: int
-
-        if char_class == 'paladin':
-            return Paladin(name=name, level=char_level,
-                           loaded_scripts=load_saved_character_loaded_scripts(char_loaded_scripts_ID, cursor),
-                           killed_monsters=load_saved_character_killed_monsters(char_killed_monsters_ID, cursor),
-                           completed_quests=load_saved_character_completed_quests(char_completed_quests_ID, cursor),
-                           saved_inventory=load_saved_character_inventory(id=char_inventory_ID, gold=char_gold, cursor=cursor),
-                           saved_equipment=load_saved_character_equipment(id=char_equipment_ID, cursor=cursor))
-        else:
-            raise Exception(f'Unsupported class - {char_class}')
-    else:
-        # no such character
-        raise NoSuchCharacterError(f'There is no saved character by the name of {name}!')
-
-
-@db_connection
 def load_all_saved_characters_general_info(cursor) -> list:
     """
     This function loads general information about the saved characters in the DB and returns it as a list of
@@ -352,145 +313,6 @@ def load_all_saved_characters_general_info(cursor) -> list:
 
     return saved_characters
 
-
-@db_connection
-def load_saved_character_loaded_scripts(id: int, cursor) -> set:
-    """
-    This function loads all the scripts that a character has loaded, which correspond to the ID of
-     saved_character_loaded_scripts table, which looks like this:
-
-     id,    script_name
-      1,     HASKELL_PRAXTON_CONVERSATION
-
-    :param id: ID identificaton in saved_character_loaded_scripts
-    :return: a set containing all the names -> {HASKEL_PRAXTON_CONVERSATION} in this case
-    """
-    loaded_scripts_set = set()
-
-    loaded_scripts_reader = cursor.execute("SELECT * FROM saved_character_loaded_scripts WHERE id = ?", [id])
-
-    for loaded_script_info in loaded_scripts_reader:
-        loaded_script_name = loaded_script_info[DBINDEX_SC_LOADED_SCRIPTS_SCRIPT_NAME]
-        loaded_scripts_set.add(loaded_script_name)
-
-    return loaded_scripts_set
-
-
-@db_connection
-def load_saved_character_killed_monsters(id: int, cursor) -> set:
-    """
-        This function loads all the monsters that a character has killed's GUIDs, which correspond to the ID of
-         saved_character_killed_monsters table, which looks like this:
-
-         id,    GUID(of monster)
-          1,     14
-          1,      7
-        IMPORTANT: This works only for monsters that by design should not be killed twice if the player restarts the game
-
-        :param id: ID identificaton in saved_character_killed_monsters
-        :return: a set containing all the GUIs -> {14, 7} in this case
-        """
-
-    killed_monsters_set = set()
-    sc_killed_monsters_reader = cursor.execute("SELECT * FROM saved_character_killed_monsters WHERE id = ?", [id])
-
-    for killed_monster_info in sc_killed_monsters_reader:
-        sc_killed_monster_GUID = killed_monster_info[DBINDEX_SC_KILLED_MONSTERS_GUID]
-        killed_monsters_set.add(sc_killed_monster_GUID)
-
-    return killed_monsters_set
-
-
-@db_connection
-def load_saved_character_completed_quests(id: int, cursor) -> set:
-    """
-    This functions loads all the quests, which correspond to the ID of the saved_character_completed_quests table and
-     that a character has completed. The table looks like this:
-
-     id,  quest_name
-      1,   A Canine Menace
-      1,   Canine-Like Hunger
-
-    :param id: ID identification in the saved_character_completed_quests table
-    :return: a set containing all the names of the completed quests -> {"A Canine Menace", "Canine-Like Hunger"} in this case
-    """
-
-    completed_quests_set = set()
-
-    sc_completed_quests_reader = cursor.execute("SELECT * FROM saved_character_completed_quests WHERE id = ?", [id])
-
-    for completed_quest_info in sc_completed_quests_reader:
-        sc_completed_quest_name = completed_quest_info[DBINDEX_SC_COMPLETED_QUESTS_NAME]  # type: str
-        completed_quests_set.add(sc_completed_quest_name)
-
-    return completed_quests_set
-
-
-@db_connection
-def load_saved_character_inventory(id: int, cursor, gold: int=0) -> dict:
-    """
-    This function loads all the items that are in the character's inventory, stored in saved_character_inventory, with the
-    corresponding ID to the rows in that table. The table looks like this:
-
-    id, item_id, item_count
-     1,       1,        5
-     Meaning the character has 5 Wolf Meats in his inventory
-
-    :param id: The ID corresponding to the entries in saved_character_inventory
-    :param gold: The amount of gold the character has
-    :return: A dictionary, Key: item_name, Value: tuple(Item class instance, Item Count)
-    """
-
-    loaded_inventory = {"gold": gold}
-
-    sc_inventory_items = cursor.execute("SELECT * FROM saved_character_inventory WHERE id = ?", [id])
-
-    for item_row_info in sc_inventory_items:
-        item_id = item_row_info[DBINDEX_SC_INVENTORY_ITEM_ID]
-        item_count = parse_int(item_row_info[DBINDEX_SC_INVENTORY_ITEM_COUNT])  # type: int
-
-        item = load_item(item_id, cursor)  # type: Item
-
-        loaded_inventory[item.name] = (item, item_count)
-
-    return loaded_inventory
-
-
-@db_connection
-def load_saved_character_equipment(id: int, cursor) -> dict:
-    """
-    This function loads all the items that are equipped on a saved_character, stored in the saved_character_equipment
-    database table, with the corresponding row ID. The table looks like this:
-
-    id, headpiece_id, shoulderpad_id, necklace_id, chestguard_id, bracer_id, gloves_id, belt_id, leggings_id, boots_id
-     1,           11,             12,        None,            13,      Null,      Null,    Null,        Null,     Null
-    :param id: the ID corresponding to the entry in saved_character_equipment
-    :return: an equipment dictionary following a strict structure, created through modifying the DEFAULT_EQUIPMENT
-             in entities.py
-    """
-    from entities import (CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_EQUIPMENT_BOOTS_KEY, CHARACTER_EQUIPMENT_LEGGINGS_KEY,
-    CHARACTER_EQUIPMENT_BELT_KEY, CHARACTER_EQUIPMENT_GLOVES_KEY, CHARACTER_EQUIPMENT_BRACER_KEY,
-    CHARACTER_EQUIPMENT_CHESTGUARD_KEY, CHARACTER_EQUIPMENT_HEADPIECE_KEY, CHARACTER_EQUIPMENT_NECKLACE_KEY,
-    CHARACTER_EQUIPMENT_SHOULDERPAD_KEY)
-
-    saved_equipment = CHARACTER_DEFAULT_EQUIPMENT
-
-    # fetch the IDs of each item from the DB
-    saved_equipment_info = cursor.execute("SELECT * FROM saved_character_equipment WHERE id = ?", [id]).fetchone()
-    # convert the list of IDs to a list of Equipment objects. (also have None for each empty slot)
-    saved_equipment_info = [load_item(id, cursor) if id is not None else None for id in saved_equipment_info]
-
-    saved_equipment[CHARACTER_EQUIPMENT_BOOTS_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_BOOTS_ID]
-    saved_equipment[CHARACTER_EQUIPMENT_LEGGINGS_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_LEGGINGS_ID]
-    saved_equipment[CHARACTER_EQUIPMENT_BELT_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_BELT_ID]
-    saved_equipment[CHARACTER_EQUIPMENT_GLOVES_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_GLOVES_ID]
-    saved_equipment[CHARACTER_EQUIPMENT_BRACER_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_BRACER_ID]
-    saved_equipment[CHARACTER_EQUIPMENT_CHESTGUARD_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_CHESTGUARD_ID]
-    saved_equipment[CHARACTER_EQUIPMENT_SHOULDERPAD_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_SHOULDERPAD_ID]
-    saved_equipment[CHARACTER_EQUIPMENT_NECKLACE_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_NECKLACE_ID]
-    saved_equipment[CHARACTER_EQUIPMENT_HEADPIECE_KEY] = saved_equipment_info[DBINDEX_SC_EQUIPMENT_HEADPIECE_ID]
-
-    return saved_equipment
 
 """///////////////////// SAVED_CHARACTER /////////////////////"""
 
