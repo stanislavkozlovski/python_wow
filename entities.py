@@ -6,7 +6,7 @@ from termcolor import colored
 from database.main import cursor
 from items import Item, Weapon, Potion, Equipment
 from loader import (load_creature_defaults, load_character_level_stats,
-                    load_character_xp_requirements, load_item, load_vendor_inventory)
+                    load_character_xp_requirements, load_item)
 from quest import Quest, FetchQuest
 from damage import Damage
 from buffs import BeneficialBuff, DoT
@@ -333,13 +333,12 @@ class VendorNPC(FriendlyNPC):
     This is the class for the vendor NPCs in the world
     """
 
-    def __init__(self, name: str, entry: int, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
+    def __init__(self, name: str, entry: int, inventory: dict, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
                  max_damage: int = 1, quest_relation_id = 0, loot_table: 'LootTable' = None, gossip: str = 'Hello'):
         super().__init__(name, health, mana, level, min_damage, max_damage, quest_relation_id, loot_table, gossip)
         self.entry = entry
-        # TODO: Move
-        self.inventory = load_vendor_inventory(self.entry, cursor)  # type: dict: key-item_name(str), value: tuple(item object, count)
-
+        self.inventory = inventory
+        
     def __str__(self):
         return f'{self.colored_name} <Vendor>'
 

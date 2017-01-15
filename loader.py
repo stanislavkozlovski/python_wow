@@ -118,47 +118,6 @@ def load_creature_defaults(cursor) -> dict:
 
 
 @db_connection
-def load_vendor_inventory(creature_entry: int, cursor) -> dict:
-    """
-    This function loads all the items that a certain vendor should sell.
-    We take them from the npc_vendor DB table, whose contents are as follows:
-
-    creature_entry - the entry of the vendor in creature_template
-    item_id - the ID of the item that he's supposed to sell
-    item_count - the count of items he sell at once
-    price - The price in gold. By default we use the Item's item.buy_price variable in it's class.
-    However, if this is set to something we override the price. Example:
-        creature_entry, item_id, item_count, price
-                13,       1,          5,    10
-    The NPC whose entry is 13, sells the item with ID 1, 5 at a time for 10 gold.
-    He sells the whole 5 items for 10 gold. He cannot sell 1,2,3 or 4 items, only 5.
-
-    :param creature_entry: The DB entry of the npc in the creature_template table
-    :return: A dictionary of Key: "Item Name", Value: Tuple(1,2)
-                                                            1 - Item object of class Item from items.py
-                                                            2 - The count of the item
-    """
-    vendor_inventory = {}
-
-    npc_vendor_reader = cursor.execute("SELECT * FROM npc_vendor WHERE creature_entry = ?", [creature_entry])
-
-    for npc_vendor_info in npc_vendor_reader:
-        item_id = npc_vendor_info[DBINDEX_NPC_VENDOR_ITEM_ID]
-        item_count = npc_vendor_info[DBINDEX_NPC_VENDOR_ITEM_COUNT]
-        price = npc_vendor_info[DBINDEX_NPC_VENDOR_PRICE]
-
-        item = load_item(item_id, cursor)  # type: Item
-
-        if price: # check if there is anything set to price that'll make us override
-            item.buy_price = price
-
-        vendor_inventory[item.name] = (item, item_count)
-
-    return vendor_inventory
-
-
-
-@db_connection
 def load_item(item_ID: int, cursor):
     """
     Load an item from item_template, convert it to a object of Class Item and return it

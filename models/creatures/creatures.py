@@ -56,12 +56,14 @@ class Creatures(Base):
                                gossip=gossip)
 
         elif type_ == "vendor":
+            vendor_inventory = self.creature.build_vendor_inventory()
             return VendorNPC(name=name, entry=entry,
                              health=health, mana=mana, level=level,
                              min_damage=min_dmg,
                              max_damage=max_dmg,
                              quest_relation_id=quest_relation_id,
                              loot_table=loot_table,
+                             inventory=vendor_inventory,
                              gossip=gossip)
         elif type_ == "monster":
             return Monster(monster_id=entry,
