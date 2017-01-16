@@ -962,9 +962,8 @@ class Character(LivingThing):
         This method is called at the start of every turn
         It reduces the active cooldowns of our spells by 1, because a turn has passed
         """
-        # lambda expression to reduce every value by 1 if it's not 0
-        self.spell_cooldowns = dict(map(lambda x: (x[0], x[1] - 1 if x[1] != 0 else 0),
-                                        self.spell_cooldowns.items()))
+        for spell in self.learned_spells.values():
+            spell.pass_turn()
 
     def get_class(self) -> str:
         """Returns the class of the character as a string"""

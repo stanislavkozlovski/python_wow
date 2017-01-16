@@ -163,17 +163,23 @@ class Paladin(Character):
          Lasts for three turns
         :return: boolean indicating if the cast was successful or not
         """
-        mana_cost = self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]["mana_cost"]
-        cast_is_successful = (self.has_enough_mana(mana_cost)
-                              and self._check_spell_cooldown(self.KEY_SEAL_OF_RIGHTEOSNESS))
+        spell = self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]
+        mana_cost = spell.mana_cost
+        if not self.has_enough_mana(mana_cost):
+            print(f'Not enough mana! {spell.name} requires {mana_cost} but you have {self.mana}!')
+            return False
+        # proceed with casting the spell and start its cooldown timer
+        is_ready = spell.cast()
+        if not is_ready:
+            print(f'{spell.name} is still on cooldown!')
+            return False
 
-        if cast_is_successful:
-            self.mana -= mana_cost
-            self._spell_trigger_cd(self.KEY_SEAL_OF_RIGHTEOSNESS)
-            self.SOR_ACTIVE = True
-            self.SOR_TURNS = 3
-            print(f'{self.name} activates {self.KEY_SEAL_OF_RIGHTEOSNESS}!')
-        return cast_is_successful
+        self.mana -= mana_cost
+        # self._spell_trigger_cd(self.KEY_SEAL_OF_RIGHTEOSNESS)
+        self.SOR_ACTIVE = True
+        self.SOR_TURNS = 3
+        print(f'{self.name} activates {self.KEY_SEAL_OF_RIGHTEOSNESS}!')
+        return True
 
     def _spell_seal_of_righteousness_attack(self):
         if self.SOR_TURNS == 0:  # fade spell
@@ -182,7 +188,7 @@ class Paladin(Character):
             return 0
         else:
             self.SOR_TURNS -= 1
-            return self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['damage_1']  # damage from SOR
+            return self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS].damage1  # damage from SOR
 
     def _update_seal_of_righteousness(self, new_rank: dict):
         """ Updates the values of the spell in the learned_spells dictionary"""
@@ -202,43 +208,53 @@ class Paladin(Character):
         Heals the paladin for a certain amount
         :return successful cast or not
         """
-        mana_cost = self.learned_spells[self.KEY_FLASH_OF_LIGHT]['mana_cost']
-        heal = HolyHeal(heal_amount=self.learned_spells[self.KEY_FLASH_OF_LIGHT]['heal_1'])
+        spell = self.learned_spells[self.KEY_FLASH_OF_LIGHT]
+        mana_cost = spell.mana_cost
+        if not self.has_enough_mana(mana_cost):
+            print(f'Not enough mana! {spell.name} requires {mana_cost} but you have {self.mana}!')
+            return False
+        # proceed with casting the spell and start its cooldown timer
+        is_ready = spell.cast()
+        if not is_ready:
+            print(f'{spell.name} is still on cooldown!')
+            return False
+        heal = HolyHeal(heal_amount=spell.heal1)
 
-        cast_is_successful = (self.has_enough_mana(mana_cost)
-                              and self._check_spell_cooldown(spell_name=self.KEY_FLASH_OF_LIGHT))
+        self.health += heal  # TODO: Handle overheal otherwhere... is it not handled btw?
+        self.mana -= mana_cost
+        # self._spell_trigger_cd(self.KEY_FLASH_OF_LIGHT)
 
-        if cast_is_successful:
-            self.health += heal
-            self.mana -= mana_cost
-            self._spell_trigger_cd(self.KEY_FLASH_OF_LIGHT)
+        if self.health > self.max_health:  # check for overheal
+            overheal = self._handle_overheal()
+            print(f'{self.KEY_FLASH_OF_LIGHT} healed {self.name} for {heal-overheal:.2f} ({overheal:.2f} Overheal).')
+        else:
+            print(f'{self.KEY_FLASH_OF_LIGHT} healed {self.name} for {heal}.')
 
-            if self.health > self.max_health:  # check for overheal
-                overheal = self._handle_overheal()
-                print(f'{self.KEY_FLASH_OF_LIGHT} healed {self.name} for {heal-overheal:.2f} ({overheal:.2f} Overheal).')
-            else:
-                print(f'{self.KEY_FLASH_OF_LIGHT} healed {self.name} for {heal}.')
-
-        return cast_is_successful
+        return True
 
     def spell_melting_strike(self, target: Monster):
         """ Damages the enemy for DAMAGE_1 damage and puts a DoT effect, the index of which is EFFECT
         :return successful cast or not"""
-        mana_cost = self.learned_spells[self.KEY_MELTING_STRIKE]['mana_cost']
-        damage = Damage(phys_dmg=self.learned_spells[self.KEY_MELTING_STRIKE]['damage_1'])
-        dot = load_dot(self.learned_spells[self.KEY_MELTING_STRIKE]['effect'], level=self.level, cursor=cursor)
-        cast_is_successful = (self.has_enough_mana(mana_cost)
-                              and self._check_spell_cooldown(self.KEY_MELTING_STRIKE))
+        spell = self.learned_spells[self.KEY_MELTING_STRIKE]
+        mana_cost = spell.mana_cost
+        if not self.has_enough_mana(mana_cost):
+            print(f'Not enough mana! {spell.name} requires {mana_cost} but you have {self.mana}!')
+            return False
+        # proceed with casting the spell and start its cooldown timer
+        is_ready = spell.cast()
+        if not is_ready:
+            print(f'{spell.name} is still on cooldown!')
+            return False
+        damage = Damage(phys_dmg=spell.damage1)
+        dot = load_dot(spell.harmful_effect, level=self.level, cursor=cursor)
 
-        if cast_is_successful:
-            self.mana -= mana_cost
-            self._spell_trigger_cd(self.KEY_MELTING_STRIKE)
-            # damage the target and add the DoT
-            print(f'{self.KEY_MELTING_STRIKE} damages {target.name} for {damage}!')
-            target.take_attack(damage, self.level)
-            target.add_buff(dot)
+        self.mana -= mana_cost
+        # damage the target and add the DoT
+        print(f'{self.KEY_MELTING_STRIKE} damages {target.name} for {damage}!')
+        target.take_attack(damage, self.level)
+        target.add_buff(dot)
 
-        return cast_is_successful
+        return True
 
     # SPELLS
 
