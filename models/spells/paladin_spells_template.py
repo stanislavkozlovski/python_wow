@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
+from utils.helper import parse_int
+from spells import PaladinSpell
 from database.main import Base
 
 
@@ -45,3 +47,22 @@ class PaladinSpells(Base):
 
     buff = relationship('Buff')
     dot = relationship('Dot')
+
+    def convert_to_paladin_spell_object(self) -> PaladinSpell:
+        """
+        Converts the PaladinSpells schema object to a Paladin Spell object
+        """
+        damage1: int = parse_int(self.damage1)
+        damage2: int = parse_int(self.damage2)
+        damage3: int = parse_int(self.damage3)
+        mana_cost: int = parse_int(self.mana_cost)
+        heal1: int = parse_int(self.heal1)
+        heal2: int = parse_int(self.heal2)
+        heal3: int = parse_int(self.heal3)
+        cooldown: int = parse_int(self.cooldown)
+        buff: 'BeneficialBuff' = self.buff.convert_to_beneficial_buff_object() if self.buff else None
+        harmful_effect: 'DoT' = self.dot.convert_to_dot_object() if self.dot else None
+
+        return PaladinSpell(name=self.name, rank=self.rank, cooldown=cooldown, beneficial_effect=buff,
+                            harmful_effect=harmful_effect, damage1=damage1, damage2=damage2, damage3=damage3,
+                            heal1=heal1, heal2=heal2, heal3=heal3, mana_cost=mana_cost)
