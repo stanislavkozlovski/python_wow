@@ -16,6 +16,11 @@ class Spell:
     def __repr__(self):
         return f'Spell Object {self.name}: {self.mana_cost} Mana, {self._cooldown_counter}/{self.cooldown} CD.'
 
+    @property
+    def turns_on_cd(self):
+        """ Returns the turns this spell has left to cooldown """
+        return self._cooldown_counter
+
     def cast(self) -> int:
         """
         Cast the spell, starting the cooldown counter and returning its mana cost
