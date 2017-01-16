@@ -161,7 +161,7 @@ class Paladin(Character):
         :return: boolean indicating if the cast was successful or not
         """
         mana_cost = self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]["mana_cost"]
-        cast_is_successful = (self._check_enough_mana(mana_cost)
+        cast_is_successful = (self.has_enough_mana(mana_cost)
                               and self._check_spell_cooldown(self.KEY_SEAL_OF_RIGHTEOSNESS))
 
         if cast_is_successful:
@@ -202,7 +202,7 @@ class Paladin(Character):
         mana_cost = self.learned_spells[self.KEY_FLASH_OF_LIGHT]['mana_cost']
         heal = HolyHeal(heal_amount=self.learned_spells[self.KEY_FLASH_OF_LIGHT]['heal_1'])
 
-        cast_is_successful = (self._check_enough_mana(mana_cost)
+        cast_is_successful = (self.has_enough_mana(mana_cost)
                               and self._check_spell_cooldown(spell_name=self.KEY_FLASH_OF_LIGHT))
 
         if cast_is_successful:
@@ -224,7 +224,7 @@ class Paladin(Character):
         mana_cost = self.learned_spells[self.KEY_MELTING_STRIKE]['mana_cost']
         damage = Damage(phys_dmg=self.learned_spells[self.KEY_MELTING_STRIKE]['damage_1'])
         dot = load_dot(self.learned_spells[self.KEY_MELTING_STRIKE]['effect'], level=self.level, cursor=cursor)
-        cast_is_successful = (self._check_enough_mana(mana_cost)
+        cast_is_successful = (self.has_enough_mana(mana_cost)
                               and self._check_spell_cooldown(self.KEY_MELTING_STRIKE))
 
         if cast_is_successful:
@@ -280,14 +280,11 @@ class Paladin(Character):
 
         victim.take_attack(auto_attack, self.level)
 
-    def _check_enough_mana(self, mana_cost: int) -> bool:
+    def has_enough_mana(self, mana_cost: int) -> bool:
         """
         Check if we have enough mana to cast the spell we want to cast and return the result.
         """
-        if self.mana < mana_cost:
-            return False
-        else:
-            return True
+        return self.mana >= mana_cost
 
     def _check_spell_cooldown(self, spell_name: str) -> bool:
         """
