@@ -448,7 +448,6 @@ class Character(LivingThing):
     KEY_AGILITY = 'agility'
     KEY_BONUS_HEALTH = 'bonus_health'
     KEY_BONUS_MANA = 'bonus_mana'
-    spell_cooldowns = {}  # dictionary that holds Key: Spell Name(str), Value: It's cooldown in turns (int)
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1,
                  loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=set(),

@@ -21,6 +21,12 @@ class Spell:
         """ Returns the turns this spell has left to cooldown """
         return self._cooldown_counter
 
+    def reset_cd(self):
+        """
+        Resets the spell's cooldown
+        """
+        self._cooldown_counter = 0
+
     def cast(self) -> int:
         """
         Cast the spell, starting the cooldown counter and returning its mana cost

@@ -12,6 +12,8 @@ from database.database_info import (
     DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT, DBINDEX_PALADIN_SPELLS_TEMPLATE_COOLDOWN)
 from entities import Character, Monster, CHARACTER_DEFAULT_EQUIPMENT
 from heal import HolyHeal
+from spells import PaladinSpell
+
 from loader import load_dot
 
 
@@ -26,8 +28,8 @@ class Paladin(Character):
     SOR_ACTIVE = False  # Seal of Righteousness trigger
     SOR_TURNS = 0  # Holds the remaining turns for SOR
     KEY_FLASH_OF_LIGHT = "Flash of Light"
-    KEY_SEAL_OF_RIGHTEOSNESS = "Seal of Righteousness"
-    KEY_MELTING_STRIKE  = "Melting Strike"
+    KEY_SEAL_OF_RIGHTEOUSNESS = "Seal of Righteousness"
+    KEY_MELTING_STRIKE = "Melting Strike"
 
     def __init__(self, name: str, level: int = 1, health: int = 12, mana: int = 15, strength: int = 4,
                  loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=(),
@@ -44,6 +46,15 @@ class Paladin(Character):
     def leave_combat(self):
         super().leave_combat()
         self.SOR_ACTIVE = False  # Remove SOR aura
+        self.reset_spell_cooldowns()
+
+    def reset_spell_cooldowns(self):
+        """
+        Resets the cooldown of every spell
+        Typically called when we leave combat
+        """
+        for spell in self.learned_spells.values():
+            spell.reset_cd()
 
     def _level_up(self, to_level: int=0):
         """ This method levels the character up, if we're given a to_level we need to level up until we get to that level"""
@@ -56,7 +67,6 @@ class Paladin(Character):
             # level up once
             super()._level_up()
             self._lookup_and_handle_new_spells()
-
 
     def _lookup_and_handle_new_spells(self):
         """
@@ -77,9 +87,9 @@ class Paladin(Character):
         print(f"You have learned a new spell - {spell.name}")
 
         self.learned_spells[spell.name] = spell
-        # self.spell_cooldowns[spell['name']] = 0
 
-    def _lookup_available_spells_to_learn(self, level: int):
+
+    def _lookup_available_spells_to_learn(self, level: int) -> PaladinSpell:
         """
         Generator function
             paladin_spells_template table is as follows:
@@ -97,7 +107,6 @@ class Paladin(Character):
             spell_reader = cursor.execute("SELECT * FROM paladin_spells_template WHERE level_required = ?", [level])
 
             for line in spell_reader:
-                spell = {}
                 name = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_NAME]
                 rank = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_RANK]  # type: int
                 level_req = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_LEVEL_REQUIRED]  # type: int
@@ -112,19 +121,6 @@ class Paladin(Character):
                 harmful_effect = line[12]
                 cooldown = line[13]  # type: int
                 cooldown = cooldown if cooldown else 0  # if we get a None, we turn it into 0
-
-                # spell['name'] = name
-                # spell['rank'] = rank
-                # spell['damage_1'] = damage_1
-                # spell['damage_2'] = damage_2
-                # spell['damage_3'] = damage_3
-                # spell['heal_1'] = heal_1
-                # spell['heal_2'] = heal_2
-                # spell['heal_3'] = heal_3
-                # spell['mana_cost'] = mana_cost
-                # # spell['effect'] = effect
-                # spell['cooldown'] = cooldown
-                from spells import PaladinSpell
                 yield PaladinSpell(name=name, rank=rank, mana_cost=mana_cost, beneficial_effect=beneficial_effect,
                                    harmful_effect=harmful_effect, damage1=damage_1, damage2=damage_2, damage3=damage_3,
                                    heal1=heal_1, heal2=heal_2, heal3=heal_3, cooldown=cooldown)
@@ -134,12 +130,6 @@ class Paladin(Character):
         self.learned_spells[spell_name] = spell
         print(f'Spell {spell.name} has been updated to rank {spell.rank}!')
         print("*" * 20)
-
-    # SPELLS
-    def _spell_trigger_cd(self, spell_name: str):
-        """ This method triggers the cooldown after a spell has been cast"""
-        spell_cd = self.learned_spells[spell_name]['cooldown']  # type: int
-        self.spell_cooldowns[spell_name] = spell_cd
 
     def spell_handler(self, command: str, target: Monster) -> bool:
         """
@@ -163,7 +153,7 @@ class Paladin(Character):
          Lasts for three turns
         :return: boolean indicating if the cast was successful or not
         """
-        spell = self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]
+        spell = self.learned_spells[self.KEY_SEAL_OF_RIGHTEOUSNESS]
         mana_cost = spell.mana_cost
         if not self.has_enough_mana(mana_cost):
             print(f'Not enough mana! {spell.name} requires {mana_cost} but you have {self.mana}!')
@@ -178,30 +168,17 @@ class Paladin(Character):
         # self._spell_trigger_cd(self.KEY_SEAL_OF_RIGHTEOSNESS)
         self.SOR_ACTIVE = True
         self.SOR_TURNS = 3
-        print(f'{self.name} activates {self.KEY_SEAL_OF_RIGHTEOSNESS}!')
+        print(f'{self.name} activates {self.KEY_SEAL_OF_RIGHTEOUSNESS}!')
         return True
 
     def _spell_seal_of_righteousness_attack(self):
         if self.SOR_TURNS == 0:  # fade spell
             self.SOR_ACTIVE = False
-            print(f'{self.KEY_SEAL_OF_RIGHTEOSNESS} has faded from {self.name}')
+            print(f'{self.KEY_SEAL_OF_RIGHTEOUSNESS} has faded from {self.name}')
             return 0
         else:
             self.SOR_TURNS -= 1
-            return self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS].damage1  # damage from SOR
-
-    def _update_seal_of_righteousness(self, new_rank: dict):
-        """ Updates the values of the spell in the learned_spells dictionary"""
-        damage_on_swing = new_rank['damage_1']
-        rank = new_rank['rank']
-        mana_cost = new_rank['mana_cost']
-
-        self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['damage_1'] = damage_on_swing
-        self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['rank'] = rank
-        self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['mana_cost'] = mana_cost
-
-        print(f'Spell {self.KEY_SEAL_OF_RIGHTEOSNESS} has been updated to rank {rank}!')
-        print("*" * 20)
+            return self.learned_spells[self.KEY_SEAL_OF_RIGHTEOUSNESS].damage1  # damage from SOR
 
     def spell_flash_of_light(self):
         """
@@ -243,7 +220,7 @@ class Paladin(Character):
         # proceed with casting the spell and start its cooldown timer
         is_ready = spell.cast()
         if not is_ready:
-            print(f'{spell.name} is still on cooldown!')
+            print(f'{spell.name} is on cooldown for {spell.turns_on_cd} more turns!')
             return False
         damage = Damage(phys_dmg=spell.damage1)
         dot = load_dot(spell.harmful_effect, level=self.level, cursor=cursor)
@@ -293,7 +270,7 @@ class Paladin(Character):
 
         auto_attack_print = victim.get_take_attack_damage(auto_attack, self.level)
         if sor_damage:
-            print(f'{self.name} attacks {victim.name} for {auto_attack_print} from {self.KEY_SEAL_OF_RIGHTEOSNESS}!')
+            print(f'{self.name} attacks {victim.name} for {auto_attack_print} from {self.KEY_SEAL_OF_RIGHTEOUSNESS}!')
         else:
             print(f'{self.name} attacks {victim.name} for {auto_attack_print}!')
 
@@ -305,19 +282,6 @@ class Paladin(Character):
         """
         return self.mana >= mana_cost
 
-    def _check_spell_cooldown(self, spell_name: str) -> bool:
-        """
-        Check if we can cast the spell or if it's on CD
-        if it's on cooldown: return FALSE
-        if it's not on cooldown: return TRUE
-        """
-        turns_left = self.spell_cooldowns[spell_name]
-
-        if turns_left:
-            print(f'{spell_name} is on cooldown for {turns_left} more turns!')
-            return False
-
-        return True
 
     def get_class(self):
         return 'paladin'
