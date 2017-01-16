@@ -20,13 +20,13 @@ class Spell:
         """
         Cast the spell, starting the cooldown counter and returning its mana cost
         """
-        if not self._cooldown_counter == 0:
+        if not self.is_ready:
             # TODO
-            return
+            return False
         self._cooldown_counter = self.cooldown
         self.is_ready = False
 
-        return self.mana_cost
+        return True
 
     def pass_turn(self):
         """
