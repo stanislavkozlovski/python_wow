@@ -52,6 +52,7 @@ class PaladinSpells(Base):
         """
         Converts the PaladinSpells schema object to a Paladin Spell object
         """
+        level: int = parse_int(self.level_required)
         damage1: int = parse_int(self.damage1)
         damage2: int = parse_int(self.damage2)
         damage3: int = parse_int(self.damage3)
@@ -61,7 +62,7 @@ class PaladinSpells(Base):
         heal3: int = parse_int(self.heal3)
         cooldown: int = parse_int(self.cooldown)
         buff: 'BeneficialBuff' = self.buff.convert_to_beneficial_buff_object() if self.buff else None
-        harmful_effect: 'DoT' = self.dot.convert_to_dot_object() if self.dot else None
+        harmful_effect: 'DoT' = self.dot.convert_to_dot_object(level) if self.dot else None
 
         return PaladinSpell(name=self.name, rank=self.rank, cooldown=cooldown, beneficial_effect=buff,
                             harmful_effect=harmful_effect, damage1=damage1, damage2=damage2, damage3=damage3,
