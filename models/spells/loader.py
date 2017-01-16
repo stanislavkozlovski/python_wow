@@ -1,12 +1,12 @@
 from database.main import session
 from models.spells.spell_buffs import Buff
-from loader import parse_int
+from utils.helper import parse_int
 from models.spells.spell_dots import Dot as DotSchema
-from buffs import BeneficialBuff, DoT
+from buffs import DoT
 from damage import Damage
 
 
-def load_buff(buff_id: int) -> BeneficialBuff:
+def load_buff(buff_id: int) -> 'BeneficialBuff':
     """
     Loads a buff from the DB table spells_buffs, whose contents are the following:
     entry,             name, duration,    stat,   amount,   stat2,   amount2,stat3,   amount3, comment
@@ -20,20 +20,8 @@ def load_buff(buff_id: int) -> BeneficialBuff:
     :param buff_id: the buff entry in spells_buffs
     :return: A instance of class Buff
     """
-    buff_info = session.query(Buff).get(buff_id)
-    buff_name: str = buff_info.name
-    buff_stat1: str = buff_info.stat1
-    buff_amount1: int = parse_int(buff_info.amount1)
-    buff_stat2: str = buff_info.stat2
-    buff_amount2: int = parse_int(buff_info.amount2)
-    buff_stat3: str = buff_info.stat3
-    buff_amount3: int = parse_int(buff_info.amount3)
-    buff_duration: int = parse_int(buff_info.duration)
-
-    buffs: [tuple] = [(buff_stat1, buff_amount1), (buff_stat2, buff_amount2), (buff_stat3, buff_amount3)]
-
-    return BeneficialBuff(name=buff_name, buff_stats_and_amounts=buffs,
-                          duration=buff_duration)
+    buff: Buff = session.query(Buff).get(buff_id)
+    return buff.convert_to_beneficial_buff_object()
 
 
 def load_dot(dot_id: int, caster_level: int) -> DoT:

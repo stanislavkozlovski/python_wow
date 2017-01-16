@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text
 
+from buffs import BeneficialBuff
+from utils.helper import parse_int
 from database.main import Base
 
 
@@ -29,3 +31,21 @@ class Buff(Base):
     stat3 = Column(String(60), nullable=True)
     amount3 = Column(Integer, nullable=True)
     comment = Column(Text)
+
+    def convert_to_beneficial_buff_object(self) -> BeneficialBuff:
+        """
+        Convert it to a BeneficialBuff object
+        """
+        buff_name: str = self.name
+        buff_stat1: str = self.stat1
+        buff_amount1: int = parse_int(self.amount1)
+        buff_stat2: str = self.stat2
+        buff_amount2: int = parse_int(self.amount2)
+        buff_stat3: str = self.stat3
+        buff_amount3: int = parse_int(self.amount3)
+        buff_duration: int = parse_int(self.duration)
+
+        buffs: [tuple] = [(buff_stat1, buff_amount1), (buff_stat2, buff_amount2), (buff_stat3, buff_amount3)]
+
+        return BeneficialBuff(name=buff_name, buff_stats_and_amounts=buffs,
+                              duration=buff_duration)
