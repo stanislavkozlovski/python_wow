@@ -86,7 +86,8 @@ class SavedCharacter(Base):
         loaded_scripts: {str} = {script.script_name for script in self.loaded_scripts}
         killed_monsters: {int} = {monster.guid for monster in self.killed_monsters}
         completed_quests: {str} = {quest.id for quest in self.completed_quests}
-        inventory: {str: tuple} = {item.item.name: (item.item, item.item_count) for item in self.inventory}
+        inventory: {str: tuple} = {i_schema.item.name: (i_schema.item.convert_to_item_object(), i_schema.item_count)
+                                   for i_schema in self.inventory}
         inventory['gold'] = self.gold
         equipment = self.build_equipment()
         print(equipment)
