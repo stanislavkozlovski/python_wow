@@ -1,9 +1,7 @@
 from database.main import session
-from models.spells.spell_buffs import Buff
+from models.spells.spell_buffs import Buff as BuffSchema
 from utils.helper import parse_int
 from models.spells.spell_dots import Dot as DotSchema
-from buffs import DoT
-from damage import Damage
 
 
 def load_buff(buff_id: int) -> 'BeneficialBuff':
@@ -20,11 +18,11 @@ def load_buff(buff_id: int) -> 'BeneficialBuff':
     :param buff_id: the buff entry in spells_buffs
     :return: A instance of class Buff
     """
-    buff: Buff = session.query(Buff).get(buff_id)
+    buff: BuffSchema = session.query(BuffSchema).get(buff_id)
     return buff.convert_to_beneficial_buff_object()
 
 
-def load_dot(dot_id: int, caster_level: int) -> DoT:
+def load_dot(dot_id: int, caster_level: int) -> 'DoT':
     """
     Loads a DoT from the spell_dots table, whose contents are the following:
     Load the information about the DoT, convert it to an instance of class DoT and return it.
@@ -33,16 +31,4 @@ def load_dot(dot_id: int, caster_level: int) -> DoT:
     """
     dot_info: DotSchema = session.query(DotSchema).get(dot_id)
 
-    dot_name: str = dot_info.name
-    dot_damage_per_tick: int = dot_info.damage_per_tick
-    dot_damage_school: str = dot_info.damage_school
-    dot_duration: int = dot_info.duration
-
-    if dot_damage_school == "magic":
-        dot_damage: Damage = Damage(magic_dmg=dot_damage_per_tick)
-    elif dot_damage_school == "physical":
-        dot_damage: Damage = Damage(phys_dmg=dot_damage_per_tick)
-    else:
-        raise Exception('Unsupported Damage type!')
-
-    return DoT(name=dot_name, damage_tick=dot_damage, duration=dot_duration, caster_lvl=caster_level)
+    return dot_info.convert_to_dot_object(caster_level)

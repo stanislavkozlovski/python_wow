@@ -1,5 +1,8 @@
 from sqlalchemy import Column, Integer, String, Text
 
+from buffs import DoT
+from damage import Damage
+
 from database.main import Base
 
 
@@ -24,3 +27,21 @@ class Dot(Base):
     damage_school = Column(String(60))
     duration = Column(Integer)
     comment = Column(Text)
+
+    def convert_to_dot_object(self, caster_lvl) -> DoT:
+        """
+        Convert the Dot schema object to a DoT object
+        """
+        dot_name: str = self.name
+        dot_damage_per_tick: int = self.damage_per_tick
+        dot_damage_school: str = self.damage_school
+        dot_duration: int = self.duration
+
+        if dot_damage_school == "magic":
+            dot_damage: Damage = Damage(magic_dmg=dot_damage_per_tick)
+        elif dot_damage_school == "physical":
+            dot_damage: Damage = Damage(phys_dmg=dot_damage_per_tick)
+        else:
+            raise Exception('Unsupported Damage type!')
+
+        return DoT(name=dot_name, damage_tick=dot_damage, duration=dot_duration, caster_lvl=caster_lvl)
