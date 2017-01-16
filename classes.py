@@ -25,7 +25,7 @@ class Paladin(Character):
             Seal of Righteousness
                 Deals X damage on each attack, needs to be activated first
     """
-    learned_spells = {}
+    learned_spells: {str: PaladinSpell} = {}
     SOR_ACTIVE = False  # Seal of Righteousness trigger
     SOR_TURNS = 0  # Holds the remaining turns for SOR
     KEY_FLASH_OF_LIGHT = "Flash of Light"
@@ -187,9 +187,9 @@ class Paladin(Character):
 
         if self.health > self.max_health:  # check for overheal
             overheal = self._handle_overheal()
-            print(f'{self.KEY_FLASH_OF_LIGHT} healed {self.name} for {heal-overheal:.2f} ({overheal:.2f} Overheal).')
+            print(f'{spell.name} healed {self.name} for {heal-overheal:.2f} ({overheal:.2f} Overheal).')
         else:
-            print(f'{self.KEY_FLASH_OF_LIGHT} healed {self.name} for {heal}.')
+            print(f'{spell.name} healed {self.name} for {heal}.')
 
         return True
 
@@ -203,7 +203,7 @@ class Paladin(Character):
 
         self.mana -= mana_cost
         # damage the target and add the DoT
-        print(f'{self.KEY_MELTING_STRIKE} damages {target.name} for {damage}!')
+        print(f'{spell.name} damages {target.name} for {damage}!')
         target.take_attack(damage, self.level)
         target.add_buff(dot)
 
@@ -257,7 +257,6 @@ class Paladin(Character):
         Check if we have enough mana to cast the spell we want to cast and return the result.
         """
         return self.mana >= mana_cost
-
 
     def get_class(self):
         return 'paladin'
