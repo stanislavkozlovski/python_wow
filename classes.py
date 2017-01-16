@@ -1,6 +1,3 @@
-import sqlite3
-
-from database.main import cursor
 from damage import Damage
 from decorators import cast_spell
 from database.database_info import (
@@ -11,6 +8,7 @@ from database.database_info import (
     DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1, DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3, DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT, DBINDEX_PALADIN_SPELLS_TEMPLATE_COOLDOWN)
+from models.spells.loader import load_paladin_spells_for_level
 from entities import Character, Monster, CHARACTER_DEFAULT_EQUIPMENT
 from heal import HolyHeal
 from spells import PaladinSpell
@@ -89,42 +87,11 @@ class Paladin(Character):
 
         self.learned_spells[spell.name] = spell
 
-
-    def _lookup_available_spells_to_learn(self, level: int) -> PaladinSpell:
+    def _lookup_available_spells_to_learn(self, level: int) -> [PaladinSpell]:
         """
-        Generator function
-            paladin_spells_template table is as follows:
-            ID, Name of Spell, Rank of Spell, Level Required for said Rank, Damage1, Damage2, Damage3, Heal1, Heal2, Heal3, Effect, Cooldown, Comment
-            1,Seal of Righteousness,       1,                            1,       2,       0,       0,     0,     0,     0,      0,        0,Seal of Righteousness
-            effect is a special effect according to the spell, only Melting Strike has one for now and it serves as the
-            entry in spell_dots
-            cooldown is the amount of turns it takes for this spell to be ready again after being cast
-            :return: A dictionary holding keys for each row (rank, damage1, damage2 etc.)
+        Generator function yielding from a list of PaladinSpells that the character can learn
         """
-
-        with sqlite3.connect(DB_PATH) as connection:
-            cursor = connection.cursor()
-            # this will return a list of tuples holding information about each spell we have the req level to learn
-            spell_reader = cursor.execute("SELECT * FROM paladin_spells_template WHERE level_required = ?", [level])
-
-            for line in spell_reader:
-                name = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_NAME]
-                rank = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_RANK]  # type: int
-                level_req = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_LEVEL_REQUIRED]  # type: int
-                damage_1 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE1]  # type: int
-                damage_2 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE2]  # type: int
-                damage_3 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE3]  # type: int
-                heal_1 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1]  # type: int
-                heal_2 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2]  # type: int
-                heal_3 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3]  # type: int
-                mana_cost = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST]  # type: int
-                beneficial_effect = line[11]  # type: int
-                harmful_effect = line[12]
-                cooldown = line[13]  # type: int
-                cooldown = cooldown if cooldown else 0  # if we get a None, we turn it into 0
-                yield PaladinSpell(name=name, rank=rank, mana_cost=mana_cost, beneficial_effect=beneficial_effect,
-                                   harmful_effect=harmful_effect, damage1=damage_1, damage2=damage_2, damage3=damage_3,
-                                   heal1=heal_1, heal2=heal_2, heal3=heal_3, cooldown=cooldown)
+        yield from load_paladin_spells_for_level(level)
 
     def update_spell(self, spell: dict):
         spell_name = spell.name
@@ -197,9 +164,10 @@ class Paladin(Character):
     def spell_melting_strike(self, spell: PaladinSpell, target: Monster):
         """ Damages the enemy for DAMAGE_1 damage and puts a DoT effect, the index of which is EFFECT
         :return successful cast or not"""
-        mana_cost = spell.mana_cost
-        damage = Damage(phys_dmg=spell.damage1)
-        dot = load_dot(spell.harmful_effect, level=self.level, cursor=cursor)
+        mana_cost: int = spell.mana_cost
+        damage: Damage = Damage(phys_dmg=spell.damage1)
+        dot: 'DoT' = spell.harmful_effect
+        dot.update_caster_level(self.level)
 
         self.mana -= mana_cost
         # damage the target and add the DoT
