@@ -53,5 +53,5 @@ class PaladinSpell(Spell):
 
     def __repr__(self):
         return (f'Paladin Spell Object {self.name}: {self.mana_cost} Mana, {self._cooldown_counter}/{self.cooldown} CD.'
-                f'\nDamage values: {damage1} | {damage2} | {damage3} '
-                f'\nHeal values: {heal1} | {heal2} | {heal3}')
+                f'\nDamage values: {self.damage1} | {self.damage2} | {self.damage3} '
+                f'\nHeal values: {self.heal1} | {self.heal2} | {self.heal3}')
