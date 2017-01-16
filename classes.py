@@ -2,6 +2,7 @@ import sqlite3
 
 from database.main import cursor
 from damage import Damage
+from decorators import cast_spell
 from database.database_info import (
     DB_PATH,
     DBINDEX_PALADIN_SPELLS_TEMPLATE_NAME, DBINDEX_PALADIN_SPELLS_TEMPLATE_RANK,
@@ -138,32 +139,23 @@ class Paladin(Character):
         :return: Returns a boolean indicating if the cast was successful or not
         """
         if command == 'sor':
-            return self.spell_seal_of_righteousness()
+            return self.spell_seal_of_righteousness(self.learned_spells[self.KEY_SEAL_OF_RIGHTEOUSNESS])
         elif command == 'fol':
-            return self.spell_flash_of_light()
+            return self.spell_flash_of_light(self.learned_spells[self.KEY_FLASH_OF_LIGHT])
         elif command == 'ms':
-            return self.spell_melting_strike(target=target)
+            return self.spell_melting_strike(spell=self.learned_spells[self.KEY_MELTING_STRIKE], target=target)
 
         print("Unsuccessful cast")
         return False  # if we do not go into any spell
 
-    def spell_seal_of_righteousness(self):
+    @cast_spell
+    def spell_seal_of_righteousness(self, spell: PaladinSpell):
         """
          When activated adds DAMAGE1 Spell Damage to each attack
          Lasts for three turns
         :return: boolean indicating if the cast was successful or not
         """
-        spell = self.learned_spells[self.KEY_SEAL_OF_RIGHTEOUSNESS]
         mana_cost = spell.mana_cost
-        if not self.has_enough_mana(mana_cost):
-            print(f'Not enough mana! {spell.name} requires {mana_cost} but you have {self.mana}!')
-            return False
-        # proceed with casting the spell and start its cooldown timer
-        is_ready = spell.cast()
-        if not is_ready:
-            print(f'{spell.name} is still on cooldown!')
-            return False
-
         self.mana -= mana_cost
         # self._spell_trigger_cd(self.KEY_SEAL_OF_RIGHTEOSNESS)
         self.SOR_ACTIVE = True
@@ -180,21 +172,13 @@ class Paladin(Character):
             self.SOR_TURNS -= 1
             return self.learned_spells[self.KEY_SEAL_OF_RIGHTEOUSNESS].damage1  # damage from SOR
 
-    def spell_flash_of_light(self):
+    @cast_spell
+    def spell_flash_of_light(self, spell):
         """
         Heals the paladin for a certain amount
         :return successful cast or not
         """
-        spell = self.learned_spells[self.KEY_FLASH_OF_LIGHT]
         mana_cost = spell.mana_cost
-        if not self.has_enough_mana(mana_cost):
-            print(f'Not enough mana! {spell.name} requires {mana_cost} but you have {self.mana}!')
-            return False
-        # proceed with casting the spell and start its cooldown timer
-        is_ready = spell.cast()
-        if not is_ready:
-            print(f'{spell.name} is still on cooldown!')
-            return False
         heal = HolyHeal(heal_amount=spell.heal1)
 
         self.health += heal  # TODO: Handle overheal otherwhere... is it not handled btw?
@@ -209,19 +193,11 @@ class Paladin(Character):
 
         return True
 
-    def spell_melting_strike(self, target: Monster):
+    @cast_spell
+    def spell_melting_strike(self, spell: PaladinSpell, target: Monster):
         """ Damages the enemy for DAMAGE_1 damage and puts a DoT effect, the index of which is EFFECT
         :return successful cast or not"""
-        spell = self.learned_spells[self.KEY_MELTING_STRIKE]
         mana_cost = spell.mana_cost
-        if not self.has_enough_mana(mana_cost):
-            print(f'Not enough mana! {spell.name} requires {mana_cost} but you have {self.mana}!')
-            return False
-        # proceed with casting the spell and start its cooldown timer
-        is_ready = spell.cast()
-        if not is_ready:
-            print(f'{spell.name} is on cooldown for {spell.turns_on_cd} more turns!')
-            return False
         damage = Damage(phys_dmg=spell.damage1)
         dot = load_dot(spell.harmful_effect, level=self.level, cursor=cursor)
 
