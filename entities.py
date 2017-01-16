@@ -5,39 +5,14 @@ import random
 from termcolor import colored
 
 from database.main import cursor
+from constants import CHARACTER_DEFAULT_EQUIPMENT
+from exceptions import ItemNotInInventoryError
 from items import Item, Weapon, Potion, Equipment
 from loader import (load_creature_defaults, load_character_level_stats,
                     load_character_xp_requirements)
 from quest import Quest, FetchQuest
 from damage import Damage
 from buffs import BeneficialBuff, DoT
-from exceptions import ItemNotInInventoryError
-
-
-# TODO: Move to constants
-CHARACTER_EQUIPMENT_HEADPIECE_KEY = 'headpiece'
-CHARACTER_EQUIPMENT_SHOULDERPAD_KEY = 'shoulderpad'
-CHARACTER_EQUIPMENT_NECKLACE_KEY = 'necklace'
-CHARACTER_EQUIPMENT_CHESTGUARD_KEY = 'chestguard'
-CHARACTER_EQUIPMENT_BRACER_KEY = 'bracer'
-CHARACTER_EQUIPMENT_GLOVES_KEY = 'gloves'
-CHARACTER_EQUIPMENT_BELT_KEY = 'belt'
-CHARACTER_EQUIPMENT_LEGGINGS_KEY = 'leggings'
-CHARACTER_EQUIPMENT_BOOTS_KEY = 'boots'
-
-CHARACTER_DEFAULT_EQUIPMENT = {CHARACTER_EQUIPMENT_HEADPIECE_KEY: None,
-                               CHARACTER_EQUIPMENT_SHOULDERPAD_KEY: None,
-                               CHARACTER_EQUIPMENT_NECKLACE_KEY: None,
-                               CHARACTER_EQUIPMENT_CHESTGUARD_KEY: None,
-                               CHARACTER_EQUIPMENT_BRACER_KEY: None,
-                               CHARACTER_EQUIPMENT_GLOVES_KEY: None,
-                               CHARACTER_EQUIPMENT_BELT_KEY: None,
-                               CHARACTER_EQUIPMENT_LEGGINGS_KEY: None,
-                               CHARACTER_EQUIPMENT_BOOTS_KEY: None}
-
-
-# Dictionary: Key: The Level of the NPC. Value: A dictionary holding keys for the default XP reward, default armor
-# and default min/max gold_reward for a given NPC
 
 
 class LivingThing:

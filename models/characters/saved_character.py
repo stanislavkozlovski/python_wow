@@ -3,6 +3,12 @@ from sqlalchemy.orm import relationship
 
 from models.items.item_template import ItemTemplate
 from entities import Character
+from constants import (CHARACTER_EQUIPMENT_BOOTS_KEY, CHARACTER_EQUIPMENT_LEGGINGS_KEY,
+                       CHARACTER_EQUIPMENT_BELT_KEY, CHARACTER_EQUIPMENT_GLOVES_KEY,
+                       CHARACTER_EQUIPMENT_BRACER_KEY,
+                       CHARACTER_EQUIPMENT_CHESTGUARD_KEY, CHARACTER_EQUIPMENT_HEADPIECE_KEY,
+                       CHARACTER_EQUIPMENT_NECKLACE_KEY,
+                       CHARACTER_EQUIPMENT_SHOULDERPAD_KEY)
 from classes import Paladin
 from database.main import Base
 
@@ -58,13 +64,6 @@ class SavedCharacter(Base):
         Create a dictionary holding the character's equipment as the Character class holds it
         :return:
         """
-        from entities import (CHARACTER_EQUIPMENT_BOOTS_KEY, CHARACTER_EQUIPMENT_LEGGINGS_KEY,
-                              CHARACTER_EQUIPMENT_BELT_KEY, CHARACTER_EQUIPMENT_GLOVES_KEY,
-                              CHARACTER_EQUIPMENT_BRACER_KEY,
-                              CHARACTER_EQUIPMENT_CHESTGUARD_KEY, CHARACTER_EQUIPMENT_HEADPIECE_KEY,
-                              CHARACTER_EQUIPMENT_NECKLACE_KEY,
-                              CHARACTER_EQUIPMENT_SHOULDERPAD_KEY)
-
         saved_equipment = {CHARACTER_EQUIPMENT_BOOTS_KEY: self.boots,
                            CHARACTER_EQUIPMENT_LEGGINGS_KEY: self.leggings,
                            CHARACTER_EQUIPMENT_BELT_KEY: self.belt,
