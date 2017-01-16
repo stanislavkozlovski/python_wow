@@ -1,7 +1,4 @@
 import sqlite3
-import items
-from buffs import BeneficialBuff, DoT
-from damage import Damage
 from decorators import db_connection
 from database.database_info import \
     (DB_PATH,
@@ -65,7 +62,6 @@ from database.database_info import \
      DBINDEX_LEVEL_XP_REQUIREMENT_LEVEL, DBINDEX_LEVEL_XP_REQUIREMENT_XP_REQUIRED
      )
 from exceptions import NoSuchCharacterError
-from quest import KillQuest, FetchQuest
 
 
 def parse_int(value) -> int:
@@ -81,72 +77,6 @@ def parse_int(value) -> int:
     invalid, thus we want to create an exception.
     """
     return int(value or 0)
-
-
-@db_connection
-def load_buff(buff_id: int, cursor) -> BeneficialBuff:
-    """
-    Loads a buff from the DB table spells_buffs, whose contents are the following:
-    entry,             name, duration,    stat,   amount,   stat2,   amount2,stat3,   amount3, comment
-        1,  Heart of a Lion,        5,strength,       10,                                      Increases strength by 10 for 5 turns
-        stat - the stat this buff increases
-        amount - the amount it increases the stat by
-        duration - the amount of turns this buff lasts for
-    This buff increases your strength by 10 for 5 turns.
-
-    Load the information about the buff, convert it to an class Buff object and return it
-    :param buff_id: the buff entry in spells_buffs
-    :return: A instance of class Buff
-    """
-    cursor.execute("SELECT * FROM spell_buffs WHERE entry = ?", [buff_id])
-    buff_information = cursor.fetchone()
-
-    buff_name = buff_information[DBINDEX_SPELL_BUFFS_NAME]  # type: str
-    buff_stat1 = buff_information[DBINDEX_SPELL_BUFFS_STAT1]  # type: str
-    buff_amount1 = parse_int(buff_information[DBINDEX_SPELL_BUFFS_AMOUNT1])  # type: int
-    buff_stat2 = buff_information[DBINDEX_SPELL_BUFFS_STAT2]  # type: str
-    buff_amount2 = parse_int(buff_information[DBINDEX_SPELL_BUFFS_AMOUNT2])  # type: int
-    buff_stat3 = buff_information[DBINDEX_SPELL_BUFFS_STAT3]  # type: str
-    buff_amount3 = parse_int(buff_information[DBINDEX_SPELL_BUFFS_AMOUNT3])  # type: int
-    buff_duration = parse_int(buff_information[DBINDEX_SPELL_BUFFS_DURATION])  # type: int
-
-    #  Create a list of tuples with each buff
-    buff_stats_and_amounts = [(buff_stat1, buff_amount1), (buff_stat2, buff_amount2), (buff_stat3, buff_amount3)]
-
-    return BeneficialBuff(name=buff_name, buff_stats_and_amounts=buff_stats_and_amounts,
-                          duration=buff_duration)
-
-
-@db_connection
-def load_dot(dot_id: int, level: int, cursor) -> DoT:
-    """ Loads a DoT from the spell_dots table, whose contents are the following:
-    entry,      name,    damage_per_tick, damage_school, duration, comment
-        1,   Melting,                 2,          magic,        2,  For the Paladin spell Melting Strike
-    A DoT that does 2 magic damage each tick and lasts for two turns.
-
-    load the information about the DoT, convert it to an instance of class DoT and return it.
-
-    :param dot_id: the entry of the DoT in the spell_dots table
-    :param level: the level of the caster
-    """
-    cursor.execute("SELECT * FROM spell_dots WHERE entry = ?", [dot_id])
-    dot_info = cursor.fetchone()
-
-    dot_name = dot_info[DBINDEX_SPELL_DOTS_NAME]
-    dot_damage_per_tick = dot_info[DBINDEX_SPELL_DOTS_DAMAGE_PER_TICK]
-    dot_damage_school = dot_info[DBINDEX_SPELL_DOTS_DAMAGE_SCHOOL]
-    dot_duration = dot_info[DBINDEX_SPELL_DOTS_DURATION]
-
-    dot_damage = Damage(0,0)  # type: Damage
-
-    if dot_damage_school == "magic":
-        dot_damage = Damage(magic_dmg=dot_damage_per_tick)
-    elif dot_damage_school == "physical":
-        dot_damage = Damage(phys_dmg=dot_damage_per_tick)
-
-    return DoT(name=dot_name, damage_tick=dot_damage, duration=dot_duration, caster_lvl=level)
-
-"""///////////////////// SAVED_CHARACTER /////////////////////"""
 
 
 @db_connection
@@ -166,9 +96,6 @@ def load_all_saved_characters_general_info(cursor) -> list:
         saved_characters.append({'name': char_name, 'class': char_class, 'level': char_level})
 
     return saved_characters
-
-
-"""///////////////////// SAVED_CHARACTER /////////////////////"""
 
 
 @db_connection
