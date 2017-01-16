@@ -84,40 +84,6 @@ def parse_int(value) -> int:
 
 
 @db_connection
-def load_creature_defaults(cursor) -> dict:
-    """
-        Load the default values that a creature should have/give at a certain level.
-        The table's contents are as follows:
-        creature_level, armor, min_gold_reward, max_gold_reward, xp_reward
-                    1,     50,              2,                5,        50
-                    2,     65,              4,                6,        75
-                    etc...
-
-        :return: A dictionary as follows: Key: Level(ex: 1), Value: Dictionary{'armor': 50,
-                                                                        'min_gold_reward': 2,
-                                                                        'max_gold_reward': 5,
-                                                                        'xp_reward': 50}
-        """
-
-    creature_defaults = {}
-
-    creature_defaults_reader = cursor.execute("SELECT * FROM creature_defaults")
-
-    for line in creature_defaults_reader:
-        level = line[DBINDEX_CREATURE_DEFAULTS_CREATURE_LEVEL]  # type: int
-        armor = line[DBINDEX_CREATURE_DEFAULTS_ARMOR]  # type: int
-        min_gold_reward = line[DBINDEX_CREATURE_DEFAULTS_MIN_GOLD_REWARD]  # type: int
-        max_gold_reward = line[DBINDEX_CREATURE_DEFAULTS_MAX_GOLD_REWARD]  # type: int
-        xp_reward = line[DBINDEX_CREATURE_DEFAULTS_XP_REWARD]  # type: int
-
-        creature_defaults[level] = {'armor': armor,
-                                    'min_gold_reward': min_gold_reward, 'max_gold_reward':max_gold_reward,
-                                    'xp_reward': xp_reward}
-
-    return creature_defaults
-
-
-@db_connection
 def load_buff(buff_id: int, cursor) -> BeneficialBuff:
     """
     Loads a buff from the DB table spells_buffs, whose contents are the following:

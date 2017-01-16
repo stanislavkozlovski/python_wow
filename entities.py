@@ -8,7 +8,7 @@ from database.main import cursor
 from constants import CHARACTER_DEFAULT_EQUIPMENT
 from exceptions import ItemNotInInventoryError
 from items import Item, Weapon, Potion, Equipment
-from loader import (load_creature_defaults, load_character_level_stats,
+from loader import (load_character_level_stats,
                     load_character_xp_requirements)
 from quest import Quest, FetchQuest
 from damage import Damage
