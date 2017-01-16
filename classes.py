@@ -67,17 +67,17 @@ class Paladin(Character):
                 self.level):  # generator that returns dictionaries holding spell attributes
 
             # update spell rank
-            if available_spell['name'] in self.learned_spells:
+            if available_spell.name in self.learned_spells:
                 self.update_spell(available_spell)
             # learn new spell
             else:
                 self.learn_new_spell(spell=available_spell)
 
     def learn_new_spell(self, spell: dict):
-        print(f"You have learned a new spell - {spell['name']}")
+        print(f"You have learned a new spell - {spell.name}")
 
-        self.learned_spells[spell['name']] = spell
-        self.spell_cooldowns[spell['name']] = 0
+        self.learned_spells[spell.name] = spell
+        # self.spell_cooldowns[spell['name']] = 0
 
     def _lookup_available_spells_to_learn(self, level: int):
         """
@@ -108,29 +108,32 @@ class Paladin(Character):
                 heal_2 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2]  # type: int
                 heal_3 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3]  # type: int
                 mana_cost = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST]  # type: int
-                effect = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT]  # type: int
-                cooldown = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_COOLDOWN]  # type: int
+                beneficial_effect = line[11]  # type: int
+                harmful_effect = line[12]
+                cooldown = line[13]  # type: int
                 cooldown = cooldown if cooldown else 0  # if we get a None, we turn it into 0
 
-                spell['name'] = name
-                spell['rank'] = rank
-                spell['damage_1'] = damage_1
-                spell['damage_2'] = damage_2
-                spell['damage_3'] = damage_3
-                spell['heal_1'] = heal_1
-                spell['heal_2'] = heal_2
-                spell['heal_3'] = heal_3
-                spell['mana_cost'] = mana_cost
-                spell['effect'] = effect
-                spell['cooldown'] = cooldown
-
-                yield spell
+                # spell['name'] = name
+                # spell['rank'] = rank
+                # spell['damage_1'] = damage_1
+                # spell['damage_2'] = damage_2
+                # spell['damage_3'] = damage_3
+                # spell['heal_1'] = heal_1
+                # spell['heal_2'] = heal_2
+                # spell['heal_3'] = heal_3
+                # spell['mana_cost'] = mana_cost
+                # # spell['effect'] = effect
+                # spell['cooldown'] = cooldown
+                from spells import PaladinSpell
+                yield PaladinSpell(name=name, rank=rank, mana_cost=mana_cost, beneficial_effect=beneficial_effect,
+                                   harmful_effect=harmful_effect, damage1=damage_1, damage2=damage_2, damage3=damage_3,
+                                   heal1=heal_1, heal2=heal_2, heal3=heal_3, cooldown=cooldown)
 
     def update_spell(self, spell: dict):
-        spell_name = spell['name']
-
-        if spell_name == self.KEY_SEAL_OF_RIGHTEOSNESS:
-            self._update_seal_of_righteousness(spell)
+        spell_name = spell.name
+        self.learned_spells[spell_name] = spell
+        print(f'Spell {spell.name} has been updated to rank {spell.rank}!')
+        print("*" * 20)
 
     # SPELLS
     def _spell_trigger_cd(self, spell_name: str):
