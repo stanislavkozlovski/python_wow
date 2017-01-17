@@ -6,7 +6,8 @@ from termcolor import colored
 from entities import Character
 from classes import Paladin
 from information_printer import print_available_character_classes, print_available_characters_to_load
-from loader import load_saved_character, load_all_saved_characters_general_info
+from models.characters.loader import load_all_saved_characters_general_info
+from models.characters.loader import load_saved_character
 from exceptions import NoSuchCharacterError
 AVAILABLE_CLASSES = ['paladin']
 
@@ -64,7 +65,7 @@ def handle_create_character() -> Character:
 
 def handle_load_character() -> Character:
     """ this function displays all the available characters to load and reads the user's input, afterwards returns the loaded character"""
-    saved_characters_general_info = load_all_saved_characters_general_info(cursor)  # list of all the characters available for load
+    saved_characters_general_info = load_all_saved_characters_general_info()  # list of all the characters available for load
     print("You've chosen to load an existing character, please enter the name of the character you want to load: ")
     print_available_characters_to_load(saved_characters_general_info)  # print available characters
 
@@ -75,7 +76,7 @@ def handle_load_character() -> Character:
 def load_character(character_name: str) -> Character:
     """ this function loads a character from the DB"""
     try:
-        character = load_saved_character(character_name, cursor)
+        character = load_saved_character(character_name)
     except NoSuchCharacterError:
         print(colored("!" * 50, 'red'))
         print(colored("A character with the name {} does not exist in the database!", 'red'))

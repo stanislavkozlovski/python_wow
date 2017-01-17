@@ -26,4 +26,8 @@ class CreatureDefaultsSchema(Base):
     armor = Column(Integer)
     min_gold_reward = Column(Integer)
     max_gold_reward = Column(Integer)
+<<<<<<< HEAD
     xp_reward = Column(Integer)
+=======
+    xp_reward = Column(Integer)
+>>>>>>> parent of a523c24... Revert "Merged branch feature/SQLAlchemy into master"

@@ -98,7 +98,9 @@ class BeneficialBuff(StatusEffect):
 
 # Damage over time debuff
 class DoT(StatusEffect):
-
+    # IMPORTANT: Due to the way of how loading spells work and the DoT requiring a level to be initialized
+    # Every time a character casts a spell which uses a DoT, he should update the level on the DoT
+    # This can be changed by changing the Character take_dot_proc function
     def __init__(self, name: str, damage_tick: Damage, duration: int, caster_lvl: int):
         """
         Dots(Fireball, 5, 2) will damage you for 5 at the start of each turn for 2 turns.
@@ -114,5 +116,9 @@ class DoT(StatusEffect):
     def __str__(self):
         return f'{self.name} - Deals {self.damage} damage every turn for {self.duration} turns'
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> parent of a523c24... Revert "Merged branch feature/SQLAlchemy into master"
     def update_caster_level(self, level: int):
         self.level = level

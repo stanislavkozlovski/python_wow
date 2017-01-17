@@ -3,6 +3,11 @@ This module will hold functions that print all kinds of information to the playe
 """
 from termcolor import colored
 from zones.zone import Zone
+from constants import (CHARACTER_EQUIPMENT_BOOTS_KEY, CHARACTER_EQUIPMENT_BRACER_KEY,
+                       CHARACTER_EQUIPMENT_HEADPIECE_KEY, CHARACTER_EQUIPMENT_CHESTGUARD_KEY,
+                       CHARACTER_EQUIPMENT_NECKLACE_KEY, CHARACTER_EQUIPMENT_LEGGINGS_KEY,
+                       CHARACTER_EQUIPMENT_GLOVES_KEY, CHARACTER_EQUIPMENT_SHOULDERPAD_KEY,
+                       CHARACTER_EQUIPMENT_BELT_KEY)
 
 
 def print_live_monsters(zone_object: Zone, print_all=False):
@@ -71,11 +76,6 @@ def print_character_equipment(equipment: dict):
     Prints the character's equipped in a nice, pretty ordered manner.
     :param equipment: a strictly-structured dictionary holding the character's equipment
     """
-    from entities import (CHARACTER_EQUIPMENT_BOOTS_KEY, CHARACTER_EQUIPMENT_BRACER_KEY,
-                          CHARACTER_EQUIPMENT_HEADPIECE_KEY, CHARACTER_EQUIPMENT_CHESTGUARD_KEY,
-                          CHARACTER_EQUIPMENT_NECKLACE_KEY, CHARACTER_EQUIPMENT_LEGGINGS_KEY,
-                          CHARACTER_EQUIPMENT_GLOVES_KEY, CHARACTER_EQUIPMENT_SHOULDERPAD_KEY,
-                          CHARACTER_EQUIPMENT_BELT_KEY)
     gap_space = 200
     head_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_HEADPIECE_KEY])
     shoulder_str = get_equipment_slot_string(equipment[CHARACTER_EQUIPMENT_SHOULDERPAD_KEY])

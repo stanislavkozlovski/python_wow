@@ -65,4 +65,8 @@ class PaladinSpell(Spell):
     def __repr__(self):
         return (f'Paladin Spell Object {self.name}: {self.mana_cost} Mana, {self._cooldown_counter}/{self.cooldown} CD.'
                 f'\nDamage values: {self.damage1} | {self.damage2} | {self.damage3} '
+<<<<<<< HEAD
                 f'\nHeal values: {self.heal1} | {self.heal2} | {self.heal3}')
+=======
+                f'\nHeal values: {self.heal1} | {self.heal2} | {self.heal3}')
+>>>>>>> parent of a523c24... Revert "Merged branch feature/SQLAlchemy into master"
