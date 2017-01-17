@@ -178,7 +178,6 @@ class LivingThing:
 
     def _subtract_health(self, damage: Damage):
         """ This method is called whenever the health of the LivingThing is damaged """
-
         self.health -= damage
         self.check_if_dead()
 
@@ -220,20 +219,16 @@ class LivingThing:
         level_difference = self.level - target_level
         percentage_mod = (abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
 
-        if inverse:  # we take damage calculation
+        if inverse:  # we take damage
             # 10% more or less damage for each level that differs
-            if level_difference == 0:
-                pass
-            elif level_difference < 0:  # target is bigger level
+            if level_difference < 0:  # target is bigger level
                 damage_to_deal += damage_to_deal * percentage_mod  # -X%
             elif level_difference > 0:  # entity is bigger level
                 damage_to_deal -= damage_to_deal * percentage_mod  # +X%
 
-        elif not inverse:  # we deal damage calculation
+        elif not inverse:  # we deal damage
             # 10% more or less damage for each level that differs
-            if level_difference == 0:
-                pass
-            elif level_difference < 0:  # target is bigger level
+            if level_difference < 0:  # target is bigger level
                 damage_to_deal -= damage_to_deal * percentage_mod  # -X%
             elif level_difference > 0:  # entity is bigger level
                 damage_to_deal += damage_to_deal * percentage_mod  # +X%
@@ -385,7 +380,7 @@ class Monster(LivingThing):
         damage = self._apply_damage_absorption(damage)
         self._subtract_health(damage)
 
-    def get_take_attack_damage(self, damage: Damage, attacker_level: int) -> Damage:
+    def get_take_attack_damage_repr(self, damage: Damage, attacker_level: int) -> Damage:
         """ this method returns the damage that the monster will suffer after taking into account
         armor and absorption. This is used for printing the result
         Currently: Only armor reduction and damage absorption is applied."""

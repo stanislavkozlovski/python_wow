@@ -1,8 +1,10 @@
+import random
+
 from damage import Damage
 from decorators import cast_spell
-from models.spells.loader import load_paladin_spells_for_level
 from entities import Character, Monster, CHARACTER_DEFAULT_EQUIPMENT
 from heal import HolyHeal
+from models.spells.loader import load_paladin_spells_for_level
 from spells import PaladinSpell
 
 
@@ -54,7 +56,7 @@ class Paladin(Character):
             # level up multiple times
             for i in range(self.level, to_level):
                 self._level_up()
-            self.xp_req_to_level = self._lookup_next_xp_level_req()
+            self.xp_req_to_level: int = self._lookup_next_xp_level_req()
         else:
             # level up once
             super()._level_up()
@@ -75,7 +77,7 @@ class Paladin(Character):
             else:
                 self.learn_new_spell(spell=available_spell)
 
-    def learn_new_spell(self, spell: dict):
+    def learn_new_spell(self, spell: PaladinSpell):
         print(f"You have learned a new spell - {spell.name}")
 
         self.learned_spells[spell.name] = spell
@@ -86,7 +88,7 @@ class Paladin(Character):
         """
         yield from load_paladin_spells_for_level(level)
 
-    def update_spell(self, spell: dict):
+    def update_spell(self, spell: PaladinSpell):
         spell_name = spell.name
         self.learned_spells[spell_name] = spell
         print(f'Spell {spell.name} has been updated to rank {spell.rank}!')
@@ -117,7 +119,7 @@ class Paladin(Character):
         """
         mana_cost = spell.mana_cost
         self.mana -= mana_cost
-        # self._spell_trigger_cd(self.KEY_SEAL_OF_RIGHTEOSNESS)
+
         self.SOR_ACTIVE = True
         self.SOR_TURNS = 3
         print(f'{self.name} activates {self.KEY_SEAL_OF_RIGHTEOUSNESS}!')
@@ -141,9 +143,8 @@ class Paladin(Character):
         mana_cost = spell.mana_cost
         heal = HolyHeal(heal_amount=spell.heal1)
 
-        self.health += heal  # TODO: Handle overheal otherwhere... is it not handled btw?
+        self.health += heal
         self.mana -= mana_cost
-        # self._spell_trigger_cd(self.KEY_FLASH_OF_LIGHT)
 
         if self.health > self.max_health:  # check for overheal
             overheal = self._handle_overheal()
@@ -172,12 +173,9 @@ class Paladin(Character):
 
     # SPELLS
 
-    def get_auto_attack_damage(self, target_level: int) -> tuple:
-        import random
-
+    def get_auto_attack_damage(self, target_level: int) -> (Damage, int):
         level_difference = self.level - target_level
-        percentage_mod = (
-            abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
+        percentage_mod = (abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
 
         sor_damage = 0
         damage_to_deal = random.randint(int(self.min_damage), int(self.max_damage) + 1)
@@ -186,9 +184,7 @@ class Paladin(Character):
             sor_damage = self._spell_seal_of_righteousness_attack()
 
         # 10% more or less damage for each level that differs
-        if level_difference == 0:
-            pass
-        elif level_difference < 0:  # monster is bigger level
+        if level_difference < 0:  # monster is bigger level
             damage_to_deal -= damage_to_deal * percentage_mod  # -X%
             sor_damage -= sor_damage * percentage_mod
         elif level_difference > 0:  # character is bigger level
@@ -198,14 +194,13 @@ class Paladin(Character):
         return Damage(phys_dmg=damage_to_deal, magic_dmg=sor_damage), sor_damage
 
     def attack(self, victim: Monster):
-        attacker_swing = self.get_auto_attack_damage(
-            victim.level)  # tuple holding Damage object and seal damage (if active)
+        attacker_swing: (Damage, int) = self.get_auto_attack_damage(victim.level)
 
-        auto_attack = attacker_swing[0]  # type: Damage
+        auto_attack: Damage = attacker_swing[0]  # type: Damage
         # the sor_damage below is used just to check for printing
-        sor_damage = attacker_swing[1]  # if the seal isn't active the damage will be 0
+        sor_damage: int = attacker_swing[1]  # if the seal isn't active the damage will be 0
 
-        auto_attack_print = victim.get_take_attack_damage(auto_attack, self.level)
+        auto_attack_print = victim.get_take_attack_damage_repr(auto_attack, self.level)
         if sor_damage:
             print(f'{self.name} attacks {victim.name} for {auto_attack_print} from {self.KEY_SEAL_OF_RIGHTEOUSNESS}!')
         else:
@@ -220,4 +215,8 @@ class Paladin(Character):
         return self.mana >= mana_cost
 
     def get_class(self):
-        return 'paladin'
+        """
+        Return the class name in lowercase.
+        Ex: paladin
+        """
+        return self.__class__.__name__.lower()
