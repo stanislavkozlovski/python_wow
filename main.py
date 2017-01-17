@@ -1,16 +1,15 @@
 import atexit
-from database.main import cursor
+from database.main import cursor, session
 from models import main as _  # load all the DB models
 from command_router import route_main_commands
 from information_printer import print_live_monsters, print_live_npcs, welcome_print
 from zones.zone import Zone
 from items import Weapon
-from save_character import save_character
+from models.characters.saver import save_character
 from start_game_prompt import get_player_character
 from zones.northshire_abbey import NorthshireAbbey
 GAME_VERSION = '0.0.6 ALPHA'
 ZONES = {"Northshire Abbey": None}
-
 
 def main():
     welcome_print(GAME_VERSION)
@@ -44,7 +43,7 @@ def get_zone_object(zone: str) -> Zone:
 
 def on_exit_handler(character):
     """ saves the character when the user quits the game"""
-    save_character(character, cursor)
+    save_character(character)
 
 if __name__ == '__main__':
     main()

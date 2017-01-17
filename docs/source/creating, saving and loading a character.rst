@@ -82,37 +82,42 @@ A character is saved in one of three scenarios:
 #. The user types in the `save` command
 #. The user quits the game in the conventional way, using Ctrl-C from the command line.
 
-Saving a character is handled by the `save_character` command in the `save_character.py` file.
+Saving a character is handled by the `save_character` command in the `models/characters/saver.py` file.
 There, we generate IDs for the saved character sub-tables or load them from the DB, if the character has been saved before.
 
 We save the character's info in the main table::
     
-    cursor.execute("INSERT INTO saved_character VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                       [character.name, character_class, character_level, character_loaded_scripts_ID,
-                        character_killed_monsters_ID, character_completed_quests_ID, character_equipment_ID, character_inventory_ID,
-                        character_gold])
+    char_to_save = SavedCharacterSchema(name=character.name, character_class=character_class, level=character_level, gold=character_gold,
+                                        scripts_id=character_loaded_scripts_id, monsters_id=character_killed_monsters_id,
+                                        quests_id=character_completed_quests_id, inventory_id=character_inventory_id,
+                                        head_id=headpiece_id, shoulder_id=shoulderpad_id, necklace_id=necklace_id,
+                                        chestguard_id=chestguard_id, belt_id=belt_id, bracer_id=bracer_id,
+                                        gloves_id=gloves_id, leggings_id=leggings_id, boots_id=boots_id)
+    session.add(char_to_save)
+    session.commit()
                         
 It is worth noting that before inserting rows into the database, each function calls the `delete_rows_from_table`::
 
-    ALLOWED_TABLES_TO_DELETE_FROM = ['saved_character_completed_quests', 'saved_character_inventory',
-                                 'saved_character_killed_monsters', 'saved_character_loaded_scripts',
-                                 'saved_character_equipment', 'saved_character']
+    def delete_rows_from_table(table_name: str, id: int):
     """
     This function will delete every row in TABLE_NAME with an id of ID
+    :param table_name: a string -> "saved_character_loaded_scripts" for example
+    :param id:  the id of the rows we want to delete -> 1
+
     The function is used whenever we want to save new information. To save the new updated information, we have to
     delete the old one first.
     """
     if table_name in ALLOWED_TABLES_TO_DELETE_FROM:
-        cursor.execute("DELETE FROM {table_name} WHERE id = ?".format(table_name=table_name), [id])
+        session.query(ALLOWED_TABLES_TO_DELETE_FROM[table_name]).filter_by(id=id).delete()
+        session.commit()
     else:
-        raise Exception("You do not have permission to delete from the {} table!".format(table_name))
-
+        raise Exception(f'You do not have permission to delete from the {table_name} table!')
 Finally, we save each sub-table::
 
-    save_loaded_scripts(character_loaded_scripts_ID, character.loaded_scripts, cursor)
-    save_killed_monsters(character_killed_monsters_ID, character.killed_monsters, cursor)
-    save_completed_quests(character_completed_quests_ID, character.completed_quests, cursor)
-    save_inventory(character_inventory_ID, character.inventory, cursor)
+    save_loaded_scripts(character_loaded_scripts_ID, character.loaded_scripts)
+    save_killed_monsters(character_killed_monsters_ID, character.killed_monsters)
+    save_completed_quests(character_completed_quests_ID, character.completed_quests)
+    save_inventory(character_inventory_ID, character.inventory)
 
 The functions in there are pretty straightforward, the Character class has sets for the scripts he's loaded, special monsters he's killed, quests he's completed and inventory he has. In the functions above, we simply iterate through the sets and insert a row for each value.
 

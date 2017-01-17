@@ -465,7 +465,7 @@ class Character(LivingThing):
         self.loaded_scripts = loaded_scripts  # holds the scripts that the character has seen (which should load only once)
         self.killed_monsters = killed_monsters  # a set that holds the GUIDs of the creatures that\
         #  the character has killed (and that should not be killable a second time)
-        self.completed_quests = completed_quests  # a set that holds the ids of the quests that the character has completed
+        self.completed_quests = completed_quests  #  a set that holds the ids of the quests that the character has completed
         self.quest_log = {}
         self.inventory = saved_inventory # dict Key: str, Value: tuple(Item class instance, Item Count)
         self.equipment = saved_equipment # dict Key: Equipment slot, Value: object of class Equipment

@@ -59,6 +59,29 @@ class SavedCharacterSchema(Base):
     leggings: ItemTemplateSchema or None = relationship('ItemTemplateSchema', foreign_keys=[leggings_id])
     boots: ItemTemplateSchema or None = relationship('ItemTemplateSchema', foreign_keys=[boots_id])
 
+    def __init__(self, name: str, character_class: str, level: int, loaded_scripts_id: int, killed_monsters_id: int, completed_quests_id: int,
+                 inventory_id: int, gold: int, headpiece_id: int, shoulderpad_id: int, necklace_id: int, chestguard_id: int,
+                 bracer_id: int, gloves_id: int, belt_id: int, leggings_id: int, boots_id: int):
+        # A init function for easily creating an object when wanting to insert a new row in the table
+        super().__init__()
+        self.name = name
+        self.character_class = character_class
+        self.level = level
+        self.loaded_scripts_id = loaded_scripts_id
+        self.killed_monsters_id = killed_monsters_id
+        self.completed_quests_id = completed_quests_id
+        self.inventory_id = inventory_id
+        self.gold = gold
+        self.headpiece_id = headpiece_id
+        self.shoulderpad_id = shoulderpad_id
+        self.necklace_id = necklace_id
+        self.chestguard_id = chestguard_id
+        self.bracer_id = bracer_id
+        self.gloves_id = gloves_id
+        self.belt_id = belt_id
+        self.leggings_id = leggings_id
+        self.boots_id = boots_id
+
     def build_equipment(self) -> {str: 'Item' or None}:
         """
         Create a dictionary holding the character's equipment as the Character class holds it

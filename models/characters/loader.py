@@ -1,5 +1,4 @@
 from sqlalchemy.orm import load_only
-
 from models.characters.saved_character import SavedCharacterSchema
 from database.main import session
 
