@@ -56,6 +56,9 @@ class Item:
     def __str__(self):
         return colored(f'{self.name}', color="grey") + ' - Miscellaneous Item'
 
+    def __eq__(self, other):
+        return self.id == other.id
+
 
 class Weapon(Item):
     def __init__(self, name: str, item_id: int, buy_price: int = 0, sell_price: int = 0, min_damage: int = 0,
