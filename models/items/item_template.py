@@ -64,7 +64,7 @@ class ItemTemplateSchema(Base):
         if item_type == 'misc':
             item_quest_id = self.quest_id
             return Item(name=item_name, item_id=item_id, buy_price=item_buy_price, sell_price=item_sell_price,
-                        quest_ID=item_quest_id)
+                        quest_id=item_quest_id)
         elif item_type in ['weapon', 'equipment']:
             item_health: int = parse_int(self.health)
             item_mana: int = parse_int(self.mana)

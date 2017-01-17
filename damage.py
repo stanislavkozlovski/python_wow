@@ -23,7 +23,6 @@ class Damage:
         if self.phys_absorbed:
             phys_dmg_print = f'{self.phys_dmg:.2f} physical damage ({self.phys_absorbed:.2f} absorbed)'
 
-
         magic_dmg_print = ""
         if self.magic_dmg:
             magic_dmg_print = f'{self.magic_dmg:.2f} magical damage'
@@ -100,7 +99,7 @@ class Damage:
                 self.phys_absorbed = self.phys_dmg
                 self.phys_dmg = 0
             else:
-                #shield is smaller
+                #  shield is smaller
                 self.phys_dmg -= absorption_shield
                 self.phys_absorbed = absorption_shield
                 absorption_shield = 0

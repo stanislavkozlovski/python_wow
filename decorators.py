@@ -45,7 +45,7 @@ def db_connection(func):
 
 
 def run_once(func):
-    "A decorator that runs a function only once."
+    """A decorator that runs a function only once."""
 
     def decorated(*args, **kwargs):
         try:

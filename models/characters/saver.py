@@ -74,7 +74,7 @@ def save_loaded_scripts(char_id: int, loaded_scripts: set):
     id,    script_name
       1,     HASKELL_PRAXTON_CONVERSATION
 
-    :param id: the ID we have to save as
+    :param char_id: the ID of the character we have to save the loaded scripts to
     :param loaded_scripts: a set containing all the names -> {HASKEL_PRAXTON_CONVERSATION} in this case
     """
 

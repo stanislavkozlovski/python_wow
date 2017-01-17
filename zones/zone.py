@@ -21,7 +21,7 @@ class Zone:
 
     def move_player(self, current_subzone: str, destination: str, character):
         """
-
+        :param character: The character that is going to be moved
         :param current_subzone: the subzone the character is in
         :param destination: the subzone he wants to go in
         :return: a boolean indicating if the move is possible

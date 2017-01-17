@@ -112,6 +112,7 @@ def pac_opened_inventory():
     print("\t?")
     print("\t\tShows a list of available commands.\n")
 
+
 def pac_map_directions(possible_routes: list):
     """
     Prints all possible subzones you can go in from your current subzone
@@ -127,27 +128,27 @@ def print_class_abilities_in_combat(character: Character):
         print_paladin_abilities_in_combat(character)
 
 
-######### PALADIN #########
+# ---------------------PALADIN---------------------
 def print_paladin_abilities_in_combat(character: Paladin):
     print("\tsor")
     print("\t\tCasts Seal of Righteousness")
-    print(f"\t\t\tMana Cost: {character.learned_spells['Seal of Righteousness']['mana_cost']}")
+    print(f"\t\t\tMana Cost: {character.learned_spells['Seal of Righteousness'].mana_cost}")
     print("'\t\t\tLasts three turns and adds {0} damage to each of your auto attacks\n".format(
-        character.learned_spells['Seal of Righteousness'][
-            'damage_on_swing']))  # TODO: rename damage_on_swing to damage_1
+        character.learned_spells['Seal of Righteousness'].damage1))
 
     if "Melting Strike" in character.learned_spells.keys():
         print("\tms")
         print("\t\tCasts Melting Strike")
         print(f'\t\t\tMana Cost: {character.learned_spells["Melting Strike"]["mana_cost"]}')
         print(f'\t\t\tDamages an enemy for '
-              f'{character.learned_spells["Melting Strike"]["damage_1"]} damage and adds a damage over time effect to it.\n')
+              f'{character.learned_spells["Melting Strike"].damage1} damage and adds a damage over time effect to it.\n')
 
     if "Flash of Light" in character.learned_spells.keys():
         print("\tfol")
         print("\t\tCasts Flash of Light")
-        print(f"\t\t\tMana Cost: {character.learned_spells['Flash of Light']['mana_cost']}")
-        print(f"\t\t\tHeals the paladin for {character.learned_spells['Flash of Light']['heal_1']} damage.")  # TODO: Move to a method in paladin that gives heal amount of spell name
+        print(f"\t\t\tMana Cost: {character.learned_spells['Flash of Light'].mana_cost}")
+        # TODO: Move to a method in paladin that gives heal amount of spell name
+        print(f"\t\t\tHeals the paladin for {character.learned_spells['Flash of Light'].heal1} damage.")
 
 
 def get_available_paladin_abilities(character: Paladin):
