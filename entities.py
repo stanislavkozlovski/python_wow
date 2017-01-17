@@ -5,14 +5,12 @@ import random
 from termcolor import colored
 
 from database.main import cursor
-from constants import CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS
+from constants import CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS
 from exceptions import ItemNotInInventoryError
 from items import Item, Weapon, Potion, Equipment
-from loader import load_character_xp_requirements
 from quest import Quest, FetchQuest
 from damage import Damage
 from buffs import BeneficialBuff, DoT
-
 
 
 class LivingThing:
@@ -468,7 +466,6 @@ class Character(LivingThing):
         self.killed_monsters = killed_monsters  # a set that holds the GUIDs of the creatures that\
         #  the character has killed (and that should not be killable a second time)
         self.completed_quests = completed_quests  # a set that holds the ids of the quests that the character has completed
-        self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements(cursor)
         self.quest_log = {}
         self.inventory = saved_inventory # dict Key: str, Value: tuple(Item class instance, Item Count)
         self.equipment = saved_equipment # dict Key: Equipment slot, Value: object of class Equipment
@@ -925,7 +922,7 @@ class Character(LivingThing):
                 print(f'\t{item_count} {item}')
 
     def _lookup_next_xp_level_req(self):
-        return self._REQUIRED_XP_TO_LEVEL[self.level]
+        return CHARACTER_LEVEL_XP_REQUIREMENTS[self.level]
 
     def loaded_script(self, script_name: str):
         """

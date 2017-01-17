@@ -1,10 +1,11 @@
 """ This file holds constant variables """
 from models.creatures.creature_defaults.loader import load_creature_defaults
-from models.misc.loader import load_character_level_stats
+from models.misc.loader import load_character_level_stats, load_character_xp_requirements
 
 # these functions run only once due to a decorator
 CREATURE_DEFAULT_VALUES = load_creature_defaults()
 CHARACTER_LEVELUP_BONUS_STATS = load_character_level_stats()
+CHARACTER_LEVEL_XP_REQUIREMENTS = load_character_xp_requirements()
 
 CHARACTER_EQUIPMENT_HEADPIECE_KEY = 'headpiece'
 CHARACTER_EQUIPMENT_SHOULDERPAD_KEY = 'shoulderpad'
