@@ -7,9 +7,9 @@ from commands import pac_main_ooc, pac_map_directions, pac_in_combat, pac_vendor
 from information_printer import (print_live_npcs, print_live_monsters, print_quest_item_choices,
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar,
                                  print_character_equipment)
-from database.main import cursor
 
 # handlers here!
+
 
 def handle_talk_to_command(command:str, character, zone_object: Zone):
     alive_npcs, guid_name_set = zone_object.get_cs_npcs()

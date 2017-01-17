@@ -1,5 +1,5 @@
 import atexit
-from database.main import cursor, session
+import database.main
 from models import main as _  # load all the DB models
 from command_router import route_main_commands
 from information_printer import print_live_monsters, print_live_npcs, welcome_print
@@ -10,6 +10,7 @@ from start_game_prompt import get_player_character
 from zones.northshire_abbey import NorthshireAbbey
 GAME_VERSION = '0.0.6 ALPHA'
 ZONES = {"Northshire Abbey": None}
+
 
 def main():
     welcome_print(GAME_VERSION)

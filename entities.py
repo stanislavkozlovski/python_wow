@@ -4,7 +4,6 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 import random
 from termcolor import colored
 
-from database.main import cursor
 from constants import CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS
 from exceptions import ItemNotInInventoryError
 from items import Item, Weapon, Potion, Equipment

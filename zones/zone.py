@@ -1,7 +1,6 @@
 """
 This is the base class for zones. Every zone in the game will inherit from this class.
 """
-from database.main import cursor
 from models.quests.loader import load_quests
 from models.creatures.loader import load_monsters, load_npcs
 

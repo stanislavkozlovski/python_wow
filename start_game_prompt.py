@@ -9,7 +9,6 @@ from information_printer import print_available_character_classes, print_availab
 from models.characters.loader import load_all_saved_characters_general_info
 from models.characters.loader import load_saved_character
 from exceptions import NoSuchCharacterError
-from database.main import cursor
 AVAILABLE_CLASSES = ['paladin']
 
 

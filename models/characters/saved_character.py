@@ -19,7 +19,6 @@ class SavedCharacterSchema(Base):
         name - the name of the character
         character_class - the class of the character
         level - the level of the character
-        XXX_id - the ID to the row in the saved_character_XXX table associated with this saved character
         gold - the amount of gold the character has
     """
     __tablename__ = 'saved_character'
@@ -28,16 +27,7 @@ class SavedCharacterSchema(Base):
     name = Column(String(60))
     character_class = Column('class', String(60))
     level = Column(Integer)
-    loaded_scripts_id = Column(Integer, ForeignKey('saved_character_loaded_scripts.saved_character_id'))
-    killed_monsters_id = Column(Integer, ForeignKey('saved_character_killed_monsters.saved_character_id'))
-    completed_quests_id = Column(Integer, ForeignKey('saved_character_completed_quests.saved_character_id'))
-    inventory_id = Column(Integer, ForeignKey('saved_character_inventory.saved_character_id'))
     gold = Column(Integer)
-
-    loaded_scripts = relationship('LoadedScriptsSchema', foreign_keys=[loaded_scripts_id], uselist=True)
-    killed_monsters = relationship('KilledMonstersSchema', foreign_keys=[killed_monsters_id], uselist=True)
-    inventory = relationship('InventorySchema', foreign_keys=[inventory_id], uselist=True)
-    completed_quests = relationship('CompletedQuestsSchema', foreign_keys=[completed_quests_id], uselist=True)
 
     headpiece_id = Column(Integer, ForeignKey('item_template.entry'))
     shoulderpad_id = Column(Integer, ForeignKey('item_template.entry'))
@@ -59,18 +49,14 @@ class SavedCharacterSchema(Base):
     leggings: ItemTemplateSchema or None = relationship('ItemTemplateSchema', foreign_keys=[leggings_id])
     boots: ItemTemplateSchema or None = relationship('ItemTemplateSchema', foreign_keys=[boots_id])
 
-    def __init__(self, name: str, character_class: str, level: int, loaded_scripts_id: int, killed_monsters_id: int, completed_quests_id: int,
-                 inventory_id: int, gold: int, headpiece_id: int, shoulderpad_id: int, necklace_id: int, chestguard_id: int,
-                 bracer_id: int, gloves_id: int, belt_id: int, leggings_id: int, boots_id: int):
+    def __init__(self, name: str, character_class: str, level: int, gold: int, headpiece_id: int,
+                 shoulderpad_id: int, necklace_id: int, chestguard_id: int, bracer_id: int, gloves_id: int,
+                 belt_id: int, leggings_id: int, boots_id: int):
         # A init function for easily creating an object when wanting to insert a new row in the table
         super().__init__()
         self.name = name
         self.character_class = character_class
         self.level = level
-        self.loaded_scripts_id = loaded_scripts_id
-        self.killed_monsters_id = killed_monsters_id
-        self.completed_quests_id = completed_quests_id
-        self.inventory_id = inventory_id
         self.gold = gold
         self.headpiece_id = headpiece_id
         self.shoulderpad_id = shoulderpad_id
@@ -130,12 +116,12 @@ class SavedCharacterSchema(Base):
 class CompletedQuestsSchema(Base):
     """
     This table holds information about the completed quests for a specific character
-        id - id of the row (NOT unique)
+        saved_character_id - id of the character (NOT unique)
         quest_id - the id of the quest that is completed
     Ex:
-    id, quest_id
-     1,   1
-     1,   2
+    saved_character_id, quest_id
+                    1,   1
+                    1,   2
     Meaning that the character whose completed_quests_id points to 1 has completed both quests - (1)Kill Wolves and (2)Kill Bears
     """
     # TODO: Holds more completed quests per row to minimize queries
@@ -145,19 +131,20 @@ class CompletedQuestsSchema(Base):
     saved_character_id = Column(Integer, ForeignKey('saved_character.entry'))
     quest_id = Column(String, ForeignKey('quest_template.entry'))
 
+    _ = relationship('SavedCharacterSchema', foreign_keys=[saved_character_id], backref='completed_quests')
     quest = relationship('QuestSchema')
 
 
 class InventorySchema(Base):
     """
     This table holds information about the inventory of a specific character
-        id - id of the entry (NOT unique)
+        saved_character_id - id of the character (NOT unique)
         item_id - the ID of the item in item_template
         item_count - the count of the item
     Example:
-        id, item_id, item_count
-         1,       1,         5
-         1,       2,         1
+        saved_character_id, item_id, item_count
+                         1,       1,         5
+                         1,       2,         1
     Meaning the character whose inventory_id points to 1 has
         - 5 items of id 1
         - 1 item of id 2
@@ -170,18 +157,19 @@ class InventorySchema(Base):
     item_id = Column(Integer, ForeignKey('item_template.entry'), primary_key=True)
     item_count = Column(Integer)
 
+    _ = relationship('SavedCharacterSchema', foreign_keys=[saved_character_id], backref='inventory')
     item = relationship('ItemTemplateSchema')
 
 
 class KilledMonstersSchema(Base):
     """
     This table holds information about all the monsters that the character has killed into the saved_character_killed_monsters DB table
-        id - id of the entry (NOT unique)
+        saved_character_id - id of the character (NOT unique)
         GUID - GUID of the monster in the creatures DB table
     Table sample contents:
-         id,    GUID(of monster)
-          1,     14
-          1,      7
+         saved_character_id,    GUID(of monster)
+                          1,     14
+                          1,      7
     IMPORTANT: This works only for monsters that by design should not be killed twice if the player restarts the game
     """
     # TODO: Hold more killed monsters per row to minimize queries
@@ -191,18 +179,19 @@ class KilledMonstersSchema(Base):
     saved_character_id = Column(Integer, ForeignKey('saved_character.entry'))
     guid = Column(Integer, ForeignKey('creatures.guid'))
 
+    _ = relationship('SavedCharacterSchema', foreign_keys=[saved_character_id], backref='killed_monsters')
     monster = relationship('CreaturesSchema')
 
 
 class LoadedScriptsSchema(Base):
     """
     This table holds the character's loaded scripts into the saved_character_loaded_scripts DB table
-        id - id of the entry (NOT unique)
+        saved_character_id - id of the character (NOT unique)
         script_name - the name of the script
     Table sample contents:
-    id,    script_name
-      1,     HASKELL_PRAXTON_CONVERSATION
-      1,     Something_Something_Something
+    saved_character_id,    script_name
+                     1,     HASKELL_PRAXTON_CONVERSATION
+                     1,     Something_Something_Something
     Meaning the character whose loaded_scripts_id has seen both scripts and should not see them again in the game.
     """
     # TODO: Hold more scripts per row to minimize queries
@@ -210,4 +199,6 @@ class LoadedScriptsSchema(Base):
 
     id = Column(Integer, primary_key=True)
     saved_character_id = Column(Integer, ForeignKey('saved_character.entry'))
+
+    _ = relationship('SavedCharacterSchema', foreign_keys=[saved_character_id], backref='loaded_scripts')
     script_name = Column(Text)
