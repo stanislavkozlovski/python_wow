@@ -39,7 +39,8 @@ class Paladin(Character):
         self.max_damage = 3
         self._lookup_and_handle_new_spells()
 
-        if level > 1: self._level_up(to_level=level)
+        if level > 1:
+            self._level_up(to_level=level)
 
 
     def leave_combat(self):
@@ -47,7 +48,9 @@ class Paladin(Character):
         self.SOR_ACTIVE = False  # Remove SOR aura
 
     def _level_up(self, to_level: int=0):
-        """ This method levels the character up, if we're given a to_level we need to level up until we get to that level"""
+        """
+        This method levels the character up, if we're given a to_level we need to level up until we get to that level
+        """
         if to_level:
             # level up multiple times
             for i in range(self.level, to_level):
@@ -141,7 +144,7 @@ class Paladin(Character):
 
     def spell_handler(self, command: str, target: Monster) -> bool:
         """
-
+        :param target: The target the spell is cast on
         :param command: Command telling you which spell to use
         :return: Returns a boolean indicating if the cast was successful or not
         """

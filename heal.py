@@ -34,7 +34,7 @@ class NatureHeal(Heal):
     """
     The idea with nature heal is that every such heal leaves off a HoT (healing over time effect) for a % of the main heal
     """
-    pass # TODO: IMPLEMENT
+    pass  # TODO: IMPLEMENT
 
 
 class HolyHeal(Heal):

@@ -46,12 +46,12 @@ def display_attributes(attributes: dict) -> str:
 
 
 class Item:
-    def __init__(self, name: str, item_id: int, buy_price: int, sell_price: int, quest_ID: int=0):
+    def __init__(self, name: str, item_id: int, buy_price: int, sell_price: int, quest_id: int=0):
         self.name = name
         self.id = item_id
         self.buy_price = buy_price
         self.sell_price = sell_price
-        self.quest_ID = quest_ID
+        self.quest_id = quest_id
 
     def __str__(self):
         return colored(f'{self.name}', color="grey") + ' - Miscellaneous Item'
@@ -86,8 +86,8 @@ class Equipment(Item):
 
 class Potion(Item):
     """ Consumable item that gives a buff to the player"""
-    def __init__(self, name: str, item_id: int, buy_price: int, sell_price: int, buff: BeneficialBuff, quest_ID: int=0, ):
-        super().__init__(name, item_id, buy_price, sell_price, quest_ID)
+    def __init__(self, name: str, item_id: int, buy_price: int, sell_price: int, buff: BeneficialBuff, quest_id: int=0, ):
+        super().__init__(name, item_id, buy_price, sell_price, quest_id)
         self.buff = buff
 
     def __str__(self):

@@ -105,6 +105,7 @@ def create_fill_row_string(slot1: str, slot2: str, gap_space: int):
     """ creates a gap with variable spaces according to the length of the slot string """
     return '|' + slot1 + (' ' * (gap_space-(2 + len(slot1) + len(slot2)))) + slot2 + '|'
 
+
 def get_gap_between_two_equipment_items(first_item_str, second_item_str, gap_length) -> str:
     """ Specifically made for the print_character_equipment function, because we want to have an
     even gap between every printed items, we need to do this calculation to get the appropriate
@@ -180,8 +181,8 @@ def print_quest_item_choices(quest_item_rewards: dict):
 
 def print_available_character_classes():
     """
-    this function is called when the player is creating a new character. It displays the available classes to pick from and
-    some information about the class
+    this function is called when the player is creating a new character. It displays the available classes to pick from
+    and some information about the class
     """
     print("| "*20)
     print("Available classes: \n")

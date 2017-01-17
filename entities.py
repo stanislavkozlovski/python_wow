@@ -4,10 +4,10 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 
 import random
 from termcolor import colored
-from database.main import cursor
-from items import  Item, Weapon, Potion, Equipment
-from loader import (load_creature_defaults, load_character_level_stats,
-                    load_character_xp_requirements, load_loot_table, load_item, load_vendor_inventory)
+
+from constants import CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS
+from exceptions import ItemNotInInventoryError
+from items import Item, Weapon, Potion, Equipment
 from quest import Quest, FetchQuest
 from damage import Damage
 from buffs import BeneficialBuff, DoT
@@ -136,7 +136,7 @@ class LivingThing:
         buffs_to_remove = []  # type: list of Buffs
 
         # iterate through active buffs and reduce duration
-        for buff in list(filter(lambda buff: isinstance(buff, BeneficialBuff), self.buffs.keys())):
+        for buff in filter(lambda bf: isinstance(bf, BeneficialBuff), self.buffs.keys()):
             # reduce duration by 1 turn
             turns_left = self.buffs[buff]
             turns_left -= 1
@@ -189,7 +189,6 @@ class LivingThing:
                 # TODO: Reduce mana method to reduce active mana too
                 self.max_mana -= buff_amount
 
-
     def _apply_armor_reduction(self, damage: Damage, attacker_level: int) -> Damage:
         """
         This method applies the armor reduction to a blow, the formula is as follows:
@@ -238,7 +237,8 @@ class LivingThing:
         # due to the way Damage handles addition, subtraction and multiplication, the _calculate_level_difference_damage
         # method below works fine with Damage type
         # noinspection PyTypeChecker
-        dot_proc_damage = self._calculate_level_difference_damage(damage_to_deal=dot_proc_damage, target_level=dot.level,
+        dot_proc_damage = self._calculate_level_difference_damage(damage_to_deal=dot_proc_damage,
+                                                                  target_level=dot.level,
                                                                   inverse=True)
         # noinspection PyTypeChecker
         dot_proc_damage = self._apply_damage_absorption(damage=dot_proc_damage)
@@ -300,6 +300,7 @@ class LivingThing:
                 damage.handle_absorption(self.absorption_shield) # only modify the specific damage in order to print it
 
         return damage
+
     def _die(self):
         self._alive = False
 
@@ -314,7 +315,7 @@ class FriendlyNPC(LivingThing):
     """
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id = 0, loot_table_ID: int = 0, gossip: str = 'Hello'):
+                 max_damage: int=1, quest_relation_id=0, loot_table: 'LootTable'=None, gossip: str = 'Hello'):
         super().__init__(name, health, mana, level)
         self.level = level
         self.min_damage = min_damage
@@ -334,9 +335,10 @@ class VendorNPC(FriendlyNPC):
     This is the class for the vendor NPCs in the world
     """
 
-    def __init__(self, name: str, entry: int, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id = 0, loot_table_ID: int = 0, gossip: str = 'Hello'):
-        super().__init__(name, health, mana, level, min_damage, max_damage, quest_relation_id, loot_table_ID, gossip)
+    def __init__(self, name: str, entry: int, inventory: dict, health: int=1, mana: int=1, level: int=1,
+                 min_damage: int=0, max_damage: int=1, quest_relation_id=0,
+                 loot_table: 'LootTable'=None, gossip: str='Hello'):
+        super().__init__(name, health, mana, level, min_damage, max_damage, quest_relation_id, loot_table, gossip)
         self.entry = entry
         # TODO: Move
         self.inventory = load_vendor_inventory(self.entry, cursor)  # type: dict: key-item_name(str), value: tuple(item object, count)
@@ -388,7 +390,8 @@ class VendorNPC(FriendlyNPC):
 
 class Monster(LivingThing):
     def __init__(self, monster_id: int, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id=0, loot_table_ID: int = 0, armor: int=0, gossip: str='',
+                 max_damage: int = 1, quest_relation_id=0, xp_to_give: int=0,
+                 gold_to_give_range: (int, int)=(0, 0), loot_table: 'LootTable'=None, armor: int=0, gossip: str='',
                  respawnable: bool=False):
         super().__init__(name, health, mana, level)
         self.monster_id = monster_id
@@ -399,9 +402,9 @@ class Monster(LivingThing):
         self.attributes[self.KEY_ARMOR] = armor if armor else lookup_default_creature_armor(self.level)
         self.gossip = gossip
         self.respawnable = respawnable  # says if the creature can ever respawn, once killed of course
-        self._gold_to_give = self._calculate_gold_reward(lookup_gold_reward(self.level))
-        self.quest_relation_ID = quest_relation_id
-        self.loot_table_ID = loot_table_ID
+        self._gold_to_give = self._calculate_gold_reward(gold_to_give_range)
+        self.quest_relation_id = quest_relation_id
+        self.loot_table = loot_table
         self.loot = {"gold": self._gold_to_give}  # dict Key: str, Value: Item class object
         # TODO: Add default monster armor for their level
 
@@ -419,7 +422,7 @@ class Monster(LivingThing):
         return Damage(phys_dmg=damage_to_deal)
 
     def attack(self, victim):  # victim: Character
-        monster_swing = self.get_auto_attack_damage(victim.level)  #  type: Damage
+        monster_swing: Damage = self.get_auto_attack_damage(victim.level)
 
         victim.take_attack(self.name, monster_swing, self.level)
 
@@ -528,10 +531,7 @@ class Character(LivingThing):
         self.loaded_scripts = loaded_scripts  # holds the scripts that the character has seen (which should load only once)
         self.killed_monsters = killed_monsters  # a set that holds the GUIDs of the creatures that\
         #  the character has killed (and that should not be killable a second time)
-        self.completed_quests = completed_quests  # a set that holds the name of the quests that the character has completed
-        # A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
-        self._LEVEL_STATS = load_character_level_stats(cursor)
-        self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements(cursor)
+        self.completed_quests = completed_quests  #  a set that holds the ids of the quests that the character has completed
         self.quest_log = {}
         self.inventory = saved_inventory # dict Key: str, Value: tuple(Item class instance, Item Count)
         self.equipment = saved_equipment # dict Key: Equipment slot, Value: object of class Equipment
@@ -663,14 +663,12 @@ class Character(LivingThing):
         self.attributes[self.KEY_STRENGTH] += agility * 0.5
         self.attributes[self.KEY_ARMOR] += agility * 2.5
 
-
         "Now we need to update our damage, because the strength might have been changed"
 
         # current formula for damage is: wep_dmg * 0.4 * strength
         strength = self.attributes[self.KEY_STRENGTH]
         self.min_damage = self.equipped_weapon.min_damage + (0.4 * strength)
         self.max_damage = self.equipped_weapon.max_damage + (0.4 * strength)
-
 
     def spell_handler(self, command: str, target: Monster):
         """
@@ -725,9 +723,6 @@ class Character(LivingThing):
                 self.attributes[buff_type] += buff_amount
 
             self._calculate_stats_formulas()  # always recalculate the formulas when stats are changed
-
-
-
 
     def _deapply_buff(self, buff: BeneficialBuff):
         """ Remove the buff from the character's stats"""
@@ -845,10 +840,10 @@ class Character(LivingThing):
         self.experience += xp_reward
         self.check_if_levelup()
 
-    def award_monster_kill(self, monster: Monster, monster_GUID: int):
+    def award_monster_kill(self, monster: Monster, monster_guid: int):
         monster_level = monster.level
         xp_reward = monster.xp_to_give
-        monster_quest_ID = monster.quest_relation_ID
+        monster_quest_ID = monster.quest_relation_id
 
         level_difference = self.level - monster_level
         xp_bonus_reward = 0
@@ -865,7 +860,7 @@ class Character(LivingThing):
             print(f'XP awarded: {xp_reward}!')
 
         if not monster.respawnable:
-            self.killed_monsters.add(monster_GUID)
+            self.killed_monsters.add(monster_guid)
 
         self._award_experience(xp_reward + xp_bonus_reward)
 
@@ -884,7 +879,7 @@ class Character(LivingThing):
     def award_item(self, item: Item, item_count=1):
         """ Take an item and put it into the character's inventory,
         store it as a tuple holding (Item Object, Item Count) """
-        item_quest_id = item.quest_ID
+        item_quest_id = item.quest_id
 
         if item.name not in self.inventory.keys():  # if we don't have the item
             self.inventory[item.name] = (item, item_count)
@@ -932,7 +927,7 @@ class Character(LivingThing):
         This function is used to add the attributes of all the character's equipment.
         NOTE: This is used only on the initial character load
         """
-        for item in filter(lambda item: item is not None, self.equipment.values()):
+        for item in filter(lambda itm: itm is not None, self.equipment.values()):
             self._add_attributes(item.attributes)
 
     def check_if_levelup(self):
@@ -1005,11 +1000,11 @@ class Character(LivingThing):
         """
         return script_name in self.loaded_scripts
 
-    def has_killed_monster(self, monster_GUID: int) -> bool:
+    def has_killed_monster(self, monster_guid: int) -> bool:
         """
         Returns a boolean whether the character has killed the specified monster before
         """
-        return monster_GUID in self.killed_monsters
+        return monster_guid in self.killed_monsters
 
     def has_completed_quest(self, quest_name: str) -> bool:
         """

@@ -2,23 +2,22 @@
 This module will handle the player's commands
 """
 from zones.zone import Zone
-from save_character import save_character
+from models.characters.saver import save_character
 from commands import pac_main_ooc, pac_map_directions, pac_in_combat, pac_vendor_dialogue, pac_opened_inventory
 from information_printer import (print_live_npcs, print_live_monsters, print_quest_item_choices,
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar,
                                  print_character_equipment)
-from database.main import cursor
 
 # handlers here!
 
-def handle_talk_to_command(command:str, character, zone_object: Zone):
+
+def handle_talk_to_command(command: str, character, zone_object: Zone):
     alive_npcs, guid_name_set = zone_object.get_cs_npcs()
 
     target = command[8:]  # name of NPC
 
     # return the guid for the npc we want to target, or None if there is no such one
     target_guid = get_guid_by_name(target, guid_name_set)
-
 
     # using the guid, target him from the alive_monsters dictionary
     if target_guid in alive_npcs.keys():
@@ -76,7 +75,7 @@ def handle_buy_from_command(command: str, character, zone_object: Zone):
         which initiates the while loop for browsing the vendor's inventory                      """
     target = command[9:]  # name of Vendor
 
-    alive_npcs, guid_name_set  = zone_object.get_cs_npcs()
+    alive_npcs, guid_name_set = zone_object.get_cs_npcs()
 
     # return the guid for the npc we want to target, or None if there is no such one
     target_guid = get_guid_by_name(target, guid_name_set)
@@ -112,7 +111,7 @@ def handle_vendor_sale(character, vendor):
             if character.has_item(item):
                 character.sell_item(item)
         elif 'info' in command:
-            item_name = command[:-5] # name of item
+            item_name = command[:-5]  # name of item
 
             item = vendor.get_item(item_name)
 
@@ -183,7 +182,7 @@ def handle_go_to_command(command: str, character, zone_object: Zone):
         # update _map directions
         print(f'Moved to {character.current_subzone}')
 
-        zone_object.engage_zone_entered_script(character) # engage a script if there is one
+        zone_object.engage_zone_entered_script(character)  # engage a script if there is one
 
         print_live_npcs(zone_object, print_all=True)
         print_live_monsters(zone_object)
@@ -218,7 +217,7 @@ def handle_quest_item_choice(item_rewards: dict):
 
 def handle_save_character_command(main_character):
     """ this function handles the 'save' command"""
-    save_character(main_character, cursor)
+    save_character(main_character)
 
 
 def handle_help_command():

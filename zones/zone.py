@@ -1,8 +1,8 @@
 """
 This is the base class for zones. Every zone in the game will inherit from this class.
 """
-from database.main import cursor
-from loader import load_monsters, load_npcs, load_quests
+from models.quests.loader import load_quests
+from models.creatures.loader import load_monsters, load_npcs
 
 
 class Zone:
@@ -21,7 +21,7 @@ class Zone:
 
     def move_player(self, current_subzone: str, destination: str, character):
         """
-
+        :param character: The character that is going to be moved
         :param current_subzone: the subzone the character is in
         :param destination: the subzone he wants to go in
         :return: a boolean indicating if the move is possible

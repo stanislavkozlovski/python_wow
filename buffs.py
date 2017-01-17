@@ -93,7 +93,7 @@ class BeneficialBuff(StatusEffect):
             if buff_amount:
                 buffed_attributes[buff_type] = buff_amount
 
-        return  buffed_attributes
+        return buffed_attributes
 
 
 # Damage over time debuff
@@ -114,3 +114,5 @@ class DoT(StatusEffect):
     def __str__(self):
         return f'{self.name} - Deals {self.damage} damage every turn for {self.duration} turns'
 
+    def update_caster_level(self, level: int):
+        self.level = level

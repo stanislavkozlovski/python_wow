@@ -1,6 +1,6 @@
-from commands import pac_looting,get_available_paladin_abilities
-from entities import Character, Monster
 from command_router import route_in_combat_non_ending_turn_commands
+from commands import pac_looting, get_available_paladin_abilities
+from entities import Character, Monster
 from information_printer import print_loot_table
 
 
@@ -79,13 +79,14 @@ def handle_monster_death(character: Character, monster: Monster, alive_monsters:
     """
     This function is called when a monster has just died
     :param character: the player's character
+    :param monster_GUID: the unique GUID of the monster
     :param monster: the monster that has died
     :param alive_monsters:Dictionary with the alive monsters in the subzone the player is in
     :param guid_name_set: Set which holds the name of each monster_GUID
     """
     print(f'{character.name} has slain {monster.name}!')
 
-    character.award_monster_kill(monster=monster, monster_GUID=monster_GUID)
+    character.award_monster_kill(monster=monster, monster_guid=monster_GUID)
     character.leave_combat()  # will exit the loop
 
     del alive_monsters[monster_GUID]  # removes the monster from the dictionary
@@ -128,7 +129,7 @@ def handle_loot(character: Character, monster: Monster):
                     character.award_gold(gold)
                     print(f'{character.name} has looted {gold} gold.')
             else:  # if we want to take an item
-                item = monster.give_loot(item_name = item_name)
+                item = monster.give_loot(item_name=item_name)
 
                 if item:  # if the loot is successful
                     character.award_item(item=item)

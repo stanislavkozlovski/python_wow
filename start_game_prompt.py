@@ -8,7 +8,6 @@ from classes import Paladin
 from information_printer import print_available_character_classes, print_available_characters_to_load
 from loader import load_saved_character, load_all_saved_characters_general_info
 from exceptions import NoSuchCharacterError
-from database.main import cursor
 AVAILABLE_CLASSES = ['paladin']
 
 
