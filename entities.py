@@ -5,14 +5,14 @@ import random
 from termcolor import colored
 
 from database.main import cursor
-from constants import CHARACTER_DEFAULT_EQUIPMENT
+from constants import CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS
 from exceptions import ItemNotInInventoryError
 from items import Item, Weapon, Potion, Equipment
-from loader import (load_character_level_stats,
-                    load_character_xp_requirements)
+from loader import load_character_xp_requirements
 from quest import Quest, FetchQuest
 from damage import Damage
 from buffs import BeneficialBuff, DoT
+
 
 
 class LivingThing:
@@ -468,8 +468,6 @@ class Character(LivingThing):
         self.killed_monsters = killed_monsters  # a set that holds the GUIDs of the creatures that\
         #  the character has killed (and that should not be killable a second time)
         self.completed_quests = completed_quests  # a set that holds the ids of the quests that the character has completed
-        # A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
-        self._LEVEL_STATS = load_character_level_stats(cursor)
         self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements(cursor)
         self.quest_log = {}
         self.inventory = saved_inventory # dict Key: str, Value: tuple(Item class instance, Item Count)
@@ -883,7 +881,7 @@ class Character(LivingThing):
     def _level_up(self):
         self.level += 1
 
-        current_level_stats = self._LEVEL_STATS[self.level]
+        current_level_stats = CHARACTER_LEVELUP_BONUS_STATS[self.level]
         # access the dictionary holding the appropriate value increases for each level
         hp_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_HEALTH]
         mana_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_MANA]

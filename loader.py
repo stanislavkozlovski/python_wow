@@ -78,44 +78,6 @@ def parse_int(value) -> int:
     """
     return int(value or 0)
 
-
-@db_connection
-def load_character_level_stats(cursor) -> dict:
-    """
-    Read the table file holding information about the amount of stats you should get according to the level you've attained
-    1 - level; 2 - hp; 3 - mana; 4 - strength; 5 - agility, 6 - armor;
-    :returns A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
-    """
-    key_level_stats_health = 'health'
-    key_level_stats_mana = 'mana'
-    key_level_stats_strength = 'strength'
-    key_level_stats_armor = 'armor'
-    key_level_stats_agility = 'agility'
-
-    level_stats = {}
-    lvl_stats_reader = cursor.execute("SELECT * FROM levelup_stats")
-
-    for line in lvl_stats_reader:
-        level_dict = {}
-
-        level = line[DBINDEX_LEVELUP_STATS_LEVEL]  # type: int
-        hp = parse_int(line[DBINDEX_LEVELUP_STATS_HEALTH])   # type: int
-        mana = parse_int(line[DBINDEX_LEVELUP_STATS_MANA])  # type: int
-        strength = parse_int(line[DBINDEX_LEVELUP_STATS_STRENGTH])  # type: int
-        agility = parse_int(line[DBINDEX_LEVELUP_STATS_AGILITY]) # type: int
-        armor = parse_int(line[DBINDEX_LEVELUP_STATS_ARMOR])  # type: int
-
-        level_dict[key_level_stats_health] = hp
-        level_dict[key_level_stats_mana] = mana
-        level_dict[key_level_stats_strength] = strength
-        level_dict[key_level_stats_agility] = agility
-        level_dict[key_level_stats_armor] = armor
-
-        level_stats[level] = level_dict
-
-    return level_stats
-
-
 @db_connection
 def load_character_xp_requirements(cursor) -> dict:
     """

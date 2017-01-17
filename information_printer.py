@@ -9,6 +9,7 @@ from constants import (CHARACTER_EQUIPMENT_BOOTS_KEY, CHARACTER_EQUIPMENT_BRACER
                        CHARACTER_EQUIPMENT_GLOVES_KEY, CHARACTER_EQUIPMENT_SHOULDERPAD_KEY,
                        CHARACTER_EQUIPMENT_BELT_KEY)
 
+
 def print_live_monsters(zone_object: Zone, print_all=False):
     """
     Prints the monsters that are alive in the current subzone
