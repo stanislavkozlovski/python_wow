@@ -15,7 +15,6 @@ Base = declarative_base()
 
 connection = sqlite3.connect(DB_PATH)
 cursor = connection.cursor()
-
-create_db_script = open('./create_test_db.sql', 'r').read()
+create_db_script = open(os.path.join(DIR_PATH, 'create_test_db.sql'), 'r').read()
 cursor.executescript(create_db_script)
 connection.commit()

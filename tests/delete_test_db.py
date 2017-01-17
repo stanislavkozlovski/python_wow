@@ -1,4 +1,4 @@
 import os
-
-if os.path.exists('test.db'):
-    os.remove('test.db')
+from tests.create_test_db import DIR_PATH
+if os.path.exists(os.path.join(DIR_PATH, 'test.db')):
+    os.remove(os.path.join(DIR_PATH, 'test.db'))
