@@ -1,5 +1,6 @@
 from database.main import session
 from models.misc.levelup_stats import LevelUpStats
+from models.misc.level_xp_requirement import LevelXpRequirement
 from decorators import run_once
 from utils.helper import parse_int
 
@@ -37,3 +38,13 @@ def load_character_level_stats() -> dict:
         }
 
     return level_stats
+
+
+@run_once
+def load_character_xp_requirements() -> {int: int}:
+    """
+    Load the information about the necessary XP needed to reach a certain level.
+    """
+    loaded_xp_reqs = session.query(LevelXpRequirement).all()
+
+    return {xp_req.level: xp_req.xp_required for xp_req in loaded_xp_reqs}
