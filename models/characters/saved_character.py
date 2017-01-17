@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
-from models.items.item_template import ItemTemplate
+from models.items.item_template import ItemTemplateSchema
 from entities import Character
 from constants import (CHARACTER_EQUIPMENT_BOOTS_KEY, CHARACTER_EQUIPMENT_LEGGINGS_KEY,
                        CHARACTER_EQUIPMENT_BELT_KEY, CHARACTER_EQUIPMENT_GLOVES_KEY,
@@ -13,7 +13,7 @@ from classes import Paladin
 from database.main import Base
 
 
-class SavedCharacter(Base):
+class SavedCharacterSchema(Base):
     """
     This table holds information about saved player characters
         name - the name of the character
@@ -34,10 +34,10 @@ class SavedCharacter(Base):
     inventory_id = Column(Integer, ForeignKey('saved_character_inventory.saved_character_id'))
     gold = Column(Integer)
 
-    loaded_scripts = relationship('LoadedScripts', foreign_keys=[loaded_scripts_id], uselist=True)
-    killed_monsters = relationship('KilledMonsters', foreign_keys=[killed_monsters_id], uselist=True)
-    inventory = relationship('Inventory', foreign_keys=[inventory_id], uselist=True)
-    completed_quests = relationship('CompletedQuests', foreign_keys=[completed_quests_id], uselist=True)
+    loaded_scripts = relationship('LoadedScriptsSchema', foreign_keys=[loaded_scripts_id], uselist=True)
+    killed_monsters = relationship('KilledMonstersSchema', foreign_keys=[killed_monsters_id], uselist=True)
+    inventory = relationship('InventorySchema', foreign_keys=[inventory_id], uselist=True)
+    completed_quests = relationship('CompletedQuestsSchema', foreign_keys=[completed_quests_id], uselist=True)
 
     headpiece_id = Column(Integer, ForeignKey('item_template.entry'))
     shoulderpad_id = Column(Integer, ForeignKey('item_template.entry'))
@@ -49,15 +49,15 @@ class SavedCharacter(Base):
     leggings_id = Column(Integer, ForeignKey('item_template.entry'))
     boots_id = Column(Integer, ForeignKey('item_template.entry'))
 
-    headpiece: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[headpiece_id])
-    shoulderpad: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[shoulderpad_id])
-    necklace: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[necklace_id])
-    chestguard: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[chestguard_id])
-    bracer: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[bracer_id])
-    gloves: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[gloves_id])
-    belt: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[belt_id])
-    leggings: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[leggings_id])
-    boots: ItemTemplate or None = relationship('ItemTemplate', foreign_keys=[boots_id])
+    headpiece: ItemTemplateSchema or None = relationship('ItemTemplateSchema', foreign_keys=[headpiece_id])
+    shoulderpad: ItemTemplateSchema or None = relationship('ItemTemplateSchema', foreign_keys=[shoulderpad_id])
+    necklace: ItemTemplateSchema or None = relationship('ItemTemplateSchema', foreign_keys=[necklace_id])
+    chestguard: ItemTemplateSchema or None = relationship('ItemTemplateSchema', foreign_keys=[chestguard_id])
+    bracer: ItemTemplateSchema or None = relationship('ItemTemplateSchema', foreign_keys=[bracer_id])
+    gloves: ItemTemplateSchema or None = relationship('ItemTemplateSchema', foreign_keys=[gloves_id])
+    belt: ItemTemplateSchema or None = relationship('ItemTemplateSchema', foreign_keys=[belt_id])
+    leggings: ItemTemplateSchema or None = relationship('ItemTemplateSchema', foreign_keys=[leggings_id])
+    boots: ItemTemplateSchema or None = relationship('ItemTemplateSchema', foreign_keys=[boots_id])
 
     def build_equipment(self) -> {str: 'Item' or None}:
         """
@@ -104,7 +104,7 @@ class SavedCharacter(Base):
             raise Exception(f'Unsupported class - {self.character_class}')
 
 
-class CompletedQuests(Base):
+class CompletedQuestsSchema(Base):
     """
     This table holds information about the completed quests for a specific character
         id - id of the row (NOT unique)
@@ -125,7 +125,7 @@ class CompletedQuests(Base):
     quest = relationship('QuestSchema')
 
 
-class Inventory(Base):
+class InventorySchema(Base):
     """
     This table holds information about the inventory of a specific character
         id - id of the entry (NOT unique)
@@ -147,10 +147,10 @@ class Inventory(Base):
     item_id = Column(Integer, ForeignKey('item_template.entry'), primary_key=True)
     item_count = Column(Integer)
 
-    item = relationship('ItemTemplate')
+    item = relationship('ItemTemplateSchema')
 
 
-class KilledMonsters(Base):
+class KilledMonstersSchema(Base):
     """
     This table holds information about all the monsters that the character has killed into the saved_character_killed_monsters DB table
         id - id of the entry (NOT unique)
@@ -168,10 +168,10 @@ class KilledMonsters(Base):
     saved_character_id = Column(Integer, ForeignKey('saved_character.entry'))
     guid = Column(Integer, ForeignKey('creatures.guid'))
 
-    monster = relationship('Creatures')
+    monster = relationship('CreaturesSchema')
 
 
-class LoadedScripts(Base):
+class LoadedScriptsSchema(Base):
     """
     This table holds the character's loaded scripts into the saved_character_loaded_scripts DB table
         id - id of the entry (NOT unique)

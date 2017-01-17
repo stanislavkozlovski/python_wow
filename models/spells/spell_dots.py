@@ -6,7 +6,7 @@ from damage import Damage
 from database.main import Base
 
 
-class Dot(Base):
+class DotSchema(Base):
     """
     Represents a DoT(Damage over Time effect) from the spell_dots table, whose contents are the following:
         entry - ID of the dot

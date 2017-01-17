@@ -2,7 +2,7 @@
 from sqlalchemy import or_, and_
 
 from database.main import session
-from models.creatures.creatures import Creatures
+from models.creatures.creatures import CreaturesSchema
 from entities import Monster, LivingThing, VendorNPC
 
 
@@ -18,7 +18,7 @@ def load_monsters(zone: str, subzone: str, character) -> tuple:
     guid_name_set: {(int, str)} = set()
 
     print("Loading Monsters...")
-    creatures = session.query(Creatures).filter_by(type='monster', zone=zone, sub_zone=subzone).all()
+    creatures = session.query(CreaturesSchema).filter_by(type='monster', zone=zone, sub_zone=subzone).all()
     for creature in creatures:
         if character.has_killed_monster(creature.guid):
             # if the character has killed this monster before and has it saved, we don't want to load it
@@ -46,8 +46,8 @@ def load_npcs(zone: str, subzone: str) -> tuple:
     guid_name_set: {(int, str)} = set()
 
     print("Loading Friendly NPCs...")
-    loaded_npcs = session.query(Creatures).filter(((Creatures.type == 'fnpc') | (Creatures.type == 'vendor')
-                                                   & (Creatures.zone == zone) & (Creatures.sub_zone == subzone)))
+    loaded_npcs = session.query(CreaturesSchema).filter(((CreaturesSchema.type == 'fnpc') | (CreaturesSchema.type == 'vendor')
+                                                         & (CreaturesSchema.zone == zone) & (CreaturesSchema.sub_zone == subzone)))
     for npc_info in loaded_npcs:
         guid: int = npc_info.guid
         loaded_npc = npc_info.convert_to_living_thing_object()

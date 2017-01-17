@@ -1,5 +1,5 @@
 from decorators import run_once
-from models.creatures.creature_defaults.creature_defaults import CreatureDefaults
+from models.creatures.creature_defaults.creature_defaults import CreatureDefaultsSchema
 from database.main import session
 
 
@@ -15,7 +15,7 @@ def load_creature_defaults() -> {int: {str: int}}:
         """
     creature_defaults = {}
 
-    loaded_creature_defaults: [CreatureDefaults] = session.query(CreatureDefaults).all()
+    loaded_creature_defaults: [CreatureDefaultsSchema] = session.query(CreatureDefaultsSchema).all()
     for creature_default in loaded_creature_defaults:
         creature_defaults[creature_default.creature_level] = {'armor': creature_default.armor,
                                                               'min_gold_reward': creature_default.min_gold_reward,

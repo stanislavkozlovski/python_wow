@@ -1,8 +1,8 @@
 from database.main import session
-from models.spells.spell_buffs import Buff as BuffSchema
+from models.spells.spell_buffs import BuffSchema
 from utils.helper import parse_int
-from models.spells.spell_dots import Dot as DotSchema
-from models.spells.paladin_spells_template import PaladinSpells as PaladinSpellSchema
+from models.spells.spell_dots import DotSchema
+from models.spells.paladin_spells_template import PaladinSpellsSchema
 
 
 def load_buff(buff_id: int) -> 'BeneficialBuff':
@@ -41,6 +41,6 @@ def load_paladin_spells_for_level(level: int) -> ['PaladinSpell']:
     Get all the PaladinSpells schema objects and convert them to PaladinSpell objects.
     Return said objects in a list
     """
-    loaded_spells: [PaladinSpellSchema] = session.query(PaladinSpellSchema).filter_by(level_required=level).all()
+    loaded_spells: [PaladinSpellsSchema] = session.query(PaladinSpellsSchema).filter_by(level_required=level).all()
 
     return [spell.convert_to_paladin_spell_object() for spell in loaded_spells]

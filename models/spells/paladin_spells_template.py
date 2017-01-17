@@ -6,7 +6,7 @@ from spells import PaladinSpell
 from database.main import Base
 
 
-class PaladinSpells(Base):
+class PaladinSpellsSchema(Base):
     """
     A table that holds spells specifically for the Paladin class
     id - id of the spell
@@ -45,8 +45,8 @@ class PaladinSpells(Base):
     cooldown = Column(Integer)
     comment = Column(Text)
 
-    buff = relationship('Buff')
-    dot = relationship('Dot')
+    buff = relationship('BuffSchema')
+    dot = relationship('DotSchema')
 
     def convert_to_paladin_spell_object(self) -> PaladinSpell:
         """

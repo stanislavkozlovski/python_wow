@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer
 from database.main import Base
 
 
-class LevelXpRequirement(Base):
+class LevelXpRequirementSchema(Base):
     """
     This table holds information about the necessary XP needed to reach a certain level.
     The table's contents are as follows:

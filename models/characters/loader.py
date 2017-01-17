@@ -1,6 +1,6 @@
 from sqlalchemy.orm import load_only
 
-from models.characters.saved_character import SavedCharacter
+from models.characters.saved_character import SavedCharacterSchema
 from database.main import session
 
 
@@ -17,7 +17,7 @@ Netherblood, Paladin,     10,                 1,                    1,          
     https://github.com/Enether/python_wow/wiki/How-saving-a-Character-works-and-information-about-the-saved_character-database-table.
     """
     from classes import Paladin
-    loaded_character: SavedCharacter = session.query(SavedCharacter).filter_by(name=name).one_or_none()
+    loaded_character: SavedCharacterSchema = session.query(SavedCharacterSchema).filter_by(name=name).one_or_none()
 
     if loaded_character is None:
         raise NoSuchCharacterError(f'There is no saved character by the name of {name}!')
@@ -30,6 +30,6 @@ def load_all_saved_characters_general_info() -> [dict()]:
     This function loads general information about the saved characters in the DB and returns it as a list of
     dictionaries to  be easily printable.
     """
-    loaded_characters: [SavedCharacter] = session.query(SavedCharacter).options(load_only("name", "character_class", "level")).all()
+    loaded_characters: [SavedCharacterSchema] = session.query(SavedCharacterSchema).options(load_only("name", "character_class", "level")).all()
 
     return [{'name': ch.name, 'class': ch.character_class, 'level': ch.level} for ch in loaded_characters]

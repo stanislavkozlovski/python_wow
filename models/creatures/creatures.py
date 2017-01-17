@@ -7,7 +7,7 @@ from constants import CREATURE_DEFAULT_VALUES
 from database.main import Base
 
 
-class Creatures(Base):
+class CreaturesSchema(Base):
     # TODO: Remove the Type column from this table
     """
     This table holds information about SPECIFIC monsters in the game
@@ -27,7 +27,7 @@ class Creatures(Base):
 
     guid = Column(Integer, primary_key=True)
     creature_id = Column(Integer, ForeignKey('creature_template.entry'))
-    creature = relationship('CreatureTemplate')
+    creature = relationship('CreatureTemplateSchema')
     type = Column(String(60))
     zone = Column(String(60))
     sub_zone = Column(String(60))

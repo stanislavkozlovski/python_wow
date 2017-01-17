@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer
 from database.main import Base
 
 
-class LevelUpStats(Base):
+class LevelUpStatsSchema(Base):
     """
     This table holds information about the amount of stats a character should gain according to the level he has attained
     Example:

@@ -5,7 +5,7 @@ from utils.helper import parse_int
 from database.main import Base
 
 
-class Buff(Base):
+class BuffSchema(Base):
     """
     A buff from the DB table spells_buffs, whose contents are the following:
 

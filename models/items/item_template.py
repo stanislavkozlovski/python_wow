@@ -6,7 +6,7 @@ from utils.helper import parse_int
 from database.main import Base
 
 
-class ItemTemplate(Base):
+class ItemTemplateSchema(Base):
     """
     Holds information about an item.
         entry - the unique ID

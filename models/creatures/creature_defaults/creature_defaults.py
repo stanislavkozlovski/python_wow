@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer
 from database.main import Base, session
 
 
-class CreatureDefaults(Base):
+class CreatureDefaultsSchema(Base):
     """
     This table holds the default values that a creature should have/give at a certain level.
     The table's contents are as follows:

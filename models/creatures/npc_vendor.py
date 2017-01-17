@@ -8,7 +8,7 @@ from database.main import Base
     1 document, rather than 2 """
 
 
-class NpcVendor(Base):
+class NpcVendorSchema(Base):
     """
     This table holds information regarding a single item a vendor sells
 
@@ -26,6 +26,6 @@ class NpcVendor(Base):
     __tablename__ = 'npc_vendor'
     creature_entry = Column(Integer, ForeignKey('creature_template.entry'), primary_key=True)
     item_id = Column(Integer, ForeignKey('item_template.entry'))
-    item = relationship('ItemTemplate')
+    item = relationship('ItemTemplateSchema')
     item_count = Column(Integer)
     price = Column(Integer)

@@ -59,9 +59,9 @@ CONT--          zone,           sub_zone,   xp_reward, comment
     reward3_id = Column('item_reward3', Integer, ForeignKey('item_template.entry'))
     item_choice_enabled = Column(Integer)  # TODO: Change
 
-    reward1 = relationship('ItemTemplate', foreign_keys=[reward1_id])
-    reward2 = relationship('ItemTemplate', foreign_keys=[reward2_id])
-    reward3 = relationship('ItemTemplate', foreign_keys=[reward3_id])
+    reward1 = relationship('ItemTemplateSchema', foreign_keys=[reward1_id])
+    reward2 = relationship('ItemTemplateSchema', foreign_keys=[reward2_id])
+    reward3 = relationship('ItemTemplateSchema', foreign_keys=[reward3_id])
 
     def convert_to_quest_object(self) -> Quest:
         """
