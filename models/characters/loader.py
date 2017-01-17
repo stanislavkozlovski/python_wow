@@ -1,8 +1,5 @@
 from sqlalchemy.orm import load_only
-<<<<<<< HEAD
-=======
 
->>>>>>> parent of a523c24... Revert "Merged branch feature/SQLAlchemy into master"
 from models.characters.saved_character import SavedCharacterSchema
 from database.main import session
 

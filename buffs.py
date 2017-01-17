@@ -116,9 +116,5 @@ class DoT(StatusEffect):
     def __str__(self):
         return f'{self.name} - Deals {self.damage} damage every turn for {self.duration} turns'
 
-<<<<<<< HEAD
-=======
-
->>>>>>> parent of a523c24... Revert "Merged branch feature/SQLAlchemy into master"
     def update_caster_level(self, level: int):
         self.level = level

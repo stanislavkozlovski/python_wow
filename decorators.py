@@ -45,11 +45,7 @@ def db_connection(func):
 
 
 def run_once(func):
-<<<<<<< HEAD
     """A decorator that runs a function only once."""
-=======
-    "A decorator that runs a function only once."
->>>>>>> parent of a523c24... Revert "Merged branch feature/SQLAlchemy into master"
 
     def decorated(*args, **kwargs):
         try:

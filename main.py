@@ -1,9 +1,5 @@
 import atexit
-<<<<<<< HEAD
 import database.main
-=======
-from database.main import cursor
->>>>>>> parent of a523c24... Revert "Merged branch feature/SQLAlchemy into master"
 from models import main as _  # load all the DB models
 from command_router import route_main_commands
 from information_printer import print_live_monsters, print_live_npcs, welcome_print

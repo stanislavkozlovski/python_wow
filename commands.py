@@ -139,7 +139,7 @@ def print_paladin_abilities_in_combat(character: Paladin):
     if "Melting Strike" in character.learned_spells.keys():
         print("\tms")
         print("\t\tCasts Melting Strike")
-        print(f'\t\t\tMana Cost: {character.learned_spells["Melting Strike"]["mana_cost"]}')
+        print(f'\t\t\tMana Cost: {character.learned_spells["Melting Strike"].mana_cost}')
         print(f'\t\t\tDamages an enemy for '
               f'{character.learned_spells["Melting Strike"].damage1} damage and adds a damage over time effect to it.\n')
 

@@ -4,10 +4,6 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 import random
 from termcolor import colored
 
-<<<<<<< HEAD
-=======
-from database.main import cursor
->>>>>>> parent of a523c24... Revert "Merged branch feature/SQLAlchemy into master"
 from constants import CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS
 from exceptions import ItemNotInInventoryError
 from items import Item, Weapon, Potion, Equipment
@@ -275,11 +271,7 @@ class FriendlyNPC(LivingThing):
     """
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-<<<<<<< HEAD
                  max_damage: int=1, quest_relation_id=0, loot_table: 'LootTable'=None, gossip: str = 'Hello'):
-=======
-                 max_damage: int = 1, quest_relation_id = 0, loot_table: 'LootTable' = None, gossip: str = 'Hello'):
->>>>>>> parent of a523c24... Revert "Merged branch feature/SQLAlchemy into master"
         super().__init__(name, health, mana, level)
         self.level = level
         self.min_damage = min_damage
@@ -299,14 +291,9 @@ class VendorNPC(FriendlyNPC):
     This is the class for the vendor NPCs in the world
     """
 
-<<<<<<< HEAD
     def __init__(self, name: str, entry: int, inventory: dict, health: int=1, mana: int=1, level: int=1,
                  min_damage: int=0, max_damage: int=1, quest_relation_id=0,
                  loot_table: 'LootTable'=None, gossip: str='Hello'):
-=======
-    def __init__(self, name: str, entry: int, inventory: dict, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id = 0, loot_table: 'LootTable' = None, gossip: str = 'Hello'):
->>>>>>> parent of a523c24... Revert "Merged branch feature/SQLAlchemy into master"
         super().__init__(name, health, mana, level, min_damage, max_damage, quest_relation_id, loot_table, gossip)
         self.entry = entry
         self.inventory = inventory
@@ -358,12 +345,8 @@ class VendorNPC(FriendlyNPC):
 
 class Monster(LivingThing):
     def __init__(self, monster_id: int, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-<<<<<<< HEAD
                  max_damage: int = 1, quest_relation_id=0, xp_to_give: int=0,
                  gold_to_give_range: (int, int)=(0, 0), loot_table: 'LootTable'=None, armor: int=0, gossip: str='',
-=======
-                 max_damage: int = 1, quest_relation_id=0, xp_to_give: int=0, gold_to_give_range: (int, int)=(0,0), loot_table: 'LootTable'=None, armor: int=0, gossip: str='',
->>>>>>> parent of a523c24... Revert "Merged branch feature/SQLAlchemy into master"
                  respawnable: bool=False):
         super().__init__(name, health, mana, level)
         self.monster_id = monster_id
@@ -375,11 +358,7 @@ class Monster(LivingThing):
         self.gossip = gossip
         self.respawnable = respawnable  # says if the creature can ever respawn, once killed of course
         self._gold_to_give = self._calculate_gold_reward(gold_to_give_range)
-<<<<<<< HEAD
         self.quest_relation_id = quest_relation_id
-=======
-        self.quest_relation_ID = quest_relation_id
->>>>>>> parent of a523c24... Revert "Merged branch feature/SQLAlchemy into master"
         self.loot_table = loot_table
         self.loot = {"gold": self._gold_to_give}  # dict Key: str, Value: Item class object
 
@@ -488,11 +467,7 @@ class Character(LivingThing):
         self.loaded_scripts = loaded_scripts  # holds the scripts that the character has seen (which should load only once)
         self.killed_monsters = killed_monsters  # a set that holds the GUIDs of the creatures that\
         #  the character has killed (and that should not be killable a second time)
-<<<<<<< HEAD
         self.completed_quests = completed_quests  #  a set that holds the ids of the quests that the character has completed
-=======
-        self.completed_quests = completed_quests  # a set that holds the ids of the quests that the character has completed
->>>>>>> parent of a523c24... Revert "Merged branch feature/SQLAlchemy into master"
         self.quest_log = {}
         self.inventory = saved_inventory # dict Key: str, Value: tuple(Item class instance, Item Count)
         self.equipment = saved_equipment # dict Key: Equipment slot, Value: object of class Equipment

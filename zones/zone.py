@@ -1,10 +1,6 @@
 """
 This is the base class for zones. Every zone in the game will inherit from this class.
 """
-<<<<<<< HEAD
-=======
-from database.main import cursor
->>>>>>> parent of a523c24... Revert "Merged branch feature/SQLAlchemy into master"
 from models.quests.loader import load_quests
 from models.creatures.loader import load_monsters, load_npcs
 
