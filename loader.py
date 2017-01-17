@@ -80,25 +80,6 @@ def parse_int(value) -> int:
 
 
 @db_connection
-def load_all_saved_characters_general_info(cursor) -> list:
-    """
-    This function loads general information about the saved characters in the DB and returns it as a list of
-    dictionaries to  be easily printable.
-    """
-    saved_characters = []
-    gi_char_reader = cursor.execute("SELECT name, class, level FROM saved_character")
-
-    for char_info in gi_char_reader:
-        char_name = char_info[DBINDEX_SAVED_CHARACTER_NAME]
-        char_class = char_info[DBINDEX_SAVED_CHARACTER_CLASS]
-        char_level = char_info[DBINDEX_SAVED_CHARACTER_LEVEL]
-
-        saved_characters.append({'name': char_name, 'class': char_class, 'level': char_level})
-
-    return saved_characters
-
-
-@db_connection
 def load_character_level_stats(cursor) -> dict:
     """
     Read the table file holding information about the amount of stats you should get according to the level you've attained

@@ -1,3 +1,5 @@
+from sqlalchemy.orm import load_only
+
 from models.characters.saved_character import SavedCharacter
 from database.main import session
 
@@ -21,3 +23,13 @@ Netherblood, Paladin,     10,                 1,                    1,          
         raise NoSuchCharacterError(f'There is no saved character by the name of {name}!')
 
     return loaded_character.convert_to_character_object()
+
+
+def load_all_saved_characters_general_info() -> [dict()]:
+    """
+    This function loads general information about the saved characters in the DB and returns it as a list of
+    dictionaries to  be easily printable.
+    """
+    loaded_characters: [SavedCharacter] = session.query(SavedCharacter).options(load_only("name", "character_class", "level")).all()
+
+    return [{'name': ch.name, 'class': ch.character_class, 'level': ch.level} for ch in loaded_characters]
