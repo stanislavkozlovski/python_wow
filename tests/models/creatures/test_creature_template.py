@@ -77,4 +77,4 @@ def tearDownModule():
     import tests.delete_test_db  # module that deletes the DB :)
 
 if __name__ == '__main__':
-    main()
+    unittest.main()
