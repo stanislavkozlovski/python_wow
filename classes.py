@@ -1,18 +1,9 @@
-import sqlite3
-
-from database.main import cursor
 from damage import Damage
-from database.database_info import (
-    DB_PATH,
-    DBINDEX_PALADIN_SPELLS_TEMPLATE_NAME, DBINDEX_PALADIN_SPELLS_TEMPLATE_RANK,
-    DBINDEX_PALADIN_SPELLS_TEMPLATE_LEVEL_REQUIRED, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE1,
-    DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE2, DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE3,
-    DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1, DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2,
-    DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3, DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST,
-    DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT, DBINDEX_PALADIN_SPELLS_TEMPLATE_COOLDOWN)
+from decorators import cast_spell
+from models.spells.loader import load_paladin_spells_for_level
 from entities import Character, Monster, CHARACTER_DEFAULT_EQUIPMENT
 from heal import HolyHeal
-from loader import load_dot
+from spells import PaladinSpell
 
 
 class Paladin(Character):
@@ -22,12 +13,12 @@ class Paladin(Character):
             Seal of Righteousness
                 Deals X damage on each attack, needs to be activated first
     """
-    learned_spells = {}
+    learned_spells: {str: PaladinSpell} = {}
     SOR_ACTIVE = False  # Seal of Righteousness trigger
     SOR_TURNS = 0  # Holds the remaining turns for SOR
     KEY_FLASH_OF_LIGHT = "Flash of Light"
-    KEY_SEAL_OF_RIGHTEOSNESS = "Seal of Righteousness"
-    KEY_MELTING_STRIKE  = "Melting Strike"
+    KEY_SEAL_OF_RIGHTEOUSNESS = "Seal of Righteousness"
+    KEY_MELTING_STRIKE = "Melting Strike"
 
     def __init__(self, name: str, level: int = 1, health: int = 12, mana: int = 15, strength: int = 4,
                  loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=(),
@@ -41,10 +32,18 @@ class Paladin(Character):
 
         if level > 1: self._level_up(to_level=level)
 
-
     def leave_combat(self):
         super().leave_combat()
         self.SOR_ACTIVE = False  # Remove SOR aura
+        self.reset_spell_cooldowns()
+
+    def reset_spell_cooldowns(self):
+        """
+        Resets the cooldown of every spell
+        Typically called when we leave combat
+        """
+        for spell in self.learned_spells.values():
+            spell.reset_cd()
 
     def _level_up(self, to_level: int=0):
         """ This method levels the character up, if we're given a to_level we need to level up until we get to that level"""
@@ -58,7 +57,6 @@ class Paladin(Character):
             super()._level_up()
             self._lookup_and_handle_new_spells()
 
-
     def _lookup_and_handle_new_spells(self):
         """
         This method looks up all the new available spells to learn or update their ranks and does so
@@ -68,76 +66,28 @@ class Paladin(Character):
                 self.level):  # generator that returns dictionaries holding spell attributes
 
             # update spell rank
-            if available_spell['name'] in self.learned_spells:
+            if available_spell.name in self.learned_spells:
                 self.update_spell(available_spell)
             # learn new spell
             else:
                 self.learn_new_spell(spell=available_spell)
 
     def learn_new_spell(self, spell: dict):
-        print(f"You have learned a new spell - {spell['name']}")
+        print(f"You have learned a new spell - {spell.name}")
 
-        self.learned_spells[spell['name']] = spell
-        self.spell_cooldowns[spell['name']] = 0
+        self.learned_spells[spell.name] = spell
 
-    def _lookup_available_spells_to_learn(self, level: int):
+    def _lookup_available_spells_to_learn(self, level: int) -> [PaladinSpell]:
         """
-        Generator function
-            paladin_spells_template table is as follows:
-            ID, Name of Spell, Rank of Spell, Level Required for said Rank, Damage1, Damage2, Damage3, Heal1, Heal2, Heal3, Effect, Cooldown, Comment
-            1,Seal of Righteousness,       1,                            1,       2,       0,       0,     0,     0,     0,      0,        0,Seal of Righteousness
-            effect is a special effect according to the spell, only Melting Strike has one for now and it serves as the
-            entry in spell_dots
-            cooldown is the amount of turns it takes for this spell to be ready again after being cast
-            :return: A dictionary holding keys for each row (rank, damage1, damage2 etc.)
+        Generator function yielding from a list of PaladinSpells that the character can learn
         """
-
-        with sqlite3.connect(DB_PATH) as connection:
-            cursor = connection.cursor()
-            # this will return a list of tuples holding information about each spell we have the req level to learn
-            spell_reader = cursor.execute("SELECT * FROM paladin_spells_template WHERE level_required = ?", [level])
-
-            for line in spell_reader:
-                spell = {}
-                name = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_NAME]
-                rank = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_RANK]  # type: int
-                level_req = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_LEVEL_REQUIRED]  # type: int
-                damage_1 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE1]  # type: int
-                damage_2 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE2]  # type: int
-                damage_3 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_DAMAGE3]  # type: int
-                heal_1 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL1]  # type: int
-                heal_2 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL2]  # type: int
-                heal_3 = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_HEAL3]  # type: int
-                mana_cost = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_MANA_COST]  # type: int
-                effect = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_EFFECT]  # type: int
-                cooldown = line[DBINDEX_PALADIN_SPELLS_TEMPLATE_COOLDOWN]  # type: int
-                cooldown = cooldown if cooldown else 0  # if we get a None, we turn it into 0
-
-                spell['name'] = name
-                spell['rank'] = rank
-                spell['damage_1'] = damage_1
-                spell['damage_2'] = damage_2
-                spell['damage_3'] = damage_3
-                spell['heal_1'] = heal_1
-                spell['heal_2'] = heal_2
-                spell['heal_3'] = heal_3
-                spell['mana_cost'] = mana_cost
-                spell['effect'] = effect
-                spell['cooldown'] = cooldown
-
-                yield spell
+        yield from load_paladin_spells_for_level(level)
 
     def update_spell(self, spell: dict):
-        spell_name = spell['name']
-
-        if spell_name == self.KEY_SEAL_OF_RIGHTEOSNESS:
-            self._update_seal_of_righteousness(spell)
-
-    # SPELLS
-    def _spell_trigger_cd(self, spell_name: str):
-        """ This method triggers the cooldown after a spell has been cast"""
-        spell_cd = self.learned_spells[spell_name]['cooldown']  # type: int
-        self.spell_cooldowns[spell_name] = spell_cd
+        spell_name = spell.name
+        self.learned_spells[spell_name] = spell
+        print(f'Spell {spell.name} has been updated to rank {spell.rank}!')
+        print("*" * 20)
 
     def spell_handler(self, command: str, target: Monster) -> bool:
         """
@@ -146,97 +96,76 @@ class Paladin(Character):
         :return: Returns a boolean indicating if the cast was successful or not
         """
         if command == 'sor':
-            return self.spell_seal_of_righteousness()
+            return self.spell_seal_of_righteousness(self.learned_spells[self.KEY_SEAL_OF_RIGHTEOUSNESS])
         elif command == 'fol':
-            return self.spell_flash_of_light()
+            return self.spell_flash_of_light(self.learned_spells[self.KEY_FLASH_OF_LIGHT])
         elif command == 'ms':
-            return self.spell_melting_strike(target=target)
+            return self.spell_melting_strike(spell=self.learned_spells[self.KEY_MELTING_STRIKE], target=target)
 
         print("Unsuccessful cast")
         return False  # if we do not go into any spell
 
-    def spell_seal_of_righteousness(self):
+    @cast_spell
+    def spell_seal_of_righteousness(self, spell: PaladinSpell):
         """
          When activated adds DAMAGE1 Spell Damage to each attack
          Lasts for three turns
         :return: boolean indicating if the cast was successful or not
         """
-        mana_cost = self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]["mana_cost"]
-        cast_is_successful = (self._check_enough_mana(mana_cost)
-                              and self._check_spell_cooldown(self.KEY_SEAL_OF_RIGHTEOSNESS))
-
-        if cast_is_successful:
-            self.mana -= mana_cost
-            self._spell_trigger_cd(self.KEY_SEAL_OF_RIGHTEOSNESS)
-            self.SOR_ACTIVE = True
-            self.SOR_TURNS = 3
-            print(f'{self.name} activates {self.KEY_SEAL_OF_RIGHTEOSNESS}!')
-        return cast_is_successful
+        mana_cost = spell.mana_cost
+        self.mana -= mana_cost
+        # self._spell_trigger_cd(self.KEY_SEAL_OF_RIGHTEOSNESS)
+        self.SOR_ACTIVE = True
+        self.SOR_TURNS = 3
+        print(f'{self.name} activates {self.KEY_SEAL_OF_RIGHTEOUSNESS}!')
+        return True
 
     def _spell_seal_of_righteousness_attack(self):
         if self.SOR_TURNS == 0:  # fade spell
             self.SOR_ACTIVE = False
-            print(f'{self.KEY_SEAL_OF_RIGHTEOSNESS} has faded from {self.name}')
+            print(f'{self.KEY_SEAL_OF_RIGHTEOUSNESS} has faded from {self.name}')
             return 0
         else:
             self.SOR_TURNS -= 1
-            return self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['damage_1']  # damage from SOR
+            return self.learned_spells[self.KEY_SEAL_OF_RIGHTEOUSNESS].damage1  # damage from SOR
 
-    def _update_seal_of_righteousness(self, new_rank: dict):
-        """ Updates the values of the spell in the learned_spells dictionary"""
-        damage_on_swing = new_rank['damage_1']
-        rank = new_rank['rank']
-        mana_cost = new_rank['mana_cost']
-
-        self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['damage_1'] = damage_on_swing
-        self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['rank'] = rank
-        self.learned_spells[self.KEY_SEAL_OF_RIGHTEOSNESS]['mana_cost'] = mana_cost
-
-        print(f'Spell {self.KEY_SEAL_OF_RIGHTEOSNESS} has been updated to rank {rank}!')
-        print("*" * 20)
-
-    def spell_flash_of_light(self):
+    @cast_spell
+    def spell_flash_of_light(self, spell):
         """
         Heals the paladin for a certain amount
         :return successful cast or not
         """
-        mana_cost = self.learned_spells[self.KEY_FLASH_OF_LIGHT]['mana_cost']
-        heal = HolyHeal(heal_amount=self.learned_spells[self.KEY_FLASH_OF_LIGHT]['heal_1'])
+        mana_cost = spell.mana_cost
+        heal = HolyHeal(heal_amount=spell.heal1)
 
-        cast_is_successful = (self._check_enough_mana(mana_cost)
-                              and self._check_spell_cooldown(spell_name=self.KEY_FLASH_OF_LIGHT))
+        self.health += heal  # TODO: Handle overheal otherwhere... is it not handled btw?
+        self.mana -= mana_cost
+        # self._spell_trigger_cd(self.KEY_FLASH_OF_LIGHT)
 
-        if cast_is_successful:
-            self.health += heal
-            self.mana -= mana_cost
-            self._spell_trigger_cd(self.KEY_FLASH_OF_LIGHT)
+        if self.health > self.max_health:  # check for overheal
+            overheal = self._handle_overheal()
+            print(f'{spell.name} healed {self.name} for {heal-overheal:.2f} ({overheal:.2f} Overheal).')
+        else:
+            print(f'{spell.name} healed {self.name} for {heal}.')
 
-            if self.health > self.max_health:  # check for overheal
-                overheal = self._handle_overheal()
-                print(f'{self.KEY_FLASH_OF_LIGHT} healed {self.name} for {heal-overheal:.2f} ({overheal:.2f} Overheal).')
-            else:
-                print(f'{self.KEY_FLASH_OF_LIGHT} healed {self.name} for {heal}.')
+        return True
 
-        return cast_is_successful
-
-    def spell_melting_strike(self, target: Monster):
+    @cast_spell
+    def spell_melting_strike(self, spell: PaladinSpell, target: Monster):
         """ Damages the enemy for DAMAGE_1 damage and puts a DoT effect, the index of which is EFFECT
         :return successful cast or not"""
-        mana_cost = self.learned_spells[self.KEY_MELTING_STRIKE]['mana_cost']
-        damage = Damage(phys_dmg=self.learned_spells[self.KEY_MELTING_STRIKE]['damage_1'])
-        dot = load_dot(self.learned_spells[self.KEY_MELTING_STRIKE]['effect'], level=self.level, cursor=cursor)
-        cast_is_successful = (self._check_enough_mana(mana_cost)
-                              and self._check_spell_cooldown(self.KEY_MELTING_STRIKE))
+        mana_cost: int = spell.mana_cost
+        damage: Damage = Damage(phys_dmg=spell.damage1)
+        dot: 'DoT' = spell.harmful_effect
+        dot.update_caster_level(self.level)
 
-        if cast_is_successful:
-            self.mana -= mana_cost
-            self._spell_trigger_cd(self.KEY_MELTING_STRIKE)
-            # damage the target and add the DoT
-            print(f'{self.KEY_MELTING_STRIKE} damages {target.name} for {damage}!')
-            target.take_attack(damage, self.level)
-            target.add_buff(dot)
+        self.mana -= mana_cost
+        # damage the target and add the DoT
+        print(f'{spell.name} damages {target.name} for {damage}!')
+        target.take_attack(damage, self.level)
+        target.add_buff(dot)
 
-        return cast_is_successful
+        return True
 
     # SPELLS
 
@@ -275,34 +204,17 @@ class Paladin(Character):
 
         auto_attack_print = victim.get_take_attack_damage(auto_attack, self.level)
         if sor_damage:
-            print(f'{self.name} attacks {victim.name} for {auto_attack_print} from {self.KEY_SEAL_OF_RIGHTEOSNESS}!')
+            print(f'{self.name} attacks {victim.name} for {auto_attack_print} from {self.KEY_SEAL_OF_RIGHTEOUSNESS}!')
         else:
             print(f'{self.name} attacks {victim.name} for {auto_attack_print}!')
 
         victim.take_attack(auto_attack, self.level)
 
-    def _check_enough_mana(self, mana_cost: int) -> bool:
+    def has_enough_mana(self, mana_cost: int) -> bool:
         """
         Check if we have enough mana to cast the spell we want to cast and return the result.
         """
-        if self.mana < mana_cost:
-            return False
-        else:
-            return True
-
-    def _check_spell_cooldown(self, spell_name: str) -> bool:
-        """
-        Check if we can cast the spell or if it's on CD
-        if it's on cooldown: return FALSE
-        if it's not on cooldown: return TRUE
-        """
-        turns_left = self.spell_cooldowns[spell_name]
-
-        if turns_left:
-            print(f'{spell_name} is on cooldown for {turns_left} more turns!')
-            return False
-
-        return True
+        return self.mana >= mana_cost
 
     def get_class(self):
         return 'paladin'

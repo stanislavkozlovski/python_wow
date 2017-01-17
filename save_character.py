@@ -10,10 +10,11 @@ from database.database_info import \
      DB_SAVED_CHARACTER_TABLE_NAME,
      DB_SC_LOADED_SCRIPTS_TABLE_NAME, DB_SC_KILLED_MONSTERS_TABLE_NAME, DB_SC_EQUIPMENT_TABLE_NAME,
      DB_SC_COMPLETED_QUESTS_TABLE_NAME, DB_SC_INVENTORY_TABLE_NAME)
-from entities import (Character, CHARACTER_EQUIPMENT_BELT_KEY, CHARACTER_EQUIPMENT_BOOTS_KEY,
-                      CHARACTER_EQUIPMENT_CHESTGUARD_KEY, CHARACTER_EQUIPMENT_SHOULDERPAD_KEY,
-                      CHARACTER_EQUIPMENT_HEADPIECE_KEY, CHARACTER_EQUIPMENT_NECKLACE_KEY,
-                      CHARACTER_EQUIPMENT_BRACER_KEY, CHARACTER_EQUIPMENT_GLOVES_KEY, CHARACTER_EQUIPMENT_LEGGINGS_KEY)
+from entities import Character
+from constants import (CHARACTER_EQUIPMENT_BELT_KEY, CHARACTER_EQUIPMENT_BOOTS_KEY,
+                       CHARACTER_EQUIPMENT_CHESTGUARD_KEY, CHARACTER_EQUIPMENT_SHOULDERPAD_KEY,
+                       CHARACTER_EQUIPMENT_HEADPIECE_KEY, CHARACTER_EQUIPMENT_NECKLACE_KEY,
+                       CHARACTER_EQUIPMENT_BRACER_KEY, CHARACTER_EQUIPMENT_GLOVES_KEY, CHARACTER_EQUIPMENT_LEGGINGS_KEY)
 from items import Item
 from decorators import db_connection
 
@@ -172,6 +173,7 @@ def save_equipment(id: int, equipment: dict, cursor):
     cursor.execute(f'INSERT INTO {DB_SC_EQUIPMENT_TABLE_NAME} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                    [id, headpiece_id,shoulderpad_id, necklace_id, chestguard_id, bracer_id, gloves_id, belt_id,
                     leggings_id, boots_id])
+
 
 def delete_rows_from_table(table_name: str, id: int, cursor):
     """

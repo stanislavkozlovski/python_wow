@@ -26,7 +26,7 @@ class Damage:
 
         magic_dmg_print = ""
         if self.magic_dmg:
-            magic_dmg_print = f'{sel.formatf.magic_dmg:.2f} magical damage'
+            magic_dmg_print = f'{self.magic_dmg:.2f} magical damage'
 
         if self.magic_absorbed:
             magic_dmg_print = f'{self.magic_dmg:.2f} magical damage ({self.magic_absorbed:.2f} absorbed)'
