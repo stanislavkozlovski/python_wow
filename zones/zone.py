@@ -2,8 +2,7 @@
 This is the base class for zones. Every zone in the game will inherit from this class.
 """
 from database.main import cursor
-from models.quests.loader import load_quests
-from models.creatures.loader import load_monsters, load_npcs
+from loader import load_monsters, load_npcs, load_quests
 
 
 class Zone:
@@ -98,9 +97,9 @@ class SubZone:
         self.parent_zone_name = parent_zone_name
         self._map = zone_map  # the _map that shows us where we can go from here
 
-        self._alive_monsters, self._monster_guid_name_set = load_monsters(self.parent_zone_name, self.name, character)
-        self._alive_npcs, self._npc_guid_name_set = load_npcs(self.parent_zone_name, self.name)
-        self._quest_list = load_quests(self.parent_zone_name, self.name, character)
+        self._alive_monsters, self._monster_guid_name_set = load_monsters(self.parent_zone_name, self.name, character, cursor)
+        self._alive_npcs, self._npc_guid_name_set = load_npcs(self.parent_zone_name, self.name, cursor)
+        self._quest_list = load_quests(self.parent_zone_name, self.name, character, cursor)
 
     def load_on_zone_entry_script(self, character):
         """

@@ -1,16 +1,60 @@
 """
 This holds the classes for every entity in the game: Monsters and Characters currently
 """
+
 import random
 from termcolor import colored
-
 from database.main import cursor
-from constants import CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS
-from exceptions import ItemNotInInventoryError
-from items import Item, Weapon, Potion, Equipment
+from items import  Item, Weapon, Potion, Equipment
+from loader import (load_creature_defaults, load_character_level_stats,
+                    load_character_xp_requirements, load_loot_table, load_item, load_vendor_inventory)
 from quest import Quest, FetchQuest
 from damage import Damage
 from buffs import BeneficialBuff, DoT
+from exceptions import ItemNotInInventoryError
+
+
+# TODO: Move to constants
+CHARACTER_EQUIPMENT_HEADPIECE_KEY = 'headpiece'
+CHARACTER_EQUIPMENT_SHOULDERPAD_KEY = 'shoulderpad'
+CHARACTER_EQUIPMENT_NECKLACE_KEY = 'necklace'
+CHARACTER_EQUIPMENT_CHESTGUARD_KEY = 'chestguard'
+CHARACTER_EQUIPMENT_BRACER_KEY = 'bracer'
+CHARACTER_EQUIPMENT_GLOVES_KEY = 'gloves'
+CHARACTER_EQUIPMENT_BELT_KEY = 'belt'
+CHARACTER_EQUIPMENT_LEGGINGS_KEY = 'leggings'
+CHARACTER_EQUIPMENT_BOOTS_KEY = 'boots'
+
+CHARACTER_DEFAULT_EQUIPMENT = {CHARACTER_EQUIPMENT_HEADPIECE_KEY: None,
+                               CHARACTER_EQUIPMENT_SHOULDERPAD_KEY: None,
+                               CHARACTER_EQUIPMENT_NECKLACE_KEY: None,
+                               CHARACTER_EQUIPMENT_CHESTGUARD_KEY: None,
+                               CHARACTER_EQUIPMENT_BRACER_KEY: None,
+                               CHARACTER_EQUIPMENT_GLOVES_KEY: None,
+                               CHARACTER_EQUIPMENT_BELT_KEY: None,
+                               CHARACTER_EQUIPMENT_LEGGINGS_KEY: None,
+                               CHARACTER_EQUIPMENT_BOOTS_KEY: None}
+
+
+# Dictionary: Key: The Level of the NPC. Value: A dictionary holding keys for the default XP reward, default armor
+# and default min/max gold_reward for a given NPC
+CREATURE_DEFAULTS_DICTIONARY = load_creature_defaults(cursor)
+
+
+def lookup_xp_reward(level: int) -> int:
+    """ Return the appropriate XP reward associated with the given level"""
+    return CREATURE_DEFAULTS_DICTIONARY[level]['xp_reward']
+
+
+def lookup_gold_reward(level: int) -> tuple:
+    """ Return a tuple that has the minimum and maximum gold amount a creature of certain level should give"""
+    return (CREATURE_DEFAULTS_DICTIONARY[level]['min_gold_reward'],
+            CREATURE_DEFAULTS_DICTIONARY[level]['max_gold_reward'])
+
+
+def lookup_default_creature_armor(level: int) -> int:
+    """ Return the default armor value that a monster of the given level should have"""
+    return CREATURE_DEFAULTS_DICTIONARY[level]['armor']
 
 
 class LivingThing:
@@ -18,7 +62,6 @@ class LivingThing:
     This is the base class for all things _alive - characters, monsters and etc.
     """
     KEY_ARMOR = 'armor'
-
     def __init__(self, name: str, health: int = 1, mana: int = 1, level: int = 1):
         self.name = name
         self.health = health
@@ -271,7 +314,7 @@ class FriendlyNPC(LivingThing):
     """
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id = 0, loot_table: 'LootTable' = None, gossip: str = 'Hello'):
+                 max_damage: int = 1, quest_relation_id = 0, loot_table_ID: int = 0, gossip: str = 'Hello'):
         super().__init__(name, health, mana, level)
         self.level = level
         self.min_damage = min_damage
@@ -291,11 +334,12 @@ class VendorNPC(FriendlyNPC):
     This is the class for the vendor NPCs in the world
     """
 
-    def __init__(self, name: str, entry: int, inventory: dict, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id = 0, loot_table: 'LootTable' = None, gossip: str = 'Hello'):
-        super().__init__(name, health, mana, level, min_damage, max_damage, quest_relation_id, loot_table, gossip)
+    def __init__(self, name: str, entry: int, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
+                 max_damage: int = 1, quest_relation_id = 0, loot_table_ID: int = 0, gossip: str = 'Hello'):
+        super().__init__(name, health, mana, level, min_damage, max_damage, quest_relation_id, loot_table_ID, gossip)
         self.entry = entry
-        self.inventory = inventory
+        # TODO: Move
+        self.inventory = load_vendor_inventory(self.entry, cursor)  # type: dict: key-item_name(str), value: tuple(item object, count)
 
     def __str__(self):
         return f'{self.colored_name} <Vendor>'
@@ -344,21 +388,22 @@ class VendorNPC(FriendlyNPC):
 
 class Monster(LivingThing):
     def __init__(self, monster_id: int, name: str, health: int = 1, mana: int = 1, level: int = 1, min_damage: int = 0,
-                 max_damage: int = 1, quest_relation_id=0, xp_to_give: int=0, gold_to_give_range: (int, int)=(0,0), loot_table: 'LootTable'=None, armor: int=0, gossip: str='',
+                 max_damage: int = 1, quest_relation_id=0, loot_table_ID: int = 0, armor: int=0, gossip: str='',
                  respawnable: bool=False):
         super().__init__(name, health, mana, level)
         self.monster_id = monster_id
         self.level = level
         self.min_damage = min_damage
         self.max_damage = max_damage
-        self.xp_to_give = xp_to_give
-        self.attributes[self.KEY_ARMOR] = armor
+        self.xp_to_give = lookup_xp_reward(self.level)
+        self.attributes[self.KEY_ARMOR] = armor if armor else lookup_default_creature_armor(self.level)
         self.gossip = gossip
         self.respawnable = respawnable  # says if the creature can ever respawn, once killed of course
-        self._gold_to_give = self._calculate_gold_reward(gold_to_give_range)
+        self._gold_to_give = self._calculate_gold_reward(lookup_gold_reward(self.level))
         self.quest_relation_ID = quest_relation_id
-        self.loot_table = loot_table
+        self.loot_table_ID = loot_table_ID
         self.loot = {"gold": self._gold_to_give}  # dict Key: str, Value: Item class object
+        # TODO: Add default monster armor for their level
 
     def __str__(self):
         colored_name = colored(self.name, color="red")
@@ -391,14 +436,31 @@ class Monster(LivingThing):
 
     def _drop_loot(self):
         """
-        This method fills up the self.loot dictionary with the items that have dropped off the monster
+        This method gets the loot the monster can drop, rolls the dice on each drop chance and
+        populates the creature's self.loot dictionary that will hold the dropped loot
         """
-        if not self.loot_table:
+        # loot_list is a list of tuples containing (item_ID(int), drop_chance(1-100))
+        if not self.loot_table_ID:
             return
-        dropped_items: [Item] = self.loot_table.decide_drops()
 
-        for item in dropped_items:
-            self.loot[item.name] = item
+        loot_list = load_loot_table(monster_loot_table_ID=self.loot_table_ID, cursor=cursor)
+
+        for item_ID, item_drop_chance in loot_list:
+            '''
+            Generate a random float from 0.0 to ~0.9999 with random.random(), then multiply it by 100
+            and compare it to the drop_chance. If the drop_chance is bigger, the item has dropped.
+
+            Example: drop chance is 30% and we roll a random float. There's a 70% chance to get a float that's bigger
+            than 0.3 and a 30% chance to get a float that's smaller. We roll 0.25, multiply it by 100 = 25 and see
+            that the drop chance is bigger, therefore the item should drop.
+            '''
+            random_float = random.random()
+
+            if item_drop_chance >= (random_float * 100):
+                # item has dropped, load it from the DB
+                item = load_item(item_ID, cursor)
+
+                self.loot[item.name] = item
 
     def give_loot(self, item_name: str):
         """ Returns the item that's looted and removes it from the monster's inventory"""
@@ -446,6 +508,7 @@ class Character(LivingThing):
     KEY_AGILITY = 'agility'
     KEY_BONUS_HEALTH = 'bonus_health'
     KEY_BONUS_MANA = 'bonus_mana'
+    spell_cooldowns = {}  # dictionary that holds Key: Spell Name(str), Value: It's cooldown in turns (int)
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1,
                  loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=set(),
@@ -465,7 +528,10 @@ class Character(LivingThing):
         self.loaded_scripts = loaded_scripts  # holds the scripts that the character has seen (which should load only once)
         self.killed_monsters = killed_monsters  # a set that holds the GUIDs of the creatures that\
         #  the character has killed (and that should not be killable a second time)
-        self.completed_quests = completed_quests  # a set that holds the ids of the quests that the character has completed
+        self.completed_quests = completed_quests  # a set that holds the name of the quests that the character has completed
+        # A dictionary of dictionaries. Key: level(int), Value: dictionary holding values for hp,mana,etc
+        self._LEVEL_STATS = load_character_level_stats(cursor)
+        self._REQUIRED_XP_TO_LEVEL = load_character_xp_requirements(cursor)
         self.quest_log = {}
         self.inventory = saved_inventory # dict Key: str, Value: tuple(Item class instance, Item Count)
         self.equipment = saved_equipment # dict Key: Equipment slot, Value: object of class Equipment
@@ -765,7 +831,7 @@ class Character(LivingThing):
 
         del self.quest_log[quest.ID]  # remove from quest log
 
-        self.completed_quests.add(quest.ID)
+        self.completed_quests.add(quest.name)
 
         self._award_experience(xp_reward)
 
@@ -878,7 +944,7 @@ class Character(LivingThing):
     def _level_up(self):
         self.level += 1
 
-        current_level_stats = CHARACTER_LEVELUP_BONUS_STATS[self.level]
+        current_level_stats = self._LEVEL_STATS[self.level]
         # access the dictionary holding the appropriate value increases for each level
         hp_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_HEALTH]
         mana_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_MANA]
@@ -922,7 +988,7 @@ class Character(LivingThing):
                 print(f'\t{item_count} {item}')
 
     def _lookup_next_xp_level_req(self):
-        return CHARACTER_LEVEL_XP_REQUIREMENTS[self.level]
+        return self._REQUIRED_XP_TO_LEVEL[self.level]
 
     def loaded_script(self, script_name: str):
         """
@@ -945,19 +1011,20 @@ class Character(LivingThing):
         """
         return monster_GUID in self.killed_monsters
 
-    def has_completed_quest(self, quest_id: str) -> bool:
+    def has_completed_quest(self, quest_name: str) -> bool:
         """
         Returns a boolean whether the character has completed the specified quest before
         """
-        return quest_id in self.completed_quests
+        return quest_name in self.completed_quests
 
     def update_spell_cooldowns(self):
         """
         This method is called at the start of every turn
         It reduces the active cooldowns of our spells by 1, because a turn has passed
         """
-        for spell in self.learned_spells.values():
-            spell.pass_turn()
+        # lambda expression to reduce every value by 1 if it's not 0
+        self.spell_cooldowns = dict(map(lambda x: (x[0], x[1] - 1 if x[1] != 0 else 0),
+                                        self.spell_cooldowns.items()))
 
     def get_class(self) -> str:
         """Returns the class of the character as a string"""
