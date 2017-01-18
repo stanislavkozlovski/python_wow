@@ -10,7 +10,6 @@ database.main.Base = Base
 import models.main
 from models.creatures.creature_template import CreatureTemplateSchema
 from models.creatures.creatures import CreaturesSchema
-from models.items.loot_table import LootTableSchema
 from models.creatures.loader import load_monsters, load_npcs
 from entities import Monster, FriendlyNPC, VendorNPC
 from items import Item
