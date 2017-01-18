@@ -9,7 +9,7 @@ database.main.Base = Base
 
 import models.main
 from models.creatures.creature_defaults.loader import load_creature_defaults
-
+import datetime
 
 class LoaderTests(unittest.TestCase):
     """
@@ -35,6 +35,24 @@ class LoaderTests(unittest.TestCase):
             del expected_default['creature_level']  # the received default does not have this intentionally
 
             self.assertCountEqual(received_default, expected_default)
+
+    def test_loader_run_once_speed(self):
+        """
+        Since the loader function uses the run_once decorator, it should
+        connect to the DB only once
+        :return:
+        """
+        start = datetime.datetime.now()
+
+        for i in range(10000):
+            load_creature_defaults()
+
+        end = datetime.datetime.now()
+        diff: datetime.timedelta = end - start
+        # half a second as max_diff
+        max_diff = datetime.timedelta(microseconds=50000)
+
+        self.assertLess(diff, max_diff)
 
 
 def tearDownModule():
