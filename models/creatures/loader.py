@@ -46,7 +46,7 @@ def load_npcs(zone: str, subzone: str) -> tuple:
     guid_name_set: {(int, str)} = set()
 
     print("Loading Friendly NPCs...")
-    loaded_npcs = session.query(CreaturesSchema).filter(((CreaturesSchema.type == 'fnpc') | (CreaturesSchema.type == 'vendor')
+    loaded_npcs = session.query(CreaturesSchema).filter((((CreaturesSchema.type == 'fnpc') | (CreaturesSchema.type == 'vendor'))
                                                          & (CreaturesSchema.zone == zone) & (CreaturesSchema.sub_zone == subzone)))
     for npc_info in loaded_npcs:
         guid: int = npc_info.guid
