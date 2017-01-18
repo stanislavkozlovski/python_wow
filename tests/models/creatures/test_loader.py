@@ -11,7 +11,7 @@ import models.main
 from models.creatures.creature_template import CreatureTemplateSchema
 from models.creatures.creatures import CreaturesSchema
 from models.items.loot_table import LootTableSchema
-from models.creatures.loader import load_monsters
+from models.creatures.loader import load_monsters, load_npcs
 from entities import Monster, FriendlyNPC, VendorNPC
 from items import Item
 
@@ -56,6 +56,37 @@ class LoaderTest(unittest.TestCase):
         monsters_dict, guid_name_set =  load_monsters(zone='Northshire Abbey', subzone='A Peculiar Hut', character=self.character)
         self.assertEqual(len(monsters_dict.keys()), 0)
         self.assertEqual(len(guid_name_set), 0)
+
+    def test_load_npcs_valid(self):
+        """
+        Load the npcs from a zone. We should get both FriendlyNPCs and VendorNPCs
+        """
+        expected_npc_count = 2
+        expected_zone = 'Northshire Abbey'
+        expected_subzone = 'Northshire Valley'
+        npcs_dict, guid_name_set = load_npcs(zone=expected_zone, subzone=expected_subzone)
+
+        for i in guid_name_set:
+            self.assertIsNotNone(i)
+            self.assertTrue(isinstance(i[0], int))
+            self.assertTrue(isinstance(i[1], str))
+        for i in npcs_dict.values():
+            self.assertTrue(isinstance(i, FriendlyNPC))
+
+        self.assertEqual(len(npcs_dict.keys()), expected_npc_count)
+        self.assertEqual(len(npcs_dict.keys()), len(guid_name_set))
+
+    def test_load_npcs_no_npcs(self):
+        """
+        Load the npcs from a zone which has no NPCs
+        """
+        expected_npc_count = 0
+        expected_zone = 'Northshire Abbey'
+        expected_subzone = 'A Peculiar Hut'
+
+        npcs_dict, guid_name_set = load_npcs(zone=expected_zone, subzone=expected_subzone)
+        self.assertEqual(len(npcs_dict.keys()), expected_npc_count)
+        self.assertEqual(len(npcs_dict.keys()), len(guid_name_set))
 
 
 def tearDownModule():
