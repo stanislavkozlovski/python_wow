@@ -11,10 +11,10 @@ import models.main
 from models.creatures.creature_template import CreatureTemplateSchema
 from models.creatures.creatures import CreaturesSchema
 from models.items.loot_table import LootTableSchema
-from entities import Monster
+from entities import Monster, FriendlyNPC
 
 
-class CreaturesTests(unittest.TestCase):
+class CreaturesMonsterTests(unittest.TestCase):
     def setUp(self):
         """
         Test loading three different types of monsters - vendor, fnpc, monster
@@ -25,6 +25,7 @@ class CreaturesTests(unittest.TestCase):
         self.monster_zone = 'Northshire Abbey'
         self.monster_subzone = 'A Peculiar Hut'
         self.monster_gold_range = range(5, 9)
+        self.monster_respawnable = False
         self.monster = Monster(monster_id=self.monster_entry, name="Brother Paxton", health=25, mana=0, armor=80, level=3,
                                min_damage=7, max_damage=10, quest_relation_id=0, xp_to_give=100,
                                gold_to_give_range=(5, 8), loot_table=None, gossip="Nobody will foil our plans!")
@@ -58,6 +59,29 @@ class CreaturesTests(unittest.TestCase):
         self.monster.loot = None
         self.monster._gold_to_give = None
         self.assertEqual(vars(converted_monster), vars(self.monster))
+        self.assertEqual(converted_monster.respawnable, self.monster.respawnable)
+
+
+class CreaturesFriendlyNpcTests(unittest.TestCase):
+    def setUp(self):
+        self.npc_entry = 13
+        self.npc_guid = 7
+        self.npc_type = 'fnpc'
+        self.npc_zone = 'Northshire Abbey'
+        self.npc_subzone = 'Northshire Valley'
+        self.npc_respawnable = True
+        self.npc = FriendlyNPC(name='Lumberjack Joe', health=25, mana=0, level=5, min_damage=10, max_damage=15,
+                               quest_relation_id=0, loot_table=None,
+                               gossip='Hey there $N, fancy helping me cut down this tree over here?')
+
+    def test_schema_values(self):
+        loaded_npc: CreaturesSchema = session.query(CreaturesSchema).get(self.npc_guid)
+        self.assertEqual(loaded_npc.guid, self.npc_guid)
+        self.assertEqual(loaded_npc.creature_id, self.npc_entry)
+        self.assertEqual(loaded_npc.type, self.npc_type)
+        self.assertEqual(loaded_npc.zone, self.npc_zone)
+        self.assertEqual(loaded_npc.sub_zone, self.npc_subzone)
+        self.assertTrue(isinstance(loaded_npc.creature, CreatureTemplateSchema))
 
 
 def tearDownModule():
