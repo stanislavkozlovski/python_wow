@@ -14,6 +14,7 @@ from models.items.loot_table import LootTableSchema
 from entities import Monster, FriendlyNPC, VendorNPC
 from items import Item
 
+
 class CreaturesMonsterTests(unittest.TestCase):
     def setUp(self):
         """
