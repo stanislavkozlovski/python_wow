@@ -11,8 +11,8 @@ import models.main
 from models.creatures.creature_template import CreatureTemplateSchema
 from models.creatures.creatures import CreaturesSchema
 from models.items.loot_table import LootTableSchema
-from entities import Monster, FriendlyNPC
-
+from entities import Monster, FriendlyNPC, VendorNPC
+from items import Item
 
 class CreaturesMonsterTests(unittest.TestCase):
     def setUp(self):
@@ -59,7 +59,6 @@ class CreaturesMonsterTests(unittest.TestCase):
         self.monster.loot = None
         self.monster._gold_to_give = None
         self.assertEqual(vars(converted_monster), vars(self.monster))
-        self.assertEqual(converted_monster.respawnable, self.monster.respawnable)
 
 
 class CreaturesFriendlyNpcTests(unittest.TestCase):
@@ -90,6 +89,34 @@ class CreaturesFriendlyNpcTests(unittest.TestCase):
         loaded_npc: FriendlyNPC = session.query(CreaturesSchema).get(self.npc_guid).convert_to_living_thing_object()
         self.assertTrue(isinstance(loaded_npc, FriendlyNPC))
         self.assertEqual(vars(loaded_npc), vars(self.npc))
+
+
+class CreaturesVendorNpcTests(unittest.TestCase):
+    def setUp(self):
+        self.vendor_entry = 14
+        self.vendor_guid = 8
+        self.vendor_type = 'vendor'
+        self.vendor_zone = 'Northshire Abbey'
+        self.vendor_subzone = 'Northshire Valley'
+        self.vendor_inventory = {'Wolf Meat': (Item(name='Wolf Meat', item_id=1, buy_price=1, sell_price=1), 10)}
+        self.vendor = VendorNPC(name='Meatseller Jack', entry=self.vendor_entry, health=20, mana=0, level=4,
+                                min_damage=5, max_damage=10, quest_relation_id=0, loot_table=None,
+                                gossip="Do you want to buy meat? You've come to the right place!",
+                                inventory=self.vendor_inventory)
+
+    def test_schema_values(self):
+        loaded_vendor: CreaturesSchema = session.query(CreaturesSchema).get(self.vendor_guid)
+        self.assertEqual(loaded_vendor.guid, self.vendor_guid)
+        self.assertEqual(loaded_vendor.creature_id, self.vendor_entry)
+        self.assertEqual(loaded_vendor.type, self.vendor_type)
+        self.assertEqual(loaded_vendor.zone, self.vendor_zone)
+        self.assertEqual(loaded_vendor.sub_zone, self.vendor_subzone)
+        self.assertTrue(isinstance(loaded_vendor.creature, CreatureTemplateSchema))
+
+    def test_convert_to_living_thing_vendor_npc_object(self):
+        loaded_vendor: VendorNPC = session.query(CreaturesSchema).get(self.vendor_guid).convert_to_living_thing_object()
+        self.assertIsNotNone(loaded_vendor)
+        self.assertEqual(vars(loaded_vendor), vars(self.vendor))
 
 
 def tearDownModule():
