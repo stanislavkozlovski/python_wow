@@ -83,6 +83,14 @@ class CreaturesFriendlyNpcTests(unittest.TestCase):
         self.assertEqual(loaded_npc.sub_zone, self.npc_subzone)
         self.assertTrue(isinstance(loaded_npc.creature, CreatureTemplateSchema))
 
+    def test_convert_to_living_thing_friendly_npc_object(self):
+        """
+        Converting a CreaturesSchema with a type of 'fnpc' should convert it to a FriendlyNpc object
+        """
+        loaded_npc: FriendlyNPC = session.query(CreaturesSchema).get(self.npc_guid).convert_to_living_thing_object()
+        self.assertTrue(isinstance(loaded_npc, FriendlyNPC))
+        self.assertEqual(vars(loaded_npc), vars(self.npc))
+
 
 def tearDownModule():
     import tests.delete_test_db  # module that deletes the DB :)
