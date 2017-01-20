@@ -12,4 +12,7 @@ def load_item(item_id: int):
 
     item_template_info: ItemTemplateSchema = session.query(ItemTemplateSchema).get(item_id)
 
+    if item_template_info is None:
+        raise Exception(f'There is no such item with an ID {item_id}!')
+
     return item_template_info.convert_to_item_object()
