@@ -64,7 +64,6 @@ class LoaderTests(unittest.TestCase):
             self.assertEqual(e.args[0], expected_exception_message)
 
 
-
 def tearDownModule():
     import tests.delete_test_db  # module that deletes the DB :)
 
