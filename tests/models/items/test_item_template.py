@@ -28,6 +28,41 @@ class ItemTemplateMiscItemTests(unittest.TestCase):
     def test_convert_to_item_object(self):
         received_item = session.query(ItemTemplateSchema).get(2)
         received_item = received_item.convert_to_item_object()
+        self.assertIsNotNone(received_item)
+        self.assertTrue(isinstance(received_item, Item))
+        self.assertEqual(vars(received_item), vars(self.expected_item))
+
+
+class ItemTemplateWeaponItemTests(unittest.TestCase):
+    """
+    Load an ItemTemplate schema and convert it to a Weapon object
+    """
+    def setUp(self):
+        self.item_entry = 3
+        self.name = 'Worn Axe'
+        self.type = 'weapon'
+        self.buy_price = 1
+        self.attributes = {
+            'bonus_health': 0,
+            'bonus_mana': 0,
+            'armor': 0,
+            'strength': 0,
+            'agility': 0
+
+        }
+        self.sell_price = 1
+        self.quest_id = 0
+        self.min_damage = 2
+        self.max_damage = 6
+        self.expected_item = Weapon(name=self.name, item_id=self.item_entry,
+                                    buy_price=self.buy_price, sell_price=self.sell_price,
+                                    min_damage=self.min_damage, max_damage=self.max_damage,
+                                    attributes_dict=self.attributes)
+
+    def test_convert_to_item_object(self):
+        received_item = session.query(ItemTemplateSchema).get(self.item_entry).convert_to_item_object()
+        self.assertIsNotNone(received_item)
+        self.assertTrue(isinstance(received_item, Weapon))
         self.assertEqual(vars(received_item), vars(self.expected_item))
 
 
