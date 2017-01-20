@@ -11,7 +11,7 @@ from models.items.loot_table import LootTableSchema
 from models.items.item_template import ItemTemplateSchema
 from models.quests.quest_template import QuestSchema
 from items import Item, Weapon, Equipment, Potion
-
+from buffs import BeneficialBuff
 
 class ItemTemplateMiscItemTests(unittest.TestCase):
     def setUp(self):
@@ -64,6 +64,30 @@ class ItemTemplateWeaponItemTests(unittest.TestCase):
         self.assertIsNotNone(received_item)
         self.assertTrue(isinstance(received_item, Weapon))
         self.assertEqual(vars(received_item), vars(self.expected_item))
+
+
+class ItemTemplatePotionItemTests(unittest.TestCase):
+    """
+    Load an ItemTemplate schema object and convert it to a Potion object
+    """
+    def setUp(self):
+        self.item_entry = 4
+        self.name = 'Strength Potion'
+        self.buy_price = 1
+        self.sell_price = 1
+        self.effect_id = 1
+        self.effect: BeneficialBuff = BeneficialBuff(name="Heart of a Lion",
+                                                     buff_stats_and_amounts=[('armor',0), ('strength', 15), ('health', 0), ('mana', 0)],
+                                                     duration=5)
+        self.potion = Potion(name=self.name, item_id=self.item_entry, buy_price=self.buy_price, sell_price=self.sell_price,
+                             buff=self.effect, quest_id=0)
+
+    def test_convert_to_item_object(self):
+        received_item: Potion = session.query(ItemTemplateSchema).get(self.item_entry).convert_to_item_object()
+
+        self.assertIsNotNone(received_item)
+        self.assertTrue(isinstance(received_item, Potion))
+        self.assertEqual(vars(received_item), vars(self.potion))
 
 
 def tearDownModule():
