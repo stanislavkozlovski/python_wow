@@ -30,7 +30,7 @@ class BeneficialBuff(StatusEffect):
                     KEY_BUFF_TYPE_HEALTH: 0,
                     KEY_BUFF_TYPE_MANA: 0}  # type: dict
 
-    def __init__(self, name: str, buff_stats_and_amounts: list, duration: int):
+    def __init__(self, name: str, buff_stats_and_amounts: [(str, int)], duration: int):
         """
         Buff(10, [(armor, 3), (None, None), (None, None)) will increase your armor by 10 for 3 turns
 
@@ -66,6 +66,9 @@ class BeneficialBuff(StatusEffect):
                     f" and {increased_attribute3} by {value3} for {self.duration} turns.")
         else:
             return ""
+
+    def __eq__(self, other):
+        return self.name == other.name and self.non_empty_buffs == other.non_empty_buffs and self.duration == other.duration
 
     def _manage_buff_types(self, buff_list: list):
         """
