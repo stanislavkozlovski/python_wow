@@ -37,17 +37,32 @@ class LoaderTests(unittest.TestCase):
 
     def test_load_invalid_item_id(self):
         """ It should raise an exception """
-        with self.assertRaises(Exception):
+        expected_exception_message = "There is no such item with an ID that's 0 or negative!"
+        try:
             received_item = load_item(0)
-        with self.assertRaises(Exception):
+            self.fail()
+        except Exception as e:
+            self.assertEqual(e.args[0], "There is no such item with an ID that's 0 or negative!")
+
+        try:
             received_item = load_item(-1)
+            self.fail()
+        except Exception as e:
+            self.assertEqual(e.args[0], "There is no such item with an ID that's 0 or negative!")
 
     def test_load_non_existing_item_id(self):
         """
         Load an item Id that is not in the DB. Ex: 200
         :return:
         """
-        pass
+        non_existant_id = 1024
+        expected_exception_message = f'There is no such item with an ID {non_existant_id}!'
+        try:
+            received_item = load_item(non_existant_id)
+            self.fail()
+        except Exception as e:
+            self.assertEqual(e.args[0], expected_exception_message)
+
 
 
 def tearDownModule():
