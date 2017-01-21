@@ -1,5 +1,7 @@
 import unittest
 
+from copy import deepcopy
+from tests.delete_test_db import delete_test_db  # module that deletes the DB :)
 import database.main
 from tests.create_test_db import engine, session, Base
 database.main.engine = engine
@@ -22,8 +24,8 @@ class SavedCharacterTests(unittest.TestCase):
         The saved character is Netherblood
         """
         self.entry = entry
-        self.char_equipment = char_equipment
-        self.character = character
+        self.char_equipment = deepcopy(char_equipment)
+        self.character = deepcopy(character)
 
     def test_build_equipment(self):
         received_eq = session.query(SavedCharacterSchema).get(self.entry).build_equipment()
@@ -52,7 +54,7 @@ class SavedCharacterTests(unittest.TestCase):
 
 
 def tearDownModule():
-    import tests.delete_test_db  # module that deletes the DB :)
+    delete_test_db()
 
 if __name__ == '__main__':
     unittest.main()

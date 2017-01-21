@@ -1,5 +1,6 @@
 import unittest
 
+from tests.delete_test_db import delete_test_db  # module that deletes the DB :)
 import database.main
 from tests.create_test_db import engine, session, Base
 database.main.engine = engine
@@ -65,7 +66,7 @@ class LoaderTests(unittest.TestCase):
 
 
 def tearDownModule():
-    import tests.delete_test_db  # module that deletes the DB :)
+    delete_test_db()
 
 if __name__ == '__main__':
     unittest.main()

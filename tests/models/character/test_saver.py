@@ -1,6 +1,8 @@
+from copy import deepcopy
 import unittest
 from unittest import mock
 
+from tests.delete_test_db import delete_test_db  # module that deletes the DB :)
 import database.main
 from tests.create_test_db import engine, session, Base
 database.main.engine = engine
@@ -21,7 +23,7 @@ class SavedCharacterSaverTests(unittest.TestCase):
     Get the Mock character, change his name and try to save him in the DB
     """
     def setUp(self):
-        self.expected_character = character
+        self.expected_character = deepcopy(character)
         # Expected Character has no completed quests, so add some
         self.expected_character.completed_quests.add(2)
         self.expected_character.name = 'Tester'
@@ -155,7 +157,7 @@ class SavedCharacterSaverTests(unittest.TestCase):
 
 
 def tearDownModule():
-    import tests.delete_test_db  # module that deletes the DB :)
+    delete_test_db()
 
 if __name__ == '__main__':
     unittest.main()

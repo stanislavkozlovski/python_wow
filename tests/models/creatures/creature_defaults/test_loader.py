@@ -1,5 +1,7 @@
+import datetime
 import unittest
 
+from tests.delete_test_db import delete_test_db  # module that deletes the DB :)
 import database.main
 from tests.create_test_db import engine, session, Base, connection, cursor
 
@@ -9,7 +11,7 @@ database.main.Base = Base
 
 import models.main
 from models.creatures.creature_defaults.loader import load_creature_defaults
-import datetime
+
 
 class LoaderTests(unittest.TestCase):
     """
@@ -56,7 +58,7 @@ class LoaderTests(unittest.TestCase):
 
 
 def tearDownModule():
-    import tests.delete_test_db
+    delete_test_db()
 
 if __name__ == '__main__':
     unittest.main()
