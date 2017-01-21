@@ -1,3 +1,4 @@
+import datetime
 import unittest
 
 from tests.delete_test_db import delete_test_db  # module that deletes the DB :)
@@ -53,6 +54,35 @@ class MiscLoaderTests(unittest.TestCase):
 
         self.assertTrue(len(loaded_requirements.keys()), self.expected_levelxp_req_count)
 
+    def test_load_character_level_stats_speed(self):
+        """
+        Since it uses the @run_once decorator, it should connect to the DB only once
+        """
+        max_diff = datetime.timedelta(microseconds=50000)
+        start = datetime.datetime.now()
+
+        for _ in range(10000):
+            load_character_level_stats()
+
+        end = datetime.datetime.now()
+        diff: datetime.timedelta = end - start
+
+        self.assertLess(diff, max_diff)
+
+    def test_load_character_xp_requirements_speed(self):
+        """
+        Since it uses the @run_once decorator, it should connect to the DB only once
+        """
+        max_diff = datetime.timedelta(microseconds=50000)
+        start = datetime.datetime.now()
+
+        for _ in range(10000):
+            load_character_xp_requirements()
+
+        end = datetime.datetime.now()
+        diff: datetime.timedelta = end - start
+
+        self.assertLess(diff, max_diff)
 
 
 def tearDownModule():
