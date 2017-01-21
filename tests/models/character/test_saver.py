@@ -11,8 +11,8 @@ from classes import Paladin
 from models.characters.saved_character import SavedCharacterSchema
 from models.items.item_template import ItemTemplateSchema
 from tests.models.character.character_mock import character, char_equipment, entry
-from models.characters.saver import save_character, save_loaded_scripts
-from models.characters.saved_character import LoadedScriptsSchema
+from models.characters.saver import save_character, save_loaded_scripts, save_killed_monsters, save_completed_quests
+from models.characters.saved_character import LoadedScriptsSchema, KilledMonstersSchema, CompletedQuestsSchema
 
 class SavedCharacterSaverTests(unittest.TestCase):
     """
@@ -63,6 +63,22 @@ class SavedCharacterSaverTests(unittest.TestCase):
 
         loaded_scripts_count = session.query(LoadedScriptsSchema).filter_by(saved_character_id=test_char_id).count()
         self.assertEqual(loaded_scripts_count, len(loaded_scripts))
+
+    def test_save_killed_monsters(self):
+        test_char_id = 147
+        killed_monsters_guids = {109, 111, 131, 149, 13141}
+        save_killed_monsters(test_char_id, killed_monsters_guids)
+
+        killed_monsters_count = session.query(KilledMonstersSchema).filter_by(saved_character_id=test_char_id).count()
+        self.assertEqual(killed_monsters_count, len(killed_monsters_guids))
+
+    def test_save_completed_quests(self):
+        test_char_id = 94
+        completed_quests_ids = {9, 10, 12, 13}
+        save_completed_quests(test_char_id, completed_quests_ids)
+        
+        completed_quests_count = session.query(CompletedQuestsSchema).filter_by(saved_character_id=test_char_id).count()
+        self.assertEqual(completed_quests_count, len(completed_quests_ids))
 
 
 def tearDownModule():
