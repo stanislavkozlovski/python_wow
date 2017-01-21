@@ -9,14 +9,17 @@ database.main.Base = Base
 import models.main
 from classes import Paladin
 from exceptions import NoSuchCharacterError
-from models.characters.loader import load_saved_character
+from models.characters.loader import load_saved_character, load_all_saved_characters_general_info
 from tests.models.character.character_mock import character
 
 
 class LoaderTests(unittest.TestCase):
     def setUp(self):
         self.character = character
-
+        self.expected_general_info = [
+            {'name': 'Netherblood', 'class': 'paladin', 'level': 3},
+            {'name': 'Visionary', 'class': 'paladin', 'level': 1}
+        ]
     def test_load_valid_character(self):
         loaded_char = load_saved_character(character.name)
         self.assertIsNotNone(loaded_char)
@@ -46,6 +49,10 @@ class LoaderTests(unittest.TestCase):
             self.fail('The test should have raised a NoSuchCharacterError!')
         except NoSuchCharacterError as e:
             self.assertEqual(str(e), expected_message)
+
+    def test_load_all_saved_characters_general_info(self):
+        loaded_general_info = load_all_saved_characters_general_info()
+        self.assertEqual(loaded_general_info, self.expected_general_info)
 
 
 def tearDownModule():

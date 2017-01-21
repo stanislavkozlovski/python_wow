@@ -4,6 +4,7 @@ from exceptions import NoSuchCharacterError
 from models.characters.saved_character import SavedCharacterSchema
 from database.main import session
 
+
 def load_saved_character(name: str):
     """
     This function loads the information about a saved chacacter in the saved_character DB table.
