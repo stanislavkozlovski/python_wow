@@ -260,7 +260,13 @@ CREATE TABLE saved_character_completed_quests (
     quest_id           INTEGER REFERENCES quest_template (entry) 
 );
 
-
+INSERT INTO saved_character_completed_quests (
+						id,
+						saved_character_id,
+						quest_id
+					     )
+					     VALUES (1, 1, 1);
+								
 -- Table: saved_character_inventory
 DROP TABLE IF EXISTS saved_character_inventory;
 

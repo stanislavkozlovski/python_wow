@@ -50,7 +50,7 @@ char_inventory: {str: (Item, int)} = {
 # if we have two items and we first equip an item with high agility we will get more armor
 # as opposed to one with less first
 loaded_scripts = {'HASKEL_PAXTON_CONVERSATION'}
-completed_quests = set()
+completed_quests = {1}
 killed_monsters = {14, 15, 20}
 character = Paladin(name=name, level=level, loaded_scripts=loaded_scripts, killed_monsters=killed_monsters,
                         completed_quests=completed_quests, saved_inventory=char_inventory, saved_equipment=char_equipment)
