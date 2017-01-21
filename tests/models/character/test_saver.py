@@ -11,8 +11,8 @@ from classes import Paladin
 from models.characters.saved_character import SavedCharacterSchema
 from models.items.item_template import ItemTemplateSchema
 from tests.models.character.character_mock import character, char_equipment, entry
-from models.characters.saver import save_character
-
+from models.characters.saver import save_character, save_loaded_scripts
+from models.characters.saved_character import LoadedScriptsSchema
 
 class SavedCharacterSaverTests(unittest.TestCase):
     """
@@ -55,6 +55,14 @@ class SavedCharacterSaverTests(unittest.TestCase):
 
         # assert they're the same
         self.assertEqual(vars(received_character), vars(self.expected_character))
+
+    def test_save_loaded_scripts(self):
+        test_char_id = 133
+        loaded_scripts = {'The Beat is too low', 'and the vocals too loud'}
+        save_loaded_scripts(test_char_id, loaded_scripts)
+
+        loaded_scripts_count = session.query(LoadedScriptsSchema).filter_by(saved_character_id=test_char_id).count()
+        self.assertEqual(loaded_scripts_count, len(loaded_scripts))
 
 
 def tearDownModule():
