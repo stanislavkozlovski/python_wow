@@ -25,11 +25,9 @@ class SavedCharacterTests(unittest.TestCase):
         self.char_equipment = char_equipment
         self.character = character
 
-
     def test_build_equipment(self):
         received_eq = session.query(SavedCharacterSchema).get(self.entry).build_equipment()
         self.assertCountEqual(received_eq, self.char_equipment)
-
 
     def test_convert_to_character_object(self):
         received_char = session.query(SavedCharacterSchema).get(self.entry).convert_to_character_object()
