@@ -37,6 +37,22 @@ class MiscLoaderTests(unittest.TestCase):
 
         self.assertTrue(len(loaded_stats.keys()), self.expected_levelup_stats_count)
 
+    def test_load_character_xp_requirements(self):
+        """
+        It should load the requirements for every level
+        """
+        loaded_requirements = load_character_xp_requirements()
+
+        self.assertIsNotNone(loaded_requirements)
+        self.assertTrue(isinstance(loaded_requirements, dict))
+
+        # assert that each level is in the keys of the dict
+        # (assumes every row is unique corresponding for each level)
+        for level in range(1, self.expected_levelxp_req_count + 1):
+            self.assertIn(level, loaded_requirements)
+
+        self.assertTrue(len(loaded_requirements.keys()), self.expected_levelxp_req_count)
+
 
 
 def tearDownModule():
