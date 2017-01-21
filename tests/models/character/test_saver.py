@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 
 import database.main
 from tests.create_test_db import engine, session, Base
@@ -11,8 +12,8 @@ from classes import Paladin
 from models.characters.saved_character import SavedCharacterSchema
 from models.items.item_template import ItemTemplateSchema
 from tests.models.character.character_mock import character, char_equipment, entry
-from models.characters.saver import save_character, save_loaded_scripts, save_killed_monsters, save_completed_quests
-from models.characters.saved_character import LoadedScriptsSchema, KilledMonstersSchema, CompletedQuestsSchema
+from models.characters.saver import save_character, save_loaded_scripts, save_killed_monsters, save_completed_quests, save_inventory
+from models.characters.saved_character import LoadedScriptsSchema, KilledMonstersSchema, CompletedQuestsSchema, InventorySchema
 
 class SavedCharacterSaverTests(unittest.TestCase):
     """
@@ -76,9 +77,24 @@ class SavedCharacterSaverTests(unittest.TestCase):
         test_char_id = 94
         completed_quests_ids = {9, 10, 12, 13}
         save_completed_quests(test_char_id, completed_quests_ids)
-        
+
         completed_quests_count = session.query(CompletedQuestsSchema).filter_by(saved_character_id=test_char_id).count()
         self.assertEqual(completed_quests_count, len(completed_quests_ids))
+
+    def test_save_inventory(self):
+        item1_mock = mock.Mock(id=1)
+        item2_mock = mock.Mock(id=2)
+        item3_mock = mock.Mock(id=3)
+        inventory_mock = {
+            "Digital": (item1_mock, 1),
+            "GetRid": (item2_mock, 2),
+            "Bra": (item3_mock, 1)
+        }
+        test_char_id = 94
+        save_inventory(test_char_id, inventory_mock)
+
+        saved_inventory_count = session.query(InventorySchema).filter_by(saved_character_id=test_char_id).count()
+        self.assertEqual(saved_inventory_count, len(inventory_mock.keys()))
 
 
 def tearDownModule():
