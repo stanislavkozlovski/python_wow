@@ -12,8 +12,9 @@ from classes import Paladin
 from models.characters.saved_character import SavedCharacterSchema
 from models.items.item_template import ItemTemplateSchema
 from tests.models.character.character_mock import character, char_equipment, entry
-from models.characters.saver import save_character, save_loaded_scripts, save_killed_monsters, save_completed_quests, save_inventory
+from models.characters.saver import save_character, save_loaded_scripts, save_killed_monsters, save_completed_quests, save_inventory, delete_rows_from_table
 from models.characters.saved_character import LoadedScriptsSchema, KilledMonstersSchema, CompletedQuestsSchema, InventorySchema
+
 
 class SavedCharacterSaverTests(unittest.TestCase):
     """
@@ -95,6 +96,51 @@ class SavedCharacterSaverTests(unittest.TestCase):
 
         saved_inventory_count = session.query(InventorySchema).filter_by(saved_character_id=test_char_id).count()
         self.assertEqual(saved_inventory_count, len(inventory_mock.keys()))
+
+    def test_delete_rows_from_table_valid_tables(self):
+        """
+        Test the function that deletes rows from a table
+        """
+        char_id = 1
+        # 1.Delete from the saved_character_inventory table
+        old_inventory_rows_count = session.query(InventorySchema).filter_by(saved_character_id=char_id).count()
+        self.assertGreater(old_inventory_rows_count, 0)
+
+        delete_rows_from_table(InventorySchema.__tablename__, char_id)
+        new_inventory_rows_count = session.query(InventorySchema).filter_by(saved_character_id=char_id).count()
+
+        self.assertEqual(new_inventory_rows_count, 0)
+        self.assertLess(new_inventory_rows_count, old_inventory_rows_count)
+
+        # 2.Delete from the saved_character_killed_monsters table
+        old_monsters_count = session.query(KilledMonstersSchema).filter_by(saved_character_id=char_id).count()
+        self.assertGreater(old_monsters_count, 0)
+
+        delete_rows_from_table(KilledMonstersSchema.__tablename__, char_id)
+        new_monsters_count = session.query(KilledMonstersSchema).filter_by(saved_character_id=char_id).count()
+
+        self.assertEqual(new_monsters_count, 0)
+        self.assertLess(new_monsters_count, old_monsters_count)
+
+        # 3.Delete from the saved_character_loaded_scripts table
+        old_scripts_count = session.query(LoadedScriptsSchema).filter_by(saved_character_id=char_id).count()
+        self.assertGreater(old_scripts_count, 0)
+
+        delete_rows_from_table(LoadedScriptsSchema.__tablename__, char_id)
+        new_scripts_count = session.query(LoadedScriptsSchema).filter_by(saved_character_id=char_id).count()
+
+        self.assertEqual(new_scripts_count, 0)
+        self.assertLess(new_scripts_count, old_scripts_count)
+
+        # 4.Delete from the saved_character_completed_quests table
+        old_quests_count = session.query(CompletedQuestsSchema).filter_by(saved_character_id=char_id).count()
+        self.assertGreater(old_quests_count, 0)
+
+        delete_rows_from_table(CompletedQuestsSchema.__tablename__, char_id)
+        new_quests_count = session.query(CompletedQuestsSchema).filter_by(saved_character_id=char_id).count()
+
+        self.assertEqual(new_quests_count, 0)
+        self.assertLess(new_quests_count, old_quests_count)
 
 
 def tearDownModule():
