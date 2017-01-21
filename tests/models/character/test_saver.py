@@ -142,6 +142,17 @@ class SavedCharacterSaverTests(unittest.TestCase):
         self.assertEqual(new_quests_count, 0)
         self.assertLess(new_quests_count, old_quests_count)
 
+    def test_delete_rows_from_table_not_allowed_table(self):
+        # we should not be able to delete from these tables
+        table_names = ['saved_character', 'loot_table', 'creature_template', 'creature_defaults']
+        for table_name in table_names:
+            expected_message = f'You do not have permission to delete from the {table_name} table!'
+            try:
+                delete_rows_from_table(table_name, 1)
+                self.fail()
+            except Exception as e:
+                self.assertEqual(str(e), expected_message)
+
 
 def tearDownModule():
     import tests.delete_test_db  # module that deletes the DB :)
