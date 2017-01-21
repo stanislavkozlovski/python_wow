@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.1.0 on вт ян. 17 16:50:48 2017
+-- File generated with SQLiteStudio v3.1.0 on сб ян. 21 01:39:28 2017
 --
 -- Text encoding used: UTF-8
 --
@@ -14,16 +14,16 @@ CREATE TABLE quest_template (
     name                VARCHAR (60),
     type                VARCHAR (60),
     level_required      INTEGER,
-    monster_required    VARCHAR (60),
-    item_required       VARCHAR (60),
+    monster_required    VARCHAR (60) REFERENCES creature_template (name),
+    item_required       VARCHAR (60) REFERENCES item_template (name),
     amount_required     INTEGER,
     zone                VARCHAR (60),
     sub_zone            VARCHAR (60),
     xp_reward           INTEGER,
     comment             TEXT,
-    item_reward1        INTEGER,
-    item_reward2        INTEGER,
-    item_reward3        INTEGER,
+    item_reward1        INTEGER      REFERENCES item_template (entry),
+    item_reward2        INTEGER      REFERENCES item_template (entry),
+    item_reward3        INTEGER      REFERENCES item_template (entry),
     item_choice_enabled INTEGER      NOT NULL
                                      DEFAULT (0) 
 );
@@ -138,39 +138,86 @@ INSERT INTO quest_template (
 DROP TABLE IF EXISTS saved_character;
 
 CREATE TABLE saved_character (
-    name                VARCHAR (60) UNIQUE
-                                     PRIMARY KEY,
-    class               VARCHAR (60),
-    level               INTEGER,
-    loaded_scripts_ID   INTEGER,
-    killed_monsters_ID  INTEGER,
-    completed_quests_ID INTEGER,
-    equipment_ID        INTEGER,
-    inventory_ID        INTEGER,
-    gold                INTEGER
+    entry          INTEGER      PRIMARY KEY AUTOINCREMENT,
+    name           VARCHAR (60) UNIQUE,
+    class          VARCHAR (60),
+    level          INTEGER,
+    gold           INTEGER,
+    headpiece_id   INTEGER      REFERENCES item_template (entry),
+    shoulderpad_id INTEGER      REFERENCES item_template (entry),
+    necklace_id    INTEGER      REFERENCES item_template (entry),
+    chestguard_id  INTEGER      REFERENCES item_template (entry),
+    bracer_id      INTEGER      REFERENCES item_template (entry),
+    gloves_id      INTEGER      REFERENCES item_template (entry),
+    belt_id        INTEGER      REFERENCES item_template (entry),
+    leggings_id    INTEGER      REFERENCES item_template (entry),
+    boots_id       INTEGER      REFERENCES item_template (entry) 
 );
 
 INSERT INTO saved_character (
+                                entry,
                                 name,
                                 class,
                                 level,
-                                loaded_scripts_ID,
-                                killed_monsters_ID,
-                                completed_quests_ID,
-                                equipment_ID,
-                                inventory_ID,
-                                gold
+                                gold,
+                                headpiece_id,
+                                shoulderpad_id,
+                                necklace_id,
+                                chestguard_id,
+                                bracer_id,
+                                gloves_id,
+                                belt_id,
+                                leggings_id,
+                                boots_id
                             )
                             VALUES (
+                                1,
                                 'Netherblood',
                                 'paladin',
                                 3,
+                                61,
+                                11,
+                                12,
+                                14,
+                                13,
+                                NULL,
+                                NULL,
+                                NULL,
+                                NULL,
+                                NULL
+                            );
+
+INSERT INTO saved_character (
+                                entry,
+                                name,
+                                class,
+                                level,
+                                gold,
+                                headpiece_id,
+                                shoulderpad_id,
+                                necklace_id,
+                                chestguard_id,
+                                bracer_id,
+                                gloves_id,
+                                belt_id,
+                                leggings_id,
+                                boots_id
+                            )
+                            VALUES (
+                                246,
+                                'Visionary',
+                                'paladin',
                                 1,
-                                1,
-                                1,
-                                1,
-                                1,
-                                24
+                                16,
+                                NULL,
+                                NULL,
+                                NULL,
+                                NULL,
+                                NULL,
+                                NULL,
+                                NULL,
+                                NULL,
+                                NULL
                             );
 
 
@@ -208,8 +255,9 @@ INSERT INTO spell_dots (
 DROP TABLE IF EXISTS saved_character_completed_quests;
 
 CREATE TABLE saved_character_completed_quests (
-    id         INTEGER,
-    quest_name STRING
+    id                 INTEGER PRIMARY KEY,
+    saved_character_id INTEGER REFERENCES saved_character (entry),
+    quest_id           INTEGER REFERENCES quest_template (entry) 
 );
 
 
@@ -217,17 +265,20 @@ CREATE TABLE saved_character_completed_quests (
 DROP TABLE IF EXISTS saved_character_inventory;
 
 CREATE TABLE saved_character_inventory (
-    id         INTEGER,
-    item_id    INTEGER,
-    item_count INTEGER
+    id                 INTEGER PRIMARY KEY,
+    saved_character_id INTEGER REFERENCES saved_character,
+    item_id            INTEGER REFERENCES item_template (entry),
+    item_count         INTEGER
 );
 
 INSERT INTO saved_character_inventory (
                                           id,
+                                          saved_character_id,
                                           item_id,
                                           item_count
                                       )
                                       VALUES (
+                                          1,
                                           2,
                                           300,
                                           3
@@ -235,10 +286,12 @@ INSERT INTO saved_character_inventory (
 
 INSERT INTO saved_character_inventory (
                                           id,
+                                          saved_character_id,
                                           item_id,
                                           item_count
                                       )
                                       VALUES (
+                                          2,
                                           1,
                                           11,
                                           5
@@ -246,23 +299,92 @@ INSERT INTO saved_character_inventory (
 
 INSERT INTO saved_character_inventory (
                                           id,
+                                          saved_character_id,
                                           item_id,
                                           item_count
                                       )
                                       VALUES (
+                                          3,
                                           1,
                                           1,
+                                          5
+                                      );
+
+INSERT INTO saved_character_inventory (
+                                          id,
+                                          saved_character_id,
+                                          item_id,
+                                          item_count
+                                      )
+                                      VALUES (
+                                          4,
+                                          1,
+                                          2,
+                                          3
+                                      );
+
+INSERT INTO saved_character_inventory (
+                                          id,
+                                          saved_character_id,
+                                          item_id,
+                                          item_count
+                                      )
+                                      VALUES (
+                                          5,
+                                          1,
+                                          12,
                                           1
                                       );
 
 INSERT INTO saved_character_inventory (
                                           id,
+                                          saved_character_id,
                                           item_id,
                                           item_count
                                       )
                                       VALUES (
+                                          6,
                                           1,
-                                          2,
+                                          10,
+                                          1
+                                      );
+
+INSERT INTO saved_character_inventory (
+                                          id,
+                                          saved_character_id,
+                                          item_id,
+                                          item_count
+                                      )
+                                      VALUES (
+                                          7,
+                                          1,
+                                          9,
+                                          1
+                                      );
+
+INSERT INTO saved_character_inventory (
+                                          id,
+                                          saved_character_id,
+                                          item_id,
+                                          item_count
+                                      )
+                                      VALUES (
+                                          8,
+                                          1,
+                                          14,
+                                          1
+                                      );
+
+INSERT INTO saved_character_inventory (
+                                          id,
+                                          saved_character_id,
+                                          item_id,
+                                          item_count
+                                      )
+                                      VALUES (
+                                          9,
+                                          1,
+                                          4,
                                           1
                                       );
 
@@ -313,24 +435,40 @@ INSERT INTO spell_buffs (
 DROP TABLE IF EXISTS saved_character_killed_monsters;
 
 CREATE TABLE saved_character_killed_monsters (
-    id   INTEGER,
-    GUID INTEGER
+    id                 INTEGER PRIMARY KEY,
+    saved_character_id INTEGER REFERENCES saved_character,
+    GUID               INTEGER REFERENCES creatures (guid) 
 );
 
 INSERT INTO saved_character_killed_monsters (
                                                 id,
+                                                saved_character_id,
                                                 GUID
                                             )
                                             VALUES (
+                                                1,
                                                 1,
                                                 20
                                             );
 
 INSERT INTO saved_character_killed_monsters (
                                                 id,
+                                                saved_character_id,
                                                 GUID
                                             )
                                             VALUES (
+                                                2,
+                                                1,
+                                                14
+                                            );
+
+INSERT INTO saved_character_killed_monsters (
+                                                id,
+                                                saved_character_id,
+                                                GUID
+                                            )
+                                            VALUES (
+                                                3,
                                                 1,
                                                 15
                                             );
@@ -340,33 +478,29 @@ INSERT INTO saved_character_killed_monsters (
 DROP TABLE IF EXISTS saved_character_loaded_scripts;
 
 CREATE TABLE saved_character_loaded_scripts (
-    id          INTEGER,
-    script_name TEXT
+    id                 INTEGER PRIMARY KEY,
+    saved_character_id INTEGER REFERENCES saved_character,
+    script_name        TEXT
 );
 
 INSERT INTO saved_character_loaded_scripts (
                                                id,
+                                               saved_character_id,
                                                script_name
                                            )
                                            VALUES (
+                                               2,
                                                2,
                                                'ss'
                                            );
 
 INSERT INTO saved_character_loaded_scripts (
                                                id,
+                                               saved_character_id,
                                                script_name
                                            )
                                            VALUES (
-                                               2,
-                                               'brr'
-                                           );
-
-INSERT INTO saved_character_loaded_scripts (
-                                               id,
-                                               script_name
-                                           )
-                                           VALUES (
+                                               3,
                                                1,
                                                'HASKEL_PAXTON_CONVERSATION'
                                            );
@@ -376,20 +510,21 @@ INSERT INTO saved_character_loaded_scripts (
 DROP TABLE IF EXISTS paladin_spells_template;
 
 CREATE TABLE paladin_spells_template (
-    id             INTEGER      PRIMARY KEY AUTOINCREMENT,
-    name           VARCHAR (60),
-    rank           INTEGER,
-    level_required INTEGER,
-    damage1        INTEGER,
-    damage2        INTEGER,
-    damage3        INTEGER,
-    heal1          INTEGER,
-    heal2          INTEGER,
-    heal3          INTEGER,
-    mana_cost      INTEGER,
-    effect         INTEGER,
-    cooldown       INTEGER,
-    comment        TEXT
+    id                INTEGER      PRIMARY KEY AUTOINCREMENT,
+    name              VARCHAR (60),
+    rank              INTEGER,
+    level_required    INTEGER,
+    damage1           INTEGER,
+    damage2           INTEGER,
+    damage3           INTEGER,
+    heal1             INTEGER,
+    heal2             INTEGER,
+    heal3             INTEGER,
+    mana_cost         INTEGER,
+    beneficial_effect INTEGER      REFERENCES spell_buffs (entry),
+    harmful_effect                 REFERENCES spell_dots (entry),
+    cooldown          INTEGER,
+    comment           TEXT
 );
 
 INSERT INTO paladin_spells_template (
@@ -404,7 +539,8 @@ INSERT INTO paladin_spells_template (
                                         heal2,
                                         heal3,
                                         mana_cost,
-                                        effect,
+                                        beneficial_effect,
+                                        harmful_effect,
                                         cooldown,
                                         comment
                                     )
@@ -422,6 +558,7 @@ INSERT INTO paladin_spells_template (
                                         4,
                                         NULL,
                                         NULL,
+                                        NULL,
                                         NULL
                                     );
 
@@ -437,7 +574,8 @@ INSERT INTO paladin_spells_template (
                                         heal2,
                                         heal3,
                                         mana_cost,
-                                        effect,
+                                        beneficial_effect,
+                                        harmful_effect,
                                         cooldown,
                                         comment
                                     )
@@ -455,6 +593,7 @@ INSERT INTO paladin_spells_template (
                                         6,
                                         NULL,
                                         NULL,
+                                        NULL,
                                         NULL
                                     );
 
@@ -470,7 +609,8 @@ INSERT INTO paladin_spells_template (
                                         heal2,
                                         heal3,
                                         mana_cost,
-                                        effect,
+                                        beneficial_effect,
+                                        harmful_effect,
                                         cooldown,
                                         comment
                                     )
@@ -488,6 +628,7 @@ INSERT INTO paladin_spells_template (
                                         7,
                                         NULL,
                                         NULL,
+                                        NULL,
                                         'Heals the character'
                                     );
 
@@ -503,7 +644,8 @@ INSERT INTO paladin_spells_template (
                                         heal2,
                                         heal3,
                                         mana_cost,
-                                        effect,
+                                        beneficial_effect,
+                                        harmful_effect,
                                         cooldown,
                                         comment
                                     )
@@ -519,6 +661,7 @@ INSERT INTO paladin_spells_template (
                                         0,
                                         0,
                                         6,
+                                        NULL,
                                         1,
                                         3,
                                         'Damages the target for damage1 and applies a DoT to the target'
@@ -700,8 +843,8 @@ CREATE TABLE creature_template (
     armor             INTEGER      DEFAULT (0),
     min_dmg           INTEGER      DEFAULT (1),
     max_dmg           INTEGER      DEFAULT (2),
-    quest_relation_ID INTEGER,
-    loot_table_ID     INTEGER,
+    quest_relation_ID INTEGER      REFERENCES quest_template (entry),
+    loot_table_ID     INTEGER      REFERENCES loot_table (entry),
     gossip            TEXT,
     respawnable       BOOLEAN
 );
@@ -1196,7 +1339,7 @@ INSERT INTO creature_template (
                                   0,
                                   7,
                                   10,
-                                  '',
+                                  NULL,
                                   4,
                                   'Nobody will foil our plans!',
                                   0
@@ -1227,8 +1370,8 @@ INSERT INTO creature_template (
                                   0,
                                   7,
                                   10,
-                                  '',
-                                  '',
+                                  NULL,
+                                  NULL,
                                   'You have not seen the last of us!',
                                   0
                               );
@@ -1239,7 +1382,7 @@ DROP TABLE IF EXISTS npc_vendor;
 
 CREATE TABLE npc_vendor (
     creature_entry INTEGER PRIMARY KEY AUTOINCREMENT,
-    item_id        INTEGER,
+    item_id        INTEGER REFERENCES item_template (entry),
     item_count     INTEGER DEFAULT (1),
     price          INTEGER
 );
@@ -1264,7 +1407,7 @@ DROP TABLE IF EXISTS creatures;
 CREATE TABLE creatures (
     guid        INTEGER      PRIMARY KEY AUTOINCREMENT
                              DEFAULT (1),
-    creature_id INTEGER,
+    creature_id INTEGER      REFERENCES creature_template (entry),
     type        VARCHAR (60),
     zone        VARCHAR (60),
     sub_zone    VARCHAR (60) 
@@ -1501,7 +1644,7 @@ DROP TABLE IF EXISTS item_template;
 
 CREATE TABLE item_template (
     entry      INTEGER      PRIMARY KEY,
-    name       VARCHAR (60),
+    name       VARCHAR (60) UNIQUE,
     type       VARCHAR (30),
     sub_type   VARCHAR (30),
     armor      INTEGER,
@@ -1513,7 +1656,7 @@ CREATE TABLE item_template (
     sell_price INTEGER,
     min_dmg    INTEGER,
     max_dmg    INTEGER,
-    quest_ID   INTEGER,
+    quest_ID   INTEGER      REFERENCES quest_template (entry),
     effect     INTEGER
 );
 
@@ -1546,8 +1689,8 @@ INSERT INTO item_template (
                               NULL,
                               1,
                               1,
-                              '',
-                              '',
+                              NULL,
+                              NULL,
                               2,
                               NULL
                           );
@@ -1581,7 +1724,7 @@ INSERT INTO item_template (
                               NULL,
                               1,
                               1,
-                              '',
+                              NULL,
                               NULL,
                               0,
                               NULL
@@ -1651,8 +1794,8 @@ INSERT INTO item_template (
                               NULL,
                               1,
                               1,
-                              '',
-                              '',
+                              NULL,
+                              NULL,
                               0,
                               1
                           );
@@ -1686,8 +1829,8 @@ INSERT INTO item_template (
                               NULL,
                               1,
                               1,
-                              '',
-                              '',
+                              NULL,
+                              NULL,
                               '',
                               NULL
                           );
@@ -1721,8 +1864,8 @@ INSERT INTO item_template (
                               NULL,
                               0,
                               0,
-                              '',
-                              '',
+                              NULL,
+                              NULL,
                               3,
                               NULL
                           );
@@ -1756,7 +1899,7 @@ INSERT INTO item_template (
                               NULL,
                               1,
                               1,
-                              '',
+                              NULL,
                               NULL,
                               NULL,
                               NULL
@@ -1851,7 +1994,7 @@ INSERT INTO item_template (
                           )
                           VALUES (
                               13,
-                              'Blackened Defias Belt',
+                              'Blackened Defias Vest',
                               'equipment',
                               'chestguard',
                               15,
@@ -2083,45 +2226,65 @@ DROP TABLE IF EXISTS loot_table;
 
 CREATE TABLE loot_table (
     entry         INTEGER PRIMARY KEY AUTOINCREMENT,
-    item1_ID      INTEGER DEFAULT (0),
+    item1_ID      INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item1_chance  INTEGER DEFAULT (0),
-    item2_ID      INTEGER DEFAULT (0),
+    item2_ID      INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item2_chance  INTEGER DEFAULT (0),
-    item3_ID      INTEGER DEFAULT (0),
+    item3_ID      INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item3_chance  INTEGER DEFAULT (0),
-    item4_ID      INTEGER DEFAULT (0),
+    item4_ID      INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item4_chance  INTEGER DEFAULT (0),
-    item5_ID      INTEGER DEFAULT (0),
+    item5_ID      INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item5_chance  INTEGER DEFAULT (0),
-    item6_ID      INTEGER DEFAULT (0),
+    item6_ID      INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item6_chance  INTEGER DEFAULT (0),
-    item7_ID      INTEGER DEFAULT (0),
+    item7_ID      INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item7_chance  INTEGER DEFAULT (0),
-    item8_ID      INTEGER DEFAULT (0),
+    item8_ID      INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item8_chance  INTEGER DEFAULT (0),
-    item9_ID      INTEGER DEFAULT (0),
+    item9_ID      INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item9_chance  INTEGER DEFAULT (0),
-    item10_ID     INTEGER DEFAULT (0),
+    item10_ID     INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item10_chance INTEGER DEFAULT (0),
-    item11_ID     INTEGER DEFAULT (0),
+    item11_ID     INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item11_chance INTEGER DEFAULT (0),
-    item12_ID     INTEGER DEFAULT (0),
+    item12_ID     INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item12_chance INTEGER DEFAULT (0),
-    item13_ID     INTEGER DEFAULT (0),
+    item13_ID     INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item13_chance INTEGER DEFAULT (0),
-    item14_ID     INTEGER DEFAULT (0),
+    item14_ID     INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item14_chance INTEGER DEFAULT (0),
-    item15_ID     INTEGER DEFAULT (0),
+    item15_ID     INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item15_chance INTEGER DEFAULT (0),
-    item16_ID     INTEGER DEFAULT (0),
+    item16_ID     INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item16_chance INTEGER DEFAULT (0),
-    item17_ID     INTEGER DEFAULT (0),
+    item17_ID     INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item17_chance INTEGER DEFAULT (0),
-    item18_ID     INTEGER DEFAULT (0),
+    item18_ID     INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item18_chance INTEGER DEFAULT (0),
-    item19_ID     INTEGER DEFAULT (0),
+    item19_ID     INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item19_chance INTEGER DEFAULT (0),
-    item20_ID     INTEGER DEFAULT (0),
+    item20_ID     INTEGER DEFAULT (0) 
+                          REFERENCES item_template (entry),
     item20_chance INTEGER DEFAULT (0) 
 );
 
