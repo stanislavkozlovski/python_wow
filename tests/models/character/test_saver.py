@@ -1,3 +1,4 @@
+import importlib
 from copy import deepcopy
 import unittest
 from unittest import mock
@@ -27,6 +28,13 @@ class SavedCharacterSaverTests(unittest.TestCase):
         # Expected Character has no completed quests, so add some
         self.expected_character.completed_quests.add(2)
         self.expected_character.name = 'Tester'
+
+    def tearDown(self):
+        # restore the DB
+        import tests.create_test_db as create_db_mod
+        session.commit()
+        delete_test_db()
+        importlib.reload(create_db_mod)
 
     def test_save_character(self):
         save_character(self.expected_character)
