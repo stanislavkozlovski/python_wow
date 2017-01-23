@@ -44,8 +44,8 @@ class KillQuest(Quest):
                  reward_choice_enabled: bool, level_required: int, required_kills: int, is_completed: bool = False):
         super().__init__(quest_name, quest_id, xp_reward, item_reward_dict, reward_choice_enabled, level_required,
                          is_completed)
-        self.required_monster = required_monster
-        self.required_kills = required_kills
+        self.required_monster: str = required_monster  # name of the monster
+        self.required_kills: int = required_kills
         self.kills = 0
 
     def __str__(self):
