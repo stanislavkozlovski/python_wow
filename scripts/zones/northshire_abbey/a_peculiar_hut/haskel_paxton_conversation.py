@@ -36,5 +36,3 @@ def script(subzone, character):
     sleep(2)
     print("When the smoke clears, you see that the traitor is nowhere in sight...")
     print()
-
-    subzone._monster_guid_name_set.remove((subzone.GUID_BROTHER_HASKEL, "Brother Haskel"))
