@@ -1,7 +1,7 @@
 import unittest
 
 from copy import deepcopy
-from tests.delete_test_db import delete_test_db  # module that deletes the DB :)
+
 import database.main
 from tests.create_test_db import engine, session, Base
 database.main.engine = engine
@@ -53,8 +53,7 @@ class SavedCharacterTests(unittest.TestCase):
         self.assertEqual(vars(received_char), vars(self.character))
 
 
-def tearDownModule():
-    delete_test_db()
+
 
 if __name__ == '__main__':
     unittest.main()

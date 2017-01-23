@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import Mock
 
-from tests.delete_test_db import delete_test_db  # module that deletes the DB :)
 import database.main
 from tests.create_test_db import engine, session, Base
 
@@ -81,9 +80,6 @@ class QuestLoaderTests(unittest.TestCase):
         self.assertEqual(len(received_quests.keys()), 0)
         self.assertEqual(received_quests, expected_quests)
 
-
-def tearDownModule():
-    delete_test_db()
 
 if __name__ == '__main__':
     unittest.main()

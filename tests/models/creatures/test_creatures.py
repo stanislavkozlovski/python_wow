@@ -1,6 +1,5 @@
 import unittest
 
-from tests.delete_test_db import delete_test_db  # module that deletes the DB :)
 import database.main
 from tests.create_test_db import engine, session, Base
 
@@ -120,9 +119,6 @@ class CreaturesVendorNpcTests(unittest.TestCase):
         self.assertIsNotNone(loaded_vendor)
         self.assertEqual(vars(loaded_vendor), vars(self.vendor))
 
-
-def tearDownModule():
-    delete_test_db()
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,6 +1,5 @@
 import unittest
 
-from tests.delete_test_db import delete_test_db  # module that deletes the DB :)
 import database.main
 from tests.create_test_db import engine, session, Base
 
@@ -46,9 +45,6 @@ class BuffSchemaTests(unittest.TestCase):
         loaded_buff: BeneficialBuff = session.query(BuffSchema).get(self.buff_entry).convert_to_beneficial_buff_object()
         self.assertEqual(vars(loaded_buff), vars(self.expected_buff))
 
-
-def tearDownModule():
-    delete_test_db()
 
 if __name__ == '__main__':
     unittest.main()

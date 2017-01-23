@@ -1,6 +1,5 @@
 import unittest
 
-from tests.delete_test_db import delete_test_db  # module that deletes the DB :)
 import database.main
 from tests.create_test_db import engine, session, Base
 
@@ -59,9 +58,6 @@ class PaladinSpellsSchemaTests(unittest.TestCase):
         loaded_quest: PaladinSpell = session.query(PaladinSpellsSchema).get(self.spell_entry).convert_to_paladin_spell_object()
         self.assertEqual(vars(loaded_quest), vars(self.expected_spell))
 
-
-def tearDownModule():
-    delete_test_db()
 
 if __name__ == '__main__':
     unittest.main()

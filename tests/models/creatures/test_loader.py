@@ -1,6 +1,5 @@
 import unittest
 
-from tests.delete_test_db import delete_test_db  # module that deletes the DB :)
 import database.main
 from tests.create_test_db import engine, session, Base
 
@@ -87,10 +86,6 @@ class LoaderTest(unittest.TestCase):
         npcs_dict, guid_name_set = load_npcs(zone=expected_zone, subzone=expected_subzone)
         self.assertEqual(len(npcs_dict.keys()), expected_npc_count)
         self.assertEqual(len(npcs_dict.keys()), len(guid_name_set))
-
-
-def tearDownModule():
-    delete_test_db()
 
 
 if __name__ == '__main__':

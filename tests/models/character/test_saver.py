@@ -3,14 +3,16 @@ from copy import deepcopy
 import unittest
 from unittest import mock
 
-from tests.delete_test_db import delete_test_db  # module that deletes the DB :)
+from tests.delete_test_db import delete_test_db
 import database.main
 from tests.create_test_db import engine, session, Base
+import tests.create_test_db as create_test_db
+
 database.main.engine = engine
 database.main.session = session
 database.main.Base = Base
-import models.main
 
+import models.main
 from classes import Paladin
 from models.characters.saved_character import SavedCharacterSchema
 from models.items.item_template import ItemTemplateSchema
@@ -165,7 +167,10 @@ class SavedCharacterSaverTests(unittest.TestCase):
 
 
 def tearDownModule():
+    # Delete the database since we've modified it
     delete_test_db()
+    # Reload the module so that it can re-create the DB
+    importlib.reload(create_test_db)
 
 if __name__ == '__main__':
     unittest.main()

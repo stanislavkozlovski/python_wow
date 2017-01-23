@@ -1,6 +1,5 @@
 import unittest
 
-from tests.delete_test_db import delete_test_db  # module that deletes the DB :)
 import database.main
 from tests.create_test_db import engine, session, Base
 
@@ -91,9 +90,6 @@ class QuestTemplateSchemaTests(unittest.TestCase):
 
         self.assertEqual(vars(received_quest), vars(expected_quest))
 
-
-def tearDownModule():
-    delete_test_db()
 
 if __name__ == '__main__':
     unittest.main()

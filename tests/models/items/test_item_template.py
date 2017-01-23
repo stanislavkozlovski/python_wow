@@ -1,6 +1,5 @@
 import unittest
 
-from tests.delete_test_db import delete_test_db  # module that deletes the DB :)
 import database.main
 from tests.create_test_db import engine, session, Base
 database.main.engine = engine
@@ -89,10 +88,6 @@ class ItemTemplatePotionItemTests(unittest.TestCase):
         self.assertIsNotNone(received_item)
         self.assertTrue(isinstance(received_item, Potion))
         self.assertEqual(vars(received_item), vars(self.potion))
-
-
-def tearDownModule():
-    delete_test_db()
 
 
 if __name__ == '__main__':
