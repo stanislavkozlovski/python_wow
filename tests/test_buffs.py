@@ -1,6 +1,7 @@
 import unittest
 
 from buffs import *
+from constants import KEY_BUFF_TYPE_ARMOR, KEY_BUFF_TYPE_HEALTH, KEY_BUFF_TYPE_MANA, KEY_BUFF_TYPE_STRENGTH
 
 
 class StatusEffectTests(unittest.TestCase):
@@ -35,6 +36,12 @@ class BeneficialBuffTests(unittest.TestCase):
         self.assertEqual(buff.name, name)
         self.assertEqual(buff.buff_stats_and_amounts, stats_amounts)
         self.assertEqual(buff.duration, duration)
+        self.assertEqual(buff.buff_amounts, {
+            KEY_BUFF_TYPE_MANA: 0,
+            KEY_BUFF_TYPE_STRENGTH: 10,
+            KEY_BUFF_TYPE_HEALTH: 30,
+            KEY_BUFF_TYPE_ARMOR: 20
+        })
 
 
 if __name__ == '__main__':

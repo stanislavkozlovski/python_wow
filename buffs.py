@@ -21,8 +21,6 @@ class StatusEffect:
 
 # Standard Buff that increases X stat for Y minutes (in our case: turns)
 class BeneficialBuff(StatusEffect):
-
-
     def __init__(self, name: str, buff_stats_and_amounts: [(str, int)], duration: int):
         """
         Buff(10, [(armor, 3), (None, None), (None, None)) will increase your armor by 10 for 3 turns
