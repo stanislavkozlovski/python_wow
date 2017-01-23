@@ -1,8 +1,11 @@
 import unittest
 import unittest.mock
+import sys
+from io import StringIO
 
 import models.main
 from zones.northshire_abbey import NorthshireAbbey, NorthshireValley, NorthshireVineyards
+from constants import ZONE_MOVE_BLOCK_SPECIAL_KEY
 
 
 class NorthshireAbbeyTests(unittest.TestCase):
@@ -52,6 +55,28 @@ class NorthshireAbbeyTests(unittest.TestCase):
         self.assertEqual(len(zone.cs_available_quests.keys()), self.northshire_vineyards_quest_count)
 
         self.assertEqual(zone.curr_subzone, 'Northshire Vineyards')
+
+    def test_move_to_peculiar_hut_padfoot_alive(self):
+        """
+        Since Garry Padfoot is alive, we should not be allowed to move
+        """
+        std_output = StringIO()
+        try:
+            sys.stdout = std_output
+            zone = NorthshireAbbey(self.char_mock)
+            self.assertIsNone(zone.loaded_zones['Northshire Vineyards'])
+            start_subzone, mid_zone, go_to_subzone = 'Northshire Valley', 'Northshire Vineyards', 'A Peculiar Hut'
+            result = zone.move_player(current_subzone=start_subzone, destination=mid_zone,
+                                      character=self.char_mock)
+            self.assertTrue(result)
+            result = zone.move_player(current_subzone=mid_zone, destination=go_to_subzone,
+                                      character=self.char_mock)
+
+            self.assertEqual(zone.curr_subzone, mid_zone)
+            self.assertEqual(result, ZONE_MOVE_BLOCK_SPECIAL_KEY)
+            self.assertTrue("Garrick Padfoot is blocking the way." in std_output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
 
     def test_kill_monsters_complete_quests_move_player_move_back(self):
         """
