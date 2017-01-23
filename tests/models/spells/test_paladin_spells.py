@@ -14,6 +14,7 @@ from spells import PaladinSpell
 from models.items.item_template import ItemTemplateSchema
 from models.spells.spell_dots import DotSchema
 from buffs import BeneficialBuff, DoT
+from damage import Damage
 
 
 class PaladinSpellsSchemaTests(unittest.TestCase):
@@ -24,7 +25,7 @@ class PaladinSpellsSchemaTests(unittest.TestCase):
         """
         self.spell_entry = 4
         self.spell_name = 'Melting Strike'
-        self.dot = DoT(name='Melting', damage_tick=2, duration=2, caster_lvl=0)
+        self.dot = DoT(name='Melting', damage_tick=Damage(magic_dmg=2), duration=2, caster_lvl=0)
         self.expected_spell = PaladinSpell(name=self.spell_name, rank=1, damage1=3, damage2=0, damage3=0,
                                            heal1=0, heal2=0, heal3=0, mana_cost=6, cooldown=3,
                                            beneficial_effect=None, harmful_effect=self.dot)
