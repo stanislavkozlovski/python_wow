@@ -145,6 +145,17 @@ class NorthshireAbbeyTests(unittest.TestCase):
         self.assertEqual(len(zone.cs_alive_npcs.keys()), self.northshire_valley_npc_count)
         self.assertEqual(len(zone.cs_available_quests.keys()), self.northshire_valley_quest_count)
 
+    def test_load_zone(self):
+        """
+        the _load_zone function creates a Zone object and adds it to our loaded_zones dictionary
+        """
+        zone = NorthshireAbbey(self.char_mock)
+        zones_to_load = ['Northshire Vineyards', 'A Peculiar Hut']
+        for z_to_load in zones_to_load:
+            self.assertIsNone(zone.loaded_zones[z_to_load])
+            zone._load_zone(z_to_load, self.char_mock)
+            self.assertIsNotNone(zone.loaded_zones[z_to_load])
+
 
 if __name__ == '__main__':
     unittest.main()
