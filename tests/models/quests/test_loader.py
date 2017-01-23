@@ -71,6 +71,16 @@ class CreatureTemplateTests(unittest.TestCase):
         self.assertEqual(len(received_quests.keys()), 0)
         self.assertEqual(received_quests, expected_quests)
 
+    def test_load_quests_invalid_zone(self):
+        """
+        The zone does not exist, therefore we should not get any quests
+        """
+        expected_quests = {}
+        received_quests = load_quests('AaAa',' AaaA', self.char_mock)
+
+        self.assertEqual(len(received_quests.keys()), 0)
+        self.assertEqual(received_quests, expected_quests)
+
 
 def tearDownModule():
     delete_test_db()
