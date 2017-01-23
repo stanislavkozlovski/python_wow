@@ -53,7 +53,7 @@ CONT--          zone,           sub_zone,   xp_reward, comment
     zone = Column(String(60))
     sub_zone = Column(String(60))
     xp_reward = Column(Integer)
-    description = Column(Text)
+    description = Column(Text)  # TODO: Add desc to the Quest class
     reward1_id = Column('item_reward1', Integer, ForeignKey('item_template.entry'))
     reward2_id = Column('item_reward2', Integer, ForeignKey('item_template.entry'))
     reward3_id = Column('item_reward3', Integer, ForeignKey('item_template.entry'))
