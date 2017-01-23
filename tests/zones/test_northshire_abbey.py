@@ -3,6 +3,7 @@ import unittest.mock
 import sys
 from copy import deepcopy
 from io import StringIO
+from datetime import datetime, timedelta
 
 import models.main
 from zones.northshire_abbey import NorthshireAbbey, NorthshireValley, NorthshireVineyards
@@ -168,6 +169,36 @@ class NorthshireAbbeyTests(unittest.TestCase):
 
         for l_zone, obj in original_loaded_zones.items():
             self.assertTrue(isinstance(zone.loaded_zones[l_zone], type(obj)))
+
+    def test_engage_zone_entered_script(self):
+        """
+        Given the character's subzone and the fact that he has not loaded the script before,
+        the Peculiar Hut script should be engaged
+        """
+        # Some pre-script mocks
+        import combat
+        combat.engage_combat = lambda *args: True
+        self.char_mock.current_subzone = 'A Peculiar Hut'
+        self.char_mock.has_loaded_script = lambda x: False
+
+        # move to the desired zone
+        zone = NorthshireAbbey(self.char_mock)
+        start_subzone, mid_zone, go_to_subzone = 'Northshire Valley', 'Northshire Vineyards', 'A Peculiar Hut'
+        zone.move_player(current_subzone=start_subzone, destination=mid_zone,
+                                  character=self.char_mock)
+        del zone.cs_alive_monsters[GARRICK_PADFOOT_GUID]
+        zone.cs_monsters_guid_name_set.remove((GARRICK_PADFOOT_GUID, 'Garrick Padfoot'))
+        zone.move_player(current_subzone=mid_zone, destination=go_to_subzone,
+                                  character=self.char_mock)
+
+        # start the test
+        start = datetime.now()
+        zone.engage_zone_entered_script(self.char_mock)
+        end = datetime.now()
+
+        # 5 seconds should have passed at least while the script played out
+        duration: timedelta = end - start
+        self.assertGreater(duration.seconds, 5)
 
 
 if __name__ == '__main__':
