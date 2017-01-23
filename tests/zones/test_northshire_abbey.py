@@ -74,5 +74,22 @@ class NorthshireAbbeyTests(unittest.TestCase):
         self.assertEqual(len(zone.cs_alive_monsters.keys()), 0)
         self.assertEqual(len(zone.cs_available_quests.keys()), 0)
 
+    def test_invalid_move(self):
+        """
+        Moving from Northshire Valley to A Peculiar Hut is not possible.
+        You first need to move to Northshire Vineyards and then you can access A Peculiar Hut
+        """
+        zone = NorthshireAbbey(self.char_mock)
+        start_subzone, go_to_subzone = 'Northshire Valley', 'A Peculiar Hut'
+        result = zone.move_player(current_subzone=start_subzone, destination=go_to_subzone, character=self.char_mock)
+
+        # Assert that we have not moved
+        self.assertFalse(result)
+        self.assertEqual(zone.curr_subzone, start_subzone)
+        self.assertEqual(len(zone.cs_alive_monsters.keys()), self.northshire_valley_monster_count)
+        self.assertEqual(len(zone.cs_alive_npcs.keys()), self.northshire_valley_npc_count)
+        self.assertEqual(len(zone.cs_available_quests.keys()), self.northshire_valley_quest_count)
+
+
 if __name__ == '__main__':
     unittest.main()
