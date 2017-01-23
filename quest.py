@@ -9,6 +9,9 @@ class Quest:
         self.item_rewards = item_reward_dict  # dictionary for the rewards key: item name, value: item object
         self.reward_choice_enabled = reward_choice_enabled  # type: bool
 
+    def __eq__(self, other):
+        return self.ID == other.ID
+
     def update_kills(self):
         """ This method updates the required kills if the quest is a KillQuest"""
         pass
