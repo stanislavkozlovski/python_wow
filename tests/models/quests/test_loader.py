@@ -20,6 +20,10 @@ from buffs import BeneficialBuff
 
 class CreatureTemplateTests(unittest.TestCase):
     def setUp(self):
+        """
+        Functions we'll be testing:
+            load_quests - Returns all the quests in the zone that the character has not completed
+        """
         self.char_mock = Mock(has_completed_quest=lambda x: False)
 
     def get_expected_quests(self) -> {str: Quest}:
@@ -54,6 +58,17 @@ class CreatureTemplateTests(unittest.TestCase):
         """
         expected_quests = self.get_expected_quests()
         received_quests = load_quests('Northshire Abbey', 'Northshire Valley', self.char_mock)
+        self.assertEqual(received_quests, expected_quests)
+
+    def test_load_quests_valid_zone_char_completed_everything(self):
+        """
+        Since the character has completed everything, we should not get any quests
+        """
+        self.char_mock.has_completed_quest = lambda x: True
+        expected_quests = {}
+        received_quests = load_quests('Northshire Abbey', 'Northshire Valley', self.char_mock)
+
+        self.assertEqual(len(received_quests.keys()), 0)
         self.assertEqual(received_quests, expected_quests)
 
 
