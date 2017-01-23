@@ -55,8 +55,7 @@ class LootTableSchemaTests(unittest.TestCase):
         l_table = session.query(LootTableSchema).get(self.loot_table_entry)
         self.expected_item1 = Item(name='Linen Cloth', item_id=self.item_1, buy_price=1, sell_price=1)
         self.effect: BeneficialBuff = BeneficialBuff(name="Heart of a Lion",
-                                                     buff_stats_and_amounts=[('armor', 0), ('strength', 15),
-                                                                             ('health', 0), ('mana', 0)],
+                                                     buff_stats_and_amounts=[('strength', 15)],
                                                      duration=5)
         self.expected_item2 = Potion(name='Strength Potion', item_id=4, buy_price=1,
                                      sell_price=1, buff=self.effect, quest_id=0)

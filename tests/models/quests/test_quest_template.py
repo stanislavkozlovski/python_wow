@@ -81,7 +81,7 @@ class QuestTemplateSchemaTests(unittest.TestCase):
             'Wolf Meat': Item(name='Wolf Meat', item_id=1, buy_price=1, sell_price=1, quest_id=2),
             'Strength Potion': Potion(name='Strength Potion', item_id=4, buy_price=1, sell_price=1,
                                       buff=BeneficialBuff(name="Heart of a Lion",
-                                                     buff_stats_and_amounts=[('armor',0), ('strength', 15), ('health', 0), ('mana', 0)],
+                                                     buff_stats_and_amounts=[('strength', 15)],
                                                      duration=5))
         }
         expected_quest = FetchQuest(quest_name=name, quest_id=entry, required_item='Wolf Meat',

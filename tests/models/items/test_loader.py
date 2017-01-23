@@ -21,7 +21,7 @@ class LoaderTests(unittest.TestCase):
         self.sell_price = 1
         self.effect_id = 1
         self.effect: BeneficialBuff = BeneficialBuff(name="Heart of a Lion",
-                                                     buff_stats_and_amounts=[('armor',0), ('strength', 15), ('health', 0), ('mana', 0)],
+                                                     buff_stats_and_amounts=[('strength', 15)],
                                                      duration=5)
         self.potion = Potion(name=self.name, item_id=self.item_entry, buy_price=self.buy_price, sell_price=self.sell_price,
                              buff=self.effect, quest_id=0)

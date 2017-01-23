@@ -42,25 +42,23 @@ class BeneficialBuff(StatusEffect):
         """
         super().__init__(name, duration)
         self.buff_stats_and_amounts = buff_stats_and_amounts
-        self._manage_buff_types(buff_stats_and_amounts)  # updates buff_amounts
-        # a list which holds tuples of the buffed attributes (will be used for __str__)
-        self.non_empty_buffs = list(filter(lambda kv: kv[1] is not 0, self.buff_amounts.items()))
+        self._manage_buff_types(buff_stats_and_amounts)  # update buff_amounts
 
     def __str__(self):
         """ Depending on the amount of stats it buffs, print out a different message"""
-        non_empty_buffs_count = len(self.non_empty_buffs)
+        non_empty_buffs_count = len(self.buff_stats_and_amounts)
         # TODO: refactor
         if non_empty_buffs_count == 1:
-            increased_attribute, value = self.non_empty_buffs[0]
+            increased_attribute, value = self.buff_stats_and_amounts[0]
             return f'Increases {increased_attribute} by {value} for {self.duration} turns.'
         elif non_empty_buffs_count == 2:
-            increased_attribute, value = self.non_empty_buffs[0]
-            increased_attribute2, value2 = self.non_empty_buffs[1]
+            increased_attribute, value = self.buff_stats_and_amounts[0]
+            increased_attribute2, value2 = self.buff_stats_and_amounts[1]
             return f'Increases {increased_attribute} by {value} and {increased_attribute2} by {value2} for {self.duration} turns.'
         elif non_empty_buffs_count == 3:
-            increased_attribute, value = self.non_empty_buffs[0]
-            increased_attribute2, value2 = self.non_empty_buffs[1]
-            increased_attribute3, value3 = self.non_empty_buffs[2]
+            increased_attribute, value = self.buff_stats_and_amounts[0]
+            increased_attribute2, value2 = self.buff_stats_and_amounts[1]
+            increased_attribute3, value3 = self.buff_stats_and_amounts[2]
 
             return (f"Increases {increased_attribute} by {value}, {increased_attribute2} by {value2}"
                     f" and {increased_attribute3} by {value3} for {self.duration} turns.")
@@ -68,7 +66,7 @@ class BeneficialBuff(StatusEffect):
             return ""
 
     def __eq__(self, other):
-        return self.name == other.name and self.non_empty_buffs == other.non_empty_buffs and self.duration == other.duration
+        return self.name == other.name and self.buff_stats_and_amounts == other.buff_stats_and_amounts and self.duration == other.duration
 
     def _manage_buff_types(self, buff_list: list):
         """
