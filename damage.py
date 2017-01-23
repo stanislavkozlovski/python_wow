@@ -10,6 +10,10 @@ class Damage:
         self.magic_dmg = round(magic_dmg, 1)
         self.phys_absorbed, self.magic_absorbed = 0, 0
 
+    def __eq__(self, other):
+        return self.phys_dmg == other.phys_dmg and self.magic_dmg == other.magic_dmg \
+                and self.phys_absorbed == other.phys_absorbed and self.magic_absorbed == other.magic_absorbed
+
     def __str__(self):
         """
         Have two separate strings for physical damage and magical damage.
