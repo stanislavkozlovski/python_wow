@@ -24,5 +24,18 @@ class StatusEffectTests(unittest.TestCase):
         self.assertEqual(str(st_ef), "Default Status Effect")
 
 
+class BeneficialBuffTests(unittest.TestCase):
+    def test_init(self):
+        name = 'BMW'
+        stats_amounts = [('strength', 10), ('armor', 20), ('health', 30)]
+        duration = 10
+
+        buff = BeneficialBuff(name=name, buff_stats_and_amounts=stats_amounts, duration=duration)
+
+        self.assertEqual(buff.name, name)
+        self.assertEqual(buff.buff_stats_and_amounts, stats_amounts)
+        self.assertEqual(buff.duration, duration)
+
+
 if __name__ == '__main__':
     unittest.main()
