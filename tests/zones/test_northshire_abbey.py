@@ -25,6 +25,15 @@ class NorthshireAbbeyTests(unittest.TestCase):
         self.peculiar_hut_npc_count = 0
         self.peculiar_hut_quest_count = 0
 
+    def tearDown(self):
+        """
+        Due to the mutability of the static variables, we need to reset them
+        on each tearDown. (Since we change them in the tests)
+        """
+        NorthshireAbbey.loaded_zones = {"Northshire Valley": None,
+                                        "Northshire Vineyards": None,
+                                        "A Peculiar Hut": None}
+
     def test_zone(self):
         zone = NorthshireAbbey(self.char_mock)
         # it should have loaded subzones
