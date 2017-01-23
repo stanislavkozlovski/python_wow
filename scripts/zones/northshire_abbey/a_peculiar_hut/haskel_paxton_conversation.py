@@ -37,6 +37,4 @@ def script(subzone, character):
     print("When the smoke clears, you see that the traitor is nowhere in sight...")
     print()
 
-    # remove Haskel because he escapes with a smoke bomb
-    del subzone._alive_monsters[subzone.GUID_BROTHER_HASKEL]
     subzone._monster_guid_name_set.remove((subzone.GUID_BROTHER_HASKEL, "Brother Haskel"))
