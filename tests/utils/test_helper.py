@@ -19,7 +19,7 @@ class TestUtils(unittest.TestCase):
         """
         It should convert every invalid integer to 0
         """
-        self.assertEqual(parse_int(2.1), 0)
+        self.assertEqual(parse_int(2.1), 2)
         self.assertEqual(parse_int(None), 0)
         self.assertEqual(parse_int('aa'), 0)
         self.assertEqual(parse_int([]), 0)
