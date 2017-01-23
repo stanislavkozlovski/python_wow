@@ -16,4 +16,8 @@ def parse_int(value) -> int:
     On other cases, like cells pointing to certain other database IDs, a missing number there makes the row
     invalid, thus we want to create an exception.
     """
-    return int(value or 0)
+    try:
+        val = int(value)
+        return val
+    except (TypeError, ValueError):
+        return 0
