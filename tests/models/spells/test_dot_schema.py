@@ -25,6 +25,9 @@ class DotSchemaTests(unittest.TestCase):
         self.name = 'Melting'
         self.damage = Damage(magic_dmg=2)
         self.duration = 2
+        self.caster_level = 5
+        self.expected_dot = DoT(name=self.name, damage_tick=self.damage, duration=self.duration,
+                                caster_lvl=self.caster_level)
 
     def test_schema_attributes(self):
         loaded_schema: DotSchema = session.query(DotSchema).get(self.entry)
@@ -37,6 +40,16 @@ class DotSchemaTests(unittest.TestCase):
         self.assertTrue(loaded_schema.damage_school, str)
         self.assertTrue(loaded_schema.duration, int)
         self.assertTrue(loaded_schema.comment, str)
+
+    def test_convert_to_dot_object(self):
+        """
+        The function should convert out DotSchema to a DoT object
+        """
+        loaded_dot: DoT = session.query(DotSchema).get(self.entry).convert_to_dot_object(self.caster_level)
+
+        self.assertTrue(isinstance(loaded_dot, DoT))
+        self.assertEqual(loaded_dot, self.expected_dot)
+        self.assertEqual(vars(loaded_dot), vars(self.expected_dot))
 
 
 def tearDownModule():
