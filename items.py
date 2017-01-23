@@ -89,7 +89,7 @@ class Equipment(Item):
 
 class Potion(Item):
     """ Consumable item that gives a buff to the player"""
-    def __init__(self, name: str, item_id: int, buy_price: int, sell_price: int, buff: BeneficialBuff, quest_id: int=0, ):
+    def __init__(self, name: str, item_id: int, buy_price: int, sell_price: int, buff: BeneficialBuff, quest_id: int=0):
         super().__init__(name, item_id, buy_price, sell_price, quest_id)
         self.buff = buff
 
