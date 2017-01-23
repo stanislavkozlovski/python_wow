@@ -4,6 +4,7 @@ from models.misc.loader import load_character_level_stats, load_character_xp_req
 
 
 ZONE_MOVE_BLOCK_SPECIAL_KEY = '$'
+GARRICK_PADFOOT_GUID = 14
 
 # these functions run only once due to a decorator
 CREATURE_DEFAULT_VALUES = load_creature_defaults()
