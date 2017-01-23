@@ -6,10 +6,7 @@ This module holds information about all kinds of buffs that are applied to an en
 etc
 """
 from damage import Damage
-KEY_BUFF_TYPE_ARMOR = "armor"
-KEY_BUFF_TYPE_STRENGTH = "strength"
-KEY_BUFF_TYPE_HEALTH = "health"
-KEY_BUFF_TYPE_MANA = "mana"
+from constants import KEY_BUFF_TYPE_ARMOR, KEY_BUFF_TYPE_STRENGTH, KEY_BUFF_TYPE_HEALTH, KEY_BUFF_TYPE_MANA
 
 
 # the base class for all buffs/dots/debuffs
@@ -24,11 +21,7 @@ class StatusEffect:
 
 # Standard Buff that increases X stat for Y minutes (in our case: turns)
 class BeneficialBuff(StatusEffect):
-    # this dictionary will hold the meaningful information of what buff we give
-    buff_amounts = {KEY_BUFF_TYPE_ARMOR: 0,
-                    KEY_BUFF_TYPE_STRENGTH: 0,
-                    KEY_BUFF_TYPE_HEALTH: 0,
-                    KEY_BUFF_TYPE_MANA: 0}  # type: dict
+
 
     def __init__(self, name: str, buff_stats_and_amounts: [(str, int)], duration: int):
         """
@@ -41,6 +34,11 @@ class BeneficialBuff(StatusEffect):
         :param duration: How many turns this buff will be active for, type: int
         """
         super().__init__(name, duration)
+        # this dictionary will hold the meaningful information of what buff we give
+        self.buff_amounts: {str: int} = {KEY_BUFF_TYPE_ARMOR: 0,
+                                         KEY_BUFF_TYPE_STRENGTH: 0,
+                                         KEY_BUFF_TYPE_HEALTH: 0,
+                                         KEY_BUFF_TYPE_MANA: 0}
         self.buff_stats_and_amounts = buff_stats_and_amounts
         self._manage_buff_types(buff_stats_and_amounts)  # update buff_amounts
 
