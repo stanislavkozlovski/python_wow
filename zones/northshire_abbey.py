@@ -6,6 +6,7 @@ to have dead creatures stay dead, not be reloaded
 the cs in cs_alive_monsters and similar names stands for Current Subzone
 """
 from zones.zone import Zone, SubZone
+from constants import ZONE_MOVE_BLOCK_SPECIAL_KEY
 from scripts.zones.northshire_abbey.a_peculiar_hut.haskel_paxton_conversation import (
     SCRIPT_NAME as A_PECULIAR_HUT_ENTRY_SCRIPT_NAME, script as A_PECULIAR_HUT_ENTRY_SCRIPT)
 
@@ -53,7 +54,7 @@ class NorthshireAbbey(Zone):
                     # this means we are in Northshire Vineyards
                     if self.GUID_GARRY_PADFOOT in self.cs_alive_monsters.keys():  # if garry padfoot is alive
                         print("Garrick Padfoot is blocking the way.")
-                        return 0
+                        return ZONE_MOVE_BLOCK_SPECIAL_KEY
 
                 if not self.loaded_zones[destination]:  # if we don't have the destination's attributes loaded load them
                     self._load_zone(destination, character)

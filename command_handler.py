@@ -7,6 +7,7 @@ from commands import pac_main_ooc, pac_map_directions, pac_in_combat, pac_vendor
 from information_printer import (print_live_npcs, print_live_monsters, print_quest_item_choices,
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar,
                                  print_character_equipment)
+from constants import ZONE_MOVE_BLOCK_SPECIAL_KEY
 
 # handlers here!
 
@@ -170,11 +171,13 @@ def handle_go_to_command(command: str, character, zone_object: Zone):
 
     """
     move_player will usually return a boolean if we can initiate the move or not.
-    However, there's a special case: If it returns 0, it means that we cannot initiate the move and that the
-    printing is handled by the method itself.
+    However, there's a special case: If it returns SPECIAL_ZONE_BLOCK_KEY,
+    it means that we cannot initiate the move and that the printing is handled by the method itself.
     """
     valid_move = zone_object.move_player(character.current_subzone, destination, character)
 
+    if valid_move == ZONE_MOVE_BLOCK_SPECIAL_KEY:
+        return
     if valid_move:
         # if the move has been successful
         character.current_subzone = destination
@@ -186,7 +189,7 @@ def handle_go_to_command(command: str, character, zone_object: Zone):
 
         print_live_npcs(zone_object, print_all=True)
         print_live_monsters(zone_object)
-    elif isinstance(valid_move, bool) and not valid_move:  # see comment above on why we check if it's a bool
+    else:
         print(f'No such destination as {destination} that is connected to your current subzone.')
 
 
