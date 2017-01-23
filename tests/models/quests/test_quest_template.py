@@ -12,7 +12,8 @@ import models.main
 from models.quests.quest_template import QuestSchema
 from models.items.item_template import ItemTemplateSchema
 from quest import KillQuest, FetchQuest, Quest
-
+from items import Item, Potion
+from buffs import BeneficialBuff
 
 class CreatureTemplateTests(unittest.TestCase):
     def setUp(self):
@@ -66,6 +67,28 @@ class CreatureTemplateTests(unittest.TestCase):
         received_kill_quest = session.query(QuestSchema).get(self.quest_entry).convert_to_quest_object()
         self.assertEqual(vars(received_kill_quest), vars(self.expected_kill_quest))
 
+    def test_convert_to_quest_object_fetchquest(self):
+        """
+        Create the expected FetchQuest and compare it with the one that is loaded
+        :return:
+        """
+        entry, name, type = 2, 'Canine-Like Hunger', 'fetchquest'
+        level_required, monster_required, amount_required = 1, None, 2
+        zone, sub_zone, xp_reward = 'Northshire Abbey', 'Northshire Valley', 300
+        description = 'Obtain 2 Wolf Meats'
+        item_rewards = {
+            'Wolf Meat': Item(name='Wolf Meat', item_id=1, buy_price=1, sell_price=1, quest_id=2),
+            'Strength Potion': Potion(name='Strength Potion', item_id=4, buy_price=1, sell_price=1,
+                                      buff=BeneficialBuff(name="Heart of a Lion",
+                                                     buff_stats_and_amounts=[('armor',0), ('strength', 15), ('health', 0), ('mana', 0)],
+                                                     duration=5))
+        }
+        expected_quest = FetchQuest(quest_name=name, quest_id=entry, required_item='Wolf Meat',
+                                    xp_reward=xp_reward, item_reward_dict=item_rewards, reward_choice_enabled=True,
+                                    level_required=level_required, required_item_count=amount_required, is_completed=False)
+        received_quest = session.query(QuestSchema).get(entry).convert_to_quest_object()
+
+        self.assertEqual(vars(received_quest), vars(expected_quest))
 
 
 def tearDownModule():
