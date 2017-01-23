@@ -1,6 +1,7 @@
 import unittest
 import unittest.mock
 import sys
+from copy import deepcopy
 from io import StringIO
 
 import models.main
@@ -155,6 +156,18 @@ class NorthshireAbbeyTests(unittest.TestCase):
             self.assertIsNone(zone.loaded_zones[z_to_load])
             zone._load_zone(z_to_load, self.char_mock)
             self.assertIsNotNone(zone.loaded_zones[z_to_load])
+
+    def test_load_zone_invalid_zone(self):
+        """
+        Loading an invalid zone should not go into any of the if blocks and not do anything.
+        """
+        zone = NorthshireAbbey(self.char_mock)
+        original_loaded_zones = deepcopy(zone.loaded_zones)
+
+        zone._load_zone('Aa', self.char_mock)
+
+        for l_zone, obj in original_loaded_zones.items():
+            self.assertTrue(isinstance(zone.loaded_zones[l_zone], type(obj)))
 
 
 if __name__ == '__main__':
