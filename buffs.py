@@ -119,5 +119,8 @@ class DoT(StatusEffect):
     def __str__(self):
         return f'{self.name} - Deals {self.damage} damage every turn for {self.duration} turns'
 
+    def __eq__(self, other):
+        return self.name == other.name and self.damage_tick == other.damage_tick and self.duration == other.duration
+
     def update_caster_level(self, level: int):
         self.level = level
