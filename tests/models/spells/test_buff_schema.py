@@ -25,8 +25,7 @@ class BuffSchemaTests(unittest.TestCase):
         self.name = 'Heart of a Lion'
         self.duration = 5
         self.expected_buff = BeneficialBuff(name="Heart of a Lion",
-                                            buff_stats_and_amounts=[('armor', 0), ('strength', 15),
-                                                                    ('health', 0), ('mana', 0)],
+                                            buff_stats_and_amounts=[('strength', 15)],
                                             duration=5)
 
     def test_schema_values(self):
@@ -42,6 +41,10 @@ class BuffSchemaTests(unittest.TestCase):
         self.assertIsNone(loaded_schema.stat3)
         self.assertIsNone(loaded_schema.amount3)
         self.assertTrue(isinstance(loaded_schema.comment, str))
+
+    def test_convert_to_beneficial_buff_object(self):
+        loaded_buff: BeneficialBuff = session.query(BuffSchema).get(self.buff_entry).convert_to_beneficial_buff_object()
+        self.assertEqual(vars(loaded_buff), vars(self.expected_buff))
 
 
 def tearDownModule():
