@@ -5,7 +5,7 @@ from io import StringIO
 
 import models.main
 from zones.northshire_abbey import NorthshireAbbey, NorthshireValley, NorthshireVineyards
-from constants import ZONE_MOVE_BLOCK_SPECIAL_KEY
+from constants import ZONE_MOVE_BLOCK_SPECIAL_KEY, GARRICK_PADFOOT_GUID
 
 
 class NorthshireAbbeyTests(unittest.TestCase):
@@ -21,6 +21,9 @@ class NorthshireAbbeyTests(unittest.TestCase):
         self.northshire_vineyards_monster_count = 7
         self.northshire_vineyards_npc_count = 0
         self.northshire_vineyards_quest_count = 1
+        self.peculiar_hut_monster_count = 1
+        self.peculiar_hut_npc_count = 0
+        self.peculiar_hut_quest_count = 0
 
     def test_zone(self):
         zone = NorthshireAbbey(self.char_mock)
@@ -77,6 +80,24 @@ class NorthshireAbbeyTests(unittest.TestCase):
             self.assertTrue("Garrick Padfoot is blocking the way." in std_output.getvalue())
         finally:
             sys.stdout = sys.__stdout__
+
+    def test_move_to_peculiar_hut_padfoot_dead(self):
+        zone = NorthshireAbbey(self.char_mock)
+        self.assertIsNone(zone.loaded_zones['Northshire Vineyards'])
+        start_subzone, mid_zone, go_to_subzone = 'Northshire Valley', 'Northshire Vineyards', 'A Peculiar Hut'
+        result = zone.move_player(current_subzone=start_subzone, destination=mid_zone,
+                                  character=self.char_mock)
+        self.assertTrue(result)
+        del zone.cs_alive_monsters[GARRICK_PADFOOT_GUID]
+        zone.cs_monsters_guid_name_set.remove((GARRICK_PADFOOT_GUID, 'Garrick Padfoot'))
+        result = zone.move_player(current_subzone=mid_zone, destination=go_to_subzone,
+                                  character=self.char_mock)
+
+        # Move should have been successful!
+        self.assertTrue(result)
+        self.assertEqual(len(zone.cs_alive_monsters.keys()), self.peculiar_hut_monster_count)
+        self.assertEqual(len(zone.cs_alive_npcs.keys()), self.peculiar_hut_npc_count)
+        self.assertEqual(len(zone.cs_available_quests.keys()), self.peculiar_hut_quest_count)
 
     def test_kill_monsters_complete_quests_move_player_move_back(self):
         """
