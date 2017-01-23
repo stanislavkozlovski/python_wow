@@ -35,6 +35,10 @@ class CreatureTemplateTests(unittest.TestCase):
         self.item_reward2 = None
         self.item_reward3 = None
         self.item_choice_enabled = False
+        self.expected_kill_quest = KillQuest(quest_name=self.name, quest_id=self.quest_entry,
+                                             xp_reward=self.xp_reward, item_reward_dict={}, reward_choice_enabled=False,
+                                             level_required=self.level_required, is_completed=False,
+                                             required_monster='Wolf', required_kills=5)
 
     def test_values(self):
         received_q_schema: QuestSchema = session.query(QuestSchema).get(self.quest_entry)
@@ -57,6 +61,10 @@ class CreatureTemplateTests(unittest.TestCase):
         self.assertIsNone(received_q_schema.reward1)
         self.assertIsNone(received_q_schema.reward2)
         self.assertIsNone(received_q_schema.reward3)
+
+    def test_convert_to_quest_object_killquest(self):
+        received_kill_quest = session.query(QuestSchema).get(self.quest_entry).convert_to_quest_object()
+        self.assertEqual(vars(received_kill_quest), vars(self.expected_kill_quest))
 
 
 
