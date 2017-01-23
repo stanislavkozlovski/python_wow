@@ -9,6 +9,7 @@ from tests.create_test_db import engine, session, Base
 database.main.engine = engine
 database.main.session = session
 database.main.Base = Base
+
 import models.main
 from models.quests.quest_template import QuestSchema
 from models.quests.loader import load_quests
@@ -18,7 +19,7 @@ from items import Item, Potion
 from buffs import BeneficialBuff
 
 
-class CreatureTemplateTests(unittest.TestCase):
+class QuestLoaderTests(unittest.TestCase):
     def setUp(self):
         """
         Functions we'll be testing:

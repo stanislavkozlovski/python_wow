@@ -15,7 +15,8 @@ from quest import KillQuest, FetchQuest, Quest
 from items import Item, Potion
 from buffs import BeneficialBuff
 
-class CreatureTemplateTests(unittest.TestCase):
+
+class QuestTemplateSchemaTests(unittest.TestCase):
     def setUp(self):
         """
         There are two type of quests for now - KillQuest and FetchQuest.
