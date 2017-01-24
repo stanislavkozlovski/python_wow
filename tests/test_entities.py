@@ -359,6 +359,26 @@ class LivingThingTests(unittest.TestCase):
         damage = 100
         self.assertEqual(self.dummy._calculate_level_difference_damage(damage, target_level), damage - (damage * 0.1))
 
+    def test_calculate_level_difference_damage_inverse_set(self):
+        """
+        Test the function with the inverse flag set as true.
+        The inverse flag calculates as if we're taking damage and is used
+         specifically for DoT procs, since we do not have a reference to the caster from the DoT
+        """
+        """
+        Since our level is one higher, there should be a 10% damage decrease
+        """
+        target_level = self.dummy.level - 1
+        damage = 100
+        self.assertEqual(self.dummy._calculate_level_difference_damage(damage, target_level, inverse=True), damage - (damage * 0.1))
+
+        """
+        Since our level is one smaller, there should be a 10% damage increase
+        """
+        target_level = self.dummy.level + 1
+        damage = 100
+        self.assertEqual(self.dummy._calculate_level_difference_damage(damage, target_level, inverse=True), damage + (damage * 0.1))
+
 
 if __name__ == '__main__':
     unittest.main()
