@@ -114,7 +114,7 @@ def handle_vendor_sale(character, vendor):
         elif 'info' in command:
             item_name = command[:-5]  # name of item
 
-            item = vendor.get_item(item_name)
+            item = vendor.get_item_info(item_name)
 
             print("\t", item, "\n") if item else None
         elif command == '?':
