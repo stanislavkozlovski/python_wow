@@ -5,7 +5,8 @@ from exceptions import NonExistantBuffError
 
 from constants import KEY_ARMOR_ATTRIBUTE
 from entities import LivingThing
-from buffs import BeneficialBuff
+from damage import Damage
+from buffs import BeneficialBuff, DoT
 
 
 class LivingThingTests(unittest.TestCase):
@@ -15,6 +16,7 @@ class LivingThingTests(unittest.TestCase):
         self.mana = 100
         self.level = 5
         self.dummy_buff = BeneficialBuff(name='Zdrave', buff_stats_and_amounts=[('health', self.health)], duration=5)
+        self.dummy_dot = DoT(name='Disease', damage_tick=Damage(phys_dmg=15), duration=2, caster_lvl=self.level)
         self.expected_attributes = {KEY_ARMOR_ATTRIBUTE: 0}  # the base stat for every creature
         self.dummy = LivingThing(name=self.name, health=self.health, mana=self.mana, level=self.level)
 
@@ -137,6 +139,28 @@ class LivingThingTests(unittest.TestCase):
             self.assertEqual(self.dummy.health, self.health)
 
             self.assertIn(expected_output, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+    def test_take_dot_proc(self):
+        """
+        The take_dot_proc method damages the character for the DoT's damage per tick
+        """
+        output = StringIO()
+        expected_message = f'{self.name} suffers {self.dummy_dot.damage} from {self.dummy_dot.name}!'
+        try:
+            sys.stdout = output
+            self.dummy.take_dot_proc(self.dummy_dot)
+
+            # assert that health has been reduced
+            self.assertLess(self.dummy.health, self.health)
+            self.assertIn(expected_message, output.getvalue())
+
+            # try to kill him using the dot proc
+            for _ in range(100):
+                self.dummy.take_dot_proc(self.dummy_dot)
+            self.assertLess(self.dummy.health, 0)
+            self.assertFalse(self.dummy.is_alive())
         finally:
             sys.stdout = sys.__stdout__
 
