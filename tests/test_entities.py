@@ -50,6 +50,17 @@ class LivingThingTests(unittest.TestCase):
         self.assertFalse(self.dummy.is_in_combat())
         self.assertEqual(self.dummy.health, self.health)
 
+    def test_subtract_health(self):
+        """
+        The subtract_health removes health from the LivingThing and check if it has died from that result
+        If it has, it calls the _die method which turns self.alive to false
+        """
+        self.assertTrue(self.dummy.health > 0)
+        self.dummy._subtract_health(self.dummy.health)
+        # should be at 0 health and dead
+        self.assertEqual(self.dummy.health, 0)
+        self.assertFalse(self.dummy.is_alive())
+
     def test_regenerate(self):
         """
         The regenerate function should reset the character's health/mana to it's max
