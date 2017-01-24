@@ -319,7 +319,7 @@ class VendorNPC(FriendlyNPC):
         """
         return item_name in self.inventory.keys()
 
-    def get_item(self, item_name: str) -> Item:
+    def get_item_info(self, item_name: str) -> Item:
         """
         USED ONLY FOR PRINTING/TESTING PURPOSES
         Returns the item we want to get from the vendor,
