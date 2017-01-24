@@ -142,17 +142,20 @@ class DoTTests(unittest.TestCase):
     """
     Tests for the DoT class
     """
-    def test_init(self):
-        name = 'Audi'
-        damage_tick = Damage(phys_dmg=3)
-        duration = 5
-        caster_level = 10
+    def setUp(self):
+        self.name = 'Audi'
+        self.damage_tick = Damage(phys_dmg=3)
+        self.duration = 5
+        self.caster_level = 10
 
-        dot_dummy = DoT(name, damage_tick, duration, caster_level)
-        self.assertEqual(dot_dummy.name, name)
-        self.assertEqual(dot_dummy.damage, damage_tick)
-        self.assertEqual(dot_dummy.duration, duration)
-        self.assertEqual(dot_dummy.level, caster_level)
+        self.dot_dummy = DoT(self.name, self.damage_tick, self.duration, self.caster_level)
+
+    def test_init(self):
+        self.assertEqual(self.dot_dummy.name, self.name)
+        self.assertEqual(self.dot_dummy.damage, self.damage_tick)
+        self.assertEqual(self.dot_dummy.duration, self.duration)
+        self.assertEqual(self.dot_dummy.level, self.caster_level)
+
 
 if __name__ == '__main__':
     unittest.main()
