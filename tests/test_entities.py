@@ -164,6 +164,47 @@ class LivingThingTests(unittest.TestCase):
         finally:
             sys.stdout = sys.__stdout__
 
+    def test_update_dots(self):
+        """
+        The _update_dots function reduces the duration of each dot and activates its damage tick
+        """
+        output = StringIO()
+        try:
+            sys.stdout = output
+            orig_health = self.dummy.health
+            first_dot = DoT(name='first', damage_tick=Damage(5), duration=3, caster_lvl=2)
+            second_dot = DoT(name='second', damage_tick=Damage(2), duration=5, caster_lvl=2)
+            self.dummy.add_buff(first_dot)
+            self.dummy.add_buff(second_dot)
+            self.assertEqual(self.dummy.buffs, {first_dot: 3, second_dot: 5})
+
+            self.dummy._update_dots()
+            # should have reduced the durations
+            self.assertEqual(self.dummy.buffs, {first_dot: 2, second_dot: 4})
+            # should have subtracted health
+            self.assertLess(self.dummy.health, orig_health)
+            health_after_first_tick = self.dummy.health
+
+            self.dummy._update_dots()
+            self.dummy._update_dots()
+            self.assertLess(self.dummy.health, health_after_first_tick)
+            # should have removed the first dot
+            self.assertEqual(self.dummy.buffs, {second_dot: 2})
+            health_after_second_tick = self.dummy.health
+
+            self.dummy._update_dots()
+            self.dummy._update_dots()
+            self.assertLess(self.dummy.health, health_after_second_tick)
+            self.assertEqual(self.dummy.buffs, {})
+
+            stdout_result = output.getvalue()
+            self.assertIn('suffers', stdout_result)
+            self.assertIn(f'DoT {first_dot.name}', stdout_result)
+            self.assertIn(f'DoT {second_dot.name}', stdout_result)
+        finally:
+            sys.stdout = sys.__stdout__
+
+
     def test_remove_non_existant_buff(self):
         """
         Should thrown an error
