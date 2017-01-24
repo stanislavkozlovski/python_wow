@@ -7,7 +7,7 @@ etc
 """
 from damage import Damage
 from constants import KEY_BUFF_TYPE_ARMOR, KEY_BUFF_TYPE_STRENGTH, KEY_BUFF_TYPE_HEALTH, KEY_BUFF_TYPE_MANA
-
+from exceptions import InvalidBuffError
 
 # the base class for all buffs/dots/debuffs
 class StatusEffect:
@@ -64,7 +64,7 @@ class BeneficialBuff(StatusEffect):
     def __eq__(self, other):
         return self.name == other.name and self.buff_stats_and_amounts == other.buff_stats_and_amounts and self.duration == other.duration
 
-    def _manage_buff_types(self, buff_list: list):
+    def _manage_buff_types(self, buff_list: [(str, int)]):
         """
         Iterate through the list of tuples and add each buff to our buff_amounts dictionary
         :param buff_list: A list of tuples, each tuple holding the stat we are going to buff and the amount
@@ -75,7 +75,7 @@ class BeneficialBuff(StatusEffect):
                 if buff_type in self.buff_amounts.keys():
                     self.buff_amounts[buff_type] = buff_amount
                 else:
-                    raise ValueError(f'Buff type {buff_type} is not supported!')
+                    raise InvalidBuffError(f'Buff type {buff_type} is not supported!')
 
     def get_buffed_attributes(self) -> {str: int}:
         """
