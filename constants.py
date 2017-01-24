@@ -17,6 +17,8 @@ KEY_BONUS_MANA_ATTRIBUTE = 'bonus_mana'
 KEY_LEVEL_STATS_HEALTH = 'health'
 KEY_LEVEL_STATS_MANA = 'mana'
 
+CHAR_STARTER_ZONE, CHAR_STARTER_SUBZONE = "Northshire Abbey", "Northshire Valley"
+
 # these functions run only once due to a decorator
 CREATURE_DEFAULT_VALUES = load_creature_defaults()
 CHARACTER_LEVELUP_BONUS_STATS = load_character_level_stats()

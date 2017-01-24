@@ -2,7 +2,7 @@
 This module will hold functions that print all kinds of information to the player
 """
 from termcolor import colored
-from zones.zone import Zone
+# from zones.zone import Zone
 from constants import (CHARACTER_EQUIPMENT_BOOTS_KEY, CHARACTER_EQUIPMENT_BRACER_KEY,
                        CHARACTER_EQUIPMENT_HEADPIECE_KEY, CHARACTER_EQUIPMENT_CHESTGUARD_KEY,
                        CHARACTER_EQUIPMENT_NECKLACE_KEY, CHARACTER_EQUIPMENT_LEGGINGS_KEY,
@@ -10,7 +10,35 @@ from constants import (CHARACTER_EQUIPMENT_BOOTS_KEY, CHARACTER_EQUIPMENT_BRACER
                        CHARACTER_EQUIPMENT_BELT_KEY)
 
 
-def print_live_monsters(zone_object: Zone, print_all=False):
+def print_level_up_event(name, level, armor_inc, hp_inc, mana_inc, strength_inc, agi_inc):
+    """
+    Print information when the Character leveles up
+    """
+    print('*' * 20)
+    print(f'Character {name} has leveled up to level {level}!')
+    print(f'Armor Points increased by {armor_inc}')
+    print(f'Health Points increased by {hp_inc}')
+    print(f'Mana Points increased by {mana_inc}')
+    print(f'Strength Points increased by {strength_inc}')
+    print(f'Agility Points increased by {agi_inc}')
+    print('*' * 20)
+
+
+def print_quest_log(quest_log):
+    """
+    Print out the character's quest log
+    :param quest_log: {str: 'Quest'} - the quest log of the character
+    """
+    print("Your quest log:")
+
+    for quest in quest_log.values():
+        # TODO: validate quest types, maybe move to a str
+        print(f'\t{quest.name} - {quest.kills}/{quest.required_kills} {quest.required_monster} slain.')
+
+    print()
+
+
+def print_live_monsters(zone_object: 'Zone', print_all=False):
     """
     Prints the monsters that are alive in the current subzone
     :param zone_object: an object of class Zone in zones.zone.py
@@ -32,7 +60,7 @@ def print_live_monsters(zone_object: Zone, print_all=False):
     print()
 
 
-def print_live_npcs(zone_object: Zone, print_all=False):
+def print_live_npcs(zone_object: 'Zone', print_all=False):
     """
     Prints the NPCs that are alive in the current subzone
     :param zone_object: an object of class Zone in zones.zone.py

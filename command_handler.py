@@ -8,7 +8,7 @@ from information_printer import (print_live_npcs, print_live_monsters, print_que
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar,
                                  print_character_equipment)
 from constants import ZONE_MOVE_BLOCK_SPECIAL_KEY
-
+from information_printer import print_quest_log
 # handlers here!
 
 
@@ -242,7 +242,7 @@ def handle_paq_command(zone_object, main_character):
 def handle_pql_command(main_character):
     """ this function handles the 'print quest log' or 'pql' command, showing the player all the quests he is
     currently on """
-    main_character.print_quest_log()
+    print_quest_log(main_character.quest_log)
 
 
 def handle_print_inventory_command(main_character):

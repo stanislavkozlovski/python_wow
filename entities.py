@@ -6,7 +6,9 @@ from termcolor import colored
 
 from constants import (CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS,
                        KEY_ARMOR_ATTRIBUTE, KEY_STRENGTH_ATTRIBUTE, KEY_AGILITY_ATTRIBUTE, KEY_BONUS_HEALTH_ATTRIBUTE,
-                       KEY_BONUS_MANA_ATTRIBUTE, KEY_LEVEL_STATS_HEALTH, KEY_LEVEL_STATS_MANA)
+                       KEY_BONUS_MANA_ATTRIBUTE, KEY_LEVEL_STATS_HEALTH, KEY_LEVEL_STATS_MANA, CHAR_STARTER_ZONE,
+                       CHAR_STARTER_SUBZONE)
+from information_printer import print_level_up_event
 from exceptions import ItemNotInInventoryError
 from items import Item, Weapon, Potion, Equipment
 from quest import Quest, FetchQuest
@@ -435,8 +437,6 @@ class Monster(LivingThing):
 
 
 class Character(LivingThing):
-    # keys are used to access the level_stats dictionary that holds information on stats to update on each level KEY_LEVEL_STATS_HEALTH = 'health'
-
     def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1,
                  loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=set(),
                  saved_inventory: dict={'gold': 0}, saved_equipment: dict=CHARACTER_DEFAULT_EQUIPMENT):
@@ -451,8 +451,8 @@ class Character(LivingThing):
         self.attributes: {str: int} = {KEY_STRENGTH_ATTRIBUTE: strength, KEY_ARMOR_ATTRIBUTE: 75,
                                        KEY_AGILITY_ATTRIBUTE: agility, KEY_BONUS_HEALTH_ATTRIBUTE: 0,
                                        KEY_BONUS_MANA_ATTRIBUTE: 0}
-        self.current_zone = "Northshire Abbey"
-        self.current_subzone = "Northshire Valley"
+        self.current_zone = CHAR_STARTER_ZONE
+        self.current_subzone = CHAR_STARTER_SUBZONE
         self.loaded_scripts = loaded_scripts  # holds the scripts that the character has seen (which should load only once)
         self.killed_monsters = killed_monsters  # a set that holds the GUIDs of the creatures that\
         #  the character has killed (and that should not be killable a second time)
@@ -880,22 +880,9 @@ class Character(LivingThing):
         self._calculate_stats_formulas()  # recalculate formulas with stats
         self._regenerate()  # regen to full hp/mana
 
-        print('*' * 20)
-        print(f'Character {self.name} has leveled up to level {self.level}!')
-        print(f'Armor Points increased by {armor_increase_amount}')
-        print(f'Health Points increased by {hp_increase_amount}')
-        print(f'Mana Points increased by {mana_increase_amount}')
-        print(f'Strength Points increased by {strength_increase_amount}')
-        print(f'Agility Points increased by {agility_increase_amount}')
-        print('*' * 20)
-
-    def print_quest_log(self):
-        print("Your quest log:")
-
-        for _, quest in self.quest_log.items():
-            print(f'\t{quest.name} - {quest.kills}/{quest.needed_kills} {quest.monster_to_kill} slain.')
-
-        print()
+        print_level_up_event(name=self.name, level=self.level, armor_inc=armor_increase_amount,
+                             hp_inc=hp_increase_amount, mana_inc=mana_increase_amount,
+                             strength_inc=strength_increase_amount, agi_inc=agility_increase_amount)
 
     def print_inventory(self):
         print("Your inventory:")
