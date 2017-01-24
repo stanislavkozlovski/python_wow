@@ -31,3 +31,15 @@ class InvalidBuffError(Error):
         self.buff_name = name
 
         super(Exception, self).__init__(message, name, args)
+
+
+class NonExistantBuffError(Error):
+    """
+    This exception is raised whenever we're trying to access a Buff that is not part of the object
+    ex: Trying to remove a buff from a Character when he does not have it in the first place
+    """
+
+    def __init(self, message, name: str, *args):
+        self.buff_name = name
+
+        super(Exception, self).__init__(message, name, args)
