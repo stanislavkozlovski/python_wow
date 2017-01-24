@@ -6,7 +6,7 @@ This module holds information about all kinds of buffs that are applied to an en
 etc
 """
 from damage import Damage
-from constants import KEY_BUFF_TYPE_ARMOR, KEY_BUFF_TYPE_STRENGTH, KEY_BUFF_TYPE_HEALTH, KEY_BUFF_TYPE_MANA
+from constants import KEY_ARMOR_ATTRIBUTE, KEY_STRENGTH_ATTRIBUTE, KEY_HEALTH_ATTRIBUTE, KEY_MANA_ATTRIBUTE
 from exceptions import InvalidBuffError
 
 # the base class for all buffs/dots/debuffs
@@ -33,10 +33,10 @@ class BeneficialBuff(StatusEffect):
         """
         super().__init__(name, duration)
         # this dictionary will hold the meaningful information of what buff we give
-        self.buff_amounts: {str: int} = {KEY_BUFF_TYPE_HEALTH: 0,
-                                         KEY_BUFF_TYPE_MANA: 0,
-                                         KEY_BUFF_TYPE_ARMOR: 0,
-                                         KEY_BUFF_TYPE_STRENGTH: 0}
+        self.buff_amounts: {str: int} = {KEY_HEALTH_ATTRIBUTE: 0,
+                                         KEY_MANA_ATTRIBUTE: 0,
+                                         KEY_ARMOR_ATTRIBUTE: 0,
+                                         KEY_STRENGTH_ATTRIBUTE: 0}
         self._manage_buff_types(buff_stats_and_amounts)  # update buff_amounts
 
     def __str__(self):

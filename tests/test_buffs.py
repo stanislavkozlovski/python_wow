@@ -4,7 +4,7 @@ import unittest
 from buffs import *
 from damage import Damage
 from exceptions import InvalidBuffError
-from constants import KEY_BUFF_TYPE_ARMOR, KEY_BUFF_TYPE_HEALTH, KEY_BUFF_TYPE_MANA, KEY_BUFF_TYPE_STRENGTH
+from constants import KEY_ARMOR_ATTRIBUTE, KEY_HEALTH_ATTRIBUTE, KEY_MANA_ATTRIBUTE, KEY_STRENGTH_ATTRIBUTE
 
 
 class StatusEffectTests(unittest.TestCase):
@@ -40,10 +40,10 @@ class BeneficialBuffTests(unittest.TestCase):
         self.assertEqual(buff.buff_amounts, expected_buff_amounts)
         self.assertEqual(buff.duration, duration)
         self.assertEqual(buff.buff_amounts, {
-            KEY_BUFF_TYPE_MANA: 0,
-            KEY_BUFF_TYPE_STRENGTH: 10,
-            KEY_BUFF_TYPE_HEALTH: 30,
-            KEY_BUFF_TYPE_ARMOR: 20
+            KEY_MANA_ATTRIBUTE: 0,
+            KEY_STRENGTH_ATTRIBUTE: 10,
+            KEY_HEALTH_ATTRIBUTE: 30,
+            KEY_ARMOR_ATTRIBUTE: 20
         })
 
     def test_equals_dunder(self):
@@ -72,7 +72,7 @@ class BeneficialBuffTests(unittest.TestCase):
 
     def test_str_one_attribute(self):
         name = 'X'
-        attr_name, attr_increase = KEY_BUFF_TYPE_STRENGTH, 10
+        attr_name, attr_increase = KEY_STRENGTH_ATTRIBUTE, 10
         stats_amounts = [(attr_name, attr_increase)]
         duration = 10
 
@@ -82,8 +82,8 @@ class BeneficialBuffTests(unittest.TestCase):
 
     def test_str_two_attributes(self):
         name = 'X'
-        attr_name, attr_increase = KEY_BUFF_TYPE_ARMOR, 15
-        attr_name2, attr_increase2 = KEY_BUFF_TYPE_STRENGTH, 10
+        attr_name, attr_increase = KEY_ARMOR_ATTRIBUTE, 15
+        attr_name2, attr_increase2 = KEY_STRENGTH_ATTRIBUTE, 10
         stats_amounts = [(attr_name, attr_increase), (attr_name2, attr_increase2)]
         duration = 10
 
@@ -94,9 +94,9 @@ class BeneficialBuffTests(unittest.TestCase):
     def test_str_three_attributes(self):
         name = 'X'
 
-        attr_name, attr_increase = KEY_BUFF_TYPE_HEALTH, 20
-        attr_name2, attr_increase2 = KEY_BUFF_TYPE_ARMOR, 15
-        attr_name3, attr_increase3 = KEY_BUFF_TYPE_STRENGTH, 10
+        attr_name, attr_increase = KEY_HEALTH_ATTRIBUTE, 20
+        attr_name2, attr_increase2 = KEY_ARMOR_ATTRIBUTE, 15
+        attr_name3, attr_increase3 = KEY_STRENGTH_ATTRIBUTE, 10
         stats_amounts = [(attr_name, attr_increase), (attr_name2, attr_increase2), (attr_name3, attr_increase3)]
         duration = 10
 
@@ -124,12 +124,12 @@ class BeneficialBuffTests(unittest.TestCase):
         The get_buffed_attributes function should return the buffs that have a value increase
         """
         expected_result = {
-            KEY_BUFF_TYPE_STRENGTH: 10,
-            KEY_BUFF_TYPE_ARMOR: 15
+            KEY_STRENGTH_ATTRIBUTE: 10,
+            KEY_ARMOR_ATTRIBUTE: 15
         }
         name = 'X'
-        attr_name, attr_increase = KEY_BUFF_TYPE_STRENGTH, 10
-        attr_name2, attr_increase2 = KEY_BUFF_TYPE_ARMOR, 15
+        attr_name, attr_increase = KEY_STRENGTH_ATTRIBUTE, 10
+        attr_name2, attr_increase2 = KEY_ARMOR_ATTRIBUTE, 15
         stats_amounts = [(attr_name, attr_increase), (attr_name2, attr_increase2)]
         duration = 10
 

@@ -4,7 +4,8 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 import random
 from termcolor import colored
 
-from constants import CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS
+from constants import (CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS,
+                        KEY_ARMOR_ATTRIBUTE, KEY_STRENGTH_ATTRIBUTE)
 from exceptions import ItemNotInInventoryError
 from items import Item, Weapon, Potion, Equipment
 from quest import Quest, FetchQuest
@@ -16,7 +17,6 @@ class LivingThing:
     """
     This is the base class for all things _alive - characters, monsters and etc.
     """
-    KEY_ARMOR = 'armor'
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, level: int = 1):
         self.name = name
@@ -26,7 +26,7 @@ class LivingThing:
         self.max_mana = mana
         self.level = level
         self.absorption_shield = 0
-        self.attributes = {self.KEY_ARMOR: 0}
+        self.attributes = {KEY_ARMOR_ATTRIBUTE: 0}
         self._alive = True
         self._in_combat = False
         self.buffs = {}  # dict Key: an instance of class Buff, Value: The turns it has left to be active, int
@@ -152,7 +152,7 @@ class LivingThing:
         :param damage: the raw damage
         :return: the damage with the applied reduction
         """
-        armor = self.attributes[self.KEY_ARMOR]
+        armor = self.attributes[KEY_ARMOR_ATTRIBUTE]
 
         reduction_percentage = armor / (armor + 400 + 85 * attacker_level)
         damage_to_deduct = damage.phys_dmg * reduction_percentage
@@ -349,7 +349,7 @@ class Monster(LivingThing):
         self.min_damage = min_damage
         self.max_damage = max_damage
         self.xp_to_give = xp_to_give
-        self.attributes[self.KEY_ARMOR] = armor
+        self.attributes[KEY_ARMOR_ATTRIBUTE] = armor
         self.gossip = gossip
         self.respawnable = respawnable  # says if the creature can ever respawn, once killed of course
         self._gold_to_give = self._calculate_gold_reward(gold_to_give_range)
@@ -455,7 +455,7 @@ class Character(LivingThing):
         self.xp_req_to_level = 400
         self.bonus_health = 0
         self.bonus_mana = 0
-        self.attributes = {self.KEY_STRENGTH: strength, self.KEY_ARMOR: 75, self.KEY_AGILITY: agility, self.KEY_BONUS_HEALTH: 0,
+        self.attributes = {self.KEY_STRENGTH: strength, KEY_ARMOR_ATTRIBUTE: 75, self.KEY_AGILITY: agility, self.KEY_BONUS_HEALTH: 0,
                       self.KEY_BONUS_MANA: 0}  # dictionary holding attributes, KEY: strength, Value: 5
         self.current_zone = "Northshire Abbey"
         self.current_subzone = "Northshire Valley"
@@ -592,7 +592,7 @@ class Character(LivingThing):
         # formula for agility is: for each point of agility, add 2.5 armor and 0.5 strength
         agility = self.attributes[self.KEY_AGILITY]
         self.attributes[self.KEY_STRENGTH] += agility * 0.5
-        self.attributes[self.KEY_ARMOR] += agility * 2.5
+        self.attributes[KEY_ARMOR_ATTRIBUTE] += agility * 2.5
 
         "Now we need to update our damage, because the strength might have been changed"
 
@@ -876,12 +876,12 @@ class Character(LivingThing):
         mana_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_MANA]
         strength_increase_amount = current_level_stats[self.KEY_STRENGTH]
         agility_increase_amount = current_level_stats[self.KEY_AGILITY]
-        armor_increase_amount = current_level_stats[self.KEY_ARMOR]
+        armor_increase_amount = current_level_stats[KEY_ARMOR_ATTRIBUTE]
 
         self.max_health += hp_increase_amount
         self.max_mana += mana_increase_amount
         self.attributes[self.KEY_STRENGTH] += strength_increase_amount
-        self.attributes[self.KEY_ARMOR] += armor_increase_amount
+        self.attributes[KEY_ARMOR_ATTRIBUTE] += armor_increase_amount
         self.attributes[self.KEY_AGILITY] += agility_increase_amount
         self._calculate_stats_formulas()  # recalculate formulas with stats
         self._regenerate()  # regen to full hp/mana
