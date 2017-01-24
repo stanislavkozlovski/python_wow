@@ -32,7 +32,7 @@ class LivingThing:
         self.attributes = {KEY_ARMOR_ATTRIBUTE: 0}
         self._alive = True
         self._in_combat = False
-        self.buffs = {}  # dict Key: an instance of class Buff, Value: The turns it has left to be active, int
+        self.buffs: {BeneficialBuff or DoT: int} = {}
 
     def is_alive(self):
         return self._alive
@@ -92,7 +92,7 @@ class LivingThing:
         from the character.
         After iterating through all of the active Buffs, we remove every Buff that is in the list
         """
-        buffs_to_remove = []  # type: list of Buffs
+        buffs_to_remove: [BeneficialBuff] = []  # type: list of Buffs
 
         # iterate through active buffs and reduce duration
         for buff in filter(lambda bf: isinstance(bf, BeneficialBuff), self.buffs.keys()):
@@ -108,7 +108,7 @@ class LivingThing:
         for buff in buffs_to_remove:
             self.remove_buff(buff)
 
-    def remove_buff(self, buff: BeneficialBuff):
+    def remove_buff(self, buff: BeneficialBuff or DoT):
         """ Method that handles when a buff is removed/expired"""
         del self.buffs[buff]
         if isinstance(buff, BeneficialBuff):
@@ -117,7 +117,7 @@ class LivingThing:
         elif isinstance(buff, DoT):
             print(f"DoT {buff.name} has expired from {self.name}.")
 
-    def add_buff(self, buff: BeneficialBuff):
+    def add_buff(self, buff: BeneficialBuff or DoT):
         """ Method that handles when a buff is added to the player
         also adds DoTs to the list"""
         self.buffs[buff] = buff.duration
