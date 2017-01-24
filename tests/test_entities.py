@@ -164,6 +164,29 @@ class LivingThingTests(unittest.TestCase):
         self.assertEqual(self.dummy.buffs, {})
         self.assertEqual(self.dummy.health, self.health)
 
+    def test_end_turn_update(self):
+        """
+        the end_turn_update is called whenever the character's turn ends. It currently
+        only calls the _update_buffs() function, which lowers the duration on all of our buffs by one turn
+        :return:
+        """
+        self.dummy.add_buff(self.dummy_buff)
+
+        for i in range(self.dummy_buff.duration - 1):
+            self.assertNotEqual(self.dummy.health, self.health)
+            self.assertEqual(self.dummy.max_health, self.health + self.dummy_buff.buff_amounts['health'])
+            self.assertEqual(self.dummy.health, self.health + self.dummy_buff.buff_amounts['health'])
+
+            self.dummy.end_turn_update()
+
+            self.assertEqual(self.dummy.buffs[self.dummy_buff], self.dummy_buff.duration - (i + 1))
+
+        self.assertEqual(self.dummy.buffs[self.dummy_buff], 1)
+        self.dummy.end_turn_update()
+        # the buff should have been removed and the health reduced
+        self.assertEqual(self.dummy.buffs, {})
+        self.assertEqual(self.dummy.health, self.health)
+
     def test_take_dot_proc(self):
         """
         The take_dot_proc method damages the character for the DoT's damage per tick
