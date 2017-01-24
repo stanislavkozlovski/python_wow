@@ -44,6 +44,31 @@ class BeneficialBuffTests(unittest.TestCase):
             KEY_BUFF_TYPE_ARMOR: 20
         })
 
+    def test_equals_dunder(self):
+        """
+        Two buffs are only equal if their name, buffs and duration is the same
+        """
+        name = 'BMW'
+        stats_amounts = [('strength', 10), ('armor', 20), ('health', 30)]
+        duration = 10
+        buff = BeneficialBuff(name=name, buff_stats_and_amounts=stats_amounts, duration=duration)
+
+        name = 'BMW2'
+        stats_amounts = [('strength', 10), ('armor', 20), ('health', 30)]
+        duration = 10
+        buff2 = BeneficialBuff(name=name, buff_stats_and_amounts=stats_amounts, duration=duration)
+
+        self.assertFalse(buff == buff2) # Different names
+        buff2.name = 'BMW'
+        buff2.duration = 11
+        self.assertFalse(buff == buff2) # Different duration
+        buff2.duration = 10
+        buff2.buff_amounts['strength'] = 9
+        self.assertFalse(buff == buff2)  # Different buff amounts
+        buff2.buff_amounts['strength'] = 10
+        self.assertTrue(buff == buff2)  # Identical
+
+
     def test_str_one_attribute(self):
         name = 'X'
         attr_name, attr_increase = KEY_BUFF_TYPE_STRENGTH, 10
