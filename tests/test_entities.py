@@ -50,6 +50,18 @@ class LivingThingTests(unittest.TestCase):
         self.assertFalse(self.dummy.is_in_combat())
         self.assertEqual(self.dummy.health, self.health)
 
+    def test_regenerate(self):
+        """
+        The regenerate function should reset the character's health/mana to it's max
+        """
+        self.dummy.health -= 50
+        self.dummy.mana -= 50
+        self.assertNotEqual(self.dummy.health, self.health)
+        self.assertNotEqual(self.dummy.mana, self.mana)
+        self.dummy._regenerate()
+        self.assertEqual(self.dummy.health, self.health)
+        self.assertEqual(self.dummy.mana, self.mana)
+
     def test_add_buff(self):
         """
         The add_buff method should add a DoT/BeneficialBuff to the character's self.buffs dictionary.
