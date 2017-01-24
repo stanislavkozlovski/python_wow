@@ -23,3 +23,11 @@ class NoSuchCharacterError(Error):
         self.char_name = name
 
         super(Exception, self).__init__(message, name, args)
+
+
+class InvalidBuffError(Error):
+    """ This exception is raised whenever we're trying to load a buff that is not of an approved type """
+    def __init(self, message, name: str, *args):
+        self.buff_name = name
+
+        super(Exception, self).__init__(message, name, args)
