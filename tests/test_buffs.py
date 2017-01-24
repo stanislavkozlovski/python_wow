@@ -177,5 +177,24 @@ class DoTTests(unittest.TestCase):
         second_dot.damage.phys_dmg = 150
         self.assertNotEqual(self.dot_dummy, second_dot)  # Damage differs
 
+    def test_update_caster_level(self):
+        """
+        The update_caster_level simply updates the self.level attribute.
+        It is useful because when loading DoTs from the DB you can't know the
+        level of the caster and thus you need to update it to the appropriate level
+        later on.
+        """
+        self.assertEqual(self.dot_dummy.level, self.caster_level)
+        self.dot_dummy.update_caster_level(0)
+        self.assertNotEqual(self.dot_dummy.level, self.caster_level)
+        self.dot_dummy.update_caster_level(2310)
+        self.assertNotEqual(self.dot_dummy.level, self.caster_level)
+        self.dot_dummy.update_caster_level(self.caster_level)
+        self.assertEqual(self.dot_dummy.level, self.caster_level)
+
+
+
+
+
 if __name__ == '__main__':
     unittest.main()
