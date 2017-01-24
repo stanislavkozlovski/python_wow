@@ -435,6 +435,12 @@ class FriendlyNpcTests(unittest.TestCase):
         self.assertEqual(self.dummy.gossip, self.gossip)
         self.assertEqual(self.dummy.colored_name, self.expected_colored_name)
 
-        
+    def test_str(self):
+        """
+        Should return the name of the FriendlyNPC
+        """
+        expected_str = str(self.expected_colored_name)
+        self.assertEqual(str(self.dummy), expected_str)
+
 if __name__ == '__main__':
     unittest.main()
