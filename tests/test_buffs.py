@@ -156,6 +156,9 @@ class DoTTests(unittest.TestCase):
         self.assertEqual(self.dot_dummy.duration, self.duration)
         self.assertEqual(self.dot_dummy.level, self.caster_level)
 
+    def test_str(self):
+        expected_str = f'{self.dot_dummy.name} - Deals {self.dot_dummy.damage} damage every turn for {self.dot_dummy.duration} turns.'
+        self.assertEqual(str(self.dot_dummy), expected_str)
 
 if __name__ == '__main__':
     unittest.main()
