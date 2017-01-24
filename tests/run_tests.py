@@ -12,11 +12,12 @@ from tests.models.quests import test_loader as test_quest_loader, test_quest_tem
 from tests.models.spells import test_buff_schema, test_dot_schema, test_paladin_spells
 from tests.utils import test_helper
 from tests.zones import test_northshire_abbey
+from tests import test_buffs
 
 modules_to_load = [test_saved_character, test_creature_template, test_creatures, test_npc_vendor,
                    test_creatures_loader, test_creature_def_loader, test_item_loader, test_item_template, test_loot_table,
                    test_char_saver, test_misc_loader, test_quest_loader, test_quest_template, test_buff_schema,
-                   test_dot_schema, test_paladin_spells, test_helper, test_northshire_abbey]
+                   test_dot_schema, test_paladin_spells, test_helper, test_northshire_abbey, test_buffs]
 
 loader = unittest.TestLoader()
 main_suite = loader.loadTestsFromModule(test_char_loader)
