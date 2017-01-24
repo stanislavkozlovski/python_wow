@@ -519,6 +519,13 @@ class VendorNpcTests(unittest.TestCase):
         finally:
             sys.stdout = sys.__stdout__
 
+    def test_get_item_price(self):
+        """
+        the get_item_price function returns the price for the specific item
+        """
+        received_price = self.dummy.get_item_price(self.first_item.name)
+        self.assertEqual(self.first_item.buy_price, received_price)
+
 
 if __name__ == '__main__':
     unittest.main()
