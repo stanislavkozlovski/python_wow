@@ -98,15 +98,17 @@ def handle_vendor_sale(character, vendor):
             break
         elif 'buy ' in command:
             item = command[4:]  # name of the item
-            if vendor.has_item(item):
-                # check if the player has enough gold
-                if character.has_enough_gold(vendor.get_item_price(item)):
-                    character.buy_item(vendor.sell_item(item))
-                    print(f'{character.name} has bought {item} from {vendor.name}!')
-                else:
-                    print(f'You do not have enough gold to buy {item}!\n')
-            else:
+            if not vendor.has_item(item):
                 print(f'{vendor.name} does not have {item} in stock.')
+                continue
+            
+            # check if the player has enough gold
+            if not character.has_enough_gold(vendor.get_item_price(item)):
+                print(f'You do not have enough gold to buy {item}!\n')
+                continue
+
+            character.buy_item(vendor.sell_item(item))
+            print(f'{character.name} has bought {item} from {vendor.name}!')
         elif 'sell ' in command:
             item = command[5:]  # name of the item
             if character.has_item(item):
