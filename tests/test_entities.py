@@ -142,6 +142,28 @@ class LivingThingTests(unittest.TestCase):
         finally:
             sys.stdout = sys.__stdout__
 
+    def test_update_buffs(self):
+        """
+        The _update_buffs function goes through every buff and reduces its duration.
+        It also removes buffs once their duration has passed :0
+        """
+        self.dummy.add_buff(self.dummy_buff)
+
+        for i in range(self.dummy_buff.duration - 1):
+            self.assertNotEqual(self.dummy.health, self.health)
+            self.assertEqual(self.dummy.max_health, self.health + self.dummy_buff.buff_amounts['health'])
+            self.assertEqual(self.dummy.health, self.health + self.dummy_buff.buff_amounts['health'])
+
+            self.dummy._update_buffs()
+
+            self.assertEqual(self.dummy.buffs[self.dummy_buff], self.dummy_buff.duration - (i+1))
+
+        self.assertEqual(self.dummy.buffs[self.dummy_buff], 1)
+        self.dummy._update_buffs()
+        # the buff should have been removed and the health reduced
+        self.assertEqual(self.dummy.buffs, {})
+        self.assertEqual(self.dummy.health, self.health)
+
     def test_take_dot_proc(self):
         """
         The take_dot_proc method damages the character for the DoT's damage per tick
