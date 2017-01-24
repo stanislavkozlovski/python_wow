@@ -61,6 +61,21 @@ class LivingThingTests(unittest.TestCase):
         self.assertEqual(self.dummy.max_health, self.health + self.dummy_buff.buff_amounts['health'])
         self.assertEqual(self.dummy.health, self.health + self.dummy_buff.buff_amounts['health'])
 
+    def test_add_multiple_buffs(self):
+        """
+        If it is the same buff, it should just overwrite itself on the duration
+        """
+        self.assertEqual(self.dummy.buffs, {})
+        self.dummy.add_buff(self.dummy_buff)
+        self.assertEqual(self.dummy.buffs, {self.dummy_buff: self.dummy_buff.duration})
+        self.dummy.buffs[self.dummy_buff] = 0  # reset the duration
+        self.dummy.add_buff(self.dummy_buff)
+
+        # health should have been increased only once
+        self.assertNotEqual(self.dummy.health, self.health)
+        self.assertEqual(self.dummy.max_health, self.health + self.dummy_buff.buff_amounts['health'])
+        self.assertEqual(self.dummy.health, self.health + self.dummy_buff.buff_amounts['health'])
+
 
 
 
