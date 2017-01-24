@@ -1,4 +1,6 @@
 import unittest
+import sys
+from io import StringIO
 
 from constants import KEY_ARMOR_ATTRIBUTE
 from entities import LivingThing
@@ -75,6 +77,31 @@ class LivingThingTests(unittest.TestCase):
         self.assertNotEqual(self.dummy.health, self.health)
         self.assertEqual(self.dummy.max_health, self.health + self.dummy_buff.buff_amounts['health'])
         self.assertEqual(self.dummy.health, self.health + self.dummy_buff.buff_amounts['health'])
+
+    def test_remove_buff(self):
+        """
+        The remove_buff method should be called whenever a buff has expired from the character.
+        It should remove the buff from the character's buffs dictionary and remove the bonuses it gave him
+        """
+        expected_output = f'Buff {self.dummy_buff.name} has expired from {self.name}.'
+        output = StringIO()
+        try:
+            sys.stdout = output
+            self.dummy.add_buff(self.dummy_buff)
+            # assert that the health has been increased
+            self.assertEqual(self.dummy.max_health, self.health + self.dummy_buff.buff_amounts['health'])
+            self.assertEqual(self.dummy.health, self.health + self.dummy_buff.buff_amounts['health'])
+
+            # assert that the health and buff has been removed
+            self.dummy.remove_buff(self.dummy_buff)
+            self.assertEqual(self.dummy.buffs, {})
+            self.assertEqual(self.dummy.max_health, self.health)
+            self.assertEqual(self.dummy.health, self.health)
+
+            self.assertIn(expected_output, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
 
 
 
