@@ -26,5 +26,27 @@ class LivingThingTests(unittest.TestCase):
         self.assertFalse(self.dummy._in_combat)
         self.assertEqual(self.dummy.buffs, {})  # should not have any buffs on creation
 
+    def test_enter_in_leave_combat_methods(self):
+        """
+        The is_in_combat function should return whether the object is in combat
+            enter_combat should put him in combat
+            leave_combat should leave combat and regenerate the living thing
+        """
+        self.assertFalse(self.dummy.is_in_combat())
+        self.dummy.enter_combat()  # enter combat
+        self.assertTrue(self.dummy.is_in_combat())
+
+        self.assertEqual(self.dummy.health, self.health)
+        self.dummy.health -= 50
+        self.assertNotEqual(self.dummy.health, self.health)
+
+        self.dummy.leave_combat()
+        # Should have left combat and regenerated health
+        self.assertFalse(self.dummy.is_in_combat())
+        self.assertEqual(self.dummy.health, self.health)
+
+
+
+
 if __name__ == '__main__':
     unittest.main()
