@@ -507,6 +507,18 @@ class VendorNpcTests(unittest.TestCase):
         received_item: Item = self.dummy.get_item_info(valid_item_name)
         self.assertEqual(received_item, self.first_item)
 
+    def test_get_item_info_invalid_item(self):
+        output = StringIO()
+        invalid_item_name = 'logic'
+        expected_message = f'{self.dummy.name} does not have {invalid_item_name} for sale.'
+        try:
+            sys.stdout = output
+            received_item = self.dummy.get_item_info(invalid_item_name)
+            self.assertIsNone(received_item)
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
 
 if __name__ == '__main__':
     unittest.main()
