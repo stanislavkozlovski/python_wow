@@ -497,5 +497,16 @@ class VendorNpcTests(unittest.TestCase):
         self.assertTrue(self.dummy.has_item(valid_item))
         self.assertFalse(self.dummy.has_item(invalid_item))
 
+    def test_get_item_info_valid_item(self):
+        """
+        This get_item_info function is only used for printing purposes
+        it returns the item we want from the vendor.
+        It is used when the Character queries to see the item
+        """
+        valid_item_name = self.first_item.name
+        received_item: Item = self.dummy.get_item_info(valid_item_name)
+        self.assertEqual(received_item, self.first_item)
+
+
 if __name__ == '__main__':
     unittest.main()
