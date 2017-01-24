@@ -465,14 +465,14 @@ class VendorNpcTests(unittest.TestCase):
         name, self.entry, health, mana = 'Jack', 1, 100, 100
         level, min_damage, max_damage, quest_relation_id = 3, 2, 6, 0
         loot_table, gossip = None, 'Like a genesisis, $N!'
-        first_item = Item(name='game', item_id=5, buy_price=5, sell_price=5, quest_id=0)
+        self.first_item = Item(name='game', item_id=5, buy_price=5, sell_price=5, quest_id=0)
         first_item_stock = 10
         second_item = Item(name='copy-cat', item_id=2, buy_price=1, sell_price=1, quest_id=1)
         second_item_stock = 1
         third_item = Item(name='Domev_se_vrushta', item_id=4, buy_price=2, sell_price=2, quest_id=2)
         third_item_stock = 2
         self.expected_colored_name = termcolor.colored(name, color='green')
-        self.inventory = {first_item.name: (first_item, first_item_stock),
+        self.inventory = {self.first_item.name: (self.first_item, first_item_stock),
                          second_item.name: (second_item, second_item_stock),
                          third_item.name: (third_item, third_item_stock)}
         self.dummy = VendorNPC(name=name, entry=self.entry, health=health, mana=mana, level=level, min_damage=min_damage,
@@ -487,6 +487,15 @@ class VendorNpcTests(unittest.TestCase):
         """ The __str__ dunder method should return the colored name with a <Vendor> added to it"""
         expected_str = f'{self.expected_colored_name} <Vendor>'
         self.assertEqual(expected_str, str(self.dummy))
+
+    def test_has_item(self):
+        """
+        has_item returns a boolean if the vendor has the item in his inventory
+        """
+        valid_item = self.first_item.name
+        invalid_item = 'ThreeOnEYeah'
+        self.assertTrue(self.dummy.has_item(valid_item))
+        self.assertFalse(self.dummy.has_item(invalid_item))
 
 if __name__ == '__main__':
     unittest.main()
