@@ -10,6 +10,12 @@ KEY_ARMOR_ATTRIBUTE = "armor"
 KEY_STRENGTH_ATTRIBUTE = "strength"
 KEY_HEALTH_ATTRIBUTE = "health"
 KEY_MANA_ATTRIBUTE = "mana"
+KEY_AGILITY_ATTRIBUTE = 'agility'
+KEY_BONUS_HEALTH_ATTRIBUTE = 'bonus_health'
+KEY_BONUS_MANA_ATTRIBUTE = 'bonus_mana'
+
+KEY_LEVEL_STATS_HEALTH = 'health'
+KEY_LEVEL_STATS_MANA = 'mana'
 
 # these functions run only once due to a decorator
 CREATURE_DEFAULT_VALUES = load_creature_defaults()

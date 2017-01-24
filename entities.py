@@ -5,7 +5,8 @@ import random
 from termcolor import colored
 
 from constants import (CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS,
-                        KEY_ARMOR_ATTRIBUTE, KEY_STRENGTH_ATTRIBUTE)
+                       KEY_ARMOR_ATTRIBUTE, KEY_STRENGTH_ATTRIBUTE, KEY_AGILITY_ATTRIBUTE, KEY_BONUS_HEALTH_ATTRIBUTE,
+                       KEY_BONUS_MANA_ATTRIBUTE, KEY_LEVEL_STATS_HEALTH, KEY_LEVEL_STATS_MANA)
 from exceptions import ItemNotInInventoryError
 from items import Item, Weapon, Potion, Equipment
 from quest import Quest, FetchQuest
@@ -434,15 +435,7 @@ class Monster(LivingThing):
 
 
 class Character(LivingThing):
-    # keys are used to access the level_stats dictionary that holds information on stats to update on each level up
-    KEY_LEVEL_STATS_HEALTH = 'health'
-    KEY_LEVEL_STATS_MANA = 'mana'
-    # these keys are used to access the attributes dictionary which holds information on the character's stats
-    KEY_STRENGTH = 'strength'
-    KEY_ARMOR = 'armor'
-    KEY_AGILITY = 'agility'
-    KEY_BONUS_HEALTH = 'bonus_health'
-    KEY_BONUS_MANA = 'bonus_mana'
+    # keys are used to access the level_stats dictionary that holds information on stats to update on each level KEY_LEVEL_STATS_HEALTH = 'health'
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1,
                  loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=set(),
@@ -455,8 +448,9 @@ class Character(LivingThing):
         self.xp_req_to_level = 400
         self.bonus_health = 0
         self.bonus_mana = 0
-        self.attributes = {self.KEY_STRENGTH: strength, KEY_ARMOR_ATTRIBUTE: 75, self.KEY_AGILITY: agility, self.KEY_BONUS_HEALTH: 0,
-                      self.KEY_BONUS_MANA: 0}  # dictionary holding attributes, KEY: strength, Value: 5
+        self.attributes: {str: int} = {KEY_STRENGTH_ATTRIBUTE: strength, KEY_ARMOR_ATTRIBUTE: 75,
+                                       KEY_AGILITY_ATTRIBUTE: agility, KEY_BONUS_HEALTH_ATTRIBUTE: 0,
+                                       KEY_BONUS_MANA_ATTRIBUTE: 0}
         self.current_zone = "Northshire Abbey"
         self.current_subzone = "Northshire Valley"
         self.loaded_scripts = loaded_scripts  # holds the scripts that the character has seen (which should load only once)
@@ -583,21 +577,21 @@ class Character(LivingThing):
 
         # update health according to bonus health
         self.max_health -= self.bonus_health  # remove the old bonus health
-        self.bonus_health = self.attributes[self.KEY_BONUS_HEALTH]  # update bonus health
+        self.bonus_health = self.attributes[KEY_BONUS_HEALTH_ATTRIBUTE]  # update bonus health
         self.max_health += self.bonus_health  # add bonus health again
         self.max_mana -= self.bonus_mana
-        self.bonus_mana = self.attributes[self.KEY_BONUS_MANA]
+        self.bonus_mana = self.attributes[KEY_BONUS_MANA_ATTRIBUTE]
         self.max_mana += self.bonus_mana
 
         # formula for agility is: for each point of agility, add 2.5 armor and 0.5 strength
-        agility = self.attributes[self.KEY_AGILITY]
-        self.attributes[self.KEY_STRENGTH] += agility * 0.5
+        agility = self.attributes[KEY_AGILITY_ATTRIBUTE]
+        self.attributes[KEY_STRENGTH_ATTRIBUTE] += agility * 0.5
         self.attributes[KEY_ARMOR_ATTRIBUTE] += agility * 2.5
 
         "Now we need to update our damage, because the strength might have been changed"
 
         # current formula for damage is: wep_dmg * 0.4 * strength
-        strength = self.attributes[self.KEY_STRENGTH]
+        strength = self.attributes[KEY_STRENGTH_ATTRIBUTE]
         self.min_damage = self.equipped_weapon.min_damage + (0.4 * strength)
         self.max_damage = self.equipped_weapon.max_damage + (0.4 * strength)
 
@@ -872,17 +866,17 @@ class Character(LivingThing):
 
         current_level_stats = CHARACTER_LEVELUP_BONUS_STATS[self.level]
         # access the dictionary holding the appropriate value increases for each level
-        hp_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_HEALTH]
-        mana_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_MANA]
-        strength_increase_amount = current_level_stats[self.KEY_STRENGTH]
-        agility_increase_amount = current_level_stats[self.KEY_AGILITY]
+        hp_increase_amount = current_level_stats[KEY_LEVEL_STATS_HEALTH]
+        mana_increase_amount = current_level_stats[KEY_LEVEL_STATS_MANA]
+        strength_increase_amount = current_level_stats[KEY_STRENGTH_ATTRIBUTE]
+        agility_increase_amount = current_level_stats[KEY_AGILITY_ATTRIBUTE]
         armor_increase_amount = current_level_stats[KEY_ARMOR_ATTRIBUTE]
 
         self.max_health += hp_increase_amount
         self.max_mana += mana_increase_amount
-        self.attributes[self.KEY_STRENGTH] += strength_increase_amount
+        self.attributes[KEY_STRENGTH_ATTRIBUTE] += strength_increase_amount
         self.attributes[KEY_ARMOR_ATTRIBUTE] += armor_increase_amount
-        self.attributes[self.KEY_AGILITY] += agility_increase_amount
+        self.attributes[KEY_AGILITY_ATTRIBUTE] += agility_increase_amount
         self._calculate_stats_formulas()  # recalculate formulas with stats
         self._regenerate()  # regen to full hp/mana
 
