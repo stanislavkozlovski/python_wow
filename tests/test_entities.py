@@ -62,6 +62,20 @@ class LivingThingTests(unittest.TestCase):
         self.assertEqual(self.dummy.health, self.health)
         self.assertEqual(self.dummy.mana, self.mana)
 
+    def test_handle_overheal(self):
+        """
+        handle_overheal is a helper function which returns the amount we've been overhealed by
+        and resets the health to the maximum
+        """
+        overheal_amount = 10
+        self.dummy.health += overheal_amount
+        self.assertGreater(self.dummy.health, self.dummy.max_health)
+
+        received_overheal_amount = self.dummy._handle_overheal()
+        self.assertEqual(received_overheal_amount, overheal_amount)
+        # should have reset the health
+        self.assertEqual(self.dummy.health, self.dummy.max_health)
+
     def test_add_buff(self):
         """
         The add_buff method should add a DoT/BeneficialBuff to the character's self.buffs dictionary.
@@ -126,9 +140,6 @@ class LivingThingTests(unittest.TestCase):
         except NonExistantBuffError as e:
             received_message = e.args[0]
             self.assertEqual(received_message, expected_message)
-
-
-
 
 
 if __name__ == '__main__':
