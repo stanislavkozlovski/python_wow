@@ -9,7 +9,7 @@ from constants import (CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STAT
                        KEY_BONUS_MANA_ATTRIBUTE, KEY_LEVEL_STATS_HEALTH, KEY_LEVEL_STATS_MANA, CHAR_STARTER_ZONE,
                        CHAR_STARTER_SUBZONE)
 from information_printer import print_level_up_event
-from exceptions import ItemNotInInventoryError
+from exceptions import ItemNotInInventoryError, NonExistantBuffError
 from items import Item, Weapon, Potion, Equipment
 from quest import Quest, FetchQuest
 from damage import Damage
@@ -110,12 +110,14 @@ class LivingThing:
 
     def remove_buff(self, buff: BeneficialBuff or DoT):
         """ Method that handles when a buff is removed/expired"""
-        del self.buffs[buff]
+        if buff not in self.buffs:
+            raise NonExistantBuffError(f"Cannot remove {buff.name} from {self.name} because he does not have it!", buff.name)
         if isinstance(buff, BeneficialBuff):
             self._deapply_buff(buff)
             print(f"Buff {buff.name} has expired from {self.name}.")
         elif isinstance(buff, DoT):
             print(f"DoT {buff.name} has expired from {self.name}.")
+        del self.buffs[buff]
 
     def add_buff(self, buff: BeneficialBuff or DoT):
         """ Method that handles when a buff is added to the player
