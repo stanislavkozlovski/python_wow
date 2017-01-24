@@ -323,6 +323,23 @@ class LivingThingTests(unittest.TestCase):
         reduced_dmg: Damage = self.dummy._apply_armor_reduction(damage, attacker_level)
         self.assertEqual(reduced_dmg, expected_damage)
 
+    def test_apply_armor_reduction_no_phys_dmg(self):
+        attacker_level = self.dummy.level
+        armor = 500
+        self.dummy.attributes['armor'] = armor
+
+        # the formula
+        reduction_percentage = armor / (armor + 400 + 85 * attacker_level)
+
+        phys_dmg, magic_dmg = 0, 500
+        damage = Damage(phys_dmg=phys_dmg, magic_dmg=magic_dmg)
+        expected_phys_dmg, expected_magic_dmg = phys_dmg - (reduction_percentage * phys_dmg), magic_dmg
+        expected_damage = Damage(phys_dmg=expected_phys_dmg, magic_dmg=expected_magic_dmg)
+
+        reduced_dmg: Damage = self.dummy._apply_armor_reduction(damage, attacker_level)
+        self.assertEqual(reduced_dmg.phys_dmg, 0)
+        self.assertEqual(reduced_dmg, expected_damage)
+
 
 if __name__ == '__main__':
     unittest.main()
