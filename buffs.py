@@ -48,7 +48,7 @@ class BeneficialBuff(StatusEffect):
         return f"Increases {main_annexation} for {self.duration} turns."
 
     def __eq__(self, other):
-        if not isinstance(other, self):
+        if not isinstance(other, type(self)):
             raise Exception('A BeneficialBuff can only be compared to another Beneficial Buff!')
 
         return self.name == other.name and self.buff_amounts == other.buff_amounts and self.duration == other.duration
