@@ -1,6 +1,7 @@
 import unittest
 
 from buffs import *
+from exceptions import InvalidBuffError
 from constants import KEY_BUFF_TYPE_ARMOR, KEY_BUFF_TYPE_HEALTH, KEY_BUFF_TYPE_MANA, KEY_BUFF_TYPE_STRENGTH
 
 
@@ -94,6 +95,22 @@ class BeneficialBuffTests(unittest.TestCase):
         result = buff.get_buffed_attributes()
 
         self.assertEqual(result, expected_result)
+
+    def test_manage_buff_types_invalid_buff(self):
+        """
+        The _manage_buff_types function is called to fill the self.buff_amounts dictionary
+        with the given buff stats and amounts in the form of a list.
+        It also validates that the given bufff type is valid and raises an error if its not
+        """
+        invalid_buff_type = 'LoLo'
+        expected_error_message = f'Buff type {invalid_buff_type} is not supported!'
+        buff = BeneficialBuff('dada', [], 3)
+        try:
+            buff._manage_buff_types([('armor', 5), (invalid_buff_type, 10)])
+            self.fail('Should have raised an InvalidBuffError')
+        except InvalidBuffError as e:
+            self.assertEqual(str(e), expected_error_message)
+
 
 if __name__ == '__main__':
     unittest.main()
