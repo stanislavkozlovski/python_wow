@@ -31,11 +31,11 @@ class BeneficialBuffTests(unittest.TestCase):
         name = 'BMW'
         stats_amounts = [('strength', 10), ('armor', 20), ('health', 30)]
         duration = 10
-
+        expected_buff_amounts = {'strength': 10, 'armor': 20, 'health': 30, 'mana': 0}
         buff = BeneficialBuff(name=name, buff_stats_and_amounts=stats_amounts, duration=duration)
 
         self.assertEqual(buff.name, name)
-        self.assertEqual(buff.buff_stats_and_amounts, stats_amounts)
+        self.assertEqual(buff.buff_amounts, expected_buff_amounts)
         self.assertEqual(buff.duration, duration)
         self.assertEqual(buff.buff_amounts, {
             KEY_BUFF_TYPE_MANA: 0,
@@ -56,8 +56,8 @@ class BeneficialBuffTests(unittest.TestCase):
 
     def test_str_two_attributes(self):
         name = 'X'
-        attr_name, attr_increase = KEY_BUFF_TYPE_STRENGTH, 10
-        attr_name2, attr_increase2 = KEY_BUFF_TYPE_ARMOR, 15
+        attr_name, attr_increase = KEY_BUFF_TYPE_ARMOR, 15
+        attr_name2, attr_increase2 = KEY_BUFF_TYPE_STRENGTH, 10
         stats_amounts = [(attr_name, attr_increase), (attr_name2, attr_increase2)]
         duration = 10
 
@@ -67,9 +67,10 @@ class BeneficialBuffTests(unittest.TestCase):
 
     def test_str_three_attributes(self):
         name = 'X'
-        attr_name, attr_increase = KEY_BUFF_TYPE_STRENGTH, 10
+
+        attr_name, attr_increase = KEY_BUFF_TYPE_HEALTH, 20
         attr_name2, attr_increase2 = KEY_BUFF_TYPE_ARMOR, 15
-        attr_name3, attr_increase3 = KEY_BUFF_TYPE_HEALTH, 20
+        attr_name3, attr_increase3 = KEY_BUFF_TYPE_STRENGTH, 10
         stats_amounts = [(attr_name, attr_increase), (attr_name2, attr_increase2), (attr_name3, attr_increase3)]
         duration = 10
 
