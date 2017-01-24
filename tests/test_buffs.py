@@ -1,6 +1,7 @@
 import unittest
 
 from buffs import *
+from damage import Damage
 from exceptions import InvalidBuffError
 from constants import KEY_BUFF_TYPE_ARMOR, KEY_BUFF_TYPE_HEALTH, KEY_BUFF_TYPE_MANA, KEY_BUFF_TYPE_STRENGTH
 
@@ -68,7 +69,6 @@ class BeneficialBuffTests(unittest.TestCase):
         buff2.buff_amounts['strength'] = 10
         self.assertTrue(buff == buff2)  # Identical
 
-
     def test_str_one_attribute(self):
         name = 'X'
         attr_name, attr_increase = KEY_BUFF_TYPE_STRENGTH, 10
@@ -103,6 +103,21 @@ class BeneficialBuffTests(unittest.TestCase):
         buff = BeneficialBuff(name=name, buff_stats_and_amounts=stats_amounts, duration=duration)
         self.assertEqual(str(buff), expected_str)
 
+    def test_manage_buff_types_invalid_buff(self):
+        """
+        The _manage_buff_types function is called to fill the self.buff_amounts dictionary
+        with the given buff stats and amounts in the form of a list.
+        It also validates that the given bufff type is valid and raises an error if its not
+        """
+        invalid_buff_type = 'LoLo'
+        expected_error_message = f'Buff type {invalid_buff_type} is not supported!'
+        buff = BeneficialBuff('dada', [], 3)
+        try:
+            buff._manage_buff_types([('armor', 5), (invalid_buff_type, 10)])
+            self.fail('Should have raised an InvalidBuffError')
+        except InvalidBuffError as e:
+            self.assertEqual(str(e), expected_error_message)
+
     def test_get_buffed_attributes(self):
         """
         The get_buffed_attributes function should return the buffs that have a value increase
@@ -122,21 +137,22 @@ class BeneficialBuffTests(unittest.TestCase):
 
         self.assertEqual(result, expected_result)
 
-    def test_manage_buff_types_invalid_buff(self):
-        """
-        The _manage_buff_types function is called to fill the self.buff_amounts dictionary
-        with the given buff stats and amounts in the form of a list.
-        It also validates that the given bufff type is valid and raises an error if its not
-        """
-        invalid_buff_type = 'LoLo'
-        expected_error_message = f'Buff type {invalid_buff_type} is not supported!'
-        buff = BeneficialBuff('dada', [], 3)
-        try:
-            buff._manage_buff_types([('armor', 5), (invalid_buff_type, 10)])
-            self.fail('Should have raised an InvalidBuffError')
-        except InvalidBuffError as e:
-            self.assertEqual(str(e), expected_error_message)
 
+class DoTTests(unittest.TestCase):
+    """
+    Tests for the DoT class
+    """
+    def test_init(self):
+        name = 'Audi'
+        damage_tick = Damage(phys_dmg=3)
+        duration = 5
+        caster_level = 10
+
+        dot_dummy = DoT(name, damage_tick, duration, caster_level)
+        self.assertEqual(dot_dummy.name, name)
+        self.assertEqual(dot_dummy.damage, damage_tick)
+        self.assertEqual(dot_dummy.duration, duration)
+        self.assertEqual(dot_dummy.level, caster_level)
 
 if __name__ == '__main__':
     unittest.main()
