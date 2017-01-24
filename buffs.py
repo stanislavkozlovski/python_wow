@@ -77,20 +77,14 @@ class BeneficialBuff(StatusEffect):
                 else:
                     raise ValueError(f'Buff type {buff_type} is not supported!')
 
-    def get_buffed_attributes(self) -> dict:
+    def get_buffed_attributes(self) -> {str: int}:
         """
         Return a dictionary
             Key: buff_type (str)
             Value: buff_amount (int)
         Only filled with the buffs that are increased
         """
-        buffed_attributes = {}  # type: dict
-
-        for buff_type, buff_amount in self.buff_amounts.items():
-            if buff_amount:
-                buffed_attributes[buff_type] = buff_amount
-
-        return buffed_attributes
+        return {b_type: b_amount for b_type, b_amount in self.buff_amounts.items() if b_amount > 0}
 
 
 # Damage over time debuff
