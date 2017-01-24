@@ -419,7 +419,7 @@ class LivingThingTests(unittest.TestCase):
 
 class FriendlyNpcTests(unittest.TestCase):
     def setUp(self):
-        self.gossip = 'Hey guyss'
+        self.gossip = 'Hey guyss, ayy $N'
         self.min_damage, self.max_damage = 5, 5
         self.health, self.mana = 100, 100
         self.name, self.level = 'Rado', 7
@@ -441,6 +441,22 @@ class FriendlyNpcTests(unittest.TestCase):
         """
         expected_str = str(self.expected_colored_name)
         self.assertEqual(str(self.dummy), expected_str)
+
+    def test_talk(self):
+        """
+        The talk method should print out the gossip of the npc along with a NPC_NAME says: pre-text
+        There is a special symbol - $N, which should be replaced with the player name given in the method
+        """
+        output = StringIO()
+        p_name = 'Mello'
+        expected_message = f'{self.expected_colored_name} says: {self.gossip.replace("$N", p_name)}'
+        try:
+            sys.stdout = output
+            self.dummy.talk(player_name=p_name)
+            result = output.getvalue()
+            self.assertIn(expected_message, result)
+        finally:
+            sys.stdout = sys.__stdout__
 
 if __name__ == '__main__':
     unittest.main()
