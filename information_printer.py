@@ -38,6 +38,12 @@ def print_quest_log(quest_log):
     print()
 
 
+def print_vendor_products_for_sale(vendor_name: str, vendor_inventory: {str: ('Item', int)}):
+    print(f'{vendor_name}\'s items for sale:')
+    for item, item_count in vendor_inventory.values():
+        print(f'\t{item_count} {item.name} - {item.buy_price} gold.')
+
+
 def print_live_monsters(zone_object: 'Zone', print_all=False):
     """
     Prints the monsters that are alive in the current subzone

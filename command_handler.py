@@ -8,7 +8,7 @@ from information_printer import (print_live_npcs, print_live_monsters, print_que
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar,
                                  print_character_equipment)
 from constants import ZONE_MOVE_BLOCK_SPECIAL_KEY
-from information_printer import print_quest_log
+from information_printer import print_quest_log, print_vendor_products_for_sale
 # handlers here!
 
 
@@ -91,7 +91,7 @@ def handle_buy_from_command(command: str, character, zone_object: Zone):
 
 def handle_vendor_sale(character, vendor):
     while True:
-        vendor.print_inventory()
+        print_vendor_products_for_sale(vendor_name=vendor.name, vendor_inventory=vendor.inventory)
 
         command = input()
         if command == 'exit':

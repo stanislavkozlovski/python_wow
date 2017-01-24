@@ -8,7 +8,7 @@ from constants import (CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STAT
                        KEY_ARMOR_ATTRIBUTE, KEY_STRENGTH_ATTRIBUTE, KEY_AGILITY_ATTRIBUTE, KEY_BONUS_HEALTH_ATTRIBUTE,
                        KEY_BONUS_MANA_ATTRIBUTE, KEY_LEVEL_STATS_HEALTH, KEY_LEVEL_STATS_MANA, CHAR_STARTER_ZONE,
                        CHAR_STARTER_SUBZONE)
-from information_printer import print_level_up_event
+from information_printer import print_level_up_event, print_vendor_products_for_sale
 from exceptions import ItemNotInInventoryError, NonExistantBuffError
 from items import Item, Weapon, Potion, Equipment
 from quest import Quest, FetchQuest
@@ -310,11 +310,6 @@ class VendorNPC(FriendlyNPC):
 
     def __str__(self):
         return f'{self.colored_name} <Vendor>'
-
-    def print_inventory(self):
-        print(f'{self.name}\'s items for sale:')
-        for item, item_count in self.inventory.values():
-            print(f'\t{item_count} {item.name} - {item.buy_price} gold.')
 
     def has_item(self, item_name: str) -> bool:
         """
