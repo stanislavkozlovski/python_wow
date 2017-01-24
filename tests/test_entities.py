@@ -383,6 +383,8 @@ class LivingThingTests(unittest.TestCase):
         """
         The _apply_damage_absorption function subtracts from the received damage according to the
         absorption shield points the character has.
+        It calls the damage.handle_absorption method of the Damage class, so further tests regarding
+        absorption are in the tests for that class
         """
         orig_absorption_shield = 500
         self.dummy.absorption_shield = orig_absorption_shield
@@ -395,6 +397,23 @@ class LivingThingTests(unittest.TestCase):
         reduced_dmg = self.dummy._apply_damage_absorption(damage_to_deal)
         self.assertEqual(reduced_dmg, expected_damage)
         self.assertEqual(self.dummy.absorption_shield, orig_absorption_shield-phys_dmg-magic_dmg)
+
+    def test_apply_damage_absorption_to_print_set(self):
+        """
+        The function takes a flag called to_print, which if set to True
+         only returns the resulting Damage object without modifying the LivingThing's absorption shield
+        """
+        orig_absorption_shield = 500
+        self.dummy.absorption_shield = orig_absorption_shield
+        phys_dmg, magic_dmg = 100, 100
+        damage_to_deal = Damage(phys_dmg=100, magic_dmg=100)
+        expected_damage = Damage(phys_dmg=0, magic_dmg=0)
+        expected_damage.phys_absorbed = phys_dmg
+        expected_damage.magic_absorbed = magic_dmg
+
+        reduced_dmg = self.dummy._apply_damage_absorption(damage_to_deal, to_print=True)
+        self.assertEqual(reduced_dmg, expected_damage)
+        self.assertEqual(self.dummy.absorption_shield, orig_absorption_shield)
 
 
 if __name__ == '__main__':
