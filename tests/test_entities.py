@@ -379,6 +379,23 @@ class LivingThingTests(unittest.TestCase):
         damage = 100
         self.assertEqual(self.dummy._calculate_level_difference_damage(damage, target_level, inverse=True), damage + (damage * 0.1))
 
+    def test_apply_damage_absorption(self):
+        """
+        The _apply_damage_absorption function subtracts from the received damage according to the
+        absorption shield points the character has.
+        """
+        orig_absorption_shield = 500
+        self.dummy.absorption_shield = orig_absorption_shield
+        phys_dmg, magic_dmg = 100, 100
+        damage_to_deal = Damage(phys_dmg=100, magic_dmg=100)
+        expected_damage = Damage(phys_dmg=0, magic_dmg=0)
+        expected_damage.phys_absorbed = phys_dmg
+        expected_damage.magic_absorbed = magic_dmg
+
+        reduced_dmg = self.dummy._apply_damage_absorption(damage_to_deal)
+        self.assertEqual(reduced_dmg, expected_damage)
+        self.assertEqual(self.dummy.absorption_shield, orig_absorption_shield-phys_dmg-magic_dmg)
+
 
 if __name__ == '__main__':
     unittest.main()
