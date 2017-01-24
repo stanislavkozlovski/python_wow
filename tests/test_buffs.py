@@ -1,3 +1,4 @@
+from copy import deepcopy
 import unittest
 
 from buffs import *
@@ -159,6 +160,22 @@ class DoTTests(unittest.TestCase):
     def test_str(self):
         expected_str = f'{self.dot_dummy.name} - Deals {self.dot_dummy.damage} damage every turn for {self.dot_dummy.duration} turns.'
         self.assertEqual(str(self.dot_dummy), expected_str)
+
+    def test_equals(self):
+        """
+        Two DoTs are equal if their name, damage and duration are the same
+        :return:
+        """
+        second_dot = deepcopy(self.dot_dummy)
+        self.assertEqual(self.dot_dummy, second_dot)  # Identical
+        second_dot.name = self.name + ' '
+        self.assertNotEqual(self.dot_dummy, second_dot)  # Name differs
+        second_dot.name = self.name
+        second_dot.duration = self.duration + 1
+        self.assertNotEqual(self.dot_dummy, second_dot)  # Duration differs
+        second_dot.duration = self.duration
+        second_dot.damage.phys_dmg = 150
+        self.assertNotEqual(self.dot_dummy, second_dot)  # Damage differs
 
 if __name__ == '__main__':
     unittest.main()
