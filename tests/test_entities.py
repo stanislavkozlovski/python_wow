@@ -340,6 +340,25 @@ class LivingThingTests(unittest.TestCase):
         self.assertEqual(reduced_dmg.phys_dmg, 0)
         self.assertEqual(reduced_dmg, expected_damage)
 
+    def test_calculate_level_difference_damage(self):
+        """
+        Test the calculate_level_difference_damage, which gives 10% more damage for each level we have
+        over the target, or takes 10% damage from us for each level the target has over us
+        """
+        """
+        Since our level is one higher, we should have a 10% damage increase
+        """
+        target_level = self.dummy.level - 1
+        damage = 100
+        self.assertEqual(self.dummy._calculate_level_difference_damage(damage, target_level), damage + (damage*0.1))
+
+        """
+        Since our level is one smaller, we should have a 10% damage decrease
+        """
+        target_level = self.dummy.level + 1
+        damage = 100
+        self.assertEqual(self.dummy._calculate_level_difference_damage(damage, target_level), damage - (damage * 0.1))
+
 
 if __name__ == '__main__':
     unittest.main()
