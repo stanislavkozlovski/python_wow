@@ -1,6 +1,7 @@
 import unittest
 import sys
 from io import StringIO
+from exceptions import NonExistantBuffError
 
 from constants import KEY_ARMOR_ATTRIBUTE
 from entities import LivingThing
@@ -101,6 +102,18 @@ class LivingThingTests(unittest.TestCase):
             self.assertIn(expected_output, output.getvalue())
         finally:
             sys.stdout = sys.__stdout__
+
+    def test_remove_non_existant_buff(self):
+        """
+        Should thrown an error
+        """
+        expected_message = f"Cannot remove {self.dummy_buff.name} from {self.name} because he does not have it!"
+        try:
+            self.dummy.remove_buff(self.dummy_buff)
+            self.fail('The test should have raised a NonExistantBuffError!')
+        except NonExistantBuffError as e:
+            received_message = e.args[0]
+            self.assertEqual(received_message, expected_message)
 
 
 
