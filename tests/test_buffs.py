@@ -76,6 +76,24 @@ class BeneficialBuffTests(unittest.TestCase):
         buff = BeneficialBuff(name=name, buff_stats_and_amounts=stats_amounts, duration=duration)
         self.assertEqual(str(buff), expected_str)
 
+    def test_get_buffed_attributes(self):
+        """
+        The get_buffed_attributes function should return the buffs that have a value increase
+        """
+        expected_result = {
+            KEY_BUFF_TYPE_STRENGTH: 10,
+            KEY_BUFF_TYPE_ARMOR: 15
+        }
+        name = 'X'
+        attr_name, attr_increase = KEY_BUFF_TYPE_STRENGTH, 10
+        attr_name2, attr_increase2 = KEY_BUFF_TYPE_ARMOR, 15
+        stats_amounts = [(attr_name, attr_increase), (attr_name2, attr_increase2)]
+        duration = 10
+
+        buff = BeneficialBuff(name=name, buff_stats_and_amounts=stats_amounts, duration=duration)
+        result = buff.get_buffed_attributes()
+
+        self.assertEqual(result, expected_result)
 
 if __name__ == '__main__':
     unittest.main()
