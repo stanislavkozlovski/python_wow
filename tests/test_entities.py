@@ -1,10 +1,11 @@
 import unittest
 import sys
+import termcolor
 from io import StringIO
 from exceptions import NonExistantBuffError
 
 from constants import KEY_ARMOR_ATTRIBUTE
-from entities import LivingThing
+from entities import LivingThing, FriendlyNPC
 from damage import Damage
 from buffs import BeneficialBuff, DoT
 
@@ -416,5 +417,24 @@ class LivingThingTests(unittest.TestCase):
         self.assertEqual(self.dummy.absorption_shield, orig_absorption_shield)
 
 
+class FriendlyNpcTests(unittest.TestCase):
+    def setUp(self):
+        self.gossip = 'Hey guyss'
+        self.min_damage, self.max_damage = 5, 5
+        self.health, self.mana = 100, 100
+        self.name, self.level = 'Rado', 7
+        # The FriendlyNpc keeps a colored str object in it
+        self.expected_colored_name = termcolor.colored(self.name, 'green')
+        self.dummy = FriendlyNPC(name=self.name, health=self.health, mana=self.mana, level=self.level, min_damage=self.min_damage, max_damage=self.max_damage,
+                                 quest_relation_id=0, loot_table=None, gossip=self.gossip)
+
+    def test_init(self):
+        self.assertEqual(self.dummy.level, self.level)
+        self.assertEqual(self.dummy.min_damage, self.min_damage)
+        self.assertEqual(self.dummy.max_damage, self.max_damage)
+        self.assertEqual(self.dummy.gossip, self.gossip)
+        self.assertEqual(self.dummy.colored_name, self.expected_colored_name)
+
+        
 if __name__ == '__main__':
     unittest.main()
