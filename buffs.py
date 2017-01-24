@@ -33,36 +33,25 @@ class BeneficialBuff(StatusEffect):
         """
         super().__init__(name, duration)
         # this dictionary will hold the meaningful information of what buff we give
-        self.buff_amounts: {str: int} = {KEY_BUFF_TYPE_ARMOR: 0,
-                                         KEY_BUFF_TYPE_STRENGTH: 0,
-                                         KEY_BUFF_TYPE_HEALTH: 0,
-                                         KEY_BUFF_TYPE_MANA: 0}
-        self.buff_stats_and_amounts = buff_stats_and_amounts
+        self.buff_amounts: {str: int} = {KEY_BUFF_TYPE_HEALTH: 0,
+                                         KEY_BUFF_TYPE_MANA: 0,
+                                         KEY_BUFF_TYPE_ARMOR: 0,
+                                         KEY_BUFF_TYPE_STRENGTH: 0}
         self._manage_buff_types(buff_stats_and_amounts)  # update buff_amounts
 
     def __str__(self):
         """ Depending on the amount of stats it buffs, print out a different message"""
-        non_empty_buffs_count = len(self.buff_stats_and_amounts)
-        # TODO: refactor
-        if non_empty_buffs_count == 1:
-            increased_attribute, value = self.buff_stats_and_amounts[0]
-            return f'Increases {increased_attribute} by {value} for {self.duration} turns.'
-        elif non_empty_buffs_count == 2:
-            increased_attribute, value = self.buff_stats_and_amounts[0]
-            increased_attribute2, value2 = self.buff_stats_and_amounts[1]
-            return f'Increases {increased_attribute} by {value} and {increased_attribute2} by {value2} for {self.duration} turns.'
-        elif non_empty_buffs_count == 3:
-            increased_attribute, value = self.buff_stats_and_amounts[0]
-            increased_attribute2, value2 = self.buff_stats_and_amounts[1]
-            increased_attribute3, value3 = self.buff_stats_and_amounts[2]
+        str_annexations = [f'{attr} by {inc}' for attr, inc in self.buff_amounts.items() if inc > 0]
+        main_annexation = ' and '.join(part for part in [', '.join(str_annexations[:-1])] + [str_annexations[-1]]
+                                       if part)  # escapes empty strings
 
-            return (f"Increases {increased_attribute} by {value}, {increased_attribute2} by {value2}"
-                    f" and {increased_attribute3} by {value3} for {self.duration} turns.")
-        else:
-            return ""
+        return f"Increases {main_annexation} for {self.duration} turns."
 
     def __eq__(self, other):
-        return self.name == other.name and self.buff_stats_and_amounts == other.buff_stats_and_amounts and self.duration == other.duration
+        if not isinstance(other, self):
+            raise Exception('A BeneficialBuff can only be compared to another Beneficial Buff!')
+
+        return self.name == other.name and self.buff_amounts == other.buff_amounts and self.duration == other.duration
 
     def _manage_buff_types(self, buff_list: [(str, int)]):
         """
