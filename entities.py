@@ -120,6 +120,8 @@ class LivingThing:
     def add_buff(self, buff: BeneficialBuff or DoT):
         """ Method that handles when a buff is added to the player
         also adds DoTs to the list"""
+        if buff in self.buffs:
+            self._deapply_buff(buff)
         self.buffs[buff] = buff.duration
         if isinstance(buff, BeneficialBuff):
             self._apply_buff(buff)
@@ -131,8 +133,12 @@ class LivingThing:
         # iterate through the buffed attributes and apply them to the entity
         for buff_type, buff_amount in buff_attributes.items():
             if buff_type == "health":
+                if not self._in_combat:
+                    self.health += buff_amount
                 self.max_health += buff_amount
             elif buff_type == "mana":
+                if not self._in_combat:
+                    self.mana += buff_amount
                 self.max_mana += buff_amount
 
     def _deapply_buff(self, buff: BeneficialBuff):
@@ -641,8 +647,12 @@ class Character(LivingThing):
         # iterate through the buffed attributes and apply them to the character
         for buff_type, buff_amount in buff_attributes.items():
             if buff_type == "health":
+                if not self._in_combat:
+                    self.health += buff_amount
                 self.max_health += buff_amount
             elif buff_type == "mana":
+                if not self._in_combat:
+                    self.mana += buff_amount
                 self.max_mana += buff_amount
             else:
                 self.attributes[buff_type] += buff_amount
