@@ -53,6 +53,9 @@ class BeneficialBuff(StatusEffect):
 
         return self.name == other.name and self.buff_amounts == other.buff_amounts and self.duration == other.duration
 
+    def __hash__(self):
+        return hash(self.name + str(self.buff_amounts) + str(self.duration))
+
     def _manage_buff_types(self, buff_list: [(str, int)]):
         """
         Iterate through the list of tuples and add each buff to our buff_amounts dictionary
@@ -90,7 +93,7 @@ class DoT(StatusEffect):
         :param caster_lvl: the level of the caster
         """
         super().__init__(name, duration)
-        self.damage = damage_tick  # type: Damage
+        self.damage: Damage = damage_tick
         self.level = caster_lvl
 
     def __str__(self):
@@ -98,6 +101,9 @@ class DoT(StatusEffect):
 
     def __eq__(self, other):
         return self.name == other.name and self.damage == other.damage and self.duration == other.duration
+
+    def __hash__(self):
+        return hash(self.name + str(self.damage) + str(self.duration))
 
     def update_caster_level(self, level: int):
         self.level = level
