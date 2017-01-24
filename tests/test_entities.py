@@ -5,8 +5,9 @@ from io import StringIO
 from exceptions import NonExistantBuffError
 
 from constants import KEY_ARMOR_ATTRIBUTE
-from entities import LivingThing, FriendlyNPC
+from entities import LivingThing, FriendlyNPC, VendorNPC
 from damage import Damage
+from items import Item
 from buffs import BeneficialBuff, DoT
 
 
@@ -457,6 +458,31 @@ class FriendlyNpcTests(unittest.TestCase):
             self.assertIn(expected_message, result)
         finally:
             sys.stdout = sys.__stdout__
+
+
+class VendorNpcTests(unittest.TestCase):
+    def setUp(self):
+        name, self.entry, health, mana = 'Jack', 1, 100, 100
+        level, min_damage, max_damage, quest_relation_id = 3, 2, 6, 0
+        loot_table, gossip = None, 'Like a genesisis, $N!'
+        first_item = Item(name='game', item_id=5, buy_price=5, sell_price=5, quest_id=0)
+        first_item_stock = 10
+        second_item = Item(name='copy-cat', item_id=2, buy_price=1, sell_price=1, quest_id=1)
+        second_item_stock = 1
+        third_item = Item(name='Domev_se_vrushta', item_id=4, buy_price=2, sell_price=2, quest_id=2)
+        third_item_stock = 2
+
+        self.inventory = {first_item.name: (first_item, first_item_stock),
+                         second_item.name: (second_item, second_item_stock),
+                         third_item.name: (third_item, third_item_stock)}
+        self.dummy = VendorNPC(name=name, entry=self.entry, health=health, mana=mana, level=level, min_damage=min_damage,
+                               max_damage=max_damage, quest_relation_id=quest_relation_id, loot_table=loot_table,
+                               gossip=gossip, inventory=self.inventory)
+
+    def test_init(self):
+        self.assertEqual(self.dummy.inventory, self.inventory)
+        self.assertEqual(self.dummy.entry, self.entry)
+
 
 if __name__ == '__main__':
     unittest.main()
