@@ -471,7 +471,7 @@ class VendorNpcTests(unittest.TestCase):
         second_item_stock = 1
         third_item = Item(name='Domev_se_vrushta', item_id=4, buy_price=2, sell_price=2, quest_id=2)
         third_item_stock = 2
-
+        self.expected_colored_name = termcolor.colored(name, color='green')
         self.inventory = {first_item.name: (first_item, first_item_stock),
                          second_item.name: (second_item, second_item_stock),
                          third_item.name: (third_item, third_item_stock)}
@@ -483,6 +483,10 @@ class VendorNpcTests(unittest.TestCase):
         self.assertEqual(self.dummy.inventory, self.inventory)
         self.assertEqual(self.dummy.entry, self.entry)
 
+    def test_str(self):
+        """ The __str__ dunder method should return the colored name with a <Vendor> added to it"""
+        expected_str = f'{self.expected_colored_name} <Vendor>'
+        self.assertEqual(expected_str, str(self.dummy))
 
 if __name__ == '__main__':
     unittest.main()
