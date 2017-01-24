@@ -150,9 +150,13 @@ class LivingThing:
             if buff_type == "health":
                 # TODO: Reduce health method to reduce active health too, otherwise we can end up with 10/5 HP
                 self.max_health -= buff_amount
+                if self.health > self.max_health:
+                    self.health = self.max_health
             elif buff_type == "mana":
                 # TODO: Reduce mana method to reduce active mana too
                 self.max_mana -= buff_amount
+                if self.mana > self.max_mana:
+                    self.mana = self.max_mana
 
     def _apply_armor_reduction(self, damage: Damage, attacker_level: int) -> Damage:
         """
