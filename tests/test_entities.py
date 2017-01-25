@@ -632,6 +632,15 @@ class MonsterTests(unittest.TestCase):
         finally:
             sys.stdout = sys.__stdout__
 
+    def test_take_attack(self):
+        """
+        The take_attack function deals the damage given to it to the Monster after applying
+        armor reduction and absorption
+        """
+        dmg_to_take = Damage(magic_dmg=10)  # magic so we don't get reduction by the armor
+        attacker_level = self.dummy.level
+        self.dummy.take_attack(dmg_to_take, attacker_level)
+        self.assertEqual(self.dummy.health, self.health-dmg_to_take.magic_dmg)
 
 if __name__ == '__main__':
     unittest.main()
