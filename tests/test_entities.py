@@ -770,6 +770,23 @@ class MonsterTests(unittest.TestCase):
         finally:
             sys.stdout = sys.__stdout__
 
+    def test_die(self):
+        """ the _die function calls the super()_die() function and _drop_loot to fill the loot dict"""
+        output = StringIO()
+        expected_print = f'Creature {self.dummy.name} has died!'
+
+        try:
+            sys.stdout = output
+
+            self.dummy._die()
+
+            self.assertFalse(self.dummy.is_alive())
+            self.assertNotEqual(self.dummy.loot, {})
+            self.assertEqual(len(self.dummy.loot.keys()), 3)
+            self.assertIn(expected_print, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
 
 if __name__ == '__main__':
     unittest.main()
