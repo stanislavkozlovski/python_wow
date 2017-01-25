@@ -1,8 +1,10 @@
 import unittest
+from unittest.mock import Mock
 import sys
 import termcolor
 from io import StringIO
 from exceptions import NonExistantBuffError
+
 
 from constants import KEY_ARMOR_ATTRIBUTE
 from entities import LivingThing, FriendlyNPC, VendorNPC, Monster
@@ -605,7 +607,31 @@ class MonsterTests(unittest.TestCase):
         """
         target_level = self.dummy.level  # so the level doesn't affect the damage
         result: Damage = self.dummy.get_auto_attack_damage(target_level)
+
+        self.assertTrue(isinstance(result, Damage))
         self.assertTrue(self.min_damage <= result.phys_dmg <= self.max_damage)
+
+    def test_attack(self):
+        """
+        The attack function deals damage to the monster while applying armor reduction and absorption
+        It calls the victim's take_attack function with the damage dealt
+        """
+        output = StringIO()
+        victim_level = self.dummy.level
+        # Modify the take_attack function to print the damage it took so we can assert it takes the appropriate damage
+        victim_mock = Mock(take_attack=lambda *args: print(args[1].phys_dmg), level=victim_level)
+        expected_damage = self.dummy.get_auto_attack_damage(victim_level)
+        try:
+            sys.stdout = output
+            self.dummy.attack(victim_mock)
+            # the damage should be different, since it's always random
+            std_output = output.getvalue()
+            self.assertNotIn(str(expected_damage.phys_dmg), std_output)
+            dealt_dmg: float = float(std_output)
+            self.assertTrue(self.min_damage <= dealt_dmg <= self.max_damage)
+        finally:
+            sys.stdout = sys.__stdout__
+
 
 if __name__ == '__main__':
     unittest.main()
