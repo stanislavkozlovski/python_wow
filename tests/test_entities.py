@@ -673,6 +673,29 @@ class MonsterTests(unittest.TestCase):
         expected_health = self.health - (dmg_to_take.magic_dmg - absorption_shield)
         self.assertEqual(self.dummy.health, expected_health)
 
+    def test_get_take_attack_damage_repr(self):
+        """
+        The get_take_attack_damage_repr returns a Damage object only to for printing purposes.
+        It does not lower the monster's  health in any way.
+        """
+        orig_health = self.dummy.health
+        armor = self.armor
+        phys_dmg, magic_dmg = 15, 20
+        dmg_to_take = Damage(phys_dmg, magic_dmg)
+        attacker_level = self.dummy.level
+
+        # get the expected damage after reduction
+        reduction_percentage = armor / (armor + 400 + 85 * attacker_level)
+        damage_to_deduct = dmg_to_take.phys_dmg * reduction_percentage
+        reduced_damage = dmg_to_take.phys_dmg - damage_to_deduct
+
+        result: Damage = self.dummy.get_take_attack_damage_repr(dmg_to_take, attacker_level)
+        expected_result = Damage(phys_dmg=reduced_damage, magic_dmg=magic_dmg)
+
+        self.assertTrue(isinstance(result, Damage))
+        self.assertEqual(self.dummy.health, orig_health)
+        self.assertEqual(result, expected_result)
+
 
 if __name__ == '__main__':
     unittest.main()
