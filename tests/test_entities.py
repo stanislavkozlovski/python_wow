@@ -721,6 +721,10 @@ class MonsterTests(unittest.TestCase):
         self.assertEqual(self.dummy.health, orig_health)
         self.assertEqual(result, expected_result)
 
+    def test_drop_loot_empty_loot_table(self):
+        """ It should return None when there is no loot table"""
+        self.assertIsNone(self.dummy._drop_loot())
+
 
 if __name__ == '__main__':
     unittest.main()
