@@ -3,6 +3,7 @@ from unittest.mock import Mock
 import sys
 import termcolor
 from io import StringIO
+from collections import Counter
 from exceptions import NonExistantBuffError
 
 
@@ -786,6 +787,22 @@ class MonsterTests(unittest.TestCase):
             self.assertIn(expected_print, output.getvalue())
         finally:
             sys.stdout = sys.__stdout__
+
+    def test_calculate_gold_reward(self):
+        """
+        The calculate_gold_reward returns a random integer between the gold_to_give_range
+        """
+        min_g, max_g = 50, 100
+        received_gold = self.dummy._calculate_gold_reward((min_g, max_g))
+
+        self.assertTrue(min_g <= received_gold <= max_g)
+
+        # assert that the return value is random and fairly spread out
+        multiple_gold_rewards = [self.dummy._calculate_gold_reward((min_g, max_g)) for _ in range(100)]
+        count = Counter(multiple_gold_rewards)
+        most_common_num, count = count.most_common()[0]
+
+        self.assertTrue(count < len(multiple_gold_rewards) // 3)
 
 
 if __name__ == '__main__':
