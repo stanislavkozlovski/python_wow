@@ -642,5 +642,24 @@ class MonsterTests(unittest.TestCase):
         self.dummy.take_attack(dmg_to_take, attacker_level)
         self.assertEqual(self.dummy.health, self.health-dmg_to_take.magic_dmg)
 
+    def test_take_attack_armor_reduction(self):
+        """
+        Test if the take_attack function actually applies armor reduction
+        """
+        armor = 500
+        self.dummy.attributes['armor'] = armor
+        dmg_to_take = Damage(phys_dmg=10)
+        attacker_level = self.dummy.level
+
+        # get the expected damage after reduction
+        reduction_percentage = armor / (armor + 400 + 85 * attacker_level)
+        damage_to_deduct = dmg_to_take.phys_dmg * reduction_percentage
+        reduced_damage = dmg_to_take.phys_dmg - damage_to_deduct
+
+        self.dummy.take_attack(dmg_to_take, attacker_level)
+
+        self.assertEqual(self.dummy.health, int(self.health - reduced_damage))
+
+
 if __name__ == '__main__':
     unittest.main()
