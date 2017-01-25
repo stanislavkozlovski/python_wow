@@ -598,5 +598,14 @@ class MonsterTests(unittest.TestCase):
 
         self.assertEqual(str(self.dummy), expected_str)
 
+    def test_get_auto_attack_damage(self):
+        """
+        The get_auto_attack_damage should return a basic attack damage from the Monster class
+        it chooses a random integer between the min/max damage and
+        """
+        target_level = self.dummy.level  # so the level doesn't affect the damage
+        result: Damage = self.dummy.get_auto_attack_damage(target_level)
+        self.assertTrue(self.min_damage <= result.phys_dmg <= self.max_damage)
+
 if __name__ == '__main__':
     unittest.main()
