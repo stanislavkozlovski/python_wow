@@ -740,6 +740,20 @@ class MonsterTests(unittest.TestCase):
         self.dummy.loot_table = None
         self.assertIsNone(self.dummy._drop_loot())
 
+    def test_give_loot(self):
+        """
+        The give_loot function is called whenever the character loots something from the monster.
+        It checks if the item is in the loot and if it is, removes it and returns it
+        """
+        # fill the loot dict
+        self.dummy._drop_loot()
+
+        received_item = self.dummy.give_loot(self.dropped_item_mock.name)
+
+        self.assertTrue(isinstance(received_item, type(self.dropped_item_mock)))
+        self.assertEqual(received_item, self.dropped_item_mock)
+        self.assertTrue(self.dropped_item_mock.name not in self.dummy.loot)
+
 
 if __name__ == '__main__':
     unittest.main()
