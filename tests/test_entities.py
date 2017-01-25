@@ -660,6 +660,19 @@ class MonsterTests(unittest.TestCase):
 
         self.assertEqual(self.dummy.health, int(self.health - reduced_damage))
 
+    def test_take_attack_absorption(self):
+        """
+        Test the take_attack function when the monster has an absorption shield
+        """
+        magic_dmg, absorption_shield = 11, 10
+        self.dummy.absorption_shield = absorption_shield
+        dmg_to_take = Damage(magic_dmg=magic_dmg)
+        attacker_level = self.dummy.level
+
+        self.dummy.take_attack(dmg_to_take, attacker_level)
+        expected_health = self.health - (dmg_to_take.magic_dmg - absorption_shield)
+        self.assertEqual(self.dummy.health, expected_health)
+
 
 if __name__ == '__main__':
     unittest.main()
