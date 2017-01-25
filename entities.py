@@ -335,7 +335,7 @@ class VendorNPC(FriendlyNPC):
         if not self.has_item(item_name):
             print(f'{self.name} does not have {item_name} for sale.')
             return None
-        
+
         item, _ = self.inventory[item_name]
         return item.buy_price
 
@@ -344,6 +344,10 @@ class VendorNPC(FriendlyNPC):
             1 - the item object type: Item
             2 - the number of items type: int
             3 - the price of the item type: int"""
+        if not self.has_item(item_name):
+            print(f'{self.name} does not have {item_name} for sale.')
+            return None
+
         item, item_count = self.inventory[item_name]
         item_price = item.buy_price
 
