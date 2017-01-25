@@ -589,6 +589,14 @@ class MonsterTests(unittest.TestCase):
         self.assertEqual(self.dummy.loot_table, self.loot_table)
         self.assertEqual(self.dummy.loot, {'gold': self.dummy._gold_to_give})
 
+    def test_str(self):
+        """
+        The str method should return all sorts of information regarding the creature
+        """
+        colored_monster_name = termcolor.colored(self.name, color='red')
+        expected_str = f'Creature Level {self.level} {colored_monster_name} - {self.dummy.health}/{self.health} HP | {self.dummy.mana}/{self.mana} Mana | {self.min_damage}-{self.max_damage} Damage'
+
+        self.assertEqual(str(self.dummy), expected_str)
 
 if __name__ == '__main__':
     unittest.main()
