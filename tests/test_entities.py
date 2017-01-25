@@ -754,6 +754,22 @@ class MonsterTests(unittest.TestCase):
         self.assertEqual(received_item, self.dropped_item_mock)
         self.assertTrue(self.dropped_item_mock.name not in self.dummy.loot)
 
+    def test_give_loot_nonexisting_item(self):
+        output = StringIO()
+        expected_print = f'{self.dummy.name} did not drop {self.dropped_item_mock.name}.'
+        # fill the loot dict
+        self.dummy._drop_loot()
+        # get the item once
+        received_item = self.dummy.give_loot(self.dropped_item_mock.name)
+
+        # try to get it again
+        try:
+            sys.stdout = output
+            self.dummy.give_loot(self.dropped_item_mock.name)
+            self.assertIn(expected_print, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
 
 if __name__ == '__main__':
     unittest.main()
