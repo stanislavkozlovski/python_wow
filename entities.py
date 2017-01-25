@@ -324,14 +324,18 @@ class VendorNPC(FriendlyNPC):
         USED ONLY FOR PRINTING/TESTING PURPOSES
         Returns the item we want to get from the vendor,
         """
-        if self.has_item(item_name):
-            return self.inventory[item_name][0]  # returns the item object
-        else:
+        if not self.has_item(item_name):
             print(f'{self.name} does not have {item_name} for sale.')
             return None
 
+        return self.inventory[item_name][0]  # returns the item object
+
     def get_item_price(self, item_name: str) -> int:
         """Returns the price the vendor sells the item for"""
+        if not self.has_item(item_name):
+            print(f'{self.name} does not have {item_name} for sale.')
+            return None
+        
         item, _ = self.inventory[item_name]
         return item.buy_price
 
