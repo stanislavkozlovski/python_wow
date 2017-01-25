@@ -568,8 +568,12 @@ class MonsterTests(unittest.TestCase):
         self.monster_id = 1
         self.name, self.health, self.mana, self.level = 'Monstru', 100, 100, 4
         self.min_damage, self.max_damage, self.quest_relation_id = 3, 6, 0
-        self.xp_to_give, self.gold_to_give_range, self.loot_table = 250, (50, 100), None
+        self.xp_to_give, self.gold_to_give_range = 250, (50, 100)
         self.armor, self.gossip, self.respawnable = 100, 'Grr, I kill you!', True
+        self.dropped_item_mock = Mock(name='something')
+        self.dropped_item_mock2 = Mock(name='smth')
+        loot_to_drop = [self.dropped_item_mock, self.dropped_item_mock2]
+        self.loot_table = Mock(decide_drops=lambda: loot_to_drop)
         self.dummy = Monster(monster_id=self.monster_id, name=self.name, health=self.health, mana=self.mana,
                              level=self.level, min_damage=self.min_damage, max_damage=self.max_damage,
                              quest_relation_id=self.quest_relation_id, xp_to_give=self.xp_to_give,
@@ -721,8 +725,19 @@ class MonsterTests(unittest.TestCase):
         self.assertEqual(self.dummy.health, orig_health)
         self.assertEqual(result, expected_result)
 
+    def test_drop_loot(self):
+        expected_loot = {self.dropped_item_mock.name: self.dropped_item_mock,
+                         self.dropped_item_mock2.name: self.dropped_item_mock2}
+        default_loot = {'gold': self.dummy._gold_to_give}
+        expected_loot.update(default_loot)
+
+        self.assertEqual(self.dummy.loot, default_loot)
+        self.dummy._drop_loot()
+        self.assertEqual(self.dummy.loot, expected_loot)
+
     def test_drop_loot_empty_loot_table(self):
         """ It should return None when there is no loot table"""
+        self.dummy.loot_table = None
         self.assertIsNone(self.dummy._drop_loot())
 
 
