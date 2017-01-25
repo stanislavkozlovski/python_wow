@@ -12,6 +12,7 @@ from information_printer import print_level_up_event, print_vendor_products_for_
 from exceptions import ItemNotInInventoryError, NonExistantBuffError
 from items import Item, Weapon, Potion, Equipment
 from quest import Quest, FetchQuest
+from decorators import has_item_in_stock
 from damage import Damage
 from buffs import BeneficialBuff, DoT
 
@@ -319,35 +320,26 @@ class VendorNPC(FriendlyNPC):
         """
         return item_name in self.inventory.keys()
 
+    @has_item_in_stock
     def get_item_info(self, item_name: str) -> Item:
         """
         USED ONLY FOR PRINTING/TESTING PURPOSES
         Returns the item we want to get from the vendor,
         """
-        if not self.has_item(item_name):
-            print(f'{self.name} does not have {item_name} for sale.')
-            return None
-
         return self.inventory[item_name][0]  # returns the item object
 
+    @has_item_in_stock
     def get_item_price(self, item_name: str) -> int:
         """Returns the price the vendor sells the item for"""
-        if not self.has_item(item_name):
-            print(f'{self.name} does not have {item_name} for sale.')
-            return None
-
         item, _ = self.inventory[item_name]
         return item.buy_price
 
+    @has_item_in_stock
     def sell_item(self, item_name: str) -> tuple:
         """ Returns a tuple(1,2,3)
             1 - the item object type: Item
             2 - the number of items type: int
             3 - the price of the item type: int"""
-        if not self.has_item(item_name):
-            print(f'{self.name} does not have {item_name} for sale.')
-            return None
-
         item, item_count = self.inventory[item_name]
         item_price = item.buy_price
 
