@@ -5,7 +5,7 @@ from io import StringIO
 from exceptions import NonExistantBuffError
 
 from constants import KEY_ARMOR_ATTRIBUTE
-from entities import LivingThing, FriendlyNPC, VendorNPC
+from entities import LivingThing, FriendlyNPC, VendorNPC, Monster
 from damage import Damage
 from items import Item
 from buffs import BeneficialBuff, DoT
@@ -545,6 +545,8 @@ class VendorNpcTests(unittest.TestCase):
         self.assertEqual(item_sale_info[0], self.first_item)
         self.assertEqual(item_sale_info[1], self.first_item_stock)
         self.assertEqual(item_sale_info[2], self.first_item.buy_price)
+        # assert that the item has been sold
+        self.assertNotIn(self.first_item.name, self.dummy.inventory)
 
     def test_sell_item_invalid_item(self):
         output = StringIO()
@@ -557,6 +559,36 @@ class VendorNpcTests(unittest.TestCase):
             self.assertIn(expected_message, output.getvalue())
         finally:
             sys.stdout = sys.__stdout__
+
+
+class MonsterTests(unittest.TestCase):
+    def setUp(self):
+        self.monster_id = 1
+        self.name, self.health, self.mana, self.level = 'Monstru', 100, 100, 4
+        self.min_damage, self.max_damage, self.quest_relation_id = 3, 6, 0
+        self.xp_to_give, self.gold_to_give_range, self.loot_table = 250, (50, 100), None
+        self.armor, self.gossip, self.respawnable = 100, 'Grr, I kill you!', True
+        self.dummy = Monster(monster_id=self.monster_id, name=self.name, health=self.health, mana=self.mana,
+                             level=self.level, min_damage=self.min_damage, max_damage=self.max_damage,
+                             quest_relation_id=self.quest_relation_id, xp_to_give=self.xp_to_give,
+                             gold_to_give_range=self.gold_to_give_range, loot_table=self.loot_table,
+                             armor=self.armor, gossip=self.gossip, respawnable=self.respawnable)
+
+    def test_init(self):
+        self.assertEqual(self.dummy.monster_id, self.monster_id)
+        self.assertEqual(self.dummy.level, self.level)
+        self.assertEqual(self.dummy.min_damage, self.min_damage)
+        self.assertEqual(self.dummy.max_damage, self.max_damage)
+        self.assertEqual(self.dummy.xp_to_give, self.xp_to_give)
+        self.assertEqual(self.dummy.attributes, {'armor': self.armor})
+        self.assertEqual(self.dummy.gossip, self.gossip)
+        self.assertEqual(self.dummy.respawnable, self.respawnable)
+        # gold to give must be between range
+        self.assertTrue(self.gold_to_give_range[0] <= self.dummy._gold_to_give <= self.gold_to_give_range[1])
+        self.assertEqual(self.dummy.quest_relation_id, self.quest_relation_id)
+        self.assertEqual(self.dummy.loot_table, self.loot_table)
+        self.assertEqual(self.dummy.loot, {'gold': self.dummy._gold_to_give})
+
 
 if __name__ == '__main__':
     unittest.main()
