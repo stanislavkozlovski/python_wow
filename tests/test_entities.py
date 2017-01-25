@@ -466,15 +466,15 @@ class VendorNpcTests(unittest.TestCase):
         level, min_damage, max_damage, quest_relation_id = 3, 2, 6, 0
         loot_table, gossip = None, 'Like a genesisis, $N!'
         self.first_item = Item(name='game', item_id=5, buy_price=5, sell_price=5, quest_id=0)
-        first_item_stock = 10
-        second_item = Item(name='copy-cat', item_id=2, buy_price=1, sell_price=1, quest_id=1)
-        second_item_stock = 1
-        third_item = Item(name='Domev_se_vrushta', item_id=4, buy_price=2, sell_price=2, quest_id=2)
-        third_item_stock = 2
+        self.first_item_stock = 10
+        self.second_item = Item(name='copy-cat', item_id=2, buy_price=1, sell_price=1, quest_id=1)
+        self.second_item_stock = 1
+        self.third_item = Item(name='Domev_se_vrushta', item_id=4, buy_price=2, sell_price=2, quest_id=2)
+        self.third_item_stock = 2
         self.expected_colored_name = termcolor.colored(name, color='green')
-        self.inventory = {self.first_item.name: (self.first_item, first_item_stock),
-                         second_item.name: (second_item, second_item_stock),
-                         third_item.name: (third_item, third_item_stock)}
+        self.inventory = {self.first_item.name: (self.first_item, self.first_item_stock),
+                          self.second_item.name: (self.second_item, self.second_item_stock),
+                          self.third_item.name: (self.third_item, self.third_item_stock)}
         self.dummy = VendorNPC(name=name, entry=self.entry, health=health, mana=mana, level=level, min_damage=min_damage,
                                max_damage=max_damage, quest_relation_id=quest_relation_id, loot_table=loot_table,
                                gossip=gossip, inventory=self.inventory)
@@ -537,6 +537,14 @@ class VendorNpcTests(unittest.TestCase):
             self.assertIn(expected_message, output.getvalue())
         finally:
             sys.stdout = sys.__stdout__
+
+    def test_sell_item(self):
+        """ The sell_item function returns the item object, the count of items fro sale and the price for the items"""
+        item_sale_info: (Item, int, int) = self.dummy.sell_item(self.first_item.name)
+        self.assertTrue(isinstance(item_sale_info[0], Item))
+        self.assertEqual(item_sale_info[0], self.first_item)
+        self.assertEqual(item_sale_info[1], self.first_item_stock)
+        self.assertEqual(item_sale_info[2], self.first_item.buy_price)
 
 if __name__ == '__main__':
     unittest.main()
