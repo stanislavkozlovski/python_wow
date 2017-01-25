@@ -673,6 +673,31 @@ class MonsterTests(unittest.TestCase):
         expected_health = self.health - (dmg_to_take.magic_dmg - absorption_shield)
         self.assertEqual(self.dummy.health, expected_health)
 
+    def test_take_attack_absorption_and_armor(self):
+        """ Test the function, this time accouting for armor and absorption """
+        orig_health = self.dummy.health
+        absorption_shield = 16
+        armor = 500
+        self.dummy.absorption_shield = absorption_shield
+        self.dummy.attributes['armor'] = armor
+        attacker_level = self.dummy.level
+
+        dmg_to_take = Damage(phys_dmg=15, magic_dmg=15)
+
+        # get the expected damage after armor reduction
+        reduction_percentage = armor / (armor + 400 + 85 * attacker_level)
+        damage_to_deduct = dmg_to_take.phys_dmg * reduction_percentage
+        reduced_damage = dmg_to_take.phys_dmg - damage_to_deduct
+
+        # NOTE: Magical damage always gets absorbed first
+        leftover_shield = absorption_shield - dmg_to_take.magic_dmg
+        expected_dmg = reduced_damage - leftover_shield
+
+        # ACT
+        self.dummy.take_attack(dmg_to_take, attacker_level)
+
+        self.assertEqual(self.dummy.health, round(orig_health-expected_dmg, 1))
+
     def test_get_take_attack_damage_repr(self):
         """
         The get_take_attack_damage_repr returns a Damage object only to for printing purposes.
