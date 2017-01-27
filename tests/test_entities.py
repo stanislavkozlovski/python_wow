@@ -831,5 +831,19 @@ class MonsterTests(unittest.TestCase):
         finally:
             sys.stdout = sys.__stdout__
 
+    def test_ask_gossip(self):
+        """
+        The monster should 'ask' his gossip since it ends in an question mark
+        """
+        self.dummy.gossip = "And I'm like hello?"
+        expected_message = f'{self.dummy.name} asks: {self.dummy.gossip}'
+        output = StringIO()
+        try:
+            sys.stdout = output
+            self.dummy.say_gossip()
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
 if __name__ == '__main__':
     unittest.main()
