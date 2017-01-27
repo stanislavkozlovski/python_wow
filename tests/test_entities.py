@@ -1006,6 +1006,11 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.inventory[self.item_to_eq.name], (self.item_to_eq, 1))
 
     def test_consume_item(self):
+        """
+        The consume_item function consumes the given potion from the inventory, adding a buff to the
+        player and removing the potion from the inventory
+        :return:
+        """
         orig_strength = self.dummy.attributes['strength']
         self.item_entry = 4
         self.name = 'Strength Potion'
@@ -1029,6 +1034,14 @@ class CharacterTests(unittest.TestCase):
         self.assertGreater(current_strength, orig_strength)
 
         self.assertTrue(self.potion.name not in self.dummy.inventory)
+
+    def test_consume_item_non_consumable_item(self):
+        self.item_to_eq = Item(name='Evangelism', item_id=1, buy_price=1, sell_price=1)
+        self.dummy.inventory = {
+            self.item_to_eq.name: (self.item_to_eq, 1)
+        }
+        self.dummy.consume_item(self.item_to_eq)
+        self.assertTrue(self.item_to_eq.name in self.dummy.inventory)
 
 
 if __name__ == '__main__':
