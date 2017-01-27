@@ -909,23 +909,23 @@ class CharacterTests(unittest.TestCase):
         Test that everything works as expected when equipping an item over another
         """
         original_health = self.dummy.health
-        self.item_to_dequip = Equipment(name='FirstHead', item_id=1, slot='headpiece',
-                                       attributes=create_attributes_dict(bonus_health=1000), buy_price=1)
+        self.gear = Equipment(name='FirstHead', item_id=1, slot='headpiece',
+                              attributes=create_attributes_dict(bonus_health=1000), buy_price=1)
         self.item_to_eq = Equipment(name='SecondHead', item_id=1, slot='headpiece',
                                     attributes=create_attributes_dict(), buy_price=1)
         self.dummy.inventory = {
-            self.item_to_dequip.name: (self.item_to_dequip, 1),
+            self.gear.name: (self.gear, 1),
             self.item_to_eq.name: (self.item_to_eq, 1)
         }
 
         # act
 
         # Equip the first item
-        self.dummy.equip_item(item=self.item_to_dequip)
+        self.dummy.equip_item(item=self.gear)
         self.assertNotEqual(self.dummy.health, original_health)
         self.assertTrue(self.dummy.health - original_health >= 1000)
-        self.assertTrue(self.item_to_dequip.name not in self.dummy.inventory)
-        self.assertEqual(self.dummy.equipment['headpiece'], self.item_to_dequip)
+        self.assertTrue(self.gear.name not in self.dummy.inventory)
+        self.assertEqual(self.dummy.equipment['headpiece'], self.gear)
 
         # Equip the second item
         self.dummy.equip_item(item=self.item_to_eq)
@@ -934,8 +934,8 @@ class CharacterTests(unittest.TestCase):
         self.assertTrue(self.item_to_eq.name not in self.dummy.inventory)
         self.assertEqual(self.dummy.equipment['headpiece'], self.item_to_eq)
         # assert that the old item is in the inventory
-        self.assertTrue(self.item_to_dequip.name in self.dummy.inventory)
-        self.assertEqual(self.dummy.inventory[self.item_to_dequip.name], (self.item_to_dequip, 1))
+        self.assertTrue(self.gear.name in self.dummy.inventory)
+        self.assertEqual(self.dummy.inventory[self.gear.name], (self.gear, 1))
 
     def test_equip_item_weapon(self):
         original_health = self.dummy.health
@@ -1065,6 +1065,28 @@ class CharacterTests(unittest.TestCase):
             # assert that the damage has been modified
             self.assertGreater(self.dummy.min_damage, orig_min_dmg)
             self.assertGreater(self.dummy.max_damage, orig_max_dmg)
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+    def test_equip_gear(self):
+        """
+        The _equip_gear function takes an Equipment object and 'equips' on the character.
+        It does not take care of the old one and is simply there  to print, add the item and add the attributes it gives
+        """
+        output = StringIO()
+        orig_health = self.dummy.health
+        self.gear = Equipment(name='FirstHead', item_id=1, slot='headpiece',
+                              attributes=create_attributes_dict(bonus_health=1000), buy_price=1)
+        expected_message = f'{self.dummy.name} has equipped {self.gear.slot} {self.gear.name}'
+        try:
+            sys.stdout = output
+
+            self.dummy._equip_gear(self.gear)
+
+            self.assertNotEqual(self.dummy.health, orig_health)
+            self.assertTrue(self.dummy.health - orig_health >= 1000)
+            self.assertEqual(self.dummy.equipment['headpiece'], self.gear)
             self.assertIn(expected_message, output.getvalue())
         finally:
             sys.stdout = sys.__stdout__
