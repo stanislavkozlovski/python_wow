@@ -475,7 +475,7 @@ class Character(LivingThing):
     def add_item_to_inventory(self, item: Item):
         count = 1
         if item.name in self.inventory:
-            count += self.inventory[item.name]
+            count += self.inventory[item.name][1]
 
         self.inventory[item.name] = (item, count)
 
