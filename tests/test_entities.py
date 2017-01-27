@@ -11,7 +11,8 @@ from constants import (
     CHAR_STARTER_ZONE)
 from entities import LivingThing, FriendlyNPC, VendorNPC, Monster, Character
 from damage import Damage
-from items import Item
+from utils.helper import create_attributes_dict
+from items import Item, Equipment
 from buffs import BeneficialBuff, DoT
 
 
@@ -876,6 +877,30 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.attributes, expected_attributes)
         self.assertEqual(self.dummy.current_zone, CHAR_STARTER_ZONE)
         self.assertEqual(self.dummy.current_subzone, CHAR_STARTER_SUBZONE)
+
+    def test_equip_item(self):
+        """
+        The equip item takes na item from our inventory and adds it to our equipment, swapping with the
+        already equipped item essentially
+        """
+        original_health = self.dummy.health
+        self.item_to_deq = Equipment(name='FirstHead', item_id=1, slot='headpiece',
+                                    attributes=create_attributes_dict(bonus_health=1000), buy_price=1)
+        self.dummy.inventory = {
+            self.item_to_deq.name: (self.item_to_deq, 1)
+        }
+
+        # act
+
+        # Equip the first item
+        self.dummy.equip_item(item=self.item_to_deq)
+        # assert that the bonus health has been added
+        self.assertNotEqual(self.dummy.health, original_health)
+        self.assertTrue(self.dummy.health - original_health >= 1000)
+        # assert that the item is not in the inventory anymore
+        self.assertTrue(self.item_to_deq.name not in self.dummy.inventory)
+        # assert that its in the equipment
+        self.assertEqual(self.dummy.equipment['headpiece'], self.item_to_deq)
 
 
 if __name__ == '__main__':
