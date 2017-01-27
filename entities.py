@@ -472,6 +472,13 @@ class Character(LivingThing):
         super().start_turn_update()
         self.update_spell_cooldowns()
 
+    def add_item_to_inventory(self, item: Item):
+        count = 1
+        if item.name in self.inventory:
+            count += self.inventory[item.name]
+
+        self.inventory[item.name] = (item, count)
+
     def equip_item(self, item: Item):
         """
         This method equips an item to the character and handles the appropriate change in inventory following the equip
@@ -491,11 +498,7 @@ class Character(LivingThing):
             # transfer the equipped weapon to the inventory
             eq_weapon = self.equipped_weapon
 
-            if eq_weapon.name in self.inventory.keys():  # if we have such an item in the inventory, we add one more
-                weapon_in_inventory, wep_count = self.inventory[eq_weapon.name]
-                self.inventory[eq_weapon.name] = weapon_in_inventory, wep_count + 1
-            else:  # we don't have such an item in the inventory, we create one
-                self.inventory[eq_weapon.name] = eq_weapon, 1
+            self.add_item_to_inventory(eq_weapon)
 
             self._subtract_attributes(eq_weapon.attributes)  # remove the attributes it has given us
             self.equip_weapon(item)
@@ -512,12 +515,8 @@ class Character(LivingThing):
             # TODO: Handle custom error if there isn't such a slot in the equipment
             equipped_item = self.equipment[item.slot]  # type: Equipment
 
-            if equipped_item:  # if we had such an item equipped
-                if equipped_item.name in self.inventory.keys():
-                    item_in_inventory, item_count = self.inventory[equipped_item.name]
-                    self.inventory[equipped_item.name] = item_in_inventory, item_count + 1
-                else:  # we don't have such an item in the inventory, we create one
-                    self.inventory[equipped_item.name] = equipped_item, 1
+            if equipped_item:
+                self.add_item_to_inventory(equipped_item)
                 self._subtract_attributes(equipped_item.attributes)
 
             self.equip_gear(item)
@@ -820,12 +819,7 @@ class Character(LivingThing):
         store it as a tuple holding (Item Object, Item Count) """
         item_quest_id = item.quest_id
 
-        if item.name not in self.inventory.keys():  # if we don't have the item
-            self.inventory[item.name] = (item, item_count)
-        else:
-            # if there is such an item, simply update it's count by one
-            item, item_count = self.inventory[item.name]
-            self.inventory[item.name] = (item, item_count + 1)
+        self.add_item_to_inventory(item)
 
         if item_quest_id and item_quest_id in self.quest_log and not self.quest_log[item_quest_id].is_completed:
             # if the item is related to a quest and if we have that quest and said quest is not completed
@@ -838,7 +832,7 @@ class Character(LivingThing):
 
             self._check_if_quest_completed(temp_quest)
 
-    def _remove_item_from_inventory(self, item_name: str, item_count: int = 1, remove_all: bool = False):
+    def _remove_item_from_inventory(self, item_name: str, item_count: int=1, remove_all: bool = False):
         """ This method removes the specified item from the player's inventory
             :param item_count: the count we want to remove, ex: we may want to remove 2 Wolf Meats, as opposed to one
             :param remove_all: simply removes all the items, with this variable set to True, item_count is useless"""
