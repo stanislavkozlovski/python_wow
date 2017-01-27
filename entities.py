@@ -7,7 +7,7 @@ from termcolor import colored
 from constants import (CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS,
                        KEY_ARMOR_ATTRIBUTE, KEY_STRENGTH_ATTRIBUTE, KEY_AGILITY_ATTRIBUTE, KEY_BONUS_HEALTH_ATTRIBUTE,
                        KEY_BONUS_MANA_ATTRIBUTE, KEY_LEVEL_STATS_HEALTH, KEY_LEVEL_STATS_MANA, CHAR_STARTER_ZONE,
-                       CHAR_STARTER_SUBZONE)
+                       CHAR_STARTER_SUBZONE, CHAR_ATTRIBUTES_TEMPLATE)
 from information_printer import print_level_up_event, print_vendor_products_for_sale
 from exceptions import ItemNotInInventoryError, NonExistantBuffError
 from items import Item, Weapon, Potion, Equipment
@@ -256,7 +256,7 @@ class LivingThing:
         This method subtracts the absorption (if any) from the damage
         :param to_print: A boolean indicating if we want to actually subtract the damage from the shield. If it's true,
         we're getting the damage for the sole reason to print it only, therefore we should not modify anything
-        :return Tuple(Damage, absorbed(float)
+        :return Damage
         """
 
         if self.absorption_shield:  # if there is anything to absorb
@@ -380,7 +380,7 @@ class Monster(LivingThing):
 
         return Damage(phys_dmg=damage_to_deal)
 
-    def attack(self, victim):  # victim: Character
+    def attack(self, victim: 'Character'):
         monster_swing: Damage = self.get_auto_attack_damage(victim.level)
 
         victim.take_attack(self.name, monster_swing, self.level)
@@ -409,13 +409,12 @@ class Monster(LivingThing):
 
     def give_loot(self, item_name: str):
         """ Returns the item that's looted and removes it from the monster's inventory"""
-        if item_name not in self.loot:  # TODO: This should not be checked here
-            # unsuccessful loot
+        if item_name not in self.loot:
             print(f'{self.name} did not drop {item_name}.')
             return False
 
-        item = self.loot[item_name] # type: Item
-        del self.loot[item_name] # remove it from the inventory
+        item: Item = self.loot[item_name]
+        del self.loot[item_name]  # remove it as it's looted
         return item
 
     def _die(self):
@@ -447,7 +446,7 @@ class Character(LivingThing):
     def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1,
                  loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=set(),
                  saved_inventory: dict={'gold': 0}, saved_equipment: dict=CHARACTER_DEFAULT_EQUIPMENT):
-        super().__init__(name, health, mana, level=1)
+        super().__init__(name, health, mana, level=0)
         self.min_damage = 0
         self.max_damage = 1
         self.equipped_weapon = Weapon(name="Starter Weapon", item_id=0)
@@ -455,9 +454,8 @@ class Character(LivingThing):
         self.xp_req_to_level = 400
         self.bonus_health = 0
         self.bonus_mana = 0
-        self.attributes: {str: int} = {KEY_STRENGTH_ATTRIBUTE: strength, KEY_ARMOR_ATTRIBUTE: 75,
-                                       KEY_AGILITY_ATTRIBUTE: agility, KEY_BONUS_HEALTH_ATTRIBUTE: 0,
-                                       KEY_BONUS_MANA_ATTRIBUTE: 0}
+        self.attributes: {str: int} = CHAR_ATTRIBUTES_TEMPLATE
+        self._level_up(False)  # level up to 1
         self.current_zone = CHAR_STARTER_ZONE
         self.current_subzone = CHAR_STARTER_SUBZONE
         self.loaded_scripts = loaded_scripts  # holds the scripts that the character has seen (which should load only once)
@@ -872,7 +870,7 @@ class Character(LivingThing):
             self.experience = 0
             self.xp_req_to_level = self._lookup_next_xp_level_req()
 
-    def _level_up(self):
+    def _level_up(self, to_print=True):
         self.level += 1
 
         current_level_stats = CHARACTER_LEVELUP_BONUS_STATS[self.level]

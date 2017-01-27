@@ -101,7 +101,7 @@ def handle_vendor_sale(character, vendor):
             if not vendor.has_item(item):
                 print(f'{vendor.name} does not have {item} in stock.')
                 continue
-            
+
             # check if the player has enough gold
             if not character.has_enough_gold(vendor.get_item_price(item)):
                 print(f'You do not have enough gold to buy {item}!\n')

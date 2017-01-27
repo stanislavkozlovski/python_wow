@@ -3,7 +3,7 @@ This holds the classes for every kind of item in the game
 """
 from buffs import BeneficialBuff
 from termcolor import colored
-
+from constants import CHAR_ATTRIBUTES_TEMPLATE
 KEY_BONUS_HEALTH = 'bonus_health'  # TODO: Move these constants to a constants.py module
 KEY_BONUS_MANA = 'bonus_mana'
 KEY_STRENGTH = 'strength'
@@ -62,11 +62,11 @@ class Item:
 
 class Weapon(Item):
     def __init__(self, name: str, item_id: int, buy_price: int = 0, sell_price: int = 0, min_damage: int = 0,
-                 max_damage: int = 1, attributes_dict: dict=create_attributes_dict()):
+                 max_damage: int = 1, attributes: dict=CHAR_ATTRIBUTES_TEMPLATE):
         super().__init__(name, item_id, buy_price, sell_price)
         self.min_damage = min_damage
         self.max_damage = max_damage
-        self.attributes = attributes_dict  # the attributes this item gives on equip
+        self.attributes = attributes  # the attributes this item gives on equip
 
     def __str__(self):
         return colored(f'{self.name}', color="green") + f'- Weapon ({self.min_damage}-{self.max_damage}) damage'
@@ -76,10 +76,10 @@ class Equipment(Item):
     """ Any item that can be equipped in an equipment slot, as distinguished from items that can only be
     carried in the inventory.
     ex: Headpiece, Shoulderpad, Necklace, Chestguard, Bracer, Gloves, Belt, Leggings, Boots"""
-    def __init__(self, name: str, item_id: int, slot: str, attributes_dict: dict=create_attributes_dict(), buy_price: int=0, sell_price: int=0):
+    def __init__(self, name: str, item_id: int, slot: str, attributes: dict=CHAR_ATTRIBUTES_TEMPLATE, buy_price: int=0, sell_price: int=0):
         super().__init__(name, item_id, buy_price, sell_price)
         self.slot = slot
-        self.attributes = attributes_dict
+        self.attributes = attributes
 
     def __str__(self):
         return (colored(self.name, color='green')
