@@ -455,6 +455,8 @@ class Character(LivingThing):
         self.xp_req_to_level = 400
         self.bonus_health = 0
         self.bonus_mana = 0
+        self.bonus_strength = 0
+        self.bonus_armor = 0
         self.attributes: {str: int} = create_character_attributes_template()
         self._level_up(False)  # level up to 1
         self.current_zone = CHAR_STARTER_ZONE
@@ -594,8 +596,16 @@ class Character(LivingThing):
 
         # formula for agility is: for each point of agility, add 2.5 armor and 0.5 strength
         agility = self.attributes[KEY_AGILITY_ATTRIBUTE]
-        self.attributes[KEY_STRENGTH_ATTRIBUTE] += agility * 0.5
-        self.attributes[KEY_ARMOR_ATTRIBUTE] += agility * 2.5
+
+        # remove the old bonus strength/armor
+        self.attributes[KEY_STRENGTH_ATTRIBUTE] -= self.bonus_strength
+        self.attributes[KEY_ARMOR_ATTRIBUTE] -= self.bonus_armor
+        # recalculate them
+        self.bonus_strength = agility * 0.5
+        self.bonus_armor = agility * 2.5
+        # add them back again
+        self.attributes[KEY_STRENGTH_ATTRIBUTE] += self.bonus_strength
+        self.attributes[KEY_ARMOR_ATTRIBUTE] += self.bonus_armor
 
         "Now we need to update our damage, because the strength might have been changed"
 
