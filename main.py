@@ -18,7 +18,7 @@ def main():
     atexit.register(on_exit_handler, main_character)
     ZONES["Northshire Abbey"] = NorthshireAbbey(main_character)
     starter_weapon = Weapon(name="Starter Weapon", item_id=0, min_damage=1, max_damage=3)
-    main_character.equip_weapon(starter_weapon)
+    main_character._equip_weapon(starter_weapon)
     print(f'Character {main_character.name} created!')
 
     zone_object = get_zone_object(main_character.current_zone)  # type: Zone

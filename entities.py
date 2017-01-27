@@ -503,7 +503,7 @@ class Character(LivingThing):
             self.add_item_to_inventory(eq_weapon)
 
             self._subtract_attributes(eq_weapon.attributes)  # remove the attributes it has given us
-            self.equip_weapon(item)
+            self._equip_weapon(item)
         elif isinstance(item, Equipment):
             item_in_inventory, count = self.inventory[item.name]
 
@@ -521,7 +521,7 @@ class Character(LivingThing):
                 self.add_item_to_inventory(equipped_item)
                 self._subtract_attributes(equipped_item.attributes)
 
-            self.equip_gear(item)
+            self._equip_gear(item)
 
         self._calculate_stats_formulas()  # always recalculate formulas when adding an item
 
@@ -544,12 +544,12 @@ class Character(LivingThing):
             # call the potion's consume method
             potion.consume(self)
 
-    def equip_weapon(self, weapon: Weapon):
+    def _equip_weapon(self, weapon: Weapon):
         print(f'{self.name} has equipped Weapon {weapon.name}')
         self.equipped_weapon = weapon
         self._add_attributes(weapon.attributes)
 
-    def equip_gear(self, item: Equipment):
+    def _equip_gear(self, item: Equipment):
         """ equip an equipment item like a Headpiece, Shoulderpad, Chestguard and etc."""
         print(f'{self.name} has equipped {item.slot} {item.name}')
         self.equipment[item.slot] = item
