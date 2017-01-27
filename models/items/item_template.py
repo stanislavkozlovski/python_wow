@@ -1,7 +1,8 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 
 from models.spells.loader import load_buff
-from items import create_attributes_dict, Weapon, Equipment, Potion, Item
+from utils.helper import create_attributes_dict
+from items import Weapon, Equipment, Potion, Item
 from utils.helper import parse_int
 from database.main import Base
 
