@@ -1221,5 +1221,25 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.health, orig_health)
         self.assertEqual(self.dummy.mana, orig_mana)
 
+    def test_calculate_stats_formulas_in_combat(self):
+        """ Adding more health in combat should increase the char's max health but not affect his current health"""
+        self.dummy.enter_combat()
+        orig_current_health, orig_max_health = self.dummy.health, self.dummy.max_health
+        orig_current_mana, orig_max_mana = self.dummy.mana, self.dummy.max_mana
+
+        mana_increase, health_increase = 100, 100
+        expected_max_health, expected_max_mana = orig_max_health + health_increase, orig_max_mana + mana_increase
+        expected_current_health, expected_current_mana = orig_current_health, orig_current_mana
+
+        # increase the health/mana from the attributes
+        self.dummy.attributes['bonus_health'] += health_increase
+        self.dummy.attributes['bonus_mana'] += mana_increase
+        self.dummy._calculate_stats_formulas()
+
+        self.assertEqual(self.dummy.health, expected_current_health)
+        self.assertEqual(self.dummy.mana, expected_current_mana)
+        self.assertEqual(self.dummy.max_health, expected_max_health)
+        self.assertEqual(self.dummy.max_mana, expected_max_mana)
+
 if __name__ == '__main__':
     unittest.main()
