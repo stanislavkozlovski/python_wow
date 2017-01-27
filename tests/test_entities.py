@@ -884,23 +884,56 @@ class CharacterTests(unittest.TestCase):
         already equipped item essentially
         """
         original_health = self.dummy.health
-        self.item_to_deq = Equipment(name='FirstHead', item_id=1, slot='headpiece',
-                                    attributes=create_attributes_dict(bonus_health=1000), buy_price=1)
+        self.item_to_equip = Equipment(name='FirstHead', item_id=1, slot='headpiece',
+                                       attributes=create_attributes_dict(bonus_health=1000), buy_price=1)
         self.dummy.inventory = {
-            self.item_to_deq.name: (self.item_to_deq, 1)
+            self.item_to_equip.name: (self.item_to_equip, 1)
+        }
+
+        # act
+
+        # Equip the  item
+        self.dummy.equip_item(item=self.item_to_equip)
+        # assert that the bonus health has been added
+        self.assertNotEqual(self.dummy.health, original_health)
+        self.assertTrue(self.dummy.health - original_health >= 1000)
+        # assert that the item is not in the inventory anymore
+        self.assertTrue(self.item_to_equip.name not in self.dummy.inventory)
+        # assert that its in the equipment
+        self.assertEqual(self.dummy.equipment['headpiece'], self.item_to_equip)
+
+    def test_equip_dequip_item(self):
+        """
+        Test that everything works as expected when equipping an item over another
+        """
+        original_health = self.dummy.health
+        self.item_to_dequip = Equipment(name='FirstHead', item_id=1, slot='headpiece',
+                                       attributes=create_attributes_dict(bonus_health=1000), buy_price=1)
+        self.item_to_eq = Equipment(name='SecondHead', item_id=1, slot='headpiece',
+                                    attributes=create_attributes_dict(), buy_price=1)
+        self.dummy.inventory = {
+            self.item_to_dequip.name: (self.item_to_dequip, 1),
+            self.item_to_eq.name: (self.item_to_eq, 1)
         }
 
         # act
 
         # Equip the first item
-        self.dummy.equip_item(item=self.item_to_deq)
-        # assert that the bonus health has been added
+        self.dummy.equip_item(item=self.item_to_dequip)
         self.assertNotEqual(self.dummy.health, original_health)
         self.assertTrue(self.dummy.health - original_health >= 1000)
-        # assert that the item is not in the inventory anymore
-        self.assertTrue(self.item_to_deq.name not in self.dummy.inventory)
-        # assert that its in the equipment
-        self.assertEqual(self.dummy.equipment['headpiece'], self.item_to_deq)
+        self.assertTrue(self.item_to_dequip.name not in self.dummy.inventory)
+        self.assertEqual(self.dummy.equipment['headpiece'], self.item_to_dequip)
+
+        # Equip the second item
+        self.dummy.equip_item(item=self.item_to_eq)
+        # health should be subtracted
+        self.assertEqual(self.dummy.health, original_health)
+        self.assertTrue(self.item_to_eq.name not in self.dummy.inventory)
+        self.assertEqual(self.dummy.equipment['headpiece'], self.item_to_eq)
+        # assert that the old item is in the inventory
+        self.assertTrue(self.item_to_dequip.name in self.dummy.inventory)
+
 
 
 if __name__ == '__main__':
