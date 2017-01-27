@@ -1110,8 +1110,8 @@ class CharacterTests(unittest.TestCase):
         to the character's
         """
         # subtract the strength/armor because we will recalculate the added values from the agility
-        orig_health, orig_mana, orig_stren = self.dummy.health, self.dummy.mana, self.dummy.attributes['strength'] - self.dummy.bonus_strength
-        orig_agi, orig_armor = self.dummy.attributes['agility'], self.dummy.attributes['armor'] - self.dummy.bonus_armor
+        orig_health, orig_mana, orig_stren = self.dummy.health, self.dummy.mana, self.dummy.attributes['strength'] - self.dummy._bonus_strength
+        orig_agi, orig_armor = self.dummy.attributes['agility'], self.dummy.attributes['armor'] - self.dummy._bonus_armor
 
         added_agi, added_health, added_mana = 1000, 1000, 1000
         expected_agility = orig_agi + added_agi
@@ -1119,6 +1119,8 @@ class CharacterTests(unittest.TestCase):
         expected_armor = orig_armor + (expected_agility * 2.5)
         expected_health = orig_health + added_health
         expected_mana = orig_mana + added_mana
+        expected_min_dmg = self.dummy.equipped_weapon.min_damage + (0.4 * expected_strength)
+        expected_max_dmg = self.dummy.equipped_weapon.max_damage + (0.4 * expected_strength)
 
         attributes_to_add = create_attributes_dict(bonus_health=added_health, bonus_mana=added_mana, strength=0, agility=added_agi, armor=0)
 
@@ -1130,6 +1132,8 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.attributes['armor'], expected_armor)
         self.assertEqual(self.dummy.health, expected_health)
         self.assertEqual(self.dummy.mana, expected_mana)
+        self.assertEqual(self.dummy.min_damage, expected_min_dmg)
+        self.assertEqual(self.dummy.max_damage, expected_max_dmg)
 
     def test_add_attributes_empty_attributes(self):
         """
@@ -1137,6 +1141,7 @@ class CharacterTests(unittest.TestCase):
         """
         orig_health, orig_mana, orig_stren = self.dummy.health, self.dummy.mana, self.dummy.attributes['strength']
         orig_agi, orig_armor = self.dummy.attributes['agility'], self.dummy.attributes['armor']
+        orig_min_damage, orig_max_damage = self.dummy.min_damage, self.dummy.max_damage
 
         attributes_to_add = create_attributes_dict()  # is empty
 
@@ -1147,6 +1152,8 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.attributes['armor'], orig_armor)
         self.assertEqual(self.dummy.health, orig_health)
         self.assertEqual(self.dummy.mana, orig_mana)
+        self.assertEqual(self.dummy.min_damage, orig_min_damage)
+        self.assertEqual(self.dummy.max_damage, orig_max_damage)
 
     def test_subtract_attributes(self):
         """
@@ -1155,8 +1162,8 @@ class CharacterTests(unittest.TestCase):
         """
         # subtract the strength/armor because we will recalculate the added values from the agility
         orig_health, orig_mana, orig_stren = self.dummy.health, self.dummy.mana, self.dummy.attributes[
-            'strength'] - self.dummy.bonus_strength
-        orig_agi, orig_armor = self.dummy.attributes['agility'], self.dummy.attributes['armor'] - self.dummy.bonus_armor
+            'strength'] - self.dummy._bonus_strength
+        orig_agi, orig_armor = self.dummy.attributes['agility'], self.dummy.attributes['armor'] - self.dummy._bonus_armor
 
         subtracted_agi, subtracted_health, subtracted_mana = 1, 1, 1
         expected_agility = orig_agi - subtracted_agi
@@ -1164,6 +1171,8 @@ class CharacterTests(unittest.TestCase):
         expected_armor = orig_armor + (expected_agility * 2.5)
         expected_health = orig_health - subtracted_health
         expected_mana = orig_mana - subtracted_mana
+        expected_min_dmg = self.dummy.equipped_weapon.min_damage + (0.4 * expected_strength)
+        expected_max_dmg = self.dummy.equipped_weapon.max_damage + (0.4 * expected_strength)
 
         attributes_to_add = create_attributes_dict(bonus_health=subtracted_health, bonus_mana=subtracted_mana, strength=0,
                                                    agility=subtracted_agi, armor=0)
@@ -1176,12 +1185,15 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.attributes['armor'], expected_armor)
         self.assertEqual(self.dummy.health, expected_health)
         self.assertEqual(self.dummy.mana, expected_mana)
+        self.assertEqual(self.dummy.min_damage, expected_min_dmg)
+        self.assertEqual(self.dummy.max_damage, expected_max_dmg)
 
     def test_subtract_attributes_empty_attributes(self):
         # subtract the strength/armor because we will recalculate the added values from the agility
         orig_health, orig_mana, orig_stren = self.dummy.health, self.dummy.mana, self.dummy.attributes[
-            'strength'] - self.dummy.bonus_strength
-        orig_agi, orig_armor = self.dummy.attributes['agility'], self.dummy.attributes['armor'] - self.dummy.bonus_armor
+            'strength'] - self.dummy._bonus_strength
+        orig_agi, orig_armor = self.dummy.attributes['agility'], self.dummy.attributes['armor'] - self.dummy._bonus_armor
+        orig_min_damage, orig_max_damage = self.dummy.min_damage, self.dummy.max_damage
 
         subtracted_agi, subtracted_health, subtracted_mana = 0, 0, 0
         expected_agility = orig_agi - subtracted_agi
@@ -1202,6 +1214,8 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.attributes['armor'], expected_armor)
         self.assertEqual(self.dummy.health, expected_health)
         self.assertEqual(self.dummy.mana, expected_mana)
+        self.assertEqual(self.dummy.min_damage, orig_min_damage)
+        self.assertEqual(self.dummy.max_damage, orig_max_damage)
 
     def test_calculate_stats_formulas(self):
         """
@@ -1210,6 +1224,7 @@ class CharacterTests(unittest.TestCase):
         """
         orig_health, orig_mana, orig_stren = self.dummy.health, self.dummy.mana, self.dummy.attributes['strength']
         orig_agi, orig_armor = self.dummy.attributes['agility'], self.dummy.attributes['armor']
+        orig_min_damage, orig_max_damage = self.dummy.min_damage, self.dummy.max_damage
 
         # since we've done nothing, calling the method should not change anything
         for _ in range(50):
@@ -1220,6 +1235,8 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.attributes['armor'], orig_armor)
         self.assertEqual(self.dummy.health, orig_health)
         self.assertEqual(self.dummy.mana, orig_mana)
+        self.assertEqual(self.dummy.min_damage, orig_min_damage)
+        self.assertEqual(self.dummy.max_damage, orig_max_damage)
 
     def test_calculate_stats_formulas_in_combat(self):
         """ Adding more health in combat should increase the char's max health but not affect his current health"""
@@ -1238,6 +1255,7 @@ class CharacterTests(unittest.TestCase):
 
         self.assertEqual(self.dummy.health, expected_current_health)
         self.assertEqual(self.dummy.mana, expected_current_mana)
+
         self.assertEqual(self.dummy.max_health, expected_max_health)
         self.assertEqual(self.dummy.max_mana, expected_max_mana)
 
