@@ -1104,5 +1104,31 @@ class CharacterTests(unittest.TestCase):
             self.assertIn(item_mock.name, self.dummy.inventory)
             self.assertEqual(self.dummy.inventory[item_mock.name], (item_mock, i+1))
 
+    def test_add_attributes(self):
+        """
+        The add_attributes function simply takes a dictionary of expected attributes and adds them
+        to the character's
+        """
+        orig_health, orig_mana, orig_stren = self.dummy.health, self.dummy.mana, self.dummy.attributes['strength'] - self.dummy.bonus_strength
+        orig_agi, orig_armor = self.dummy.attributes['agility'], self.dummy.attributes['armor'] - self.dummy.bonus_armor
+
+        added_agi, added_health, added_mana = 1000, 1000, 1000
+        expected_agility = orig_agi + added_agi
+        expected_strength = orig_stren + (expected_agility * 0.5)
+        expected_armor = orig_armor + (expected_agility * 2.5)
+        expected_health = orig_health + added_health
+        expected_mana = orig_mana + added_mana
+
+        attributes_to_add = create_attributes_dict(bonus_health=added_health, bonus_mana=added_mana, strength=0, agility=added_agi, armor=0)
+
+        # Act
+        self.dummy._add_attributes(attributes_to_add)
+
+        self.assertEqual(self.dummy.attributes['strength'], expected_strength)
+        self.assertEqual(self.dummy.attributes['agility'], expected_agility)
+        self.assertEqual(self.dummy.attributes['armor'], expected_armor)
+        self.assertEqual(self.dummy.health, expected_health)
+        self.assertEqual(self.dummy.mana, expected_mana)
+
 if __name__ == '__main__':
     unittest.main()
