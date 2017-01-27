@@ -1091,5 +1091,18 @@ class CharacterTests(unittest.TestCase):
         finally:
             sys.stdout = sys.__stdout__
 
+    def test_add_item_to_inventory_new_item(self):
+        """
+        The add_item_to_inventory function adds a given item to the inventory
+        """
+        item_mock = Mock(name='someItemBitch')
+        self.assertNotIn(item_mock.name, self.dummy.inventory)
+
+        for i in range(100):
+            self.dummy.add_item_to_inventory(item_mock)
+
+            self.assertIn(item_mock.name, self.dummy.inventory)
+            self.assertEqual(self.dummy.inventory[item_mock.name], (item_mock, i+1))
+
 if __name__ == '__main__':
     unittest.main()
