@@ -1271,8 +1271,84 @@ class CharacterTests(unittest.TestCase):
             self.assertEqual(result.magic_dmg, 0)
             self.assertNotEqual(result.phys_dmg, 0)
             phys_dmg = result.phys_dmg
-            
+
             self.assertTrue(int(self.dummy.min_damage) <= phys_dmg <= int(self.dummy.max_damage))
+
+    def test_take_attack(self):
+        """
+        The take_attack function deals the damage given to it to the Character after applying
+        armor reduction and absorption
+        """
+        output = StringIO()
+        monster_name = 'WhatUp'
+        expected_message = f'{monster_name} attacks {self.dummy.name} for'  # intentionally omit the exact damage
+        dmg_to_take = Damage(magic_dmg=10)  # magic so we don't get reduction by the armor
+        attacker_level = self.dummy.level
+        try:
+            sys.stdout = output
+
+            self.dummy.take_attack(monster_name, dmg_to_take, attacker_level)
+            self.assertEqual(self.dummy.health, self.health-dmg_to_take.magic_dmg)
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+    def test_take_attack_armor_reduction(self):
+        """
+        Test if the take_attack function actually applies armor reduction
+        """
+        armor = 500
+        self.dummy.attributes['armor'] = armor
+        dmg_to_take = Damage(phys_dmg=10)
+        attacker_level = self.dummy.level
+
+        # get the expected damage after reduction
+        reduction_percentage = armor / (armor + 400 + 85 * attacker_level)
+        damage_to_deduct = dmg_to_take.phys_dmg * reduction_percentage
+        reduced_damage = dmg_to_take.phys_dmg - damage_to_deduct
+
+        self.dummy.take_attack('', dmg_to_take, attacker_level)
+
+        self.assertAlmostEqual(self.dummy.health, self.health - reduced_damage, 1)
+
+    def test_take_attack_absorption(self):
+        """
+        Test the take_attack function when the monster has an absorption shield
+        """
+        magic_dmg, absorption_shield = 11, 10
+        self.dummy.absorption_shield = absorption_shield
+        dmg_to_take = Damage(magic_dmg=magic_dmg)
+        attacker_level = self.dummy.level
+
+        self.dummy.take_attack('', dmg_to_take, attacker_level)
+        expected_health = self.health - (dmg_to_take.magic_dmg - absorption_shield)
+        self.assertEqual(self.dummy.health, expected_health)
+
+    def test_take_attack_absorption_and_armor(self):
+        """ Test the function, this time accouting for armor and absorption """
+        orig_health = self.dummy.health
+        absorption_shield = 16
+        armor = 500
+        self.dummy.absorption_shield = absorption_shield
+        self.dummy.attributes['armor'] = armor
+        attacker_level = self.dummy.level
+
+        dmg_to_take = Damage(phys_dmg=15, magic_dmg=15)
+
+        # get the expected damage after armor reduction
+        reduction_percentage = armor / (armor + 400 + 85 * attacker_level)
+        damage_to_deduct = dmg_to_take.phys_dmg * reduction_percentage
+        reduced_damage = dmg_to_take.phys_dmg - damage_to_deduct
+
+        # NOTE: Magical damage always gets absorbed first
+        leftover_shield = absorption_shield - dmg_to_take.magic_dmg
+        expected_dmg = reduced_damage - leftover_shield
+
+        # ACT
+        self.dummy.take_attack('', dmg_to_take, attacker_level)
+
+        self.assertEqual(self.dummy.health, round(orig_health-expected_dmg, 1))
+
 
 if __name__ == '__main__':
     unittest.main()
