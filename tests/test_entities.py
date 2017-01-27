@@ -13,7 +13,7 @@ from constants import (
 from entities import LivingThing, FriendlyNPC, VendorNPC, Monster, Character
 from damage import Damage
 from utils.helper import create_attributes_dict
-from items import Item, Equipment, Weapon
+from items import Item, Equipment, Weapon, Potion
 from buffs import BeneficialBuff, DoT
 
 
@@ -992,7 +992,7 @@ class CharacterTests(unittest.TestCase):
         self.dummy.inventory = {
             self.item_to_eq.name: (self.item_to_eq, 1)
         }
-        
+
         for _ in range(10000):
             self.dummy.equip_item(self.item_to_eq)
 
@@ -1004,6 +1004,31 @@ class CharacterTests(unittest.TestCase):
         # assert that the item has not moved
         self.assertTrue(self.item_to_eq.name in self.dummy.inventory)
         self.assertEqual(self.dummy.inventory[self.item_to_eq.name], (self.item_to_eq, 1))
+
+    def test_consume_item(self):
+        orig_strength = self.dummy.attributes['strength']
+        self.item_entry = 4
+        self.name = 'Strength Potion'
+        self.buy_price = 1
+        self.sell_price = 1
+        self.effect_id = 1
+        self.effect: BeneficialBuff = BeneficialBuff(name="Heart of a Lion",
+                                                     buff_stats_and_amounts=[('strength', 15)],
+                                                     duration=5)
+        self.potion = Potion(name=self.name, item_id=self.item_entry, buy_price=self.buy_price,
+                             sell_price=self.sell_price,
+                             buff=self.effect, quest_id=0)
+
+        self.dummy.inventory = {
+            self.potion.name: (self.potion, 1)
+        }
+
+        self.dummy.consume_item(self.potion)
+
+        current_strength = self.dummy.attributes['strength']
+        self.assertGreater(current_strength, orig_strength)
+
+        self.assertTrue(self.potion.name not in self.dummy.inventory)
 
 
 if __name__ == '__main__':
