@@ -453,10 +453,10 @@ class Character(LivingThing):
         self.equipped_weapon = Weapon(name="Starter Weapon", item_id=0)
         self.experience = 0
         self.xp_req_to_level = 400
-        self.bonus_health = 0
-        self.bonus_mana = 0
-        self.bonus_strength = 0
-        self.bonus_armor = 0
+        self._bonus_health = 0
+        self._bonus_mana = 0
+        self._bonus_strength = 0
+        self._bonus_armor = 0
         self.attributes: {str: int} = create_character_attributes_template()
         self._level_up(False)  # level up to 1
         self.current_zone = CHAR_STARTER_ZONE
@@ -559,7 +559,8 @@ class Character(LivingThing):
         """ this function goes through a dictionary that holds character attributes and adds them
         with the character's. Called whenever we equip an item
         We directly apply it to the character's attributes dictionary because we trust that the
-        argument has gone through item.py's create_attributes_dict function"""
+        argument has gone through helper.py's create_attributes function
+        and has valid attribute names"""
         for attribute_name, attribute_value in attributes.items():
             self.attributes[attribute_name] += attribute_value
         self._calculate_stats_formulas()
@@ -568,7 +569,8 @@ class Character(LivingThing):
         """ this function goes through a dictionary that holds character attributes and adds them
             with the character's. Called whenever we dequip an item
             We directly apply it to the character's attributes dictionary because we trust that the
-            argument has gone through item.py's create_attributes_dict function"""
+            argument has gone through helper.py's create_attributes function
+            and has valid attribute names"""
         for attribute_name, attribute_value in attributes.items():
             # we also trust that the values cannot be negative after the subtraction, because the same amount has
             # been added beforehand and we currently do not support any features that lower a character's
@@ -583,12 +585,12 @@ class Character(LivingThing):
         """
 
         # update health according to bonus health
-        self.max_health -= self.bonus_health  # remove the old bonus health
-        self.bonus_health = self.attributes[KEY_BONUS_HEALTH_ATTRIBUTE]  # update bonus health
-        self.max_health += self.bonus_health  # add bonus health again
-        self.max_mana -= self.bonus_mana
-        self.bonus_mana = self.attributes[KEY_BONUS_MANA_ATTRIBUTE]
-        self.max_mana += self.bonus_mana
+        self.max_health -= self._bonus_health  # remove the old bonus health
+        self._bonus_health = self.attributes[KEY_BONUS_HEALTH_ATTRIBUTE]  # update bonus health
+        self.max_health += self._bonus_health  # add bonus health again
+        self.max_mana -= self._bonus_mana
+        self._bonus_mana = self.attributes[KEY_BONUS_MANA_ATTRIBUTE]
+        self.max_mana += self._bonus_mana
 
         if not self.is_in_combat():
             self.health = self.max_health
@@ -598,14 +600,14 @@ class Character(LivingThing):
         agility = self.attributes[KEY_AGILITY_ATTRIBUTE]
 
         # remove the old bonus strength/armor
-        self.attributes[KEY_STRENGTH_ATTRIBUTE] -= self.bonus_strength
-        self.attributes[KEY_ARMOR_ATTRIBUTE] -= self.bonus_armor
+        self.attributes[KEY_STRENGTH_ATTRIBUTE] -= self._bonus_strength
+        self.attributes[KEY_ARMOR_ATTRIBUTE] -= self._bonus_armor
         # recalculate them
-        self.bonus_strength = agility * 0.5
-        self.bonus_armor = agility * 2.5
+        self._bonus_strength = agility * 0.5
+        self._bonus_armor = agility * 2.5
         # add them back again
-        self.attributes[KEY_STRENGTH_ATTRIBUTE] += self.bonus_strength
-        self.attributes[KEY_ARMOR_ATTRIBUTE] += self.bonus_armor
+        self.attributes[KEY_STRENGTH_ATTRIBUTE] += self._bonus_strength
+        self.attributes[KEY_ARMOR_ATTRIBUTE] += self._bonus_armor
 
         "Now we need to update our damage, because the strength might have been changed"
 
