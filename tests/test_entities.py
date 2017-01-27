@@ -1047,21 +1047,27 @@ class CharacterTests(unittest.TestCase):
         """
         The _equip_weapon function directly equips the weapon and adds the attributes to the player
         """
+        output = StringIO()
         original_health = self.dummy.health
         orig_min_dmg, orig_max_dmg = self.dummy.min_damage, self.dummy.max_damage
         self.wep_to_eq = Weapon(name='wep', item_id=1, min_damage=10, max_damage=20, attributes=create_attributes_dict(
             bonus_health=1000, strength=1000
         ))
+        expected_message = f'{self.dummy.name} has equipped Weapon {self.wep_to_eq.name}'
+        try:
+            sys.stdout = output
 
-        self.dummy._equip_weapon(self.wep_to_eq)
+            self.dummy._equip_weapon(self.wep_to_eq)
 
-        #  assert that the item is equipped
-        self.assertEqual(self.dummy.equipped_weapon, self.wep_to_eq)
-        self.assertGreater(self.dummy.health, original_health)
-        # assert that the damage has been modified
-        self.assertGreater(self.dummy.min_damage, orig_min_dmg)
-        self.assertGreater(self.dummy.max_damage, orig_max_dmg)
-
+            #  assert that the item is equipped
+            self.assertEqual(self.dummy.equipped_weapon, self.wep_to_eq)
+            self.assertGreater(self.dummy.health, original_health)
+            # assert that the damage has been modified
+            self.assertGreater(self.dummy.min_damage, orig_min_dmg)
+            self.assertGreater(self.dummy.max_damage, orig_max_dmg)
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
 
 if __name__ == '__main__':
     unittest.main()
