@@ -804,6 +804,19 @@ class MonsterTests(unittest.TestCase):
 
         self.assertTrue(count < len(multiple_gold_rewards) // 3)
 
+    def test_yell_gossip(self):
+        """
+        The monster should say/yell/ask his gossip according to what it ends with.
+        """
+        expected_message = f'{self.dummy.name} yells: {self.dummy.gossip}'
+        output = StringIO()
+        try:
+            sys.stdout = output
+            self.dummy.say_gossip()
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
 
 if __name__ == '__main__':
     unittest.main()
