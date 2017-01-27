@@ -6,28 +6,7 @@ from termcolor import colored
 from constants import (
     CHAR_ATTRIBUTES_TEMPLATE, KEY_BONUS_HEALTH_ATTRIBUTE, KEY_BONUS_MANA_ATTRIBUTE,
     KEY_STRENGTH_ATTRIBUTE, KEY_AGILITY_ATTRIBUTE, KEY_ARMOR_ATTRIBUTE)
-
-
-def display_attributes(attributes: dict) -> str:
-    """
-    This function read a dictionary with attributes and returns a string displaying the attributes it gives.
-    A template: {armor} {health} {mana} {strength} {agility}
-    If any are missing, we don't add them
-    """
-    attributes_to_print = []
-
-    if attributes[KEY_ARMOR]:
-        attributes_to_print.append(f'armor: {attributes[KEY_ARMOR]}')
-    if attributes[KEY_BONUS_HEALTH]:
-        attributes_to_print.append(f'health: {attributes[KEY_BONUS_HEALTH]}')
-    if attributes[KEY_BONUS_MANA]:
-        attributes_to_print.append(f'mana: {attributes[KEY_BONUS_MANA]}')
-    if attributes[KEY_STRENGTH]:
-        attributes_to_print.append(f'strength: {attributes[KEY_STRENGTH]}')
-    if attributes[KEY_AGILITY]:
-        attributes_to_print.append(f'agility: {attributes[KEY_AGILITY]}')
-
-    return ", ".join(attributes_to_print)
+from utils.helper import display_attributes
 
 
 class Item:

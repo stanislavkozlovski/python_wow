@@ -36,3 +36,15 @@ def create_attributes_dict(bonus_health: int=0, bonus_mana: int=0, armor: int=0,
 
     return {KEY_BONUS_HEALTH_ATTRIBUTE: bonus_health, KEY_BONUS_MANA_ATTRIBUTE: bonus_mana,
             KEY_ARMOR_ATTRIBUTE: armor, KEY_STRENGTH_ATTRIBUTE: strength, KEY_AGILITY_ATTRIBUTE: agility}
+
+
+def display_attributes(attributes: dict) -> str:
+    """
+    This function read a dictionary with attributes and returns a string displaying the attributes it gives.
+    A template: {armor} {health} {mana} {strength} {agility}
+    If any are missing, we don't add them
+    """
+
+    attributes_to_print = [f'{attr.replace("bonus_", "")}: {val}' for attr, val in attributes.items() if val]
+
+    return ", ".join(attributes_to_print)
