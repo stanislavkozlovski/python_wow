@@ -12,7 +12,7 @@ from constants import (
 from entities import LivingThing, FriendlyNPC, VendorNPC, Monster, Character
 from damage import Damage
 from utils.helper import create_attributes_dict
-from items import Item, Equipment
+from items import Item, Equipment, Weapon
 from buffs import BeneficialBuff, DoT
 
 
@@ -899,6 +899,7 @@ class CharacterTests(unittest.TestCase):
         self.assertTrue(self.dummy.health - original_health >= 1000)
         # assert that the item is not in the inventory anymore
         self.assertTrue(self.item_to_equip.name not in self.dummy.inventory)
+
         # assert that its in the equipment
         self.assertEqual(self.dummy.equipment['headpiece'], self.item_to_equip)
 
@@ -933,7 +934,31 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.equipment['headpiece'], self.item_to_eq)
         # assert that the old item is in the inventory
         self.assertTrue(self.item_to_dequip.name in self.dummy.inventory)
+        self.assertEqual(self.dummy.inventory[self.item_to_dequip.name], (self.item_to_dequip, 1))
 
+    def test_equip_item_weapon(self):
+        original_health = self.dummy.health
+        orig_min_dmg, orig_max_dmg = self.dummy.min_damage, self.dummy.max_damage
+        self.wep_to_eq = Weapon(name='wep', item_id=1, min_damage=10, max_damage=20, attributes=create_attributes_dict(
+            bonus_health=1000, strength=1000
+        ))
+        self.dummy.inventory = {
+            self.wep_to_eq.name: (self.wep_to_eq, 1)
+        }
+        equipped_weapon = self.dummy.equipped_weapon
+        self.assertTrue(equipped_weapon.name not in self.dummy.inventory)
+
+        self.assertNotEqual(self.dummy.equipped_weapon, self.wep_to_eq)
+
+        self.dummy.equip_item(self.wep_to_eq)
+
+        #  assert that the item is equipped and the old item is in the inventory
+        self.assertEqual(self.dummy.equipped_weapon, self.wep_to_eq)
+        self.assertGreater(self.dummy.health, original_health)
+        self.assertTrue(equipped_weapon.name in self.dummy.inventory)
+        # assert that the damage has been modified
+        self.assertGreater(self.dummy.min_damage, orig_min_dmg)
+        self.assertGreater(self.dummy.max_damage, orig_max_dmg)
 
 
 if __name__ == '__main__':
