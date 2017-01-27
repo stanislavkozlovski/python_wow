@@ -1203,6 +1203,23 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.health, expected_health)
         self.assertEqual(self.dummy.mana, expected_mana)
 
+    def test_calculate_stats_formulas(self):
+        """
+        Apart from the horrendous name, this function simply recalculates all our stats after they have allegedly been changed.
+
+        """
+        orig_health, orig_mana, orig_stren = self.dummy.health, self.dummy.mana, self.dummy.attributes['strength']
+        orig_agi, orig_armor = self.dummy.attributes['agility'], self.dummy.attributes['armor']
+
+        # since we've done nothing, calling the method should not change anything
+        for _ in range(50):
+            self.dummy._calculate_stats_formulas()
+
+        self.assertEqual(self.dummy.attributes['strength'], orig_stren)
+        self.assertEqual(self.dummy.attributes['agility'], orig_agi)
+        self.assertEqual(self.dummy.attributes['armor'], orig_armor)
+        self.assertEqual(self.dummy.health, orig_health)
+        self.assertEqual(self.dummy.mana, orig_mana)
 
 if __name__ == '__main__':
     unittest.main()
