@@ -2,6 +2,7 @@
 This module holds helper functions.
 i.e functions that do not serve any specific purpose but are needed in multiple places
 """
+from copy import deepcopy
 
 
 def parse_int(value) -> int:
@@ -48,3 +49,14 @@ def display_attributes(attributes: dict) -> str:
     attributes_to_print = [f'{attr.replace("bonus_", "")}: {val}' for attr, val in attributes.items() if val]
 
     return ", ".join(attributes_to_print)
+
+
+def create_character_attributes_template() -> dict:
+    """
+    Gets the CHARACTER_ATTRIBUTES_TEMPLATE from constants.py,
+        copies it and returns it.
+    This is needed, otherwise Characters would have the same reference to a dictionary, which
+    creates problems while testing and would create problems if players could switch characters
+    """
+    from constants import CHAR_ATTRIBUTES_TEMPLATE  # Hackish import to prevent an import loop
+    return deepcopy(CHAR_ATTRIBUTES_TEMPLATE)

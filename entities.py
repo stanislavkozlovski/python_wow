@@ -10,6 +10,7 @@ from constants import (CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STAT
                        CHAR_STARTER_SUBZONE, CHAR_ATTRIBUTES_TEMPLATE)
 from information_printer import print_level_up_event, print_vendor_products_for_sale
 from exceptions import ItemNotInInventoryError, NonExistantBuffError
+from utils.helper import create_character_attributes_template
 from items import Item, Weapon, Potion, Equipment
 from quest import Quest, FetchQuest
 from decorators import has_item_in_stock
@@ -454,7 +455,7 @@ class Character(LivingThing):
         self.xp_req_to_level = 400
         self.bonus_health = 0
         self.bonus_mana = 0
-        self.attributes: {str: int} = CHAR_ATTRIBUTES_TEMPLATE
+        self.attributes: {str: int} = create_character_attributes_template()
         self._level_up(False)  # level up to 1
         self.current_zone = CHAR_STARTER_ZONE
         self.current_subzone = CHAR_STARTER_SUBZONE

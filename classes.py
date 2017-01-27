@@ -28,6 +28,7 @@ class Paladin(Character):
         super().__init__(name=name, health=health, mana=mana, strength=strength, loaded_scripts=loaded_scripts,
                          killed_monsters=killed_monsters, completed_quests=completed_quests,
                          saved_inventory=saved_inventory, saved_equipment=saved_equipment)
+        # TODO: Equip items AFTER level up
         self.min_damage = 1
         self.max_damage = 3
         self._lookup_and_handle_new_spells()
