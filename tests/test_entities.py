@@ -6,9 +6,10 @@ from io import StringIO
 from collections import Counter
 from exceptions import NonExistantBuffError
 
-
-from constants import KEY_ARMOR_ATTRIBUTE
-from entities import LivingThing, FriendlyNPC, VendorNPC, Monster
+from constants import (
+    KEY_ARMOR_ATTRIBUTE, CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHAR_STARTER_SUBZONE,
+    CHAR_STARTER_ZONE)
+from entities import LivingThing, FriendlyNPC, VendorNPC, Monster, Character
 from damage import Damage
 from items import Item
 from buffs import BeneficialBuff, DoT
@@ -844,6 +845,38 @@ class MonsterTests(unittest.TestCase):
             self.assertIn(expected_message, output.getvalue())
         finally:
             sys.stdout = sys.__stdout__
+
+
+class CharacterTests(unittest.TestCase):
+    def setUp(self):
+        self.name, self.health, self.mana, self.strength = 'Neth', 100, 100, 10
+        self.agility, self.loaded_scripts, self.killed_monsters = 5, set(), set()
+        self.completed_quests, self.saved_inventory, self.saved_equipment = set(), {'gold': 0}, CHARACTER_DEFAULT_EQUIPMENT
+        self.dummy = Character(name=self.name, health=self.health, mana=self.mana, strength=self.strength,
+                               agility=self.agility, loaded_scripts=self.loaded_scripts, killed_monsters=self.killed_monsters,
+                               completed_quests=self.completed_quests, saved_equipment=self.saved_equipment,
+                               saved_inventory=self.saved_inventory)
+
+    def test_init(self):
+        # The damage should be modified since the character is level 1 and has some strength/agi
+        level_one_bonus_stats = CHARACTER_LEVELUP_BONUS_STATS[1]
+        expected_agility = level_one_bonus_stats['agility']   # agility modified armor/strength
+        expected_strength = level_one_bonus_stats['strength'] + (expected_agility * 0.5)
+        expected_armor = level_one_bonus_stats['armor'] + (expected_agility * 2.5)
+        expected_attributes = {
+            'bonus_health': 0,
+            'bonus_mana': 0,
+            'agility': expected_agility,
+            'armor': expected_armor,
+            'strength': expected_strength
+        }
+        self.assertNotEqual(self.dummy.min_damage, 0)
+        self.assertNotEqual(self.dummy.max_health, 1)
+        self.assertEqual(self.dummy.level, 1)
+        self.assertEqual(self.dummy.attributes, expected_attributes)
+        self.assertEqual(self.dummy.current_zone, CHAR_STARTER_ZONE)
+        self.assertEqual(self.dummy.current_subzone, CHAR_STARTER_SUBZONE)
+
 
 if __name__ == '__main__':
     unittest.main()
