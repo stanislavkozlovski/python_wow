@@ -589,6 +589,10 @@ class Character(LivingThing):
         self.bonus_mana = self.attributes[KEY_BONUS_MANA_ATTRIBUTE]
         self.max_mana += self.bonus_mana
 
+        if not self.is_in_combat():
+            self.health = self.max_health
+            self.mana = self.max_mana
+
         # formula for agility is: for each point of agility, add 2.5 armor and 0.5 strength
         agility = self.attributes[KEY_AGILITY_ATTRIBUTE]
         self.attributes[KEY_STRENGTH_ATTRIBUTE] += agility * 0.5
