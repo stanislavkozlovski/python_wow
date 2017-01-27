@@ -1259,5 +1259,20 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.max_health, expected_max_health)
         self.assertEqual(self.dummy.max_mana, expected_max_mana)
 
+    def test_get_auto_attack_damage(self):
+        """
+        The get_auto_attack_damage function returns a Damage object with random physical damage, according to
+        the min/max damage of the character and his level difference
+        """
+        # let them be the same level so no level difference damage is applied
+        for _ in range(100):
+            result: Damage = self.dummy.get_auto_attack_damage(target_level=self.dummy.level)
+            self.assertTrue(isinstance(result, Damage))
+            self.assertEqual(result.magic_dmg, 0)
+            self.assertNotEqual(result.phys_dmg, 0)
+            phys_dmg = result.phys_dmg
+            
+            self.assertTrue(int(self.dummy.min_damage) <= phys_dmg <= int(self.dummy.max_damage))
+
 if __name__ == '__main__':
     unittest.main()
