@@ -2,9 +2,6 @@
 This module holds helper functions.
 i.e functions that do not serve any specific purpose but are needed in multiple places
 """
-from constants import (
-    KEY_ARMOR_ATTRIBUTE, KEY_BONUS_HEALTH_ATTRIBUTE, KEY_BONUS_MANA_ATTRIBUTE,
-    KEY_AGILITY_ATTRIBUTE, KEY_STRENGTH_ATTRIBUTE)
 
 
 def parse_int(value) -> int:
@@ -33,6 +30,9 @@ def create_attributes_dict(bonus_health: int=0, bonus_mana: int=0, armor: int=0,
     pre-defined dictionary holding all of them. This enables easier passing and application of said attributes
     :return: a dict like {"strength": 10, "armor": 4}
     """
+    from constants import (  # Hackish import to prevent an import loop
+        KEY_ARMOR_ATTRIBUTE, KEY_BONUS_HEALTH_ATTRIBUTE, KEY_BONUS_MANA_ATTRIBUTE,
+        KEY_AGILITY_ATTRIBUTE, KEY_STRENGTH_ATTRIBUTE)
 
-    return {KEY_BONUS_HEALTH: bonus_health, KEY_BONUS_MANA: bonus_mana,
-            KEY_ARMOR: armor, KEY_STRENGTH: strength, KEY_AGILITY: agility}
+    return {KEY_BONUS_HEALTH_ATTRIBUTE: bonus_health, KEY_BONUS_MANA_ATTRIBUTE: bonus_mana,
+            KEY_ARMOR_ATTRIBUTE: armor, KEY_STRENGTH_ATTRIBUTE: strength, KEY_AGILITY_ATTRIBUTE: agility}

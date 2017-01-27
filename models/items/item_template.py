@@ -79,13 +79,13 @@ class ItemTemplateSchema(Base):
                 item_min_dmg: int = parse_int(self.min_dmg)
                 item_max_dmg: int = parse_int(self.max_dmg)
 
-                return Weapon(name=item_name, item_id=item_id, attributes_dict=attributes,
+                return Weapon(name=item_name, item_id=item_id, attributes=attributes,
                               buy_price=item_buy_price, sell_price=item_sell_price,
                               min_damage=item_min_dmg, max_damage=item_max_dmg)
             else:
                 item_slot: str = self.sub_type
 
-                return Equipment(name=item_name, item_id=item_id, slot=item_slot, attributes_dict=attributes,
+                return Equipment(name=item_name, item_id=item_id, slot=item_slot, attributes=attributes,
                                  buy_price=item_buy_price, sell_price=item_sell_price)
         elif item_type == 'potion':
             buff_id: int = self.effect

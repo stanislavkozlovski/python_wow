@@ -57,7 +57,7 @@ class ItemTemplateWeaponItemTests(unittest.TestCase):
         self.expected_item = Weapon(name=self.name, item_id=self.item_entry,
                                     buy_price=self.buy_price, sell_price=self.sell_price,
                                     min_damage=self.min_damage, max_damage=self.max_damage,
-                                    attributes_dict=self.attributes)
+                                    attributes=self.attributes)
 
     def test_convert_to_item_object(self):
         received_item = session.query(ItemTemplateSchema).get(self.item_entry).convert_to_item_object()

@@ -60,7 +60,7 @@ class LootTableSchemaTests(unittest.TestCase):
                                      sell_price=1, buff=self.effect, quest_id=0)
         self.expected_item3 = Weapon(name='Worn Axe', item_id=3,
                                     buy_price=1, sell_price=1, min_damage=2, max_damage=6,
-                                    attributes_dict={'bonus_health': 0, 'bonus_mana': 0, 'armor': 0, 'strength': 0, 'agility': 0})
+                                    attributes={'bonus_health': 0, 'bonus_mana': 0, 'armor': 0, 'strength': 0, 'agility': 0})
 
         received_items_count = 0
         for _ in range(100):
