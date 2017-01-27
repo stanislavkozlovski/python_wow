@@ -962,6 +962,22 @@ class CharacterTests(unittest.TestCase):
         self.assertGreater(self.dummy.min_damage, orig_min_dmg)
         self.assertGreater(self.dummy.max_damage, orig_max_dmg)
 
+    def  test_equip_item_non_equippable_item(self):
+        self.item_to_eq = Item(name='Evangelism', item_id=1, buy_price=1, sell_price=1)
+        orig_health, orig_mana, orig_agi, orig_stren = self.dummy.health, self.dummy.mana, self.dummy.attributes['agility'], self.dummy.attributes['strength']
+        self.dummy.inventory = {
+            self.item_to_eq.name: (self.item_to_eq, 1)
+        }
+
+        # assert that nothing has happened
+        self.assertEqual(self.dummy.health, orig_health)
+        self.assertEqual(self.dummy.mana, orig_mana)
+        self.assertEqual(self.dummy.attributes['agility'], orig_agi)
+        self.assertEqual(self.dummy.attributes['strength'], orig_stren)
+        # assert that the item has not moved
+        self.assertTrue(self.item_to_eq.name in self.dummy.inventory)
+        self.assertEqual(self.dummy.inventory[self.item_to_eq.name], (self.item_to_eq, 1))
+
 
 if __name__ == '__main__':
     unittest.main()
