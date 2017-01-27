@@ -1177,6 +1177,32 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.health, expected_health)
         self.assertEqual(self.dummy.mana, expected_mana)
 
+    def test_subtract_attributes_empty_attributes(self):
+        # subtract the strength/armor because we will recalculate the added values from the agility
+        orig_health, orig_mana, orig_stren = self.dummy.health, self.dummy.mana, self.dummy.attributes[
+            'strength'] - self.dummy.bonus_strength
+        orig_agi, orig_armor = self.dummy.attributes['agility'], self.dummy.attributes['armor'] - self.dummy.bonus_armor
+
+        subtracted_agi, subtracted_health, subtracted_mana = 0, 0, 0
+        expected_agility = orig_agi - subtracted_agi
+        expected_strength = orig_stren + (expected_agility * 0.5)
+        expected_armor = orig_armor + (expected_agility * 2.5)
+        expected_health = orig_health - subtracted_health
+        expected_mana = orig_mana - subtracted_mana
+
+        attributes_to_add = create_attributes_dict(bonus_health=0, bonus_mana=0,
+                                                   strength=0,
+                                                   agility=0, armor=0)
+
+        # Act
+        self.dummy._subtract_attributes(attributes_to_add)
+
+        self.assertEqual(self.dummy.attributes['strength'], expected_strength)
+        self.assertEqual(self.dummy.attributes['agility'], expected_agility)
+        self.assertEqual(self.dummy.attributes['armor'], expected_armor)
+        self.assertEqual(self.dummy.health, expected_health)
+        self.assertEqual(self.dummy.mana, expected_mana)
+
 
 if __name__ == '__main__':
     unittest.main()
