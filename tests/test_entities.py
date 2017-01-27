@@ -3,6 +3,7 @@ from unittest.mock import Mock
 import sys
 import termcolor
 from io import StringIO
+from copy import deepcopy
 from collections import Counter
 from exceptions import NonExistantBuffError
 
@@ -852,7 +853,7 @@ class CharacterTests(unittest.TestCase):
     def setUp(self):
         self.name, self.health, self.mana, self.strength = 'Neth', 100, 100, 10
         self.agility, self.loaded_scripts, self.killed_monsters = 5, set(), set()
-        self.completed_quests, self.saved_inventory, self.saved_equipment = set(), {'gold': 0}, CHARACTER_DEFAULT_EQUIPMENT
+        self.completed_quests, self.saved_inventory, self.saved_equipment = set(), {'gold': 0}, deepcopy(CHARACTER_DEFAULT_EQUIPMENT)
         self.dummy = Character(name=self.name, health=self.health, mana=self.mana, strength=self.strength,
                                agility=self.agility, loaded_scripts=self.loaded_scripts, killed_monsters=self.killed_monsters,
                                completed_quests=self.completed_quests, saved_equipment=self.saved_equipment,
@@ -956,6 +957,7 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.equipped_weapon, self.wep_to_eq)
         self.assertGreater(self.dummy.health, original_health)
         self.assertTrue(equipped_weapon.name in self.dummy.inventory)
+        self.assertEqual(self.dummy.inventory[equipped_weapon.name], (equipped_weapon, 1))
         # assert that the damage has been modified
         self.assertGreater(self.dummy.min_damage, orig_min_dmg)
         self.assertGreater(self.dummy.max_damage, orig_max_dmg)
