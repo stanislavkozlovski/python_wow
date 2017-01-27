@@ -1109,6 +1109,7 @@ class CharacterTests(unittest.TestCase):
         The add_attributes function simply takes a dictionary of expected attributes and adds them
         to the character's
         """
+        # subtract the strength/armor because we will recalculate the added values from the agility
         orig_health, orig_mana, orig_stren = self.dummy.health, self.dummy.mana, self.dummy.attributes['strength'] - self.dummy.bonus_strength
         orig_agi, orig_armor = self.dummy.attributes['agility'], self.dummy.attributes['armor'] - self.dummy.bonus_armor
 
@@ -1129,6 +1130,24 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.attributes['armor'], expected_armor)
         self.assertEqual(self.dummy.health, expected_health)
         self.assertEqual(self.dummy.mana, expected_mana)
+
+    def test_add_attributes_empty_attributes(self):
+        """
+        Nothing should change
+        """
+        orig_health, orig_mana, orig_stren = self.dummy.health, self.dummy.mana, self.dummy.attributes['strength']
+        orig_agi, orig_armor = self.dummy.attributes['agility'], self.dummy.attributes['armor']
+
+        attributes_to_add = create_attributes_dict()  # is empty
+
+        self.dummy._add_attributes(attributes_to_add)
+
+        self.assertEqual(self.dummy.attributes['strength'], orig_stren)
+        self.assertEqual(self.dummy.attributes['agility'], orig_agi)
+        self.assertEqual(self.dummy.attributes['armor'], orig_armor)
+        self.assertEqual(self.dummy.health, orig_health)
+        self.assertEqual(self.dummy.mana, orig_mana)
+
 
 if __name__ == '__main__':
     unittest.main()
