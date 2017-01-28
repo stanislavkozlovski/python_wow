@@ -598,31 +598,8 @@ class Character(LivingThing):
         self._bonus_mana = self.attributes[KEY_BONUS_MANA_ATTRIBUTE]
         self.max_mana += self._bonus_mana
 
-        is_in_combat = self.is_in_combat()
-        if orig_max_h < self.max_health and not is_in_combat:
-            hp_increase = self.max_health - orig_max_h
-            self.health += hp_increase
-        elif orig_max_h > self.max_health:
-            hp_decrease = orig_max_h - self.max_health
-            if self.health > self.max_health:
-                self.health -= hp_decrease
-                if self.health != self.max_health:
-                    raise Exception('Expected health to be equal to the max hp once decreased')
-            elif not is_in_combat:
-                """ If the character's health is not over the max_health and only out of combat,
-                    decrease his current HP"""
-                self.health -= hp_decrease
-        if orig_max_m < self.max_mana and not is_in_combat:
-            mana_increase = self.max_mana - orig_max_m
-            self.mana += mana_increase
-        elif orig_max_m > self.max_mana:
-            mana_decrease = orig_max_m - self.max_mana
-            if self.mana > self.max_mana:
-                self.mana -= mana_decrease
-                if self.mana != self.max_mana:
-                    raise Exception('Expected mana to be equal to the max hp once decreased')
-            elif not is_in_combat:
-                self.mana -= mana_decrease
+        self._handle_health_change(orig_max_h)
+        self._handle_mana_change(orig_max_m)
 
         # formula for agility is: for each point of agility, add 2.5 armor and 0.5 strength
         agility = self.attributes[KEY_AGILITY_ATTRIBUTE]
@@ -643,6 +620,44 @@ class Character(LivingThing):
         strength = self.attributes[KEY_STRENGTH_ATTRIBUTE]
         self.min_damage = self.equipped_weapon.min_damage + (0.4 * strength)
         self.max_damage = self.equipped_weapon.max_damage + (0.4 * strength)
+
+    def _handle_health_change(self, orig_max_h):
+        """ Handles cases where the maximum health of the Character has been changed"""
+        if orig_max_h < self.max_health and not self.is_in_combat():  # Has increased
+            # Increase the current health only if the character is out of combat
+            hp_increase = self.max_health - orig_max_h
+            self.health += hp_increase
+        elif orig_max_h > self.max_health:  # Has decreased
+            hp_decrease = orig_max_h - self.max_health
+            if self.health > self.max_health:
+                self.health -= hp_decrease
+                if self.health != self.max_health:
+                    raise Exception('Expected health to be equal to the max hp once decreased')
+            elif not self.is_in_combat():
+                """
+                If the character's health is not over the max_health and only out of combat,
+                decrease his current HP
+                """
+                self.health -= hp_decrease
+
+    def _handle_mana_change(self, orig_max_m):
+        """ Handles cases where the maximum mana of the Character has been changed"""
+        if orig_max_m < self.max_mana and not self.is_in_combat():  # Has increased
+            # Increase the current mana only if the character is out of combat
+            m_increase = self.max_mana - orig_max_m
+            self.mana += m_increase
+        elif orig_max_m > self.max_mana:  # Has decreased
+            m_decrease = orig_max_m - self.max_mana
+            if self.mana > self.max_mana:
+                self.mana -= m_decrease
+                if self.mana != self.max_mana:
+                    raise Exception('Expected mana to be equal to the max hp once decreased')
+            elif not self.is_in_combat():
+                """
+                If the character's mana is not over the max_mana and only out of combat,
+                decrease his current HP
+                """
+                self.mana -= m_decrease
 
     def spell_handler(self, command: str, target: Monster):
         """
