@@ -1378,6 +1378,25 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.attributes['strength'], expected_strength)
         self.assertEqual(self.dummy.attributes['armor'], expected_armor)
 
+    def test_apply_buff_low_hp_out_of_combat(self):
+        """
+        Have a character be at low HP and apply a buff which increases his HP
+        by 10. If he is out of combat, his health should increase by 10 points
+
+        NOTE: This is somewhat irrelevant, as there should not be a case where the
+        character's HP is anything less than maximum while out of combat... but who knows
+        what can happen
+        """
+        health_inc = 10
+        health_buff = BeneficialBuff(name="SMALL_HEALTH", buff_stats_and_amounts=[('health', health_inc)], duration=20)
+        self.dummy._subtract_health(Damage(phys_dmg=90))
+        left_hp = self.dummy.health
+        expected_hp = left_hp + health_inc
+
+        self.dummy._apply_buff(health_buff)
+
+        self.assertEqual(self.dummy.health, expected_hp)
+
     def test_deapply_buff(self):
         stren_increase, armor_increase, health_inc, mana_inc = 100, 100, 100, 100
         test_buff = BeneficialBuff(name="Silence", buff_stats_and_amounts=(('strength', stren_increase), ('armor', armor_increase), ('health', health_inc), ('mana', mana_inc)), duration=5)
