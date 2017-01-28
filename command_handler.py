@@ -8,6 +8,7 @@ from information_printer import (print_live_npcs, print_live_monsters, print_que
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar,
                                  print_character_equipment)
 from constants import ZONE_MOVE_BLOCK_SPECIAL_KEY
+from utils.helper import get_guid_by_name
 from information_printer import print_quest_log, print_vendor_products_for_sale
 # handlers here!
 
@@ -296,23 +297,3 @@ def handle_combat_print_stats_command(character, monster):
 def handle_combat_print_xp_command(character):
     """ this function handles the 'print xp' command, showing the player's current experience bar while in combat """
     print_character_xp_bar(character)
-
-
-def get_guid_by_name(name: str, guid_name_set: set):
-    """
-    A function that returns a GUID which is associated with the given name,
-    if there is no such one, return None
-    :param name: The name of the creature you want to get a GUID of
-    :return: the GUID you're searching for
-    """
-    # TODO: Move
-    for guid, _name in guid_name_set:
-        if _name == name:
-            return guid
-
-    return None
-
-
-
-
-

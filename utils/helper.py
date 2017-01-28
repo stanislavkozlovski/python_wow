@@ -60,3 +60,18 @@ def create_character_attributes_template() -> dict:
     """
     from constants import CHAR_ATTRIBUTES_TEMPLATE  # Hackish import to prevent an import loop
     return deepcopy(CHAR_ATTRIBUTES_TEMPLATE)
+
+
+def get_guid_by_name(name: str, guid_names: {(int, str)}):
+    """
+    A function that returns a GUID which is associated with the given name,
+    if there is no such one, return None
+    :param guid_names: A set of tuples, holding the GUID and NAME
+    :param name: The name of the creature you want to get a GUID of
+    :return: the GUID you're searching for
+    """
+    for guid, potential_name in guid_names:
+        if potential_name == name:
+            return guid
+
+    return None
