@@ -625,6 +625,11 @@ class MonsterTests(unittest.TestCase):
         It calls the victim's take_attack function with the damage dealt
         """
         output = StringIO()
+        # Increase the damage difference so there is a minimal chance to get the same damage twice in a row (for the test)
+        self.max_damage = 1000
+        self.min_damage = 0
+        self.dummy.max_damage = self.max_damage
+        self.dummy.min_damage = self.min_damage
         victim_level = self.dummy.level
         # Modify the take_attack function to print the damage it took so we can assert it takes the appropriate damage
         victim_mock = Mock(take_attack=lambda *args: print(args[1].phys_dmg), level=victim_level)
@@ -634,7 +639,7 @@ class MonsterTests(unittest.TestCase):
             self.dummy.attack(victim_mock)
             # the damage should be different, since it's always random
             std_output = output.getvalue()
-            self.assertNotIn(str(expected_damage.phys_dmg), std_output)
+            self.assertNotIn(str(expected_damage.phys_dmg), std_output)   # WARNING: RANDOM!
             dealt_dmg: float = float(std_output)
             self.assertTrue(self.min_damage <= dealt_dmg <= self.max_damage)
         finally:
@@ -1418,6 +1423,70 @@ class CharacterTests(unittest.TestCase):
 
         try:
             self.dummy._handle_health_change(orig_max_health)
+            self.fail()
+        except Exception as e:
+            self.assertEqual(str(e), expected_message)
+
+    def test_handle_mana_change_increase_out_of_combat(self):
+        """
+        The handle_mana_change function fixes up the character's current mana when
+        his max mana has been modified. (via a Buff most likely)
+        """
+        # Remove 50 from his mana and add 49 to his max mana, he should be at 99/149 mana
+        original_max_mana = self.dummy.max_mana
+        self.dummy.mana -= 50
+        mana_inc = 49
+        self.dummy.max_mana += mana_inc
+        expected_mana, expected_max_mana = 99, 149
+
+        self.dummy._handle_mana_change(original_max_mana)
+
+        self.assertEqual(self.dummy.mana, expected_mana)
+        self.assertEqual(self.dummy.max_mana, expected_max_mana)
+
+    def test_handle_mana_change_decrease_out_of_combat(self):
+        # Remove 50 from his mana and decrease his max mana by 40, his current mana should be unchanged
+        original_max_mana = self.dummy.max_mana
+        self.dummy.mana -= 50  # simulate damage
+        mana_dec = 49
+        self.dummy.max_mana -= mana_dec
+        # Since its out of combat, his current mana should drop as well
+        expected_mana, expected_max_mana = 1, 51
+
+        self.dummy._handle_mana_change(original_max_mana)
+
+        self.assertEqual(self.dummy.mana, expected_mana)
+        self.assertEqual(self.dummy.max_mana, expected_max_mana)
+
+    def test_handle_mana_change_decrease_in_combat(self):
+        # Remove 50 from his mana and decrease his max mana by 40, his current mana should be unchanged
+        original_max_mana = self.dummy.max_mana
+        self.dummy.enter_combat()
+        self.dummy.mana -= 50  # simulate damage
+        mana_dec = 49
+        self.dummy.max_mana -= mana_dec
+        # Since its in combat, his current mana should not be affected
+        expected_mana, expected_max_mana = 50, 51
+
+        self.dummy._handle_mana_change(original_max_mana)
+
+        self.assertEqual(self.dummy.mana, expected_mana)
+        self.assertEqual(self.dummy.max_mana, expected_max_mana)
+
+    def test_handle_mana_invalid_should_raise_exception(self):
+        """
+        Decrease an already invalid mana,, it should see that the character's current
+        mana is bigger than the max mana and subtract the amount of mana that was decreased (10).
+        But after finding that they're still not equal, it should raise an exception
+        """
+        expected_message = 'Expected mana to be equal to the max hp once decreased'
+        orig_max_mana = self.dummy.max_mana
+        self.dummy.mana = self.dummy.max_mana + 1  # Health is already invalid
+        mana_dec = 10
+        self.dummy.max_mana -= mana_dec
+
+        try:
+            self.dummy._handle_mana_change(orig_max_mana)
             self.fail()
         except Exception as e:
             self.assertEqual(str(e), expected_message)
