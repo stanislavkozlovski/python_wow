@@ -1640,6 +1640,17 @@ class CharacterTests(unittest.TestCase):
         self.assertIn(quest.ID, self.dummy.quest_log)
         self.assertEqual(self.dummy.quest_log[quest.ID], quest)
 
+    def test_add_quest_already_added(self):
+        """ Add a quest twice, expect it to raise an exception the second time """
+        quest = Quest(quest_id=1, quest_name="Vices", item_reward_dict={}, level_required=1,
+                      reward_choice_enabled=False, xp_reward=500)
+        expected_message = f'{quest.name} is already in your quest log!'
+        self.dummy.add_quest(quest)
+        try:
+            self.dummy.add_quest(quest)
+            self.fail()
+        except Exception as e:
+            self.assertEqual(str(e), expected_message)
 
 if __name__ == '__main__':
     unittest.main()
