@@ -589,16 +589,40 @@ class Character(LivingThing):
         """
 
         # update health according to bonus health
+        orig_max_h = self.max_health
         self.max_health -= self._bonus_health  # remove the old bonus health
         self._bonus_health = self.attributes[KEY_BONUS_HEALTH_ATTRIBUTE]  # update bonus health
         self.max_health += self._bonus_health  # add bonus health again
+        orig_max_m = self.max_mana
         self.max_mana -= self._bonus_mana
         self._bonus_mana = self.attributes[KEY_BONUS_MANA_ATTRIBUTE]
         self.max_mana += self._bonus_mana
 
-        if not self.is_in_combat():
-            self.health = self.max_health
-            self.mana = self.max_mana
+        is_in_combat = self.is_in_combat()
+        if orig_max_h < self.max_health and not is_in_combat:
+            hp_increase = self.max_health - orig_max_h
+            self.health += hp_increase
+        elif orig_max_h > self.max_health:
+            hp_decrease = orig_max_h - self.max_health
+            if self.health > self.max_health:
+                self.health -= hp_decrease
+                if self.health != self.max_health:
+                    raise Exception('Expected health to be equal to the max hp once decreased')
+            elif not is_in_combat:
+                """ If the character's health is not over the max_health and only out of combat,
+                    decrease his current HP"""
+                self.health -= hp_decrease
+        if orig_max_m < self.max_mana and not is_in_combat:
+            mana_increase = self.max_mana - orig_max_m
+            self.mana += mana_increase
+        elif orig_max_m > self.max_mana:
+            mana_decrease = orig_max_m - self.max_mana
+            if self.mana > self.max_mana:
+                self.mana -= mana_decrease
+                if self.mana != self.max_mana:
+                    raise Exception('Expected mana to be equal to the max hp once decreased')
+            elif not is_in_combat:
+                self.mana -= mana_decrease
 
         # formula for agility is: for each point of agility, add 2.5 armor and 0.5 strength
         agility = self.attributes[KEY_AGILITY_ATTRIBUTE]
@@ -648,19 +672,15 @@ class Character(LivingThing):
         self._subtract_health(damage)
 
     def _apply_buff(self, buff: BeneficialBuff):
-        """ Add the buff to the character's stats"""
-        buff_attributes = buff.get_buffed_attributes()  # type: dict
+        """ Add the buffed attributes to the character's stats"""
+        buff_attributes: {str: int} = buff.get_buffed_attributes()
 
         # iterate through the buffed attributes and apply them to the character
         for buff_type, buff_amount in buff_attributes.items():
             if buff_type == "health":
-                if not self._in_combat:
-                    self.health += buff_amount
-                self.max_health += buff_amount
+                self.attributes[KEY_BONUS_HEALTH_ATTRIBUTE] += buff_amount
             elif buff_type == "mana":
-                if not self._in_combat:
-                    self.mana += buff_amount
-                self.max_mana += buff_amount
+                self.attributes[KEY_BONUS_MANA_ATTRIBUTE] += buff_amount
             else:
                 self.attributes[buff_type] += buff_amount
 
@@ -668,16 +688,14 @@ class Character(LivingThing):
 
     def _deapply_buff(self, buff: BeneficialBuff):
         """ Remove the buff from the character's stats"""
-        buff_attributes = buff.get_buffed_attributes()  # type: dict
+        buff_attributes: {str: int} = buff.get_buffed_attributes()
 
-        # iterate through the buffed attributes and remove them fromthe character
+        # iterate through the buffed attributes and remove them from the character
         for buff_type, buff_amount in buff_attributes.items():
             if buff_type == "health":
-                # TODO: Reduce health method to reduce active health too, otherwise we can end up with 10/5 HP
-                self.max_health -= buff_amount
+                self.attributes[KEY_BONUS_HEALTH_ATTRIBUTE] -= buff_amount
             elif buff_type == "mana":
-                # TODO: Reduce mana method to reduce active mana too
-                self.max_mana -= buff_amount
+                self.attributes[KEY_BONUS_MANA_ATTRIBUTE] -= buff_amount
             else:
                 self.attributes[buff_type] -= buff_amount
 
