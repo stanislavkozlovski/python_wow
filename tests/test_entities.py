@@ -1594,6 +1594,19 @@ class CharacterTests(unittest.TestCase):
         self.assertFalse(self.dummy.has_item('item'))
         self.assertFalse(self.dummy.has_item('gold'))
 
+    def test_buy_item(self):
+        item_to_buy = Item(name='NuItem', item_id=1, buy_price=1, sell_price=1)
+        sale = (item_to_buy, 10, 10)
+        self.dummy.inventory['gold'] = 11
+        expected_gold = 1
+        
+        self.dummy.buy_item(sale)
+
+        # assert that we bought 10 NuItems for 10 NuItems for 10 Gold
+        self.assertEqual(self.dummy.inventory['gold'], expected_gold)
+        self.assertTrue('NuItem' in self.dummy.inventory)
+        self.assertEqual(self.dummy.inventory['NuItem'], (item_to_buy, 10))
+
 
 if __name__ == '__main__':
     unittest.main()
