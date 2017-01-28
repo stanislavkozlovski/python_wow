@@ -478,8 +478,8 @@ class Character(LivingThing):
         super().start_turn_update()
         self.update_spell_cooldowns()
 
-    def add_item_to_inventory(self, item: Item):
-        count = 1
+    def add_item_to_inventory(self, item: Item, item_count=1):
+        count = item_count
         if item.name in self.inventory:
             count += self.inventory[item.name][1]
 
@@ -823,7 +823,7 @@ class Character(LivingThing):
         store it as a tuple holding (Item Object, Item Count) """
         item_quest_id = item.quest_id
 
-        self.add_item_to_inventory(item)
+        self.add_item_to_inventory(item, item_count)
 
         if item_quest_id and item_quest_id in self.quest_log and not self.quest_log[item_quest_id].is_completed:
             # if the item is related to a quest and if we have that quest and said quest is not completed
