@@ -1689,6 +1689,35 @@ class CharacterTests(unittest.TestCase):
         except Exception as e:
             self.assertEqual(str(e), expected_message)
 
+    def test_complete_quest_kill_quest(self):
+        item1_name, item2_name = 'Item', 'Item2'
+        orig_xp = self.dummy.experience
+        kill_quest = KillQuest(quest_name='Kill !', quest_id=5, required_kills=10, required_monster='some',
+                               xp_reward=10, item_reward_dict={item1_name: Item(item1_name, 1, 1, 1),
+                                                               item2_name: Item(item2_name, 2, 2, 2)},
+                               level_required=1, reward_choice_enabled=False)
+        expected_message = f'Quest {kill_quest.name} is completed! XP awarded: {kill_quest.xp_reward}!'
+        self.assertNotIn(item1_name, self.dummy.inventory)
+        self.assertNotIn(item2_name, self.dummy.inventory)
+
+        self.dummy.quest_log = {kill_quest.ID: kill_quest}
+        try:
+            output = StringIO()
+            sys.stdout = output
+            self.dummy._complete_quest(kill_quest)
+
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+        # the player should be awarded with both items and experience
+        # the quest should also be added into the player's completed_quests
+        # it should also not be in his quest log
+        self.assertNotIn(kill_quest.ID, self.dummy.quest_log)
+        self.assertIn(item1_name, self.dummy.inventory)
+        self.assertIn(item2_name, self.dummy.inventory)
+        self.assertEqual(self.dummy.experience, orig_xp + kill_quest.xp_reward)
+        self.assertIn(kill_quest.ID, self.dummy.completed_quests)
+
 
 if __name__ == '__main__':
     unittest.main()
