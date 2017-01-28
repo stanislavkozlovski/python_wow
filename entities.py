@@ -768,6 +768,9 @@ class Character(LivingThing):
         self.award_gold(gold_award)
 
     def add_quest(self, quest: Quest):
+        if quest.ID in self.quest_log:
+            raise Exception(f'{quest.name} is already in your quest log!')
+
         self.quest_log[quest.ID] = quest
 
     def _check_if_quest_completed(self, quest: Quest):
