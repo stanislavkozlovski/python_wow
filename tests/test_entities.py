@@ -1104,6 +1104,15 @@ class CharacterTests(unittest.TestCase):
             self.assertIn(item_mock.name, self.dummy.inventory)
             self.assertEqual(self.dummy.inventory[item_mock.name], (item_mock, i+1))
 
+    def test_add_item_to_inventory_multiple_items(self):
+        item_mock = Mock(name='someItemBitch')
+        self.assertNotIn(item_mock.name, self.dummy.inventory)
+
+        self.dummy.add_item_to_inventory(item_mock, 200)
+
+        self.assertIn(item_mock.name, self.dummy.inventory)
+        self.assertEqual(self.dummy.inventory[item_mock.name], (item_mock, 200))
+
     def test_add_attributes(self):
         """
         The add_attributes function simply takes a dictionary of expected attributes and adds them
@@ -1348,7 +1357,6 @@ class CharacterTests(unittest.TestCase):
         self.dummy.take_attack('', dmg_to_take, attacker_level)
 
         self.assertEqual(self.dummy.health, round(orig_health-expected_dmg, 1))
-
 
 if __name__ == '__main__':
     unittest.main()
