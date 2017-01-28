@@ -6,8 +6,8 @@ class Quest:
         self.xp_reward = xp_reward
         self.is_completed = is_completed
         self.required_level = level_required
-        self.item_rewards = item_reward_dict  # dictionary for the rewards key: item name, value: item object
-        self.reward_choice_enabled = reward_choice_enabled  # type: bool
+        self.item_rewards: {str: 'Item'} = item_reward_dict
+        self.reward_choice_enabled: bool = reward_choice_enabled
 
     def __eq__(self, other):
         return self.ID == other.ID
@@ -30,13 +30,13 @@ class Quest:
         """ this method gives the player his items, or if he has to choose one, opens up the window where
         he makes the choice and gives him that item.
         This method is called from the Character class in entities.py"""
-        from command_handler import handle_quest_item_choice
-
         if self.reward_choice_enabled:
+            from command_handler import handle_quest_item_choice
+
             return handle_quest_item_choice(self.item_rewards)
         else:
             # return a list of all the instances of Item
-            return list(filter(lambda x: x is not None,  self.item_rewards.values()))
+            return [item for item in self.item_rewards.values() if item is not None]
 
 
 class KillQuest(Quest):
@@ -73,7 +73,7 @@ class FetchQuest(Quest):
                  reward_choice_enabled: bool, level_required: int, required_item_count: int, is_completed: bool = False):
         super().__init__(quest_name, quest_id, xp_reward, item_reward_dict, reward_choice_enabled,
                          level_required, is_completed)
-        self.required_item = required_item
+        self.required_item: str = required_item
         self.required_item_count = required_item_count
 
     def __str__(self):
