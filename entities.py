@@ -3,7 +3,6 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 """
 import random
 from termcolor import colored
-
 from constants import (CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS,
                        KEY_ARMOR_ATTRIBUTE, KEY_STRENGTH_ATTRIBUTE, KEY_AGILITY_ATTRIBUTE, KEY_BONUS_HEALTH_ATTRIBUTE,
                        KEY_BONUS_MANA_ATTRIBUTE, KEY_LEVEL_STATS_HEALTH, KEY_LEVEL_STATS_MANA, CHAR_STARTER_ZONE,
@@ -204,7 +203,7 @@ class LivingThing:
 
     def take_dot_proc(self, dot: DoT):
         """ this method damages the entity for the dot's proc"""
-        dot_proc_damage = dot.damage  # type: Damage
+        dot_proc_damage: Damage = dot.damage
 
         # due to the way Damage handles addition, subtraction and multiplication, the _calculate_level_difference_damage
         # method below works fine with Damage type
@@ -212,8 +211,12 @@ class LivingThing:
         dot_proc_damage = self._calculate_level_difference_damage(damage_to_deal=dot_proc_damage,
                                                                   target_level=dot.level,
                                                                   inverse=True)
-        # noinspection PyTypeChecker
-        dot_proc_damage = self._apply_damage_absorption(damage=dot_proc_damage)
+        if dot_proc_damage.phys_dmg:  # if there is physical damage in the DoT, apply armor reduction
+            dot_proc_damage = self._apply_armor_reduction(damage=dot_proc_damage,
+                                                          attacker_level=self.level)
+        if self.absorption_shield:  # if we have a shield
+            dot_proc_damage = self._apply_damage_absorption(dot_proc_damage)
+
 
         print(f'{self.name} suffers {dot_proc_damage} from {dot.name}!')
         self._subtract_health(dot_proc_damage)
@@ -641,19 +644,6 @@ class Character(LivingThing):
 
         print(f'{monster_name} attacks {self.name} for {damage}!')
         self._subtract_health(damage)
-
-    def take_dot_proc(self, dot: DoT):
-        """ this method damages the character for the dot's proc"""
-        dot_proc_damage = dot.damage  # type: Damage
-
-        if dot_proc_damage.phys_dmg:  # if there is physical damage in the DoT, apply armor reduction
-            dot_proc_damage = self._apply_armor_reduction(damage=dot_proc_damage,
-                                                                    attacker_level=self.level)
-        if self.absorption_shield:  # if we have a shield
-            dot_proc_damage = self._apply_damage_absorption(dot_proc_damage)
-
-        print(f'{self.name} suffers {dot_proc_damage} from {dot.name}!')
-        self._subtract_health(dot_proc_damage)
 
     def _apply_buff(self, buff: BeneficialBuff):
         """ Add the buff to the character's stats"""
