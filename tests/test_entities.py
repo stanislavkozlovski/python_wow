@@ -12,6 +12,7 @@ from constants import (
     CHAR_STARTER_ZONE)
 from entities import LivingThing, FriendlyNPC, VendorNPC, Monster, Character
 from damage import Damage
+from quest import Quest, FetchQuest, KillQuest
 from utils.helper import create_attributes_dict
 from items import Item, Equipment, Weapon, Potion
 from buffs import BeneficialBuff, DoT
@@ -1626,6 +1627,18 @@ class CharacterTests(unittest.TestCase):
         # assert that he does not have the item anymore
         self.assertNotIn(item_name, self.dummy.inventory)
         self.assertEqual(self.dummy.inventory['gold'], sell_price * 2)
+
+    def test_add_quest(self):
+        """
+        Simply adds a quest to the Character's quest_log
+        """
+        quest = Quest(quest_id=1, quest_name="Vices", item_reward_dict={}, level_required=1,
+                      reward_choice_enabled=False,  xp_reward=500)
+
+        self.assertNotIn(quest.ID, self.dummy.quest_log)
+        self.dummy.add_quest(quest)
+        self.assertIn(quest.ID, self.dummy.quest_log)
+        self.assertEqual(self.dummy.quest_log[quest.ID], quest)
 
 
 if __name__ == '__main__':
