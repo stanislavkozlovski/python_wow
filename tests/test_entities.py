@@ -1404,6 +1404,24 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.health, expected_health)
         self.assertEqual(self.dummy.max_health, expected_max_health)
 
+    def test_handle_health_invalid_should_raise_exception(self):
+        """
+        Decrease an already invalid health,, it should see that the character's current
+        health is bigger than the max health and subtract the amount of health that was decreased (10).
+        But after finding that they're still not equal, it should raise an exception
+        """
+        expected_message = 'Expected health to be equal to the max hp once decreased'
+        orig_max_health = self.dummy.max_health
+        self.dummy.health = self.dummy.max_health + 1  # Health is already invalid
+        health_dec = 10
+        self.dummy.max_health -= health_dec
+
+        try:
+            self.dummy._handle_health_change(orig_max_health)
+            self.fail()
+        except Exception as e:
+            self.assertEqual(str(e), expected_message)
+
     def test_apply_buff(self):
         """
         The difference with this _apply_buff function to the other is
