@@ -749,21 +749,21 @@ class Character(LivingThing):
 
         self.award_item(item, item_count)
 
-    def sell_item(self, item: str):
+    def sell_item(self, item_name: str):
         """
         This method is used when the character sells an item to the vendor.
         We give **him** the item and he gives us gold for it
         """
-        item, item_count = self.inventory[item]
+        item, item_count = self.inventory[item_name]
 
         # remove the item from the inventory
         if item_count == 1:
             del self.inventory[item.name]
         else:
-            self.inventory[item] = (item, item_count-1)
+            self.inventory[item_name] = (item, item_count-1)
 
         gold_award = item.sell_price
-        print(f'You have sold {item.name} for {gold_award} gold.')
+        print(f'You have sold {item_name} for {gold_award} gold.')
         print()
         self.award_gold(gold_award)
 
