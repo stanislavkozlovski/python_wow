@@ -114,6 +114,9 @@ def handle_vendor_sale(character, vendor):
             item = command[5:]  # name of the item
             if character.has_item(item):
                 character.sell_item(item)
+            else:
+                print(f'You do not have {item} in your inventory!')
+                print()
         elif 'info' in command:
             item_name = command[:-5]  # name of item
 

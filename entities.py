@@ -734,7 +734,7 @@ class Character(LivingThing):
 
         return item in self.inventory.keys()
 
-    def buy_item(self, sale: tuple):
+    def buy_item(self, sale: (Item, int, int)):
         """
         This method is used when we buy an item from a vendor. It subtracts the price of the item from our gold and
         gives us the item in our inventory
@@ -754,22 +754,18 @@ class Character(LivingThing):
         This method is used when the character sells an item to the vendor.
         We give **him** the item and he gives us gold for it
         """
-        if not self.inventory[item]:
-            print(f'You do not have {item} in your inventory!')
-            print()
+        item, item_count = self.inventory[item]
+
+        # remove the item from the inventory
+        if item_count == 1:
+            del self.inventory[item.name]
         else:
-            item, item_count = self.inventory[item]
+            self.inventory[item] = (item, item_count-1)
 
-            # remove the item from the inventory
-            if item_count == 1:
-                del self.inventory[item.name]
-            else:
-                self.inventory[item] = (item, item_count-1)
-
-            gold_award = item.sell_price
-            print(f'You have sold {item.name} for {gold_award} gold.')
-            print()
-            self.award_gold(gold_award)
+        gold_award = item.sell_price
+        print(f'You have sold {item.name} for {gold_award} gold.')
+        print()
+        self.award_gold(gold_award)
 
     def add_quest(self, quest: Quest):
         self.quest_log[quest.ID] = quest
