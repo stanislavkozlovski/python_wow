@@ -774,6 +774,8 @@ class Character(LivingThing):
         self.quest_log[quest.ID] = quest
 
     def _check_if_quest_completed(self, quest: Quest):
+        if quest.ID not in self.quest_log:
+            raise Exception(f'You do not have {quest.name} in your quest log!')
         if quest.is_completed:
             self._complete_quest(quest)
 
