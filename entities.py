@@ -728,6 +728,10 @@ class Character(LivingThing):
 
     def has_item(self, item: str) -> bool:
         """ This method checks if the character has the item in his inventory"""
+        if item == 'gold':
+            # gold is a special keyword used to store the gold in the inventory
+            return False
+
         return item in self.inventory.keys()
 
     def buy_item(self, sale: tuple):
