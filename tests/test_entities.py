@@ -1406,6 +1406,26 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.attributes['strength'], orig_strength)
         self.assertEqual(self.dummy.attributes['armor'], orig_armor)
 
+    def test_deapply_buff_with_health_in_combat(self):
+        """
+        Apply a buff to the user while out of combat, giving him health
+         and remove the buff while he is in combat. The maximum health should
+         not be less than the current health
+        """
+        health_inc = 100
+        health_buff = BeneficialBuff('HEALTH', buff_stats_and_amounts=[('health', health_inc)], duration=5)
+        orig_health, orig_max_health = self.dummy.health, self.dummy.max_health
+        self.dummy._apply_buff(health_buff)
+        self.assertEqual(self.dummy.health, orig_health + health_inc)
+        self.assertEqual(self.dummy.max_health, orig_max_health + health_inc)
+
+        self.dummy.enter_combat()
+        self.dummy._deapply_buff(health_buff)
+
+        self.assertEqual(self.dummy.health, orig_health)
+        self.assertEqual(self.dummy.max_health, orig_max_health)
+        self.assertGreaterEqual(self.dummy.max_health, self.dummy.health)
+
 
 if __name__ == '__main__':
     unittest.main()
