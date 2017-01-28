@@ -1389,6 +1389,21 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.health, expected_health)
         self.assertEqual(self.dummy.max_health, expected_max_health)
 
+    def test_handle_health_change_decrease_in_combat(self):
+        # Remove 50 from his health and decrease his max health by 40, his current health should be unchanged
+        original_max_health = self.dummy.max_health
+        self.dummy.enter_combat()
+        self.dummy.health -= 50  # simulate damage
+        health_dec = 49
+        self.dummy.max_health -= health_dec
+        # Since its in combat, his current health should not be affected
+        expected_health, expected_max_health = 50, 51
+
+        self.dummy._handle_health_change(original_max_health)
+
+        self.assertEqual(self.dummy.health, expected_health)
+        self.assertEqual(self.dummy.max_health, expected_max_health)
+
     def test_apply_buff(self):
         """
         The difference with this _apply_buff function to the other is
