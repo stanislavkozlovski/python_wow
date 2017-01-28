@@ -1652,5 +1652,31 @@ class CharacterTests(unittest.TestCase):
         except Exception as e:
             self.assertEqual(str(e), expected_message)
 
+    def test_check_if_quest_completed(self):
+        """ _check_if_quest_completed checks if the quest is completed and if it is,
+            completes it, rewarding the player """
+        output = StringIO()
+        quest = Quest(quest_id=1, quest_name="Vices", item_reward_dict={}, level_required=1,
+                      reward_choice_enabled=False, xp_reward=10)
+        expected_message = f'Quest {quest.name} is completed! XP awarded: {quest.xp_reward}!'
+        self.dummy.quest_log = {1: quest}
+        original_xp = self.dummy.experience
+        try:
+            sys.stdout = output
+            # Quest is not completed, so it should not do anything
+            self.dummy._check_if_quest_completed(quest)
+
+            # assert that the experience has not changed
+            self.assertEqual(self.dummy.experience, original_xp)
+            self.assertNotIn(expected_message, output.getvalue())
+
+            # Should complete it and reward HP now
+            quest.is_completed = True
+            self.dummy._check_if_quest_completed(quest)
+            self.assertEqual(self.dummy.experience, original_xp + quest.xp_reward)
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
 if __name__ == '__main__':
     unittest.main()
