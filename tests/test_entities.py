@@ -1584,6 +1584,16 @@ class CharacterTests(unittest.TestCase):
         self.assertTrue(self.dummy.has_enough_gold(100))
         self.assertFalse(self.dummy.has_enough_gold(101))
 
+    def test_has_item(self):
+        self.dummy.inventory = {
+            'item1': None,
+        }
+
+        self.assertTrue(self.dummy.has_item('item1'))
+        self.assertFalse(self.dummy.has_item('item2'))
+        self.assertFalse(self.dummy.has_item('item'))
+        self.assertFalse(self.dummy.has_item('gold'))
+
 
 if __name__ == '__main__':
     unittest.main()
