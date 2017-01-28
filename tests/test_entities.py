@@ -1678,5 +1678,17 @@ class CharacterTests(unittest.TestCase):
         finally:
             sys.stdout = sys.__stdout__
 
+    def test_check_if_quest_completed_invalid_quest(self):
+        quest = Quest(quest_id=1, quest_name="Vices", item_reward_dict={}, level_required=1,
+                      reward_choice_enabled=False, xp_reward=10)
+        expected_message = f'You do not have {quest.name} in your quest log!'
+
+        try:
+            self.dummy._check_if_quest_completed(quest)
+            self.fail()
+        except Exception as e:
+            self.assertEqual(str(e), expected_message)
+
+
 if __name__ == '__main__':
     unittest.main()
