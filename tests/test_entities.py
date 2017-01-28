@@ -1599,13 +1599,33 @@ class CharacterTests(unittest.TestCase):
         sale = (item_to_buy, 10, 10)
         self.dummy.inventory['gold'] = 11
         expected_gold = 1
-        
+
         self.dummy.buy_item(sale)
 
         # assert that we bought 10 NuItems for 10 NuItems for 10 Gold
         self.assertEqual(self.dummy.inventory['gold'], expected_gold)
         self.assertTrue('NuItem' in self.dummy.inventory)
         self.assertEqual(self.dummy.inventory['NuItem'], (item_to_buy, 10))
+
+    def test_sell_item(self):
+        """
+        The sell_item function sells an item, effectively removing it
+        and gains gold from it
+        """
+        sell_price = 10000
+        item_name = 'Diamond'
+        item_to_sell = Item(name=item_name, item_id=1, buy_price=1, sell_price=sell_price)
+        self.dummy.inventory = {item_name: (item_to_sell, 2), 'gold': 0}
+
+        self.dummy.sell_item(item_name)
+        # assert that the character has sold his first item and has one remaining
+        self.assertEqual(self.dummy.inventory['gold'], sell_price)
+        self.assertEqual(self.dummy.inventory[item_name], (item_to_sell, 1))
+
+        self.dummy.sell_item(item_name)
+        # assert that he does not have the item anymore
+        self.assertNotIn(item_name, self.dummy.inventory)
+        self.assertEqual(self.dummy.inventory['gold'], sell_price * 2)
 
 
 if __name__ == '__main__':
