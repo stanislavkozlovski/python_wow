@@ -1378,5 +1378,34 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.attributes['strength'], expected_strength)
         self.assertEqual(self.dummy.attributes['armor'], expected_armor)
 
+    def test_deapply_buff(self):
+        stren_increase, armor_increase, health_inc, mana_inc = 100, 100, 100, 100
+        test_buff = BeneficialBuff(name="Silence", buff_stats_and_amounts=(('strength', stren_increase), ('armor', armor_increase), ('health', health_inc), ('mana', mana_inc)), duration=5)
+        orig_min_dmg, orig_max_dmg = self.dummy.min_damage, self.dummy.max_damage
+        orig_strength, orig_armor = self.dummy.attributes['strength'], self.dummy.attributes['armor']
+        orig_health, orig_mana = self.dummy.health, self.dummy.mana
+        expected_strength = (orig_strength + stren_increase)
+        expected_armor = orig_armor + armor_increase
+        expected_min_dmg, expected_max_dmg = self.dummy.equipped_weapon.min_damage + (
+        0.4 * expected_strength), self.dummy.equipped_weapon.max_damage + (0.4 * expected_strength)
+        expected_health, expected_mana = orig_health + health_inc, orig_mana + mana_inc
+        self.dummy._apply_buff(test_buff)  # <--- Apply the buff
+        self.assertEqual(self.dummy.health, expected_health)
+        self.assertEqual(self.dummy.mana, expected_mana)
+        self.assertEqual(self.dummy.min_damage, expected_min_dmg)
+        self.assertEqual(self.dummy.max_damage, expected_max_dmg)
+        self.assertEqual(self.dummy.attributes['strength'], expected_strength)
+        self.assertEqual(self.dummy.attributes['armor'], expected_armor)
+
+        # Act, deapplying the buff
+        self.dummy._deapply_buff(test_buff)
+        self.assertEqual(self.dummy.health, orig_health)
+        self.assertEqual(self.dummy.mana, orig_mana)
+        self.assertEqual(self.dummy.min_damage, orig_min_dmg)
+        self.assertEqual(self.dummy.max_damage, orig_max_dmg)
+        self.assertEqual(self.dummy.attributes['strength'], orig_strength)
+        self.assertEqual(self.dummy.attributes['armor'], orig_armor)
+
+
 if __name__ == '__main__':
     unittest.main()
