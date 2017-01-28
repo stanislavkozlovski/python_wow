@@ -1358,7 +1358,7 @@ class CharacterTests(unittest.TestCase):
 
         self.assertEqual(self.dummy.health, round(orig_health-expected_dmg, 1))
 
-    def test_handle_health_change_out_of_combat(self):
+    def test_handle_health_change_increase_out_of_combat(self):
         """
         The handle_health_change function fixes up the character's current health when
         his max health has been modified. (via a Buff most likely)
@@ -1369,6 +1369,20 @@ class CharacterTests(unittest.TestCase):
         health_inc = 49
         self.dummy.max_health += health_inc
         expected_health, expected_max_health = 99, 149
+
+        self.dummy._handle_health_change(original_max_health)
+
+        self.assertEqual(self.dummy.health, expected_health)
+        self.assertEqual(self.dummy.max_health, expected_max_health)
+
+    def test_handle_health_change_decrease_out_of_combat(self):
+        # Remove 50 from his health and decrease his max health by 40, his current health should be unchanged
+        original_max_health = self.dummy.max_health
+        self.dummy.health -= 50  # simulate damage
+        health_dec = 49
+        self.dummy.max_health -= health_dec
+        # Since its out of combat, his current health should drop as well
+        expected_health, expected_max_health = 1, 51
 
         self.dummy._handle_health_change(original_max_health)
 
