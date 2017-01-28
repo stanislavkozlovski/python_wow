@@ -1358,5 +1358,25 @@ class CharacterTests(unittest.TestCase):
 
         self.assertEqual(self.dummy.health, round(orig_health-expected_dmg, 1))
 
+    def test_apply_buff(self):
+        """
+        The difference with this _apply_buff function to the other is
+        it also applies attributes
+        """
+        stren_increase, armor_increase = 100, 100
+        test_buff = BeneficialBuff(name="Silence",
+                                   buff_stats_and_amounts=(('strength', stren_increase), ('armor', armor_increase)), duration=5)
+        orig_strength, orig_armor = self.dummy.attributes['strength'], self.dummy.attributes['armor']
+        expected_strength = (orig_strength + stren_increase)
+        expected_armor = orig_armor + armor_increase
+        expected_min_dmg, expected_max_dmg = self.dummy.equipped_weapon.min_damage + (0.4 * expected_strength), self.dummy.equipped_weapon.max_damage + (0.4 * expected_strength)
+
+        self.dummy._apply_buff(test_buff)
+
+        self.assertEqual(self.dummy.min_damage, expected_min_dmg)
+        self.assertEqual(self.dummy.max_damage, expected_max_dmg)
+        self.assertEqual(self.dummy.attributes['strength'], expected_strength)
+        self.assertEqual(self.dummy.attributes['armor'], expected_armor)
+
 if __name__ == '__main__':
     unittest.main()
