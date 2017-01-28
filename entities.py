@@ -65,7 +65,7 @@ class LivingThing:
     def _update_dots(self):
         """
         This method goes through all the DoT effects on the entity, activates their tick, reduces their duration
-        and, if the are expired, adds them to a list which holds DoTs that should be removed(expired) from the character.
+        and, if the are expired, adds them to a list which holds DoTs that should be removed(expired) from the character
         After iterating through all of the active DoTs, we remove every DoT that is in the list.
         """
         dots_to_remove = []  # type: list of DoTs
@@ -112,7 +112,8 @@ class LivingThing:
     def remove_buff(self, buff: BeneficialBuff or DoT):
         """ Method that handles when a buff is removed/expired"""
         if buff not in self.buffs:
-            raise NonExistantBuffError(f"Cannot remove {buff.name} from {self.name} because he does not have it!", buff.name)
+            raise NonExistantBuffError(f"Cannot remove {buff.name} from {self.name} because he does not have it!",
+                                       buff.name)
         if isinstance(buff, BeneficialBuff):
             self._deapply_buff(buff)
             print(f"Buff {buff.name} has expired from {self.name}.")
@@ -131,7 +132,7 @@ class LivingThing:
 
     def _apply_buff(self, buff: BeneficialBuff):
         """ Add the buff to the living thing's stats"""
-        buff_attributes = buff.get_buffed_attributes()  # type: dict
+        buff_attributes: {str: int} = buff.get_buffed_attributes()
 
         # iterate through the buffed attributes and apply them to the entity
         for buff_type, buff_amount in buff_attributes.items():
@@ -216,7 +217,6 @@ class LivingThing:
                                                           attacker_level=self.level)
         if self.absorption_shield:  # if we have a shield
             dot_proc_damage = self._apply_damage_absorption(dot_proc_damage)
-
 
         print(f'{self.name} suffers {dot_proc_damage} from {dot.name}!')
         self._subtract_health(dot_proc_damage)
@@ -464,10 +464,11 @@ class Character(LivingThing):
         self._level_up(False)  # level up to 1
         self.current_zone = CHAR_STARTER_ZONE
         self.current_subzone = CHAR_STARTER_SUBZONE
-        self.loaded_scripts = loaded_scripts  # holds the scripts that the character has seen (which should load only once)
-        self.killed_monsters = killed_monsters  # a set that holds the GUIDs of the creatures that\
-        #  the character has killed (and that should not be killable a second time)
-        self.completed_quests = completed_quests  #  a set that holds the ids of the quests that the character has completed
+        # holds the scripts that the character has seen (which should load only once)
+        self.loaded_scripts: set() = loaded_scripts
+        # holds the GUIDs of the creatures that the character has killed (and that should not be killable a second time)
+        self.killed_monsters: set() = killed_monsters
+        self.completed_quests: set() = completed_quests  # ids of the quests that the character has completed
         self.quest_log = {}
         self.inventory = saved_inventory # dict Key: str, Value: tuple(Item class instance, Item Count)
         self.equipment = saved_equipment # dict Key: Equipment slot, Value: object of class Equipment
@@ -518,7 +519,7 @@ class Character(LivingThing):
 
             # transfer the equipped item back to the inventory
             # TODO: Handle custom error if there isn't such a slot in the equipment
-            equipped_item = self.equipment[item.slot]  # type: Equipment
+            equipped_item: Equipment = self.equipment[item.slot]
 
             if equipped_item:
                 self.add_item_to_inventory(equipped_item)
@@ -534,7 +535,7 @@ class Character(LivingThing):
         :param item: an instance of class Item
         """
         if isinstance(item, Potion):
-            potion = item # type: Potion
+            potion: Potion = item
             potion_in_inventory, count = self.inventory[potion.name]
 
             # remove the potion we're consuming from the inventory
@@ -623,6 +624,7 @@ class Character(LivingThing):
         """
         Every class will have different spells, this method will make sure the proper spell is caster
         :param command: the spell name that is to be cast
+        :param target: The target on which the spell is going to be cast
         :return:
         """
         pass
@@ -638,7 +640,7 @@ class Character(LivingThing):
     def attack(self, victim: Monster):
         pass
 
-    def take_attack(self, monster_name:str, damage: Damage, attacker_level: int):
+    def take_attack(self, monster_name: str, damage: Damage, attacker_level: int):
         damage = self._apply_armor_reduction(damage, attacker_level)
         damage = self._apply_damage_absorption(damage)
 
