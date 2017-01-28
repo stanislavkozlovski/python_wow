@@ -1358,6 +1358,23 @@ class CharacterTests(unittest.TestCase):
 
         self.assertEqual(self.dummy.health, round(orig_health-expected_dmg, 1))
 
+    def test_handle_health_change_out_of_combat(self):
+        """
+        The handle_health_change function fixes up the character's current health when
+        his max health has been modified. (via a Buff most likely)
+        """
+        # Remove 50 from his health and add 49 to his max health, he should be at 99/149 health
+        original_max_health = self.dummy.max_health
+        self.dummy.health -= 50
+        health_inc = 49
+        self.dummy.max_health += health_inc
+        expected_health, expected_max_health = 99, 149
+
+        self.dummy._handle_health_change(original_max_health)
+
+        self.assertEqual(self.dummy.health, expected_health)
+        self.assertEqual(self.dummy.max_health, expected_max_health)
+
     def test_apply_buff(self):
         """
         The difference with this _apply_buff function to the other is
