@@ -1,5 +1,6 @@
 from command_router import route_in_combat_non_ending_turn_commands
 from commands import pac_looting, get_available_paladin_abilities
+from command_handler import prompt_revive
 from entities import Character, Monster
 from information_printer import print_loot_table
 
@@ -50,7 +51,7 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
             monster.leave_combat()
             print(f'{monster.name} has slain character {character.name}')
 
-            character.prompt_revive()
+            prompt_revive(character)
             break
 
         command = input()

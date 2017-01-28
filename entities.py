@@ -720,14 +720,6 @@ class Character(LivingThing):
         super()._die()
         print(f'Character {self.name} has died!')
 
-    def prompt_revive(self):
-        print("Do you want to restart? Y/N")
-        if input() in 'Yy':
-            self.revive()
-            print(f'Character {self.name} has been revived!')
-        else:
-            raise SystemExit  # quit the game
-
     def has_enough_gold(self, gold: int) -> bool:
         """
         :return: a boolean indicating if we have that much gold

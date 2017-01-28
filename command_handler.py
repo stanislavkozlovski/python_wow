@@ -221,6 +221,18 @@ def handle_quest_item_choice(item_rewards: dict):
             print("\t\tTakes the item\n")
 
 
+def prompt_revive(character):
+    """
+    Prompt if the Player wants to revive his character after death
+    """
+    print("Do you want to restart? Y/N")
+    if input() in 'Yy':
+        character.revive()
+        print(f'Character {character.name} has been revived!')
+    else:
+        raise SystemExit  # quit the game
+
+
 def handle_save_character_command(main_character):
     """ this function handles the 'save' command"""
     save_character(main_character)
@@ -297,3 +309,4 @@ def handle_combat_print_stats_command(character, monster):
 def handle_combat_print_xp_command(character):
     """ this function handles the 'print xp' command, showing the player's current experience bar while in combat """
     print_character_xp_bar(character)
+
