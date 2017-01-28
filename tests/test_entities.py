@@ -1578,6 +1578,12 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.max_health, orig_max_health)
         self.assertGreaterEqual(self.dummy.max_health, self.dummy.health)
 
+    def test_has_enough_gold(self):
+        self.dummy.inventory['gold'] = 100
+        self.assertTrue(self.dummy.has_enough_gold(99))
+        self.assertTrue(self.dummy.has_enough_gold(100))
+        self.assertFalse(self.dummy.has_enough_gold(101))
+
 
 if __name__ == '__main__':
     unittest.main()
