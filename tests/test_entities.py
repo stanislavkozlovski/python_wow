@@ -2064,6 +2064,13 @@ class CharacterTests(unittest.TestCase):
             self.dummy.level = level
             self.assertEqual(self.dummy._lookup_next_xp_level_req(), CHARACTER_LEVEL_XP_REQUIREMENTS[level])
 
+    def test_load_script(self):
+        """ the load-script function adds a loaded script to the self.loaded_scripts set"""
+        script_name = 'pick up a grape'
+        self.assertNotIn(script_name, self.dummy.loaded_scripts)
+        self.dummy.load_script(script_name)
+        self.assertIn(script_name, self.dummy.loaded_scripts)
+
 
 if __name__ == '__main__':
     unittest.main()
