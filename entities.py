@@ -923,9 +923,10 @@ class Character(LivingThing):
         self._calculate_stats_formulas()  # recalculate formulas with stats
         self._regenerate()  # regen to full hp/mana
 
-        print_level_up_event(name=self.name, level=self.level, armor_inc=armor_increase_amount,
-                             hp_inc=hp_increase_amount, mana_inc=mana_increase_amount,
-                             strength_inc=strength_increase_amount, agi_inc=agility_increase_amount)
+        if to_print:
+            print_level_up_event(name=self.name, level=self.level, armor_inc=armor_increase_amount,
+                                 hp_inc=hp_increase_amount, mana_inc=mana_increase_amount,
+                                 strength_inc=strength_increase_amount, agi_inc=agility_increase_amount)
 
     def print_inventory(self):
         print("Your inventory:")
