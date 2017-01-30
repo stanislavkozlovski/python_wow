@@ -1815,5 +1815,15 @@ class CharacterTests(unittest.TestCase):
 
         self.assertEqual(self.dummy.experience, orig_xp+add_xp)
 
+    def test_award_experience_level_up(self):
+        # add exactly enough xp to level up
+        orig_level = self.dummy.level
+        add_xp = self.dummy.xp_req_to_level - self.dummy.experience
+
+        self.dummy._award_experience(add_xp)
+
+        # should have leveled up
+        self.assertEqual(self.dummy.level, orig_level + 1)
+
 if __name__ == '__main__':
     unittest.main()
