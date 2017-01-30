@@ -2100,8 +2100,18 @@ class CharacterTests(unittest.TestCase):
 
         self.assertTrue(self.dummy.has_completed_quest(quest_id))
 
+    def test_update_spell_cooldowns(self):
+        """ Called when a turn passes, reduces the cooldown of every spell"""
+        from spells import Spell
+        spell_cd = 3
+        sp = Spell(name="Carb", rank=1, cooldown=spell_cd)
+        sp._cooldown_counter = spell_cd
 
+        self.dummy.learned_spells = {'Carb': sp}
 
+        for cd_left in reversed(range(spell_cd)):
+            self.dummy.update_spell_cooldowns()
+            self.assertEqual(sp.turns_on_cd, cd_left)
 
 
 if __name__ == '__main__':
