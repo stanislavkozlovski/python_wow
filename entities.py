@@ -895,13 +895,13 @@ class Character(LivingThing):
         This function is used to add the attributes of all the character's equipment.
         NOTE: This is used only on the initial character load
         """
-        for item in filter(lambda itm: itm is not None, self.equipment.values()):
+        for item in (itm for itm in self.equipment.values() if itm is not None):
             self._add_attributes(item.attributes)
 
     def check_if_levelup(self):
         if self.experience >= self.xp_req_to_level:
             self._level_up()
-            self.experience = 0
+            self.experience = self.experience - self.xp_req_to_level
             self.xp_req_to_level = self._lookup_next_xp_level_req()
 
     def _level_up(self, to_print=True):
