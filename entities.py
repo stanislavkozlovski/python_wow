@@ -931,7 +931,7 @@ class Character(LivingThing):
     def _lookup_next_xp_level_req(self):
         return CHARACTER_LEVEL_XP_REQUIREMENTS[self.level]
 
-    def loaded_script(self, script_name: str):
+    def load_script(self, script_name: str):
         """
         This method is called whenever the character loads a script that should be loaded only once
         It adds the script's name in the character's loaded_scripts set, which is checked every time a
