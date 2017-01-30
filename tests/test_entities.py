@@ -1744,5 +1744,37 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.experience, orig_xp + quest.xp_reward)
         self.assertIn(quest.ID, self.dummy.completed_quests)
 
+    def test_complete_fetch_quest_with_one_extra_item(self):
+        """ The fetch_quest will require 4 items and we will have 5, expect one to stay in the inventory"""
+        orig_xp = self.dummy.experience
+        wanted_item_name = 'wanted_beast'
+        wanted_amount = 5
+        quest: FetchQuest = FetchQuest(quest_name='I want some beasts!', quest_id=1, required_item=wanted_item_name,
+                                       required_item_count=wanted_amount - 1,   # <----
+                                       level_required=1, item_reward_dict={},
+                                       xp_reward=10,
+                                       reward_choice_enabled=False)
+        expected_message = f'Quest {quest.name} is completed! XP awarded: {quest.xp_reward}!'
+        wanted_item = Item(name=wanted_item_name, item_id=2, buy_price=1, sell_price=1)
+        self.dummy.inventory = {wanted_item_name: (wanted_item, wanted_amount)}
+        self.dummy.quest_log = {quest.ID: quest}
+        try:
+            output = StringIO()
+            sys.stdout = output
+
+            self.dummy._complete_quest(quest)
+
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        # assert that the item is no longer in the inventory, because the quest required exactly as much as we had
+        self.assertIn(wanted_item_name, self.dummy.inventory)
+        left_item_count = self.dummy.inventory[wanted_item_name][1]
+        self.assertEqual(left_item_count, wanted_amount-quest.required_item_count)
+        self.assertNotIn(quest.ID, self.dummy.quest_log)
+        self.assertEqual(self.dummy.experience, orig_xp + quest.xp_reward)
+        self.assertIn(quest.ID, self.dummy.completed_quests)
+
 if __name__ == '__main__':
     unittest.main()
