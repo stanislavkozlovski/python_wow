@@ -1825,5 +1825,25 @@ class CharacterTests(unittest.TestCase):
         # should have leveled up
         self.assertEqual(self.dummy.level, orig_level + 1)
 
+    def test_award_monster_kill(self):
+        orig_xp = self.dummy.experience
+        expected_message = 'XP awarded: 15!'
+        guid = 1
+        monster = Monster(monster_id=1, name='Monster', xp_to_give=15, level=self.dummy.level, respawnable=True)
+        
+        try:
+            output = StringIO()
+            sys.stdout = output
+
+            self.dummy.award_monster_kill(monster, guid)
+
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        self.assertEqual(self.dummy.experience, orig_xp+monster.xp_to_give)
+        self.assertNotIn(guid, self.dummy.killed_monsters)
+
+
 if __name__ == '__main__':
     unittest.main()
