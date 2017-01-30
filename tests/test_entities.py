@@ -1932,6 +1932,18 @@ class CharacterTests(unittest.TestCase):
         self.dummy.award_gold(10)
         self.assertEqual(self.dummy.inventory['gold'], 10)
 
+    def test_award_item(self):
+        # The award_item function adds an item to the character's inventory
+        item = Item(name="item", item_id=1, buy_price=1, sell_price=1)
+        self.dummy.award_item(item, 10)
+        self.assertEqual(self.dummy.inventory['item'], (item, 10))
+
+    def test_award_item_already_in_inventory(self):
+        item = Item(name="item", item_id=1, buy_price=1, sell_price=1)
+        self.dummy.inventory = {'item': (item, 10)}
+        self.dummy.award_item(item, 10)
+        self.assertEqual(self.dummy.inventory['item'], (item, 20))
+
 
 if __name__ == '__main__':
     unittest.main()
