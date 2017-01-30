@@ -860,16 +860,12 @@ class Character(LivingThing):
 
         self.add_item_to_inventory(item, item_count)
 
-        if item_quest_id and item_quest_id in self.quest_log and not self.quest_log[item_quest_id].is_completed:
-            # if the item is related to a quest and if we have that quest and said quest is not completed
-            temp_quest = self.quest_log[item_quest_id]
+        if item_quest_id and item_quest_id in self.quest_log:
+            # if the item is related to a quest, have the quest check if the player has enough items to complete it
+            quest = self.quest_log[item_quest_id]
+            quest.check_if_complete(self)
 
-            # have the quest check if the player has enough items to complete it
-            temp_quest.check_if_complete(self.inventory)
-
-            self.quest_log[item_quest_id] = temp_quest
-
-            self._check_if_quest_completed(temp_quest)
+            self._check_if_quest_completed(quest)
 
     def _remove_item_from_inventory(self, item_name: str, item_count: int=1, remove_all: bool = False):
         """ This method removes the specified item from the player's inventory
