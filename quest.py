@@ -16,7 +16,7 @@ class Quest:
         """ This method updates the required kills if the quest is a KillQuest"""
         pass
 
-    def _check_if_complete(self):
+    def check_if_complete(self, character: 'Character'=None):
         """ This method checks if the quest is completed on each new addition and completes it if it is"""
         pass
 
@@ -60,7 +60,7 @@ class KillQuest(Quest):
         print(f'Quest {self.name}: {self.kills}/{self.required_kills} {self.required_monster} slain.')
         self._check_if_complete()
 
-    def _check_if_complete(self):
+    def check_if_complete(self, character: 'Character'=None):
         if self.kills == self.required_kills:
             self._quest_complete()
 
@@ -80,9 +80,11 @@ class FetchQuest(Quest):
         return (f'{self.name} - Obtain {self.required_item_count} {self.required_item}. '
                 f'Rewards {self.xp_reward} experience.')
 
-    def check_if_complete(self, inventory: dict):
+    def check_if_complete(self, character: 'Character'=None):
         """ Given the player's inventory, check if he has enough to complete the quest"""
-        _, item_count = inventory.get(self.required_item, (self.required_item, 0))
+        if character is None or not hasattr(character, 'inventory'):
+            raise Exception('The FetchQuest check_if_complete method requires  that a character object is passed to it!')
+        _, item_count = character.inventory.get(self.required_item, (self.required_item, 0))
 
         if item_count:
             print(f'Quest {self.name}: {item_count}/{self.required_item_count} {self.required_item} obtained.')

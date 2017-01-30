@@ -772,6 +772,9 @@ class Character(LivingThing):
             raise Exception(f'{quest.name} is already in your quest log!')
 
         self.quest_log[quest.ID] = quest
+        # there are some cases where the quest can be completed on accept, i.e having the required items
+        quest.check_if_complete(self)
+        self._check_if_quest_completed(quest)
 
     def _check_if_quest_completed(self, quest: Quest):
         if quest.ID not in self.quest_log:
@@ -799,7 +802,6 @@ class Character(LivingThing):
         del self.quest_log[quest.ID]  # remove from quest log
 
         self.completed_quests.add(quest.ID)
-
         self._award_experience(xp_reward)
 
     def _remove_fetch_quest_required_items(self, quest: FetchQuest):
