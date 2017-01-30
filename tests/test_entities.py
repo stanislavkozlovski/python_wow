@@ -2080,6 +2080,17 @@ class CharacterTests(unittest.TestCase):
         self.assertIn(script_name, self.dummy.loaded_scripts)
         self.assertTrue(self.dummy.has_loaded_script(script_name))
 
+    def test_has_killed_monster(self):
+        """ Returns a boolean whether or not the player has killed a non-respawnable monster before """
+        monster_guid = 10
+        
+        self.assertFalse(self.dummy.has_killed_monster(monster_guid))
+
+        self.dummy.killed_monsters.add(monster_guid)
+
+        self.assertTrue(self.dummy.has_killed_monster(monster_guid))
+
+
 
 
 if __name__ == '__main__':
