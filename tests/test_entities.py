@@ -9,7 +9,7 @@ from exceptions import NonExistantBuffError, ItemNotInInventoryError
 
 from constants import (
     KEY_ARMOR_ATTRIBUTE, CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHAR_STARTER_SUBZONE,
-    CHAR_STARTER_ZONE, MAXIMUM_LEVEL_DIFFERENCE_XP_YIELD, CHARACTER_LEVELUP_BONUS_STATS)
+    CHAR_STARTER_ZONE, MAXIMUM_LEVEL_DIFFERENCE_XP_YIELD, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS)
 from entities import LivingThing, FriendlyNPC, VendorNPC, Monster, Character
 from damage import Damage
 from quest import Quest, FetchQuest, KillQuest
@@ -2057,6 +2057,12 @@ class CharacterTests(unittest.TestCase):
             self.assertNotIn(expected_message, output.getvalue())
         finally:
             sys.stdout = sys.__stdout__
+
+    def test_lookup_next_xp_level_req(self):
+        """ the function should return the needed experience to level up from the character's level """
+        for level in CHARACTER_LEVEL_XP_REQUIREMENTS.keys():
+            self.dummy.level = level
+            self.assertEqual(self.dummy._lookup_next_xp_level_req(), CHARACTER_LEVEL_XP_REQUIREMENTS[level])
 
 
 if __name__ == '__main__':
