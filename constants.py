@@ -17,6 +17,8 @@ KEY_BONUS_MANA_ATTRIBUTE = 'bonus_mana'
 KEY_LEVEL_STATS_HEALTH = 'health'
 KEY_LEVEL_STATS_MANA = 'mana'
 
+MAXIMUM_LEVEL_DIFFERENCE_XP_YIELD = 5  # a monster that is 5 levels lower than the character yields no XP
+
 CHAR_STARTER_ZONE, CHAR_STARTER_SUBZONE = "Northshire Abbey", "Northshire Valley"
 CHAR_ATTRIBUTES_TEMPLATE = {KEY_STRENGTH_ATTRIBUTE: 0, KEY_ARMOR_ATTRIBUTE: 0,
                             KEY_AGILITY_ATTRIBUTE: 0, KEY_BONUS_HEALTH_ATTRIBUTE: 0,

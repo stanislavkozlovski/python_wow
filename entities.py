@@ -6,7 +6,7 @@ from termcolor import colored
 from constants import (CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS,
                        KEY_ARMOR_ATTRIBUTE, KEY_STRENGTH_ATTRIBUTE, KEY_AGILITY_ATTRIBUTE, KEY_BONUS_HEALTH_ATTRIBUTE,
                        KEY_BONUS_MANA_ATTRIBUTE, KEY_LEVEL_STATS_HEALTH, KEY_LEVEL_STATS_MANA, CHAR_STARTER_ZONE,
-                       CHAR_STARTER_SUBZONE, CHAR_ATTRIBUTES_TEMPLATE)
+                       CHAR_STARTER_SUBZONE, CHAR_ATTRIBUTES_TEMPLATE, MAXIMUM_LEVEL_DIFFERENCE_XP_YIELD)
 from information_printer import print_level_up_event, print_vendor_products_for_sale
 from exceptions import ItemNotInInventoryError, NonExistantBuffError
 from utils.helper import create_character_attributes_template
@@ -815,17 +815,22 @@ class Character(LivingThing):
         self.check_if_levelup()
 
     def award_monster_kill(self, monster: Monster, monster_guid: int):
+        """
+        This method is called whenever a Monster is killed. It gives the monster's XP reward,
+                counts him for the appropriate quest (if there is one) and adds him to the killed_monsters
+                (if he's not respawnable)
+        """
         monster_level = monster.level
         xp_reward = monster.xp_to_give
         monster_quest_ID = monster.quest_relation_id
 
         level_difference = self.level - monster_level
         xp_bonus_reward = 0
-        if level_difference >= 5:  # if the character is 5 levels higher, give no XP
+        if level_difference >= MAXIMUM_LEVEL_DIFFERENCE_XP_YIELD:
             xp_reward = 0
         elif level_difference < 0:  # monster is higher level
-            percentage_mod = abs(
-                level_difference) * 0.1  # 10% increase of XP for every level the monster has over player
+            # 10% increase of XP for every level the monster has over player
+            percentage_mod = abs(level_difference) * 0.1
             xp_bonus_reward += int(xp_reward * percentage_mod)  # convert to int
 
         if xp_bonus_reward:
@@ -840,10 +845,7 @@ class Character(LivingThing):
 
         # If this monster is for a quest and we have that quest
         if monster_quest_ID and monster_quest_ID in self.quest_log:
-            # TODO: Might want another way to handle this
-            quest = self.quest_log[monster_quest_ID]
-            quest.update_kills()
-            self.quest_log[monster_quest_ID] = quest
+            self.quest_log[monster_quest_ID].update_kills()
 
             self._check_if_quest_completed(quest)
 
