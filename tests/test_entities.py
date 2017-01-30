@@ -5,7 +5,7 @@ import termcolor
 from io import StringIO
 from copy import deepcopy
 from collections import Counter
-from exceptions import NonExistantBuffError
+from exceptions import NonExistantBuffError, ItemNotInInventoryError
 
 from constants import (
     KEY_ARMOR_ATTRIBUTE, CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHAR_STARTER_SUBZONE,
@@ -1980,6 +1980,10 @@ class CharacterTests(unittest.TestCase):
         # should have removed it
         self.assertNotIn(item.name, self.dummy.inventory)
 
+    def test_remove_item_non_existing_item(self):
+        # If we try to remove an item that is not in the inventory, it should raise an exception
+        with self.assertRaises(ItemNotInInventoryError):
+            self.dummy._remove_item_from_inventory("aAa", 1)
 
 if __name__ == '__main__':
     unittest.main()
