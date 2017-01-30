@@ -1944,6 +1944,20 @@ class CharacterTests(unittest.TestCase):
         self.dummy.award_item(item, 10)
         self.assertEqual(self.dummy.inventory['item'], (item, 20))
 
+    def test_award_item_fetch_quest(self):
+        # adding an item which is for a fetch quest should check if the quest is completed
+        item_count = 2
+        f_quest = FetchQuest(quest_name="d", quest_id=1, required_item='item', required_item_count=item_count, item_reward_dict={},
+                             xp_reward=1, reward_choice_enabled=False, level_required=1)
+        item = Item(name="item", item_id=1, buy_price=1, sell_price=1, quest_id=f_quest.ID)
+
+        self.dummy.quest_log = {f_quest.ID: f_quest}
+
+        # We add exactly as much items as the quest requires and that should complete it
+        self.dummy.award_item(item, item_count)
+
+        self.assertTrue(f_quest.is_completed)
+
 
 if __name__ == '__main__':
     unittest.main()
