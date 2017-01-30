@@ -2001,6 +2001,18 @@ class CharacterTests(unittest.TestCase):
 
         self.assertEqual(self.dummy.health, expected_health)
 
+    def test_check_if_levelup(self):
+        """ The check_if_levelup function checks
+        if the character has enough XP to level up and if he does, levels him up"""
+        self.dummy.experience = 410
+        orig_level = self.dummy.level
+        expected_left_xp = self.dummy.experience - self.dummy.xp_req_to_level
+
+        self.dummy.check_if_levelup()
+
+        self.assertEqual(self.dummy.level, orig_level + 1)
+        self.assertEqual(self.dummy.experience, expected_left_xp)
+
 
 if __name__ == '__main__':
     unittest.main()
