@@ -9,7 +9,7 @@ from exceptions import NonExistantBuffError
 
 from constants import (
     KEY_ARMOR_ATTRIBUTE, CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHAR_STARTER_SUBZONE,
-    CHAR_STARTER_ZONE)
+    CHAR_STARTER_ZONE, MAXIMUM_LEVEL_DIFFERENCE_XP_YIELD)
 from entities import LivingThing, FriendlyNPC, VendorNPC, Monster, Character
 from damage import Damage
 from quest import Quest, FetchQuest, KillQuest
@@ -1887,6 +1887,28 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.experience, orig_xp + expected_xp)
         self.assertNotIn(guid, self.dummy.killed_monsters)
 
+    def test_award_monster_kill_lower_level_no_xp(self):
+        """ Killing a monster that is a couple of levels lower than you should not give you experience"""
+        orig_xp = self.dummy.experience
+
+        monster = Monster(monster_id=1, name='Monster', xp_to_give=10, level=self.dummy.level-MAXIMUM_LEVEL_DIFFERENCE_XP_YIELD, respawnable=True)
+        # Since the monster is too low a level, he should not yield any XP to the player
+        expected_xp = 0
+        expected_message = f'XP awarded: {int(expected_xp)}!'
+        guid = 1
+
+        try:
+            output = StringIO()
+            sys.stdout = output
+
+            self.dummy.award_monster_kill(monster, guid)
+
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        self.assertEqual(self.dummy.experience, orig_xp + expected_xp)
+        self.assertNotIn(guid, self.dummy.killed_monsters)
 
 if __name__ == '__main__':
     unittest.main()
