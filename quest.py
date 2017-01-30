@@ -58,7 +58,7 @@ class KillQuest(Quest):
     def update_kills(self):
         self.kills += 1
         print(f'Quest {self.name}: {self.kills}/{self.required_kills} {self.required_monster} slain.')
-        self._check_if_complete()
+        self.check_if_complete()
 
     def check_if_complete(self, character: 'Character'=None):
         if self.kills == self.required_kills:

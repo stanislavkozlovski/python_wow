@@ -845,7 +845,8 @@ class Character(LivingThing):
 
         # If this monster is for a quest and we have that quest
         if monster_quest_ID and monster_quest_ID in self.quest_log:
-            self.quest_log[monster_quest_ID].update_kills()
+            quest = self.quest_log[monster_quest_ID]
+            quest.update_kills()
 
             self._check_if_quest_completed(quest)
 
