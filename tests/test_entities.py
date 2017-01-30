@@ -879,7 +879,7 @@ class CharacterTests(unittest.TestCase):
             'strength': expected_strength
         }
         self.assertNotEqual(self.dummy.min_damage, 0)
-        self.assertNotEqual(self.dummy.max_health, 1)
+        self.assertNotEqual(self.dummy.max_damage, 1)
         self.assertEqual(self.dummy.level, 1)
         self.assertEqual(self.dummy.attributes, expected_attributes)
         self.assertEqual(self.dummy.current_zone, CHAR_STARTER_ZONE)
@@ -1301,7 +1301,6 @@ class CharacterTests(unittest.TestCase):
         attacker_level = self.dummy.level
         try:
             sys.stdout = output
-
             self.dummy.take_attack(monster_name, dmg_to_take, attacker_level)
             self.assertEqual(self.dummy.health, self.health-dmg_to_take.magic_dmg)
             self.assertIn(expected_message, output.getvalue())
@@ -1718,6 +1717,32 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.experience, orig_xp + kill_quest.xp_reward)
         self.assertIn(kill_quest.ID, self.dummy.completed_quests)
 
+    def test_complete_fetch_quest(self):
+        orig_xp = self.dummy.experience
+        wanted_item_name = 'wanted_beast'
+        wanted_amount = 5
+        quest: FetchQuest = FetchQuest(quest_name='I want some beasts!', quest_id=1, required_item=wanted_item_name,
+                           required_item_count=wanted_amount, level_required=1, item_reward_dict={}, xp_reward=10,
+                           reward_choice_enabled=False)
+        expected_message = f'Quest {quest.name} is completed! XP awarded: {quest.xp_reward}!'
+        wanted_item = Item(name=wanted_item_name, item_id=2, buy_price=1, sell_price=1)
+        self.dummy.inventory = {wanted_item_name: (wanted_item, wanted_amount)}
+        self.dummy.quest_log = {quest.ID: quest}
+        try:
+            output = StringIO()
+            sys.stdout = output
+
+            self.dummy._complete_quest(quest)
+
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        # assert that the item is no longer in the inventory, because the quest required exactly as much as we had
+        self.assertNotIn(wanted_item_name, self.dummy.inventory)
+        self.assertNotIn(quest.ID, self.dummy.quest_log)
+        self.assertEqual(self.dummy.experience, orig_xp + quest.xp_reward)
+        self.assertIn(quest.ID, self.dummy.completed_quests)
 
 if __name__ == '__main__':
     unittest.main()
