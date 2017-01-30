@@ -9,7 +9,7 @@ from exceptions import NonExistantBuffError, ItemNotInInventoryError
 
 from constants import (
     KEY_ARMOR_ATTRIBUTE, CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHAR_STARTER_SUBZONE,
-    CHAR_STARTER_ZONE, MAXIMUM_LEVEL_DIFFERENCE_XP_YIELD)
+    CHAR_STARTER_ZONE, MAXIMUM_LEVEL_DIFFERENCE_XP_YIELD, CHARACTER_LEVELUP_BONUS_STATS)
 from entities import LivingThing, FriendlyNPC, VendorNPC, Monster, Character
 from damage import Damage
 from quest import Quest, FetchQuest, KillQuest
@@ -2018,7 +2018,6 @@ class CharacterTests(unittest.TestCase):
         expected_message = f'Character {self.dummy.name} has leveled up to level {self.dummy.level + 1}!'
         self.dummy.health = 1
         self.dummy.mana = 1
-        from constants import CHARACTER_LEVELUP_BONUS_STATS
         stats_to_add = CHARACTER_LEVELUP_BONUS_STATS[self.dummy.level + 1]
         expected_hp = self.dummy.max_health + stats_to_add['health']
         expected_mana = self.dummy.max_mana + stats_to_add['mana']
@@ -2045,6 +2044,20 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.attributes['agility'], expected_agi)
         self.assertEqual(self.dummy.attributes['armor'], expected_armor)
         self.assertEqual(self.dummy.attributes['strength'], expected_stren)
+
+    def test_level_up_no_print(self):
+        expected_message = f'Character {self.dummy.name} has leveled up to level {self.dummy.level + 1}!'
+
+        try:
+            output = StringIO()
+            sys.stdout = output
+
+            self.dummy._level_up(to_print=False)
+
+            self.assertNotIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
 
 if __name__ == '__main__':
     unittest.main()
