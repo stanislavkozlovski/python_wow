@@ -1830,7 +1830,7 @@ class CharacterTests(unittest.TestCase):
         expected_message = 'XP awarded: 15!'
         guid = 1
         monster = Monster(monster_id=1, name='Monster', xp_to_give=15, level=self.dummy.level, respawnable=True)
-        
+
         try:
             output = StringIO()
             sys.stdout = output
@@ -1843,6 +1843,27 @@ class CharacterTests(unittest.TestCase):
 
         self.assertEqual(self.dummy.experience, orig_xp+monster.xp_to_give)
         self.assertNotIn(guid, self.dummy.killed_monsters)
+
+    def test_award_monster_kill_not_respawnable_add_in_killed_monsters(self):
+        """ When a monster is not respawnable, upon kill, he should be added in the killed_monsters set"""
+        orig_xp = self.dummy.experience
+        expected_message = 'XP awarded: 15!'
+        guid = 1
+        monster = Monster(monster_id=1, name='Monster', xp_to_give=15, level=self.dummy.level,
+                          respawnable=False)
+
+        try:
+            output = StringIO()
+            sys.stdout = output
+
+            self.dummy.award_monster_kill(monster, guid)
+
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        self.assertEqual(self.dummy.experience, orig_xp + monster.xp_to_give)
+        self.assertIn(guid, self.dummy.killed_monsters)
 
 
 if __name__ == '__main__':
