@@ -928,16 +928,6 @@ class Character(LivingThing):
                                  hp_inc=hp_increase_amount, mana_inc=mana_increase_amount,
                                  strength_inc=strength_increase_amount, agi_inc=agility_increase_amount)
 
-    def print_inventory(self):
-        print("Your inventory:")
-
-        # print the gold separately so it always comes up on top
-        print(f"\t{self.inventory['gold']} gold")
-        for key, item_tuple in self.inventory.items():
-            if key is not 'gold':
-                item, item_count = item_tuple
-                print(f'\t{item_count} {item}')
-
     def _lookup_next_xp_level_req(self):
         return CHARACTER_LEVEL_XP_REQUIREMENTS[self.level]
 

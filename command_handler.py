@@ -6,7 +6,7 @@ from models.characters.saver import save_character
 from commands import pac_main_ooc, pac_map_directions, pac_in_combat, pac_vendor_dialogue, pac_opened_inventory
 from information_printer import (print_live_npcs, print_live_monsters, print_quest_item_choices,
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar,
-                                 print_character_equipment)
+                                 print_character_equipment, print_inventory)
 from constants import ZONE_MOVE_BLOCK_SPECIAL_KEY
 from utils.helper import get_guid_by_name
 from information_printer import print_quest_log, print_vendor_products_for_sale
@@ -131,7 +131,7 @@ def handle_open_inventory_command(character):
     """
     This command opens the inventory of the character and lets him fiddle with the items there
     """
-    character.print_inventory()
+    print_inventory(character)
 
     while True:
         command = input(">inventory ")
@@ -166,7 +166,7 @@ def handle_open_inventory_command(character):
             """ item and item_name are assigned if we manage to pass this if check """
             if item:
                 # we've modified the inventory (consumed/equipped an item)
-                character.print_inventory()
+                print_inventory(character)
             else:
                 # we've tried to modify the inventory but unsuccessfuly, therefore item is None
                 print(f'{item_name} is not in your inventory.')
@@ -265,7 +265,7 @@ def handle_pql_command(main_character):
 
 def handle_print_inventory_command(main_character):
     """ this function handles the 'print inventory' command, showing the player's inventory """
-    main_character.print_inventory()
+    print_inventory(main_character)
 
 
 def handle_print_equipment_command(main_character):

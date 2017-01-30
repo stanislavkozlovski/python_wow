@@ -10,6 +10,18 @@ from constants import (CHARACTER_EQUIPMENT_BOOTS_KEY, CHARACTER_EQUIPMENT_BRACER
                        CHARACTER_EQUIPMENT_BELT_KEY)
 
 
+def print_inventory(character: 'Character'):
+    inventory = character.inventory
+    """ Prints the Character's inventory """
+    print("Your inventory:")
+
+    # print the gold separately so it always comes up on top
+    print(f"\t{inventory['gold']} gold")
+    for key, item_tuple in [(k, v) for k, v in inventory.items() if k != 'gold']:
+        item, item_count = item_tuple
+        print(f'\t{item_count} {item}')
+
+
 def print_level_up_event(name, level, armor_inc, hp_inc, mana_inc, strength_inc, agi_inc):
     """
     Print information when the Character leveles up
