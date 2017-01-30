@@ -1958,6 +1958,17 @@ class CharacterTests(unittest.TestCase):
 
         self.assertTrue(f_quest.is_completed)
 
+    def test_remove_item_from_inventory(self):
+        """ The remove_item_from inventory removes an item from the inventory of the character """
+        item = Item(name="item", item_id=1, buy_price=1, sell_price=1)
+        orig_count = 10
+        self.dummy.inventory = {'item': (item, orig_count)}
+        remove_count = 5
+
+        self.dummy._remove_item_from_inventory(item.name, remove_count)
+
+        self.assertEqual(self.dummy.inventory[item.name], (item, orig_count-remove_count))
+
 
 if __name__ == '__main__':
     unittest.main()
