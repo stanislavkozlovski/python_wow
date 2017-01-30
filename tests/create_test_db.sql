@@ -2764,8 +2764,8 @@ INSERT INTO levelup_stats (
                           )
                           VALUES (
                               1,
-                              10,
-                              10,
+                              0,
+                              0,
                               3,
                               3,
                               75
