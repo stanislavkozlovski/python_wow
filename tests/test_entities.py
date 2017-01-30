@@ -1985,5 +1985,22 @@ class CharacterTests(unittest.TestCase):
         with self.assertRaises(ItemNotInInventoryError):
             self.dummy._remove_item_from_inventory("aAa", 1)
 
+    def test_handle_load_saved_equipment(self):
+        """ the handle_load_saved_equipment adds the attributes in the character's equipment to his attributes.
+        It is only used on the initial character load"""
+        added_health = 1000
+        item = Equipment(name='FirstHead', item_id=1, slot='headpiece',
+                              attributes=create_attributes_dict(bonus_health=added_health), buy_price=1)
+        item_2 = Equipment(name='SecHead', item_id=1, slot='shoulderpad',
+                              attributes=create_attributes_dict(bonus_health=added_health), buy_price=1)
+
+        self.dummy.equipment = {'headpiece': item, 'shoulderpad': item_2}
+        expected_health = (added_health * 2) + self.dummy.health
+
+        self.dummy._handle_load_saved_equipment()
+
+        self.assertEqual(self.dummy.health, expected_health)
+
+
 if __name__ == '__main__':
     unittest.main()
