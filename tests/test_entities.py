@@ -1639,6 +1639,34 @@ class CharacterTests(unittest.TestCase):
         self.assertIn(quest.ID, self.dummy.quest_log)
         self.assertEqual(self.dummy.quest_log[quest.ID], quest)
 
+    def test_add_quest_already_completed(self):
+        """ Add a FetchQuest to the character that is essentially completed,
+            the character has the needed items. It should be completed on accept"""
+        orig_xp = self.dummy.experience
+        wanted_item_name = 'wanted_beast'
+        wanted_amount = 5
+        quest: FetchQuest = FetchQuest(quest_name='I want some beasts!', quest_id=1, required_item=wanted_item_name,
+                                       required_item_count=wanted_amount, level_required=1, item_reward_dict={},
+                                       xp_reward=10,
+                                       reward_choice_enabled=False)
+        expected_message = f'Quest {quest.name} is completed! XP awarded: {quest.xp_reward}!'
+        wanted_item = Item(name=wanted_item_name, item_id=2, buy_price=1, sell_price=1)
+        self.dummy.inventory = {wanted_item_name: (wanted_item, wanted_amount)}
+
+        try:
+            output = StringIO()
+            sys.stdout = output
+            self.dummy.add_quest(quest)
+
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        self.assertNotIn(wanted_item_name, self.dummy.inventory)
+        self.assertNotIn(quest.ID, self.dummy.quest_log)
+        self.assertEqual(self.dummy.experience, orig_xp + quest.xp_reward)
+        self.assertIn(quest.ID, self.dummy.completed_quests)
+
     def test_add_quest_already_added(self):
         """ Add a quest twice, expect it to raise an exception the second time """
         quest = Quest(quest_id=1, quest_name="Vices", item_reward_dict={}, level_required=1,
