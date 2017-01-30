@@ -2013,6 +2013,38 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.level, orig_level + 1)
         self.assertEqual(self.dummy.experience, expected_left_xp)
 
+    def test_level_up(self):
+        """ The level_up function should level up the character, add the bonus attributes and regenerate his hp/mana"""
+        expected_message = f'Character {self.dummy.name} has leveled up to level {self.dummy.level + 1}!'
+        self.dummy.health = 1
+        self.dummy.mana = 1
+        from constants import CHARACTER_LEVELUP_BONUS_STATS
+        stats_to_add = CHARACTER_LEVELUP_BONUS_STATS[self.dummy.level + 1]
+        expected_hp = self.dummy.max_health + stats_to_add['health']
+        expected_mana = self.dummy.max_mana + stats_to_add['mana']
+        expected_agi = self.dummy.attributes['agility'] + stats_to_add['agility']
+        expected_stren = (self.dummy.attributes['strength'] - self.dummy._bonus_strength) + (expected_agi * 0.5) + stats_to_add['strength']
+        expected_armor = (self.dummy.attributes['armor'] - self.dummy._bonus_armor) + (expected_agi * 2.5) + stats_to_add['armor']
+
+        try:
+            output = StringIO()
+            sys.stdout = output
+
+            self.dummy._level_up()
+
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        # should have regenerated
+        self.assertEqual(self.dummy.health, self.dummy.max_health)
+        self.assertEqual(self.dummy.mana, self.dummy.max_mana)
+        # should have added stats
+        self.assertEqual(self.dummy.max_health, expected_hp)
+        self.assertEqual(self.dummy.max_mana, expected_mana)
+        self.assertEqual(self.dummy.attributes['agility'], expected_agi)
+        self.assertEqual(self.dummy.attributes['armor'], expected_armor)
+        self.assertEqual(self.dummy.attributes['strength'], expected_stren)
 
 if __name__ == '__main__':
     unittest.main()
