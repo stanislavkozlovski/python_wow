@@ -1804,5 +1804,16 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.experience, orig_xp + quest.xp_reward)
         self.assertIn(quest.ID, self.dummy.completed_quests)
 
+    def test_award_experience(self):
+        """
+        The award_experience function adds experience to the player and checks if he levels up.
+        """
+        orig_xp = self.dummy.experience
+        add_xp = 15
+
+        self.dummy._award_experience(add_xp)
+
+        self.assertEqual(self.dummy.experience, orig_xp+add_xp)
+
 if __name__ == '__main__':
     unittest.main()
