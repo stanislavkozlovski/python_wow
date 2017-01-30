@@ -2071,6 +2071,16 @@ class CharacterTests(unittest.TestCase):
         self.dummy.load_script(script_name)
         self.assertIn(script_name, self.dummy.loaded_scripts)
 
+    def test_has_loaded_scripts(self):
+        """ Returns a boolean whether or not the player has loaded the script """
+        script_name = 'pick up a grape'
+        self.assertFalse(self.dummy.has_loaded_script(script_name))
+        self.assertNotIn(script_name, self.dummy.loaded_scripts)
+        self.dummy.load_script(script_name)
+        self.assertIn(script_name, self.dummy.loaded_scripts)
+        self.assertTrue(self.dummy.has_loaded_script(script_name))
+
+
 
 if __name__ == '__main__':
     unittest.main()
