@@ -1865,6 +1865,28 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.experience, orig_xp + monster.xp_to_give)
         self.assertIn(guid, self.dummy.killed_monsters)
 
+    def test_award_monster_kill_higher_level_higher_xp(self):
+        """ Killing a monster that is higher level than you should yield more XP"""
+        orig_xp = self.dummy.experience
+        monster = Monster(monster_id=1, name='Monster', xp_to_give=10, level=self.dummy.level + 10, respawnable=True)
+        # 10% bonus for each monster level
+        expected_xp = monster.xp_to_give + (monster.xp_to_give * ((monster.level - self.dummy.level) * 0.1))
+        expected_message = f'XP awarded: {monster.xp_to_give} + bonus {int(expected_xp-monster.xp_to_give)} for the level difference!'
+        guid = 1
+
+        try:
+            output = StringIO()
+            sys.stdout = output
+
+            self.dummy.award_monster_kill(monster, guid)
+
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        self.assertEqual(self.dummy.experience, orig_xp + expected_xp)
+        self.assertNotIn(guid, self.dummy.killed_monsters)
+
 
 if __name__ == '__main__':
     unittest.main()
