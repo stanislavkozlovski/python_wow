@@ -2083,12 +2083,23 @@ class CharacterTests(unittest.TestCase):
     def test_has_killed_monster(self):
         """ Returns a boolean whether or not the player has killed a non-respawnable monster before """
         monster_guid = 10
-        
+
         self.assertFalse(self.dummy.has_killed_monster(monster_guid))
 
         self.dummy.killed_monsters.add(monster_guid)
 
         self.assertTrue(self.dummy.has_killed_monster(monster_guid))
+
+    def test_has_completed_quest(self):
+        """ Returns a boolean whether the player has completed a certain quest """
+        quest_id = 10
+
+        self.assertFalse(self.dummy.has_completed_quest(quest_id))
+
+        self.dummy.completed_quests.add(quest_id)
+
+        self.assertTrue(self.dummy.has_completed_quest(quest_id))
+
 
 
 
