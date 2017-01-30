@@ -1926,5 +1926,12 @@ class CharacterTests(unittest.TestCase):
             self.assertEqual(k_quest.kills, i+1)
 
         self.assertTrue(k_quest.is_completed)
+
+    def test_award_gold(self):
+        self.dummy.inventory = {'gold': 0}
+        self.dummy.award_gold(10)
+        self.assertEqual(self.dummy.inventory['gold'], 10)
+
+
 if __name__ == '__main__':
     unittest.main()
