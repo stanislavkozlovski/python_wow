@@ -1910,5 +1910,21 @@ class CharacterTests(unittest.TestCase):
         self.assertEqual(self.dummy.experience, orig_xp + expected_xp)
         self.assertNotIn(guid, self.dummy.killed_monsters)
 
+    def test_award_monster_kill_for_quest(self):
+        """ Killing a monster that is for a quest should update the quest's killed monsters count """
+        q_id = 10
+        monster_name = 'Hey'
+        k_quest = KillQuest(quest_name="kill", quest_id=q_id, required_monster=monster_name,
+                            level_required=1, item_reward_dict={},
+                            reward_choice_enabled=False, required_kills=10, xp_reward=10)
+        mon = Monster(monster_id=1, name="Monster", xp_to_give=10, level=self.dummy.level, quest_relation_id=k_quest.ID)
+        self.dummy.quest_log = {k_quest.ID: k_quest}
+        self.assertEqual(k_quest.kills, 0)
+
+        for i in range(k_quest.required_kills):
+            self.dummy.award_monster_kill(mon, 1)
+            self.assertEqual(k_quest.kills, i+1)
+
+        self.assertTrue(k_quest.is_completed)
 if __name__ == '__main__':
     unittest.main()
