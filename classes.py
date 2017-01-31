@@ -46,18 +46,14 @@ class Paladin(Character):
         for spell in self.learned_spells.values():
             spell.reset_cd()
 
-    def _level_up(self, to_level: int=0):
+    def _level_up(self, to_level: int=0, to_print: bool=True):
         """
         This method levels the character up, if we're given a to_level we need to level up until we get to that level
         """
         if to_level:
-            # level up multiple times
-            for i in range(self.level, to_level):
-                self._level_up()
-            self.xp_req_to_level: int = self._lookup_next_xp_level_req()
+            super()._level_up(to_level=to_level, to_print=to_print)
         else:
-            # level up once
-            super()._level_up()
+            super()._level_up(to_print=to_print)
             self._lookup_and_handle_new_spells()
 
     def _lookup_and_handle_new_spells(self):

@@ -461,9 +461,9 @@ class Character(LivingThing):
         self._bonus_strength = 0
         self._bonus_armor = 0
         self.attributes: {str: int} = create_character_attributes_template()
-        self._level_up(False)  # level up to 1
+        self._level_up(to_print=False)  # level up to 1
         if level > 1:
-            self._level_up(to_level=level)
+            self._level_up(to_level=level, to_print=False)
 
         self.current_zone = CHAR_STARTER_ZONE
         self.current_subzone = CHAR_STARTER_SUBZONE
@@ -908,7 +908,13 @@ class Character(LivingThing):
             self.experience = self.experience - self.xp_req_to_level
             self.xp_req_to_level = self._lookup_next_xp_level_req()
 
-    def _level_up(self, to_print=True):
+    def _level_up(self, to_level: int=0, to_print=True):
+        if to_level:
+            # level up multiple times
+            for i in range(self.level, to_level):
+                self._level_up(to_print=to_print)
+            self.xp_req_to_level: int = self._lookup_next_xp_level_req()
+
         self.level += 1
 
         current_level_stats = CHARACTER_LEVELUP_BONUS_STATS[self.level]
