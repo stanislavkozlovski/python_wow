@@ -3,7 +3,7 @@ This module will hold the Heal class in the game.
 The heal class holds information about the type of heal we have
 """
 import random
-
+from decorators import run_once
 from constants import (HOLY_HEAL_DOUBLE_HEAL_CHANCE as DOUBLE_HEAL_CHANCE,
                        PROTECTIVE_HEAL_ABSORB_PERCENTAGE as ABSORB_PERCENTAGE)
 
@@ -105,13 +105,10 @@ class ProtectiveHeal(Heal):
         self._apply_shield()
         return other + self.heal_amount
 
-    def __iadd__(self, other: float) -> float:
-        self._apply_shield()
-        return other + self.heal_amount
-
     def _calculate_shield(self) -> float:
         return round((ABSORB_PERCENTAGE / 100) * self.heal_amount, 2)
 
+    @run_once
     def _apply_shield(self):
         """
         This method calculates the shield we would get from the heal and applies it to our target!
