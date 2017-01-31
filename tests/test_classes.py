@@ -402,7 +402,7 @@ class PaladinTests(unittest.TestCase):
         try:
             output = StringIO()
             sys.stdout = output
-            
+
             self.dummy.attack(victim)
 
             self.assertIn(expected_message, output.getvalue())
@@ -410,6 +410,11 @@ class PaladinTests(unittest.TestCase):
             self.assertIn(expected_message3, output.getvalue())
         finally:
             sys.stdout = sys.__stdout__
+
+    def test_get_class(self):
+        """ get_class() returns the class name as a string in lowercase """
+        expected_result = 'paladin'
+        self.assertEqual(self.dummy.get_class(), expected_result)
 
 
 if __name__ == '__main__':
