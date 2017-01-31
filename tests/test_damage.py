@@ -118,6 +118,13 @@ class DamageTests(unittest.TestCase):
 
         self.assertEqual(dmg_1-dmg_2, expected_result)
 
+    def test_sub_with_int(self):
+        dmg_1 = Damage(phys_dmg=5, magic_dmg=5)
+        dmg_2 = 4
+        expected_result = (5+5) - 4
+
+        self.assertEqual(dmg_1-dmg_2, expected_result)
+
 
 if __name__ == '__main__':
     unittest.main()
