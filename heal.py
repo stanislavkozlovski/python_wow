@@ -29,7 +29,8 @@ class Heal:
         return self.heal_amount - other
 
     def __isub__(self, other: float) -> float:
-        return self.heal_amount - other
+        self.heal_amount = max(self.heal_amount - other, 0)
+        return self
 
     def __rsub__(self, other: float) -> float:
         return other - self.heal_amount
