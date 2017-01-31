@@ -1,6 +1,6 @@
 import unittest
 
-from heal import Heal
+from heal import Heal, HolyHeal
 
 
 class HealTests(unittest.TestCase):
@@ -86,6 +86,15 @@ class HealTests(unittest.TestCase):
         heal_2 = Heal(heal_amount=5)
 
         self.assertEqual(heal_1, heal_2)
+
+
+class HolyHealTests(unittest.TestCase):
+    def test_str(self):
+        heal = HolyHeal(heal_amount=5)
+        heal.will_double_heal = False
+
+        expected_message = f'{heal.heal_amount:.2f}'
+        self.assertEqual(str(heal), expected_message)
 
 
 if __name__ == '__main__':
