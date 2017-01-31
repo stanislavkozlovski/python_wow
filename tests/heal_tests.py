@@ -149,7 +149,16 @@ class ProtectiveHealTests(unittest.TestCase):
         health = 100
         expected_health = health + self.heal_amount
         health = health + self.p_heal
-        
+
+        self.assertEqual(health, expected_health)
+        self.assertEqual(self.target.absorption_shield, self.shield)
+
+    def test_radd(self):
+        # Should apply the shield to the target and add the heal
+        health = 100
+        expected_health = health + self.heal_amount
+        health += self.p_heal
+
         self.assertEqual(health, expected_health)
         self.assertEqual(self.target.absorption_shield, self.shield)
 
