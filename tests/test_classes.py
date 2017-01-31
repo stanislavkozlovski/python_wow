@@ -1,6 +1,9 @@
 import unittest
+import sys
+from io import StringIO
 
 from classes import Paladin
+from spells import PaladinSpell
 from models.spells.loader import load_paladin_spells_for_level
 
 
@@ -97,6 +100,24 @@ class PaladinTests(unittest.TestCase):
 
         for spell in spells_to_learn:
             self.assertIn(spell.name, pl.learned_spells)
+
+    def test_learn_new_spell(self):
+        """ Given a PaladinSpell, add it to the learned_spells dictionary"""
+        spell = PaladinSpell(name="Too_Alive", rank=5)
+        expected_message = f'You have learned a new spell - {spell.name}'
+
+        self.assertNotIn(spell.name, self.dummy.learned_spells)
+        try:
+            output = StringIO()
+            sys.stdout = output
+
+            self.dummy.learn_new_spell(spell)
+
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+        self.assertIn(spell.name, self.dummy.learned_spells)
+
 
 if __name__ == '__main__':
     unittest.main()
