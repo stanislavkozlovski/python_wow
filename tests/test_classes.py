@@ -42,5 +42,16 @@ class PaladinTests(unittest.TestCase):
         # All cooldowns should be reset
         self.assertTrue(all([spell._cooldown_counter == 0 for spell in self.dummy.learned_spells.values()]))
 
+    def test_reset_spell_cooldowns(self):
+        """ The reset_spell_cooldowns goes through every spell and resets its CD"""
+        for spell in self.dummy.learned_spells.values():
+            spell._cooldown_counter = 100
+        self.assertTrue(all([spell._cooldown_counter != 0 for spell in self.dummy.learned_spells.values()]))
+
+        self.dummy.reset_spell_cooldowns()
+
+        self.assertTrue(all([spell._cooldown_counter == 0 for spell in self.dummy.learned_spells.values()]))
+
+
 if __name__ == '__main__':
     unittest.main()
