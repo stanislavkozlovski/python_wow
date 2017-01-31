@@ -192,5 +192,25 @@ class PaladinTests(unittest.TestCase):
         # Assert that it called the spell_seal_of_righteousness function
         self.assertEqual(result, fol_success_msg)
 
+    def test_spell_handler_ms(self):
+        unsuccessful_message = 'Unsuccessful cast'
+        ms_success_msg = 'MS_CASTED'
+        ms_command_name = 'ms'
+        # Mock the function that should get called
+        self.dummy.spell_melting_strike = lambda target=None, spell=None: ms_success_msg
+
+        try:
+            output = StringIO()
+            sys.stdout = output
+            result = self.dummy.spell_handler(ms_command_name, None)
+
+            self.assertNotIn(unsuccessful_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        # Assert that it called the spell_seal_of_righteousness function
+        self.assertEqual(result, ms_success_msg)
+
+
 if __name__ == '__main__':
     unittest.main()
