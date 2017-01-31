@@ -110,6 +110,14 @@ class DamageTests(unittest.TestCase):
     def test_str_with_no_damage(self):
         self.assertEqual(str(Damage()), "0 damage")
 
+    def test_sub_with_damage(self):
+        """ __sub__ works by adding the phys/magic damage and removing the other from it"""
+        dmg_1 = Damage(phys_dmg=5, magic_dmg=5)
+        dmg_2 = Damage(phys_dmg=2, magic_dmg=2)
+        expected_result = (5+5) - (2+2)
+
+        self.assertEqual(dmg_1-dmg_2, expected_result)
+
 
 if __name__ == '__main__':
     unittest.main()
