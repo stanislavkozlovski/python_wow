@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import Mock
 import sys
 from io import StringIO
 import inspect
@@ -328,6 +329,33 @@ class PaladinTests(unittest.TestCase):
 
         self.assertEqual(self.dummy.mana, expected_mana)
         self.assertEqual(self.dummy.health, orig_health)  # should have only overhealed
+
+    def test_spell_melting_strike(self):
+        ms: PaladinSpell = self.dummy.learned_spells[Paladin.KEY_MELTING_STRIKE]
+        expected_mana = self.dummy.mana - ms.mana_cost
+        expected_message2 = 'Took attack'
+        expected_message3 = 'Took buff'
+        take_attack = lambda x, y: print('Took attack')
+        add_buff = lambda x: print('Took buff')
+        target = Mock(name="All",
+                      take_attack=take_attack,
+                      add_buff=add_buff)
+        expected_message = f'{ms.name} damages {target.name} for {ms.damage1:.2f} physical damage!'
+
+        try:
+            output = StringIO()
+            sys.stdout = output
+
+            result = self.dummy.spell_melting_strike(ms, target)
+
+            self.assertIn(expected_message, output.getvalue())
+            self.assertIn(expected_message2, output.getvalue())
+            self.assertIn(expected_message3, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        self.assertTrue(result)
+        self.assertEqual(expected_mana, self.dummy.mana)
 
 
 if __name__ == '__main__':
