@@ -39,7 +39,8 @@ class NatureHeal(Heal):
     The idea with nature heal is that every such heal leaves off a HoT (healing over time effect)
     for a % of the main heal
     """
-    raise NotImplementedError()
+    def __init__(self):
+        raise NotImplementedError()
 
 
 class HolyHeal(Heal):
