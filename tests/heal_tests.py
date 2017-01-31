@@ -80,6 +80,13 @@ class HealTests(unittest.TestCase):
 
         self.assertEqual(amount-heal, expected_result)
 
+    def test_eq(self):
+        """ __eq__ checks for the heal_amount being equal"""
+        heal_1 = Heal(heal_amount=5)
+        heal_2 = Heal(heal_amount=5)
+
+        self.assertEqual(heal_1, heal_2)
+
 
 if __name__ == '__main__':
     unittest.main()
