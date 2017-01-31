@@ -71,6 +71,15 @@ class HealTests(unittest.TestCase):
 
         self.assertEqual(heal, expected_heal)
 
+    def test_rsub(self):
+        heal_amount = 5
+        heal = Heal(heal_amount=heal_amount)
+        amount = 10
+
+        expected_result = amount - heal_amount
+
+        self.assertEqual(amount-heal, expected_result)
+
 
 if __name__ == '__main__':
     unittest.main()
