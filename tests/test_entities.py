@@ -72,6 +72,11 @@ class LivingThingTests(unittest.TestCase):
         self.assertEqual(self.dummy.health, 0)
         self.assertFalse(self.dummy.is_alive())
 
+    def test_has_enough_mana(self):
+        self.assertTrue(self.dummy.has_enough_mana(self.dummy.mana-1))
+        self.assertTrue(self.dummy.has_enough_mana(self.dummy.mana))
+        self.assertFalse(self.dummy.has_enough_mana(self.dummy.mana+1))
+
     def test_regenerate(self):
         """
         The regenerate function should reset the character's health/mana to it's max
