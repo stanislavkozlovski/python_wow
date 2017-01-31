@@ -175,7 +175,7 @@ class Paladin(Character):
         percentage_mod = (abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
 
         sor_damage = 0
-        damage_to_deal = random.randint(int(self.min_damage), int(self.max_damage) + 1)
+        damage_to_deal = random.randint(int(self.min_damage), int(self.max_damage))
 
         if self.SOR_ACTIVE:
             sor_damage = self._spell_seal_of_righteousness_attack()
