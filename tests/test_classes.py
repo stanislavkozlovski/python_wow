@@ -392,5 +392,25 @@ class PaladinTests(unittest.TestCase):
         self.assertEqual(received_dmg.magic_dmg, expected_sor_dg)
         self.assertEqual(sor_dmg, expected_sor_dg)
 
+    def test_attack(self):
+        expected_message2 = 'Took Attack!'
+        expected_message3 = 'Get_take_attack_damage_repr called!'
+        victim = Mock(level=self.dummy.level, take_attack=lambda x, y: print(expected_message2),
+                      get_take_attack_damage_repr=lambda x,y: print(expected_message3))
+        expected_message = f'{self.dummy.name} attacks {victim.name}'
+
+        try:
+            output = StringIO()
+            sys.stdout = output
+            
+            self.dummy.attack(victim)
+
+            self.assertIn(expected_message, output.getvalue())
+            self.assertIn(expected_message2, output.getvalue())
+            self.assertIn(expected_message3, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+
 if __name__ == '__main__':
     unittest.main()
