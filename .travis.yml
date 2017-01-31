@@ -1,8 +1,9 @@
-language: python
+language:  python
 python:
   - "3.6"
 # command to install dependencies
-install: "pip install termcolor", "pip install sqlalchemy"
+install:
+  - "pip install termcolor"
+  - "pip install sqlalchemy"
 # command to run tests
 script: "python3 -m tests.run_tests"
-	
