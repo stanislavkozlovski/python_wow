@@ -89,6 +89,17 @@ class HealTests(unittest.TestCase):
 
 
 class HolyHealTests(unittest.TestCase):
+    def test_init(self):
+        # the __init__ should decide whether the heal will be a crit or not, depending
+        # on the check_double_heal() function which relies on a constant percentage chance
+        # in constants.py
+
+        # create multiple heals
+        heals = []
+        heal_amount = 5
+        for _ in range(100):
+            heals.append(HolyHeal(heal_amount).heal_amount)
+
     def test_str(self):
         heal = HolyHeal(heal_amount=5)
         heal.will_double_heal = False
@@ -102,6 +113,8 @@ class HolyHealTests(unittest.TestCase):
 
         expected_message = f'{heal.heal_amount:.2f} crit'
         self.assertEqual(str(heal), expected_message)
+
+    
 
 
 if __name__ == '__main__':
