@@ -1,6 +1,7 @@
 import unittest
 import sys
 from io import StringIO
+import inspect
 
 from classes import Paladin
 from spells import PaladinSpell
@@ -117,6 +118,16 @@ class PaladinTests(unittest.TestCase):
         finally:
             sys.stdout = sys.__stdout__
         self.assertIn(spell.name, self.dummy.learned_spells)
+
+    def test_lookup_available_spells_to_learn(self):
+        """ It's a generator function returning a spell that can be learnt for the level """
+        lev = 3
+        expected_spells = load_paladin_spells_for_level(lev)
+        generator = self.dummy._lookup_available_spells_to_learn(lev)
+
+        self.assertTrue(inspect.isgenerator(generator))
+        for spell in expected_spells:
+            self.assertEqual(vars(next(generator)), vars(spell))
 
 
 if __name__ == '__main__':
