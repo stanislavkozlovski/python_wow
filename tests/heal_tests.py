@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import Mock
 
 from constants import PROTECTIVE_HEAL_ABSORB_PERCENTAGE
 from heal import Heal, HolyHeal, ProtectiveHeal
@@ -129,7 +130,7 @@ class HolyHealTests(unittest.TestCase):
 
 class ProtectiveHealTests(unittest.TestCase):
     def setUp(self):
-        self.target = "Targ"
+        self.target = Mock(absorption_shield=0)
         self.heal_amount = 50
         self.p_heal = ProtectiveHeal(heal_amount=self.heal_amount, target=self.target)
         self.shield = round((PROTECTIVE_HEAL_ABSORB_PERCENTAGE / 100) * self.heal_amount, 2)
@@ -142,6 +143,15 @@ class ProtectiveHealTests(unittest.TestCase):
     def test_str(self):
         expected_str = f'{self.heal_amount:.2f} ({self.shield:.2f} shield)'
         self.assertEqual(str(self.p_heal), expected_str)
+
+    def test_add(self):
+        # Should apply the shield to the target and add the heal
+        health = 100
+        expected_health = health + self.heal_amount
+        health = health + self.p_heal
+        
+        self.assertEqual(health, expected_health)
+        self.assertEqual(self.target.absorption_shield, self.shield)
 
 
 if __name__ == '__main__':
