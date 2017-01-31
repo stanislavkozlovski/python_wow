@@ -198,7 +198,18 @@ class DamageTests(unittest.TestCase):
 
         self.assertEqual(dmg, expected_dmg)
 
-    
+    def test_handle_absorption_bigger_than_both_dmg(self):
+        absorption_shield = 17
+        dmg = Damage(phys_dmg=10, magic_dmg=6)
+        left_shield = dmg.handle_absorption(absorption_shield)
+
+        expected_dmg = Damage(phys_dmg=0, magic_dmg=0)
+        expected_dmg.magic_absorbed = 6
+        expected_dmg.phys_absorbed = 10
+        expected_shield = 1
+
+        self.assertEqual(dmg, expected_dmg)
+        self.assertEqual(left_shield, expected_shield)
 
 if __name__ == '__main__':
     unittest.main()
