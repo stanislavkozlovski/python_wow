@@ -93,6 +93,10 @@ class PaladinTests(unittest.TestCase):
             has_smaller_rank = spell.rank > pl.learned_spells[spell.name].rank if not has_not_learned_spell else False
             self.assertTrue(has_not_learned_spell or has_smaller_rank)
 
+        pl._lookup_and_handle_new_spells()
+
+        for spell in spells_to_learn:
+            self.assertIn(spell.name, pl.learned_spells)
 
 if __name__ == '__main__':
     unittest.main()
