@@ -15,6 +15,8 @@ class Paladin(Character):
             Seal of Righteousness
                 Deals X damage on each attack, needs to be activated first
     """
+    # TODO: Storing the spells here will be a problem if we ever want to have 2 simultaneous players or
+    #       the ability to load another character without exiting the game.
     learned_spells: {str: PaladinSpell} = {}
     SOR_ACTIVE = False  # Seal of Righteousness trigger
     SOR_TURNS = 0  # Holds the remaining turns for SOR
@@ -32,6 +34,12 @@ class Paladin(Character):
         self.min_damage = 1
         self.max_damage = 3
         self._lookup_and_handle_new_spells()
+
+    def end_turn_update(self):
+        super().end_turn_update()
+        if self.SOR_TURNS == 0:  # fade spell
+            self.SOR_ACTIVE = False
+            print(f'{self.KEY_SEAL_OF_RIGHTEOUSNESS} has faded from {self.name}')
 
     def leave_combat(self):
         super().leave_combat()
@@ -120,13 +128,8 @@ class Paladin(Character):
         return True
 
     def _spell_seal_of_righteousness_attack(self):
-        if self.SOR_TURNS == 0:  # fade spell
-            self.SOR_ACTIVE = False
-            print(f'{self.KEY_SEAL_OF_RIGHTEOUSNESS} has faded from {self.name}')
-            return 0
-        else:
-            self.SOR_TURNS -= 1
-            return self.learned_spells[self.KEY_SEAL_OF_RIGHTEOUSNESS].damage1  # damage from SOR
+        self.SOR_TURNS -= 1
+        return self.learned_spells[self.KEY_SEAL_OF_RIGHTEOUSNESS].damage1  # damage from SOR
 
     @cast_spell
     def spell_flash_of_light(self, spell):
