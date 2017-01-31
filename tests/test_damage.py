@@ -59,6 +59,14 @@ class DamageTests(unittest.TestCase):
 
         self.assertEqual(str(dmg), expected_str)
 
+    def test_str_with_phys_and_magic_dmg(self):
+        expected_phys = 10.2
+        expected_magic = 10.10
+        dmg = Damage(phys_dmg=10.199, magic_dmg=10.111)
+        expected_str = f'{expected_phys:.2f} physical damage and {expected_magic:.2f} magical damage'
+
+        self.assertEqual(str(dmg), expected_str)
+
 
 if __name__ == '__main__':
     unittest.main()
