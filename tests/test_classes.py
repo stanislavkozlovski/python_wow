@@ -1,8 +1,9 @@
 import unittest
-from unittest.mock import Mock
 import sys
-from io import StringIO
 import inspect
+from unittest.mock import Mock
+from io import StringIO
+from math import ceil
 
 from damage import Damage
 from classes import Paladin
@@ -381,14 +382,14 @@ class PaladinTests(unittest.TestCase):
         prc_mod = (level_diff * 0.1)
         level = self.dummy.level + level_diff
         expected_sor_dg = sor.damage1 - (sor.damage1 * prc_mod)
-        expected_min_dmg = self.dummy.min_damage - (self.dummy.min_damage * prc_mod)
-        expected_max_dmg = self.dummy.max_damage - (self.dummy.max_damage * prc_mod)
+        expected_min_dmg = int(self.dummy.min_damage) - (self.dummy.min_damage * prc_mod)
+        expected_max_dmg = int(self.dummy.max_damage) - (self.dummy.max_damage * prc_mod)
         self.dummy.spell_seal_of_righteousness(sor)
 
         received_dmg, sor_dmg = self.dummy.get_auto_attack_damage(level)
-
         self.assertTrue(isinstance(received_dmg, Damage))
-        self.assertTrue(int(expected_min_dmg) <= received_dmg.phys_dmg <= int(expected_max_dmg))
+
+        self.assertTrue(expected_min_dmg <= received_dmg.phys_dmg <= expected_max_dmg)
         self.assertEqual(received_dmg.magic_dmg, expected_sor_dg)
         self.assertEqual(sor_dmg, expected_sor_dg)
 
