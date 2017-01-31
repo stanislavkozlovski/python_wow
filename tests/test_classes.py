@@ -60,10 +60,10 @@ class PaladinTests(unittest.TestCase):
 
         spells_to_learn = [spell.name for spell in load_paladin_spells_for_level(pl.level + 1)]
         for spell in spells_to_learn:
-            self.assertNotIn(spell, self.dummy.learned_spells)
+            self.assertNotIn(spell, pl.learned_spells)
         pl._level_up()
         for spell in spells_to_learn:
-            self.assertIn(spell, self.dummy.learned_spells)
+            self.assertIn(spell, pl.learned_spells)
 
     def test_level_up_to_level(self):
         """ Except the normal behaviour, it should learn new spells for the character """
@@ -74,11 +74,12 @@ class PaladinTests(unittest.TestCase):
 
         spells_to_learn = [spell for level in range(2, to_level + 1) for spell in load_paladin_spells_for_level(level)]
         for spell in spells_to_learn:
-            self.assertTrue(spell.name not in self.dummy.learned_spells
-                            or spell.rank > self.dummy.learned_spells[spell.name].rank)
+            has_not_learned_spell = spell.name not in pl.learned_spells
+            has_smaller_rank = spell.rank > pl.learned_spells[spell.name].rank if not has_not_learned_spell else False
+            self.assertTrue(has_not_learned_spell or has_smaller_rank)
         pl._level_up(to_level=to_level)
         for spell in spells_to_learn:
-            self.assertIn(spell.name, self.dummy.learned_spells)
+            self.assertIn(spell.name, pl.learned_spells)
 
 
 if __name__ == '__main__':
