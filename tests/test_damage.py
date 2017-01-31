@@ -15,6 +15,18 @@ class DamageTests(unittest.TestCase):
         self.assertEqual(dmg.phys_absorbed, expected_absorbed)
         self.assertEqual(dmg.magic_absorbed, expected_absorbed)
 
+    def test_eq(self):
+        """ Two Damage classes should be equal if their magic/phys dmg and absorbed are equal"""
+        dmg_1 = Damage(1, 1)
+        dmg_2 = Damage(1, 1)
+        self.assertEqual(dmg_1, dmg_2)
+        dmg_1.phys_absorbed += 0.1
+        self.assertNotEqual(dmg_1, dmg_2)
+        dmg_1.phys_absorbed = dmg_2.phys_absorbed
+        self.assertEqual(dmg_1, dmg_2)
+        dmg_1.magic_dmg += 1
+        self.assertNotEqual(dmg_1, dmg_2)
+
 
 if __name__ == '__main__':
     unittest.main()
