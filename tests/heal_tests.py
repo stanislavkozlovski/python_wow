@@ -60,6 +60,17 @@ class HealTests(unittest.TestCase):
 
         self.assertEqual(heal, expected_heal)
 
+    def test_isub_negative_amount(self):
+        """ Should reset it to 0 rather than have it stay negative"""
+        heal_amount = 5
+        heal = Heal(heal_amount=heal_amount)
+        sub_amount = 10
+
+        expected_heal = Heal(heal_amount=0)
+        heal -= sub_amount
+
+        self.assertEqual(heal, expected_heal)
+
 
 if __name__ == '__main__':
     unittest.main()
