@@ -81,6 +81,18 @@ class PaladinTests(unittest.TestCase):
         for spell in spells_to_learn:
             self.assertIn(spell.name, pl.learned_spells)
 
+    def test_lookup_and_handle_new_spells(self):
+        """ Should look up the available spells for our level and learn them or update our existing ones"""
+        Paladin.learned_spells = {}
+        pl = Paladin(name="fuck a nine to five")
+        print(pl.learned_spells)
+        pl.level = 3
+        spells_to_learn = [spell for spell in load_paladin_spells_for_level(pl.level)]
+        for spell in spells_to_learn:
+            has_not_learned_spell = spell.name not in pl.learned_spells
+            has_smaller_rank = spell.rank > pl.learned_spells[spell.name].rank if not has_not_learned_spell else False
+            self.assertTrue(has_not_learned_spell or has_smaller_rank)
+
 
 if __name__ == '__main__':
     unittest.main()
