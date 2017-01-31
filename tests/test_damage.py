@@ -87,6 +87,16 @@ class DamageTests(unittest.TestCase):
 
         self.assertEqual(str(dmg), expected_str)
 
+    def test_str_with_absorbed_only(self):
+        expected_magic_absorbed = 5.5
+        expected_phys_absorbed = 5.4
+        dmg = Damage()
+        dmg.magic_absorbed = expected_magic_absorbed
+        dmg.phys_absorbed = expected_phys_absorbed
+
+        expected_str = f'0.00 physical damage ({expected_phys_absorbed:.2f} absorbed) and 0.00 magical damage ({expected_magic_absorbed:.2f} absorbed)'
+
+        self.assertEqual(str(dmg), expected_str)
 
 if __name__ == '__main__':
     unittest.main()
