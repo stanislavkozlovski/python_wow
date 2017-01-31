@@ -1,14 +1,14 @@
-engines: 
-  pep8: 
-    enabled: true 
-    config: 
-      languages: 
-        - python 
- 
-ratings: 
-   paths: 
-   - "**.py" 
- 
-exclude_paths: 
-- "tests/" 
-- "docs/" 
+engines:
+  pep8:
+    enabled: true
+    config:
+    	languages:
+        - python
+
+ratings:
+   paths:
+   - "**.py"
+
+exclude_paths:
+- "tests/"
+- "docs/"

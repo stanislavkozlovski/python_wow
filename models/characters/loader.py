@@ -1,5 +1,6 @@
 from sqlalchemy.orm import load_only
 
+from exceptions import NoSuchCharacterError
 from models.characters.saved_character import SavedCharacterSchema
 from database.main import session
 

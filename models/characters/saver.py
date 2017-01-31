@@ -115,12 +115,12 @@ def save_completed_quests(char_id: int, completed_quests: set):
     """
     This function saves all the quests that the character has completed into the saved_character_completed_quests DB table
     Table sample contents:
-    saved_character_id,  quest_name
-                     1,   A Canine Menace
-                     1,   Canine-Like Hunger
+    saved_character_id,  quest_id
+                     1,   1
+                     1,   2
 
     :param char_id: the ID of the character we have to save as
-    :param completed_quests: a set containing all the names of the completed quests -> {"A Canine Menace", "Canine-Like Hunger"} in this case
+    :param completed_quests: a set containing all the ids of the completed quests -> {1, 2} in this case
     """
 
     delete_rows_from_table(table_name=DB_SC_COMPLETED_QUESTS_TABLE_NAME, char_id=char_id)  # delete the old values first

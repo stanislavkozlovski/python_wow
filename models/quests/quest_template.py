@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
 from utils.helper import parse_int
@@ -53,11 +53,11 @@ CONT--          zone,           sub_zone,   xp_reward, comment
     zone = Column(String(60))
     sub_zone = Column(String(60))
     xp_reward = Column(Integer)
-    comment = Column(Text)
+    description = Column(Text)  # TODO: Add desc to the Quest class
     reward1_id = Column('item_reward1', Integer, ForeignKey('item_template.entry'))
     reward2_id = Column('item_reward2', Integer, ForeignKey('item_template.entry'))
     reward3_id = Column('item_reward3', Integer, ForeignKey('item_template.entry'))
-    item_choice_enabled = Column(Integer)  # TODO: Change
+    item_choice_enabled = Column(Boolean)
 
     reward1 = relationship('ItemTemplateSchema', foreign_keys=[reward1_id])
     reward2 = relationship('ItemTemplateSchema', foreign_keys=[reward2_id])

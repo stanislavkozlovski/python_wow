@@ -1,0 +1,12 @@
+language:  python
+python:
+  - "3.6"
+# command to install dependencies
+install:
+  - "pip install termcolor"
+  - "pip install sqlalchemy"
+# command to run tests
+script: "python3 -m tests.run_tests"
+addons:
+    code_climate:
+        repo_token: 7bb730babe64e75d0efa3f8077e3cdef60f6aa972427ab9b22f724e07e538632

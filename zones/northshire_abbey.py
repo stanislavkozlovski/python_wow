@@ -6,12 +6,12 @@ to have dead creatures stay dead, not be reloaded
 the cs in cs_alive_monsters and similar names stands for Current Subzone
 """
 from zones.zone import Zone, SubZone
+from constants import ZONE_MOVE_BLOCK_SPECIAL_KEY, GARRICK_PADFOOT_GUID
 from scripts.zones.northshire_abbey.a_peculiar_hut.haskel_paxton_conversation import (
     SCRIPT_NAME as A_PECULIAR_HUT_ENTRY_SCRIPT_NAME, script as A_PECULIAR_HUT_ENTRY_SCRIPT)
 
 
 class NorthshireAbbey(Zone):
-    GUID_GARRY_PADFOOT = 14  # The GUID of Garry Padfoot
     # the _map that shows us where we can go from our current subzone
     zone_map = {"Northshire Valley": ["Northshire Vineyards"],
                 "Northshire Vineyards": ["Northshire Valley", "A Peculiar Hut"],
@@ -51,9 +51,9 @@ class NorthshireAbbey(Zone):
 
                 if destination == "A Peculiar Hut":
                     # this means we are in Northshire Vineyards
-                    if self.GUID_GARRY_PADFOOT in self.cs_alive_monsters.keys():  # if garry padfoot is alive
+                    if GARRICK_PADFOOT_GUID in self.cs_alive_monsters.keys():  # if garry padfoot is alive
                         print("Garrick Padfoot is blocking the way.")
-                        return 0
+                        return ZONE_MOVE_BLOCK_SPECIAL_KEY
 
                 if not self.loaded_zones[destination]:  # if we don't have the destination's attributes loaded load them
                     self._load_zone(destination, character)
@@ -92,7 +92,7 @@ class NorthshireAbbey(Zone):
 
         if subzone == "A Peculiar Hut" and not character.has_loaded_script(A_PECULIAR_HUT_ENTRY_SCRIPT_NAME):
             # only A Peculiar Hut has a script that starts on the first entry
-            character.loaded_script(A_PECULIAR_HUT_ENTRY_SCRIPT_NAME)
+            character.load_script(A_PECULIAR_HUT_ENTRY_SCRIPT_NAME)
             self.loaded_zones[subzone].load_on_zone_entry_script(character)
 
 

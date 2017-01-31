@@ -15,6 +15,8 @@ class Paladin(Character):
             Seal of Righteousness
                 Deals X damage on each attack, needs to be activated first
     """
+    # TODO: Storing the spells here will be a problem if we ever want to have 2 simultaneous players or
+    #       the ability to load another character without exiting the game.
     learned_spells: {str: PaladinSpell} = {}
     SOR_ACTIVE = False  # Seal of Righteousness trigger
     SOR_TURNS = 0  # Holds the remaining turns for SOR
@@ -25,15 +27,19 @@ class Paladin(Character):
     def __init__(self, name: str, level: int = 1, health: int = 12, mana: int = 15, strength: int = 4,
                  loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=(),
                  saved_inventory: dict={"gold": 0}, saved_equipment: dict=CHARACTER_DEFAULT_EQUIPMENT):
-        super().__init__(name=name, health=health, mana=mana, strength=strength, loaded_scripts=loaded_scripts,
+        super().__init__(name=name, level=level, health=health, mana=mana, strength=strength, loaded_scripts=loaded_scripts,
                          killed_monsters=killed_monsters, completed_quests=completed_quests,
                          saved_inventory=saved_inventory, saved_equipment=saved_equipment)
+        # TODO: Equip items AFTER level up
         self.min_damage = 1
         self.max_damage = 3
         self._lookup_and_handle_new_spells()
 
-        if level > 1:
-            self._level_up(to_level=level)
+    def end_turn_update(self):
+        super().end_turn_update()
+        if self.SOR_TURNS == 0:  # fade spell
+            self.SOR_ACTIVE = False
+            print(f'{self.KEY_SEAL_OF_RIGHTEOUSNESS} has faded from {self.name}')
 
     def leave_combat(self):
         super().leave_combat()
@@ -48,18 +54,14 @@ class Paladin(Character):
         for spell in self.learned_spells.values():
             spell.reset_cd()
 
-    def _level_up(self, to_level: int=0):
+    def _level_up(self, to_level: int=0, to_print: bool=True):
         """
         This method levels the character up, if we're given a to_level we need to level up until we get to that level
         """
         if to_level:
-            # level up multiple times
-            for i in range(self.level, to_level):
-                self._level_up()
-            self.xp_req_to_level: int = self._lookup_next_xp_level_req()
+            super()._level_up(to_level=to_level, to_print=to_print)
         else:
-            # level up once
-            super()._level_up()
+            super()._level_up(to_print=to_print)
             self._lookup_and_handle_new_spells()
 
     def _lookup_and_handle_new_spells(self):
@@ -126,13 +128,8 @@ class Paladin(Character):
         return True
 
     def _spell_seal_of_righteousness_attack(self):
-        if self.SOR_TURNS == 0:  # fade spell
-            self.SOR_ACTIVE = False
-            print(f'{self.KEY_SEAL_OF_RIGHTEOUSNESS} has faded from {self.name}')
-            return 0
-        else:
-            self.SOR_TURNS -= 1
-            return self.learned_spells[self.KEY_SEAL_OF_RIGHTEOUSNESS].damage1  # damage from SOR
+        self.SOR_TURNS -= 1
+        return self.learned_spells[self.KEY_SEAL_OF_RIGHTEOUSNESS].damage1  # damage from SOR
 
     @cast_spell
     def spell_flash_of_light(self, spell):
@@ -178,7 +175,7 @@ class Paladin(Character):
         percentage_mod = (abs(level_difference) * 0.1)  # calculates by how many % we're going to increase/decrease dmg
 
         sor_damage = 0
-        damage_to_deal = random.randint(int(self.min_damage), int(self.max_damage) + 1)
+        damage_to_deal = random.randint(int(self.min_damage), int(self.max_damage))
 
         if self.SOR_ACTIVE:
             sor_damage = self._spell_seal_of_righteousness_attack()
@@ -207,12 +204,6 @@ class Paladin(Character):
             print(f'{self.name} attacks {victim.name} for {auto_attack_print}!')
 
         victim.take_attack(auto_attack, self.level)
-
-    def has_enough_mana(self, mana_cost: int) -> bool:
-        """
-        Check if we have enough mana to cast the spell we want to cast and return the result.
-        """
-        return self.mana >= mana_cost
 
     def get_class(self):
         """

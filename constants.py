@@ -2,6 +2,29 @@
 from models.creatures.creature_defaults.loader import load_creature_defaults
 from models.misc.loader import load_character_level_stats, load_character_xp_requirements
 
+
+ZONE_MOVE_BLOCK_SPECIAL_KEY = '$'
+GARRICK_PADFOOT_GUID = 14
+
+HOLY_HEAL_DOUBLE_HEAL_CHANCE = 30
+PROTECTIVE_HEAL_ABSORB_PERCENTAGE = 30
+KEY_ARMOR_ATTRIBUTE = "armor"
+KEY_STRENGTH_ATTRIBUTE = "strength"
+KEY_HEALTH_ATTRIBUTE = "health"
+KEY_MANA_ATTRIBUTE = "mana"
+KEY_AGILITY_ATTRIBUTE = 'agility'
+KEY_BONUS_HEALTH_ATTRIBUTE = 'bonus_health'
+KEY_BONUS_MANA_ATTRIBUTE = 'bonus_mana'
+
+KEY_LEVEL_STATS_HEALTH = 'health'
+KEY_LEVEL_STATS_MANA = 'mana'
+
+MAXIMUM_LEVEL_DIFFERENCE_XP_YIELD = 5  # a monster that is 5 levels lower than the character yields no XP
+
+CHAR_STARTER_ZONE, CHAR_STARTER_SUBZONE = "Northshire Abbey", "Northshire Valley"
+CHAR_ATTRIBUTES_TEMPLATE = {KEY_STRENGTH_ATTRIBUTE: 0, KEY_ARMOR_ATTRIBUTE: 0,
+                            KEY_AGILITY_ATTRIBUTE: 0, KEY_BONUS_HEALTH_ATTRIBUTE: 0,
+                            KEY_BONUS_MANA_ATTRIBUTE: 0}
 # these functions run only once due to a decorator
 CREATURE_DEFAULT_VALUES = load_creature_defaults()
 CHARACTER_LEVELUP_BONUS_STATS = load_character_level_stats()

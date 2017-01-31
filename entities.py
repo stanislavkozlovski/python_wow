@@ -3,11 +3,16 @@ This holds the classes for every entity in the game: Monsters and Characters cur
 """
 import random
 from termcolor import colored
-
-from constants import CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS
-from exceptions import ItemNotInInventoryError
+from constants import (CHARACTER_DEFAULT_EQUIPMENT, CHARACTER_LEVELUP_BONUS_STATS, CHARACTER_LEVEL_XP_REQUIREMENTS,
+                       KEY_ARMOR_ATTRIBUTE, KEY_STRENGTH_ATTRIBUTE, KEY_AGILITY_ATTRIBUTE, KEY_BONUS_HEALTH_ATTRIBUTE,
+                       KEY_BONUS_MANA_ATTRIBUTE, KEY_LEVEL_STATS_HEALTH, KEY_LEVEL_STATS_MANA, CHAR_STARTER_ZONE,
+                       CHAR_STARTER_SUBZONE, CHAR_ATTRIBUTES_TEMPLATE, MAXIMUM_LEVEL_DIFFERENCE_XP_YIELD)
+from information_printer import print_level_up_event, print_vendor_products_for_sale
+from exceptions import ItemNotInInventoryError, NonExistantBuffError
+from utils.helper import create_character_attributes_template
 from items import Item, Weapon, Potion, Equipment
 from quest import Quest, FetchQuest
+from decorators import has_item_in_stock
 from damage import Damage
 from buffs import BeneficialBuff, DoT
 
@@ -16,7 +21,6 @@ class LivingThing:
     """
     This is the base class for all things _alive - characters, monsters and etc.
     """
-    KEY_ARMOR = 'armor'
 
     def __init__(self, name: str, health: int = 1, mana: int = 1, level: int = 1):
         self.name = name
@@ -26,16 +30,22 @@ class LivingThing:
         self.max_mana = mana
         self.level = level
         self.absorption_shield = 0
-        self.attributes = {self.KEY_ARMOR: 0}
+        self.attributes = {KEY_ARMOR_ATTRIBUTE: 0}
         self._alive = True
         self._in_combat = False
-        self.buffs = {}  # dict Key: an instance of class Buff, Value: The turns it has left to be active, int
+        self.buffs: {BeneficialBuff or DoT: int} = {}
 
     def is_alive(self):
         return self._alive
 
     def is_in_combat(self):
         return self._in_combat
+
+    def has_enough_mana(self, mana_cost: int) -> bool:
+        """
+        Check if we have enough mana .
+        """
+        return self.mana >= mana_cost
 
     def enter_combat(self):
         self._in_combat = True
@@ -61,7 +71,7 @@ class LivingThing:
     def _update_dots(self):
         """
         This method goes through all the DoT effects on the entity, activates their tick, reduces their duration
-        and, if the are expired, adds them to a list which holds DoTs that should be removed(expired) from the character.
+        and, if the are expired, adds them to a list which holds DoTs that should be removed(expired) from the character
         After iterating through all of the active DoTs, we remove every DoT that is in the list.
         """
         dots_to_remove = []  # type: list of DoTs
@@ -89,7 +99,7 @@ class LivingThing:
         from the character.
         After iterating through all of the active Buffs, we remove every Buff that is in the list
         """
-        buffs_to_remove = []  # type: list of Buffs
+        buffs_to_remove: [BeneficialBuff] = []  # type: list of Buffs
 
         # iterate through active buffs and reduce duration
         for buff in filter(lambda bf: isinstance(bf, BeneficialBuff), self.buffs.keys()):
@@ -105,31 +115,40 @@ class LivingThing:
         for buff in buffs_to_remove:
             self.remove_buff(buff)
 
-    def remove_buff(self, buff: BeneficialBuff):
+    def remove_buff(self, buff: BeneficialBuff or DoT):
         """ Method that handles when a buff is removed/expired"""
-        del self.buffs[buff]
+        if buff not in self.buffs:
+            raise NonExistantBuffError(f"Cannot remove {buff.name} from {self.name} because he does not have it!",
+                                       buff.name)
         if isinstance(buff, BeneficialBuff):
             self._deapply_buff(buff)
             print(f"Buff {buff.name} has expired from {self.name}.")
         elif isinstance(buff, DoT):
             print(f"DoT {buff.name} has expired from {self.name}.")
+        del self.buffs[buff]
 
-    def add_buff(self, buff: BeneficialBuff):
+    def add_buff(self, buff: BeneficialBuff or DoT):
         """ Method that handles when a buff is added to the player
         also adds DoTs to the list"""
+        if buff in self.buffs:
+            self._deapply_buff(buff)
         self.buffs[buff] = buff.duration
         if isinstance(buff, BeneficialBuff):
             self._apply_buff(buff)
 
     def _apply_buff(self, buff: BeneficialBuff):
         """ Add the buff to the living thing's stats"""
-        buff_attributes = buff.get_buffed_attributes()  # type: dict
+        buff_attributes: {str: int} = buff.get_buffed_attributes()
 
         # iterate through the buffed attributes and apply them to the entity
         for buff_type, buff_amount in buff_attributes.items():
             if buff_type == "health":
+                if not self._in_combat:
+                    self.health += buff_amount
                 self.max_health += buff_amount
             elif buff_type == "mana":
+                if not self._in_combat:
+                    self.mana += buff_amount
                 self.max_mana += buff_amount
 
     def _deapply_buff(self, buff: BeneficialBuff):
@@ -141,9 +160,13 @@ class LivingThing:
             if buff_type == "health":
                 # TODO: Reduce health method to reduce active health too, otherwise we can end up with 10/5 HP
                 self.max_health -= buff_amount
+                if self.health > self.max_health:
+                    self.health = self.max_health
             elif buff_type == "mana":
                 # TODO: Reduce mana method to reduce active mana too
                 self.max_mana -= buff_amount
+                if self.mana > self.max_mana:
+                    self.mana = self.max_mana
 
     def _apply_armor_reduction(self, damage: Damage, attacker_level: int) -> Damage:
         """
@@ -152,7 +175,7 @@ class LivingThing:
         :param damage: the raw damage
         :return: the damage with the applied reduction
         """
-        armor = self.attributes[self.KEY_ARMOR]
+        armor = self.attributes[KEY_ARMOR_ATTRIBUTE]
 
         reduction_percentage = armor / (armor + 400 + 85 * attacker_level)
         damage_to_deduct = damage.phys_dmg * reduction_percentage
@@ -187,7 +210,7 @@ class LivingThing:
 
     def take_dot_proc(self, dot: DoT):
         """ this method damages the entity for the dot's proc"""
-        dot_proc_damage = dot.damage  # type: Damage
+        dot_proc_damage: Damage = dot.damage
 
         # due to the way Damage handles addition, subtraction and multiplication, the _calculate_level_difference_damage
         # method below works fine with Damage type
@@ -195,8 +218,11 @@ class LivingThing:
         dot_proc_damage = self._calculate_level_difference_damage(damage_to_deal=dot_proc_damage,
                                                                   target_level=dot.level,
                                                                   inverse=True)
-        # noinspection PyTypeChecker
-        dot_proc_damage = self._apply_damage_absorption(damage=dot_proc_damage)
+        if dot_proc_damage.phys_dmg:  # if there is physical damage in the DoT, apply armor reduction
+            dot_proc_damage = self._apply_armor_reduction(damage=dot_proc_damage,
+                                                          attacker_level=self.level)
+        if self.absorption_shield:  # if we have a shield
+            dot_proc_damage = self._apply_damage_absorption(dot_proc_damage)
 
         print(f'{self.name} suffers {dot_proc_damage} from {dot.name}!')
         self._subtract_health(dot_proc_damage)
@@ -240,7 +266,7 @@ class LivingThing:
         This method subtracts the absorption (if any) from the damage
         :param to_print: A boolean indicating if we want to actually subtract the damage from the shield. If it's true,
         we're getting the damage for the sole reason to print it only, therefore we should not modify anything
-        :return Tuple(Damage, absorbed(float)
+        :return Damage
         """
 
         if self.absorption_shield:  # if there is anything to absorb
@@ -296,11 +322,6 @@ class VendorNPC(FriendlyNPC):
     def __str__(self):
         return f'{self.colored_name} <Vendor>'
 
-    def print_inventory(self):
-        print(f'{self.name}\'s items for sale:')
-        for item, item_count in self.inventory.values():
-            print(f'\t{item_count} {item.name} - {item.buy_price} gold.')
-
     def has_item(self, item_name: str) -> bool:
         """
         Checks if the vendor has the item in stock
@@ -309,22 +330,21 @@ class VendorNPC(FriendlyNPC):
         """
         return item_name in self.inventory.keys()
 
-    def get_item(self, item_name: str) -> Item:
+    @has_item_in_stock
+    def get_item_info(self, item_name: str) -> Item:
         """
         USED ONLY FOR PRINTING/TESTING PURPOSES
         Returns the item we want to get from the vendor,
         """
-        if self.has_item(item_name):
-            return self.inventory[item_name][0]  # returns the item object
-        else:
-            print(f'{self.name} does not have {item_name} for sale.')
-            return None
+        return self.inventory[item_name][0]  # returns the item object
 
+    @has_item_in_stock
     def get_item_price(self, item_name: str) -> int:
         """Returns the price the vendor sells the item for"""
         item, _ = self.inventory[item_name]
         return item.buy_price
 
+    @has_item_in_stock
     def sell_item(self, item_name: str) -> tuple:
         """ Returns a tuple(1,2,3)
             1 - the item object type: Item
@@ -349,7 +369,7 @@ class Monster(LivingThing):
         self.min_damage = min_damage
         self.max_damage = max_damage
         self.xp_to_give = xp_to_give
-        self.attributes[self.KEY_ARMOR] = armor
+        self.attributes[KEY_ARMOR_ATTRIBUTE] = armor
         self.gossip = gossip
         self.respawnable = respawnable  # says if the creature can ever respawn, once killed of course
         self._gold_to_give = self._calculate_gold_reward(gold_to_give_range)
@@ -364,13 +384,13 @@ class Monster(LivingThing):
 
     def get_auto_attack_damage(self, target_level: int):
         # get the base auto attack damage
-        damage_to_deal = random.randint(self.min_damage, self.max_damage + 1)
+        damage_to_deal = random.randint(self.min_damage, self.max_damage)
         # factor in the level difference
         damage_to_deal = self._calculate_level_difference_damage(damage_to_deal, target_level)
 
         return Damage(phys_dmg=damage_to_deal)
 
-    def attack(self, victim):  # victim: Character
+    def attack(self, victim: 'Character'):
         monster_swing: Damage = self.get_auto_attack_damage(victim.level)
 
         victim.take_attack(self.name, monster_swing, self.level)
@@ -399,13 +419,12 @@ class Monster(LivingThing):
 
     def give_loot(self, item_name: str):
         """ Returns the item that's looted and removes it from the monster's inventory"""
-        if item_name not in self.loot:  # TODO: This should not be checked here
-            # unsuccessful loot
+        if item_name not in self.loot:
             print(f'{self.name} did not drop {item_name}.')
             return False
 
-        item = self.loot[item_name] # type: Item
-        del self.loot[item_name] # remove it from the inventory
+        item: Item = self.loot[item_name]
+        del self.loot[item_name]  # remove it as it's looted
         return item
 
     def _die(self):
@@ -434,43 +453,47 @@ class Monster(LivingThing):
 
 
 class Character(LivingThing):
-    # keys are used to access the level_stats dictionary that holds information on stats to update on each level up
-    KEY_LEVEL_STATS_HEALTH = 'health'
-    KEY_LEVEL_STATS_MANA = 'mana'
-    # these keys are used to access the attributes dictionary which holds information on the character's stats
-    KEY_STRENGTH = 'strength'
-    KEY_ARMOR = 'armor'
-    KEY_AGILITY = 'agility'
-    KEY_BONUS_HEALTH = 'bonus_health'
-    KEY_BONUS_MANA = 'bonus_mana'
-
-    def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1,
+    def __init__(self, name: str, level: int=1, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1,
                  loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=set(),
                  saved_inventory: dict={'gold': 0}, saved_equipment: dict=CHARACTER_DEFAULT_EQUIPMENT):
-        super().__init__(name, health, mana, level=1)
+        super().__init__(name, health, mana, level=0)
         self.min_damage = 0
         self.max_damage = 1
         self.equipped_weapon = Weapon(name="Starter Weapon", item_id=0)
         self.experience = 0
         self.xp_req_to_level = 400
-        self.bonus_health = 0
-        self.bonus_mana = 0
-        self.attributes = {self.KEY_STRENGTH: strength, self.KEY_ARMOR: 75, self.KEY_AGILITY: agility, self.KEY_BONUS_HEALTH: 0,
-                      self.KEY_BONUS_MANA: 0}  # dictionary holding attributes, KEY: strength, Value: 5
-        self.current_zone = "Northshire Abbey"
-        self.current_subzone = "Northshire Valley"
-        self.loaded_scripts = loaded_scripts  # holds the scripts that the character has seen (which should load only once)
-        self.killed_monsters = killed_monsters  # a set that holds the GUIDs of the creatures that\
-        #  the character has killed (and that should not be killable a second time)
-        self.completed_quests = completed_quests  #  a set that holds the ids of the quests that the character has completed
+        self._bonus_health = 0
+        self._bonus_mana = 0
+        self._bonus_strength = 0
+        self._bonus_armor = 0
+        self.attributes: {str: int} = create_character_attributes_template()
+        self._level_up(to_print=False)  # level up to 1
+        if level > 1:
+            self._level_up(to_level=level, to_print=False)
+
+        self.current_zone = CHAR_STARTER_ZONE
+        self.current_subzone = CHAR_STARTER_SUBZONE
+        # holds the scripts that the character has seen (which should load only once)
+        self.loaded_scripts: set() = loaded_scripts
+        # holds the GUIDs of the creatures that the character has killed (and that should not be killable a second time)
+        self.killed_monsters: set() = killed_monsters
+        self.completed_quests: set() = completed_quests  # ids of the quests that the character has completed
         self.quest_log = {}
         self.inventory = saved_inventory # dict Key: str, Value: tuple(Item class instance, Item Count)
         self.equipment = saved_equipment # dict Key: Equipment slot, Value: object of class Equipment
+
         self._handle_load_saved_equipment()  # add up the attributes for our saved_equipment
 
     def start_turn_update(self):
         super().start_turn_update()
         self.update_spell_cooldowns()
+
+    def add_item_to_inventory(self, item: Item, item_count=1):
+        count = item_count
+        if item.name in self.inventory:
+            count += self.inventory[item.name][1]
+
+        self.inventory[item.name] = (item, count)
 
     def equip_item(self, item: Item):
         """
@@ -491,14 +514,10 @@ class Character(LivingThing):
             # transfer the equipped weapon to the inventory
             eq_weapon = self.equipped_weapon
 
-            if eq_weapon.name in self.inventory.keys():  # if we have such an item in the inventory, we add one more
-                weapon_in_inventory, wep_count = self.inventory[eq_weapon.name]
-                self.inventory[eq_weapon.name] = weapon_in_inventory, wep_count + 1
-            else:  # we don't have such an item in the inventory, we create one
-                self.inventory[eq_weapon.name] = eq_weapon, 1
+            self.add_item_to_inventory(eq_weapon)
 
             self._subtract_attributes(eq_weapon.attributes)  # remove the attributes it has given us
-            self.equip_weapon(item)
+            self._equip_weapon(item)
         elif isinstance(item, Equipment):
             item_in_inventory, count = self.inventory[item.name]
 
@@ -510,17 +529,13 @@ class Character(LivingThing):
 
             # transfer the equipped item back to the inventory
             # TODO: Handle custom error if there isn't such a slot in the equipment
-            equipped_item = self.equipment[item.slot]  # type: Equipment
+            equipped_item: Equipment = self.equipment[item.slot]
 
-            if equipped_item:  # if we had such an item equipped
-                if equipped_item.name in self.inventory.keys():
-                    item_in_inventory, item_count = self.inventory[equipped_item.name]
-                    self.inventory[equipped_item.name] = item_in_inventory, item_count + 1
-                else:  # we don't have such an item in the inventory, we create one
-                    self.inventory[equipped_item.name] = equipped_item, 1
+            if equipped_item:
+                self.add_item_to_inventory(equipped_item)
                 self._subtract_attributes(equipped_item.attributes)
 
-            self.equip_gear(item)
+            self._equip_gear(item)
 
         self._calculate_stats_formulas()  # always recalculate formulas when adding an item
 
@@ -530,7 +545,7 @@ class Character(LivingThing):
         :param item: an instance of class Item
         """
         if isinstance(item, Potion):
-            potion = item # type: Potion
+            potion: Potion = item
             potion_in_inventory, count = self.inventory[potion.name]
 
             # remove the potion we're consuming from the inventory
@@ -543,12 +558,12 @@ class Character(LivingThing):
             # call the potion's consume method
             potion.consume(self)
 
-    def equip_weapon(self, weapon: Weapon):
+    def _equip_weapon(self, weapon: Weapon):
         print(f'{self.name} has equipped Weapon {weapon.name}')
         self.equipped_weapon = weapon
         self._add_attributes(weapon.attributes)
 
-    def equip_gear(self, item: Equipment):
+    def _equip_gear(self, item: Equipment):
         """ equip an equipment item like a Headpiece, Shoulderpad, Chestguard and etc."""
         print(f'{self.name} has equipped {item.slot} {item.name}')
         self.equipment[item.slot] = item
@@ -558,7 +573,8 @@ class Character(LivingThing):
         """ this function goes through a dictionary that holds character attributes and adds them
         with the character's. Called whenever we equip an item
         We directly apply it to the character's attributes dictionary because we trust that the
-        argument has gone through item.py's create_attributes_dict function"""
+        argument has gone through helper.py's create_attributes function
+        and has valid attribute names"""
         for attribute_name, attribute_value in attributes.items():
             self.attributes[attribute_name] += attribute_value
         self._calculate_stats_formulas()
@@ -567,7 +583,8 @@ class Character(LivingThing):
         """ this function goes through a dictionary that holds character attributes and adds them
             with the character's. Called whenever we dequip an item
             We directly apply it to the character's attributes dictionary because we trust that the
-            argument has gone through item.py's create_attributes_dict function"""
+            argument has gone through helper.py's create_attributes function
+            and has valid attribute names"""
         for attribute_name, attribute_value in attributes.items():
             # we also trust that the values cannot be negative after the subtraction, because the same amount has
             # been added beforehand and we currently do not support any features that lower a character's
@@ -582,36 +599,88 @@ class Character(LivingThing):
         """
 
         # update health according to bonus health
-        self.max_health -= self.bonus_health  # remove the old bonus health
-        self.bonus_health = self.attributes[self.KEY_BONUS_HEALTH]  # update bonus health
-        self.max_health += self.bonus_health  # add bonus health again
-        self.max_mana -= self.bonus_mana
-        self.bonus_mana = self.attributes[self.KEY_BONUS_MANA]
-        self.max_mana += self.bonus_mana
+        orig_max_h = self.max_health
+        self.max_health -= self._bonus_health  # remove the old bonus health
+        self._bonus_health = self.attributes[KEY_BONUS_HEALTH_ATTRIBUTE]  # update bonus health
+        self.max_health += self._bonus_health  # add bonus health again
+        orig_max_m = self.max_mana
+        self.max_mana -= self._bonus_mana
+        self._bonus_mana = self.attributes[KEY_BONUS_MANA_ATTRIBUTE]
+        self.max_mana += self._bonus_mana
+
+        self._handle_health_change(orig_max_h)
+        self._handle_mana_change(orig_max_m)
 
         # formula for agility is: for each point of agility, add 2.5 armor and 0.5 strength
-        agility = self.attributes[self.KEY_AGILITY]
-        self.attributes[self.KEY_STRENGTH] += agility * 0.5
-        self.attributes[self.KEY_ARMOR] += agility * 2.5
+        agility = self.attributes[KEY_AGILITY_ATTRIBUTE]
+
+        # remove the old bonus strength/armor
+        self.attributes[KEY_STRENGTH_ATTRIBUTE] -= self._bonus_strength
+        self.attributes[KEY_ARMOR_ATTRIBUTE] -= self._bonus_armor
+        # recalculate them
+        self._bonus_strength = agility * 0.5
+        self._bonus_armor = agility * 2.5
+        # add them back again
+        self.attributes[KEY_STRENGTH_ATTRIBUTE] += self._bonus_strength
+        self.attributes[KEY_ARMOR_ATTRIBUTE] += self._bonus_armor
 
         "Now we need to update our damage, because the strength might have been changed"
 
         # current formula for damage is: wep_dmg * 0.4 * strength
-        strength = self.attributes[self.KEY_STRENGTH]
+        strength = self.attributes[KEY_STRENGTH_ATTRIBUTE]
         self.min_damage = self.equipped_weapon.min_damage + (0.4 * strength)
         self.max_damage = self.equipped_weapon.max_damage + (0.4 * strength)
+
+    def _handle_health_change(self, orig_max_h):
+        """ Handles cases where the maximum health of the Character has been changed"""
+        if orig_max_h < self.max_health and not self.is_in_combat():  # Has increased
+            # Increase the current health only if the character is out of combat
+            hp_increase = self.max_health - orig_max_h
+            self.health += hp_increase
+        elif orig_max_h > self.max_health:  # Has decreased
+            hp_decrease = orig_max_h - self.max_health
+            if self.health > self.max_health:
+                self.health -= hp_decrease
+                if self.health != self.max_health:
+                    raise Exception('Expected health to be equal to the max hp once decreased')
+            elif not self.is_in_combat():
+                """
+                If the character's health is not over the max_health and only out of combat,
+                decrease his current HP
+                """
+                self.health -= hp_decrease
+
+    def _handle_mana_change(self, orig_max_m):
+        """ Handles cases where the maximum mana of the Character has been changed"""
+        if orig_max_m < self.max_mana and not self.is_in_combat():  # Has increased
+            # Increase the current mana only if the character is out of combat
+            m_increase = self.max_mana - orig_max_m
+            self.mana += m_increase
+        elif orig_max_m > self.max_mana:  # Has decreased
+            m_decrease = orig_max_m - self.max_mana
+            if self.mana > self.max_mana:
+                self.mana -= m_decrease
+                if self.mana != self.max_mana:
+                    raise Exception('Expected mana to be equal to the max hp once decreased')
+            elif not self.is_in_combat():
+                """
+                If the character's mana is not over the max_mana and only out of combat,
+                decrease his current HP
+                """
+                self.mana -= m_decrease
 
     def spell_handler(self, command: str, target: Monster):
         """
         Every class will have different spells, this method will make sure the proper spell is caster
         :param command: the spell name that is to be cast
+        :param target: The target on which the spell is going to be cast
         :return:
         """
         pass
 
     def get_auto_attack_damage(self, target_level: int) -> Damage:
         # get the base auto attack damage
-        damage_to_deal = random.randint(int(self.min_damage), int(self.max_damage) + 1)
+        damage_to_deal = random.randint(int(self.min_damage), int(self.max_damage))
         # factor in the level difference
         damage_to_deal = self._calculate_level_difference_damage(damage_to_deal, target_level)
 
@@ -620,36 +689,23 @@ class Character(LivingThing):
     def attack(self, victim: Monster):
         pass
 
-    def take_attack(self, monster_name:str, damage: Damage, attacker_level: int):
+    def take_attack(self, monster_name: str, damage: Damage, attacker_level: int):
         damage = self._apply_armor_reduction(damage, attacker_level)
         damage = self._apply_damage_absorption(damage)
 
         print(f'{monster_name} attacks {self.name} for {damage}!')
         self._subtract_health(damage)
 
-    def take_dot_proc(self, dot: DoT):
-        """ this method damages the character for the dot's proc"""
-        dot_proc_damage = dot.damage  # type: Damage
-
-        if dot_proc_damage.phys_dmg:  # if there is physical damage in the DoT, apply armor reduction
-            dot_proc_damage = self._apply_armor_reduction(damage=dot_proc_damage,
-                                                                    attacker_level=self.level)
-        if self.absorption_shield:  # if we have a shield
-            dot_proc_damage = self._apply_damage_absorption(dot_proc_damage)
-
-        print(f'{self.name} suffers {dot_proc_damage} from {dot.name}!')
-        self._subtract_health(dot_proc_damage)
-
     def _apply_buff(self, buff: BeneficialBuff):
-        """ Add the buff to the character's stats"""
-        buff_attributes = buff.get_buffed_attributes()  # type: dict
+        """ Add the buffed attributes to the character's stats"""
+        buff_attributes: {str: int} = buff.get_buffed_attributes()
 
         # iterate through the buffed attributes and apply them to the character
         for buff_type, buff_amount in buff_attributes.items():
             if buff_type == "health":
-                self.max_health += buff_amount
+                self.attributes[KEY_BONUS_HEALTH_ATTRIBUTE] += buff_amount
             elif buff_type == "mana":
-                self.max_mana += buff_amount
+                self.attributes[KEY_BONUS_MANA_ATTRIBUTE] += buff_amount
             else:
                 self.attributes[buff_type] += buff_amount
 
@@ -657,16 +713,14 @@ class Character(LivingThing):
 
     def _deapply_buff(self, buff: BeneficialBuff):
         """ Remove the buff from the character's stats"""
-        buff_attributes = buff.get_buffed_attributes()  # type: dict
+        buff_attributes: {str: int} = buff.get_buffed_attributes()
 
-        # iterate through the buffed attributes and remove them fromthe character
+        # iterate through the buffed attributes and remove them from the character
         for buff_type, buff_amount in buff_attributes.items():
             if buff_type == "health":
-                # TODO: Reduce health method to reduce active health too, otherwise we can end up with 10/5 HP
-                self.max_health -= buff_amount
+                self.attributes[KEY_BONUS_HEALTH_ATTRIBUTE] -= buff_amount
             elif buff_type == "mana":
-                # TODO: Reduce mana method to reduce active mana too
-                self.max_mana -= buff_amount
+                self.attributes[KEY_BONUS_MANA_ATTRIBUTE] -= buff_amount
             else:
                 self.attributes[buff_type] -= buff_amount
 
@@ -676,14 +730,6 @@ class Character(LivingThing):
         super()._die()
         print(f'Character {self.name} has died!')
 
-    def prompt_revive(self):
-        print("Do you want to restart? Y/N")
-        if input() in 'Yy':
-            self.revive()
-            print(f'Character {self.name} has been revived!')
-        else:
-            raise SystemExit  # quit the game
-
     def has_enough_gold(self, gold: int) -> bool:
         """
         :return: a boolean indicating if we have that much gold
@@ -692,9 +738,13 @@ class Character(LivingThing):
 
     def has_item(self, item: str) -> bool:
         """ This method checks if the character has the item in his inventory"""
+        if item == 'gold':
+            # gold is a special keyword used to store the gold in the inventory
+            return False
+
         return item in self.inventory.keys()
 
-    def buy_item(self, sale: tuple):
+    def buy_item(self, sale: (Item, int, int)):
         """
         This method is used when we buy an item from a vendor. It subtracts the price of the item from our gold and
         gives us the item in our inventory
@@ -709,32 +759,36 @@ class Character(LivingThing):
 
         self.award_item(item, item_count)
 
-    def sell_item(self, item: str):
+    def sell_item(self, item_name: str):
         """
         This method is used when the character sells an item to the vendor.
         We give **him** the item and he gives us gold for it
         """
-        if not self.inventory[item]:
-            print(f'You do not have {item} in your inventory!')
-            print()
+        item, item_count = self.inventory[item_name]
+
+        # remove the item from the inventory
+        if item_count == 1:
+            del self.inventory[item.name]
         else:
-            item, item_count = self.inventory[item]
+            self.inventory[item_name] = (item, item_count-1)
 
-            # remove the item from the inventory
-            if item_count == 1:
-                del self.inventory[item.name]
-            else:
-                self.inventory[item] = (item, item_count-1)
-
-            gold_award = item.sell_price
-            print(f'You have sold {item.name} for {gold_award} gold.')
-            print()
-            self.award_gold(gold_award)
+        gold_award = item.sell_price
+        print(f'You have sold {item_name} for {gold_award} gold.')
+        print()
+        self.award_gold(gold_award)
 
     def add_quest(self, quest: Quest):
+        if quest.ID in self.quest_log:
+            raise Exception(f'{quest.name} is already in your quest log!')
+
         self.quest_log[quest.ID] = quest
+        # there are some cases where the quest can be completed on accept, i.e having the required items
+        quest.check_if_complete(self)
+        self._check_if_quest_completed(quest)
 
     def _check_if_quest_completed(self, quest: Quest):
+        if quest.ID not in self.quest_log:
+            raise Exception(f'You do not have {quest.name} in your quest log!')
         if quest.is_completed:
             self._complete_quest(quest)
 
@@ -758,7 +812,6 @@ class Character(LivingThing):
         del self.quest_log[quest.ID]  # remove from quest log
 
         self.completed_quests.add(quest.ID)
-
         self._award_experience(xp_reward)
 
     def _remove_fetch_quest_required_items(self, quest: FetchQuest):
@@ -772,17 +825,22 @@ class Character(LivingThing):
         self.check_if_levelup()
 
     def award_monster_kill(self, monster: Monster, monster_guid: int):
+        """
+        This method is called whenever a Monster is killed. It gives the monster's XP reward,
+                counts him for the appropriate quest (if there is one) and adds him to the killed_monsters
+                (if he's not respawnable)
+        """
         monster_level = monster.level
         xp_reward = monster.xp_to_give
         monster_quest_ID = monster.quest_relation_id
 
         level_difference = self.level - monster_level
         xp_bonus_reward = 0
-        if level_difference >= 5:  # if the character is 5 levels higher, give no XP
+        if level_difference >= MAXIMUM_LEVEL_DIFFERENCE_XP_YIELD:
             xp_reward = 0
         elif level_difference < 0:  # monster is higher level
-            percentage_mod = abs(
-                level_difference) * 0.1  # 10% increase of XP for every level the monster has over player
+            # 10% increase of XP for every level the monster has over player
+            percentage_mod = abs(level_difference) * 0.1
             xp_bonus_reward += int(xp_reward * percentage_mod)  # convert to int
 
         if xp_bonus_reward:
@@ -797,10 +855,8 @@ class Character(LivingThing):
 
         # If this monster is for a quest and we have that quest
         if monster_quest_ID and monster_quest_ID in self.quest_log:
-            # TODO: Might want another way to handle this
             quest = self.quest_log[monster_quest_ID]
             quest.update_kills()
-            self.quest_log[monster_quest_ID] = quest
 
             self._check_if_quest_completed(quest)
 
@@ -812,25 +868,16 @@ class Character(LivingThing):
         store it as a tuple holding (Item Object, Item Count) """
         item_quest_id = item.quest_id
 
-        if item.name not in self.inventory.keys():  # if we don't have the item
-            self.inventory[item.name] = (item, item_count)
-        else:
-            # if there is such an item, simply update it's count by one
-            item, item_count = self.inventory[item.name]
-            self.inventory[item.name] = (item, item_count + 1)
+        self.add_item_to_inventory(item, item_count)
 
-        if item_quest_id and item_quest_id in self.quest_log and not self.quest_log[item_quest_id].is_completed:
-            # if the item is related to a quest and if we have that quest and said quest is not completed
-            temp_quest = self.quest_log[item_quest_id]
+        if item_quest_id and item_quest_id in self.quest_log:
+            # if the item is related to a quest, have the quest check if the player has enough items to complete it
+            quest = self.quest_log[item_quest_id]
+            quest.check_if_complete(self)
 
-            # have the quest check if the player has enough items to complete it
-            temp_quest.check_if_complete(self.inventory)
+            self._check_if_quest_completed(quest)
 
-            self.quest_log[item_quest_id] = temp_quest
-
-            self._check_if_quest_completed(temp_quest)
-
-    def _remove_item_from_inventory(self, item_name: str, item_count: int = 1, remove_all: bool = False):
+    def _remove_item_from_inventory(self, item_name: str, item_count: int=1, remove_all: bool = False):
         """ This method removes the specified item from the player's inventory
             :param item_count: the count we want to remove, ex: we may want to remove 2 Wolf Meats, as opposed to one
             :param remove_all: simply removes all the items, with this variable set to True, item_count is useless"""
@@ -858,65 +905,49 @@ class Character(LivingThing):
         This function is used to add the attributes of all the character's equipment.
         NOTE: This is used only on the initial character load
         """
-        for item in filter(lambda itm: itm is not None, self.equipment.values()):
+        for item in (itm for itm in self.equipment.values() if itm is not None):
             self._add_attributes(item.attributes)
 
     def check_if_levelup(self):
         if self.experience >= self.xp_req_to_level:
             self._level_up()
-            self.experience = 0
+            self.experience = self.experience - self.xp_req_to_level
             self.xp_req_to_level = self._lookup_next_xp_level_req()
 
-    def _level_up(self):
+    def _level_up(self, to_level: int=0, to_print=True):
+        if to_level:
+            # level up multiple times
+            for i in range(self.level, to_level-1):
+                self._level_up(to_print=to_print)
+            self.xp_req_to_level: int = self._lookup_next_xp_level_req()
+
         self.level += 1
 
         current_level_stats = CHARACTER_LEVELUP_BONUS_STATS[self.level]
         # access the dictionary holding the appropriate value increases for each level
-        hp_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_HEALTH]
-        mana_increase_amount = current_level_stats[self.KEY_LEVEL_STATS_MANA]
-        strength_increase_amount = current_level_stats[self.KEY_STRENGTH]
-        agility_increase_amount = current_level_stats[self.KEY_AGILITY]
-        armor_increase_amount = current_level_stats[self.KEY_ARMOR]
+        hp_increase_amount = current_level_stats[KEY_LEVEL_STATS_HEALTH]
+        mana_increase_amount = current_level_stats[KEY_LEVEL_STATS_MANA]
+        strength_increase_amount = current_level_stats[KEY_STRENGTH_ATTRIBUTE]
+        agility_increase_amount = current_level_stats[KEY_AGILITY_ATTRIBUTE]
+        armor_increase_amount = current_level_stats[KEY_ARMOR_ATTRIBUTE]
 
         self.max_health += hp_increase_amount
         self.max_mana += mana_increase_amount
-        self.attributes[self.KEY_STRENGTH] += strength_increase_amount
-        self.attributes[self.KEY_ARMOR] += armor_increase_amount
-        self.attributes[self.KEY_AGILITY] += agility_increase_amount
+        self.attributes[KEY_STRENGTH_ATTRIBUTE] += strength_increase_amount
+        self.attributes[KEY_ARMOR_ATTRIBUTE] += armor_increase_amount
+        self.attributes[KEY_AGILITY_ATTRIBUTE] += agility_increase_amount
         self._calculate_stats_formulas()  # recalculate formulas with stats
         self._regenerate()  # regen to full hp/mana
 
-        print('*' * 20)
-        print(f'Character {self.name} has leveled up to level {self.level}!')
-        print(f'Armor Points increased by {armor_increase_amount}')
-        print(f'Health Points increased by {hp_increase_amount}')
-        print(f'Mana Points increased by {mana_increase_amount}')
-        print(f'Strength Points increased by {strength_increase_amount}')
-        print(f'Agility Points increased by {agility_increase_amount}')
-        print('*' * 20)
-
-    def print_quest_log(self):
-        print("Your quest log:")
-
-        for _, quest in self.quest_log.items():
-            print(f'\t{quest.name} - {quest.kills}/{quest.needed_kills} {quest.monster_to_kill} slain.')
-
-        print()
-
-    def print_inventory(self):
-        print("Your inventory:")
-
-        # print the gold separately so it always comes up on top
-        print(f"\t{self.inventory['gold']} gold")
-        for key, item_tuple in self.inventory.items():
-            if key is not 'gold':
-                item, item_count = item_tuple
-                print(f'\t{item_count} {item}')
+        if to_print:
+            print_level_up_event(name=self.name, level=self.level, armor_inc=armor_increase_amount,
+                                 hp_inc=hp_increase_amount, mana_inc=mana_increase_amount,
+                                 strength_inc=strength_increase_amount, agi_inc=agility_increase_amount)
 
     def _lookup_next_xp_level_req(self):
         return CHARACTER_LEVEL_XP_REQUIREMENTS[self.level]
 
-    def loaded_script(self, script_name: str):
+    def load_script(self, script_name: str):
         """
         This method is called whenever the character loads a script that should be loaded only once
         It adds the script's name in the character's loaded_scripts set, which is checked every time a

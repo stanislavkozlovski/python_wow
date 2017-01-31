@@ -1,5 +1,8 @@
+from time import sleep
+
 from command_router import route_in_combat_non_ending_turn_commands
 from commands import pac_looting, get_available_paladin_abilities
+from command_handler import prompt_revive
 from entities import Character, Monster
 from information_printer import print_loot_table
 
@@ -22,12 +25,13 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
     :param guid_name_set: Set which holds the name of each monster_GUID
     :param monster_GUID: The monster GUID
     """
-    available_spells = get_available_spells(character)  # Load all of the currently available spells for our character
+    # Load all of the currently available spells for our character
+    available_spells: set() = get_available_spells(character)
     will_end_turn = True  # Dictates if we are going to count the iteration of the loop as a turn
+
     character.enter_combat()
     monster.enter_combat()
-    if(monster.gossip):  # if the monster has gossip
-        from time import sleep
+    if monster.gossip:  # if the monster has gossip
         monster.say_gossip()
         sleep(2)
 
@@ -50,7 +54,7 @@ def engage_combat(character: Character, monster: Monster, alive_monsters: dict, 
             monster.leave_combat()
             print(f'{monster.name} has slain character {character.name}')
 
-            character.prompt_revive()
+            prompt_revive(character)
             break
 
         command = input()
@@ -87,12 +91,11 @@ def handle_monster_death(character: Character, monster: Monster, alive_monsters:
     print(f'{character.name} has slain {monster.name}!')
 
     character.award_monster_kill(monster=monster, monster_guid=monster_GUID)
-    character.leave_combat()  # will exit the loop
+    character.leave_combat()  # will exit the combat loop on next iter
 
     del alive_monsters[monster_GUID]  # removes the monster from the dictionary
     guid_name_set.remove((monster_GUID, monster.name))  # remove it from the set used for looking up
 
-    # handle loot
     handle_loot(character, monster)
 
 
@@ -113,7 +116,7 @@ def handle_loot(character: Character, monster: Monster):
             monster_loot = list(monster.loot.keys())  # list of strings, the item's names
             for item_name in monster_loot:
                 # loop through them and get every one
-                item = monster.give_loot(item_name=item_name)
+                item: 'Item' = monster.give_loot(item_name=item_name)
 
                 if item:  # if the loot is successful
                     character.award_item(item=item)
@@ -150,7 +153,7 @@ def handle_loot(character: Character, monster: Monster):
 
 
 # returns a set with a list of allowed commands (you can't cast a spell you haven't learned yet)
-def get_available_spells(character: Character):
+def get_available_spells(character: Character) -> set():
     chr_class = character.get_class()
     available_spells = set()
 

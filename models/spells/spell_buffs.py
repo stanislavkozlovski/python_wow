@@ -45,7 +45,8 @@ class BuffSchema(Base):
         buff_amount3: int = parse_int(self.amount3)
         buff_duration: int = parse_int(self.duration)
 
-        buffs: [tuple] = [(buff_stat1, buff_amount1), (buff_stat2, buff_amount2), (buff_stat3, buff_amount3)]
+        buffs: [(str, int)] = [(buff_stat1, buff_amount1), (buff_stat2, buff_amount2), (buff_stat3, buff_amount3)]
 
-        return BeneficialBuff(name=buff_name, buff_stats_and_amounts=buffs,
+        return BeneficialBuff(name=buff_name, buff_stats_and_amounts=[(stat, amount) for stat, amount in buffs
+                                                                      if stat is not None and amount is not None],
                               duration=buff_duration)

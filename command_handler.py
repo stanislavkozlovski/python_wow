@@ -6,8 +6,10 @@ from models.characters.saver import save_character
 from commands import pac_main_ooc, pac_map_directions, pac_in_combat, pac_vendor_dialogue, pac_opened_inventory
 from information_printer import (print_live_npcs, print_live_monsters, print_quest_item_choices,
                                  print_available_quests, print_in_combat_stats, print_character_xp_bar,
-                                 print_character_equipment)
-
+                                 print_character_equipment, print_inventory)
+from constants import ZONE_MOVE_BLOCK_SPECIAL_KEY
+from utils.helper import get_guid_by_name
+from information_printer import print_quest_log, print_vendor_products_for_sale
 # handlers here!
 
 
@@ -90,30 +92,35 @@ def handle_buy_from_command(command: str, character, zone_object: Zone):
 
 def handle_vendor_sale(character, vendor):
     while True:
-        vendor.print_inventory()
+        print_vendor_products_for_sale(vendor_name=vendor.name, vendor_inventory=vendor.inventory)
 
         command = input()
         if command == 'exit':
             break
         elif 'buy ' in command:
             item = command[4:]  # name of the item
-            if vendor.has_item(item):
-                # check if the player has enough gold
-                if character.has_enough_gold(vendor.get_item_price(item)):
-                    character.buy_item(vendor.sell_item(item))
-                    print(f'{character.name} has bought {item} from {vendor.name}!')
-                else:
-                    print(f'You do not have enough gold to buy {item}!\n')
-            else:
+            if not vendor.has_item(item):
                 print(f'{vendor.name} does not have {item} in stock.')
+                continue
+
+            # check if the player has enough gold
+            if not character.has_enough_gold(vendor.get_item_price(item)):
+                print(f'You do not have enough gold to buy {item}!\n')
+                continue
+
+            character.buy_item(vendor.sell_item(item))
+            print(f'{character.name} has bought {item} from {vendor.name}!')
         elif 'sell ' in command:
             item = command[5:]  # name of the item
             if character.has_item(item):
                 character.sell_item(item)
+            else:
+                print(f'You do not have {item} in your inventory!')
+                print()
         elif 'info' in command:
             item_name = command[:-5]  # name of item
 
-            item = vendor.get_item(item_name)
+            item = vendor.get_item_info(item_name)
 
             print("\t", item, "\n") if item else None
         elif command == '?':
@@ -124,7 +131,7 @@ def handle_open_inventory_command(character):
     """
     This command opens the inventory of the character and lets him fiddle with the items there
     """
-    character.print_inventory()
+    print_inventory(character)
 
     while True:
         command = input(">inventory ")
@@ -159,7 +166,7 @@ def handle_open_inventory_command(character):
             """ item and item_name are assigned if we manage to pass this if check """
             if item:
                 # we've modified the inventory (consumed/equipped an item)
-                character.print_inventory()
+                print_inventory(character)
             else:
                 # we've tried to modify the inventory but unsuccessfuly, therefore item is None
                 print(f'{item_name} is not in your inventory.')
@@ -170,11 +177,13 @@ def handle_go_to_command(command: str, character, zone_object: Zone):
 
     """
     move_player will usually return a boolean if we can initiate the move or not.
-    However, there's a special case: If it returns 0, it means that we cannot initiate the move and that the
-    printing is handled by the method itself.
+    However, there's a special case: If it returns SPECIAL_ZONE_BLOCK_KEY,
+    it means that we cannot initiate the move and that the printing is handled by the method itself.
     """
     valid_move = zone_object.move_player(character.current_subzone, destination, character)
 
+    if valid_move == ZONE_MOVE_BLOCK_SPECIAL_KEY:
+        return
     if valid_move:
         # if the move has been successful
         character.current_subzone = destination
@@ -186,7 +195,7 @@ def handle_go_to_command(command: str, character, zone_object: Zone):
 
         print_live_npcs(zone_object, print_all=True)
         print_live_monsters(zone_object)
-    elif isinstance(valid_move, bool) and not valid_move:  # see comment above on why we check if it's a bool
+    else:
         print(f'No such destination as {destination} that is connected to your current subzone.')
 
 
@@ -215,6 +224,18 @@ def handle_quest_item_choice(item_rewards: dict):
             print("\t\tTakes the item\n")
 
 
+def prompt_revive(character):
+    """
+    Prompt if the Player wants to revive his character after death
+    """
+    print("Do you want to restart? Y/N")
+    if input() in 'Yy':
+        character.revive()
+        print(f'Character {character.name} has been revived!')
+    else:
+        raise SystemExit  # quit the game
+
+
 def handle_save_character_command(main_character):
     """ this function handles the 'save' command"""
     save_character(main_character)
@@ -239,12 +260,12 @@ def handle_paq_command(zone_object, main_character):
 def handle_pql_command(main_character):
     """ this function handles the 'print quest log' or 'pql' command, showing the player all the quests he is
     currently on """
-    main_character.print_quest_log()
+    print_quest_log(main_character.quest_log)
 
 
 def handle_print_inventory_command(main_character):
     """ this function handles the 'print inventory' command, showing the player's inventory """
-    main_character.print_inventory()
+    print_inventory(main_character)
 
 
 def handle_print_equipment_command(main_character):
@@ -291,23 +312,4 @@ def handle_combat_print_stats_command(character, monster):
 def handle_combat_print_xp_command(character):
     """ this function handles the 'print xp' command, showing the player's current experience bar while in combat """
     print_character_xp_bar(character)
-
-
-def get_guid_by_name(name: str, guid_name_set: set):
-    """
-    A function that returns a GUID which is associated with the given name,
-    if there is no such one, return None
-    :param name: The name of the creature you want to get a GUID of
-    :return: the GUID you're searching for
-    """
-    # TODO: Move
-    for guid, _name in guid_name_set:
-        if _name == name:
-            return guid
-
-    return None
-
-
-
-
 

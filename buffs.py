@@ -6,11 +6,8 @@ This module holds information about all kinds of buffs that are applied to an en
 etc
 """
 from damage import Damage
-KEY_BUFF_TYPE_ARMOR = "armor"
-KEY_BUFF_TYPE_STRENGTH = "strength"
-KEY_BUFF_TYPE_HEALTH = "health"
-KEY_BUFF_TYPE_MANA = "mana"
-
+from constants import KEY_ARMOR_ATTRIBUTE, KEY_STRENGTH_ATTRIBUTE, KEY_HEALTH_ATTRIBUTE, KEY_MANA_ATTRIBUTE
+from exceptions import InvalidBuffError
 
 # the base class for all buffs/dots/debuffs
 class StatusEffect:
@@ -24,13 +21,7 @@ class StatusEffect:
 
 # Standard Buff that increases X stat for Y minutes (in our case: turns)
 class BeneficialBuff(StatusEffect):
-    # this dictionary will hold the meaningful information of what buff we give
-    buff_amounts = {KEY_BUFF_TYPE_ARMOR: 0,
-                    KEY_BUFF_TYPE_STRENGTH: 0,
-                    KEY_BUFF_TYPE_HEALTH: 0,
-                    KEY_BUFF_TYPE_MANA: 0}  # type: dict
-
-    def __init__(self, name: str, buff_stats_and_amounts: list, duration: int):
+    def __init__(self, name: str, buff_stats_and_amounts: [(str, int)], duration: int):
         """
         Buff(10, [(armor, 3), (None, None), (None, None)) will increase your armor by 10 for 3 turns
 
@@ -41,33 +32,31 @@ class BeneficialBuff(StatusEffect):
         :param duration: How many turns this buff will be active for, type: int
         """
         super().__init__(name, duration)
-        self.buff_stats_and_amounts = buff_stats_and_amounts
-        self._manage_buff_types(buff_stats_and_amounts)  # updates buff_amounts
-        # a list which holds tuples of the buffed attributes (will be used for __str__)
-        self.non_empty_buffs = list(filter(lambda kv: kv[1] is not 0, self.buff_amounts.items()))
+        # this dictionary will hold the meaningful information of what buff we give
+        self.buff_amounts: {str: int} = {KEY_HEALTH_ATTRIBUTE: 0,
+                                         KEY_MANA_ATTRIBUTE: 0,
+                                         KEY_ARMOR_ATTRIBUTE: 0,
+                                         KEY_STRENGTH_ATTRIBUTE: 0}
+        self._manage_buff_types(buff_stats_and_amounts)  # update buff_amounts
 
     def __str__(self):
         """ Depending on the amount of stats it buffs, print out a different message"""
-        non_empty_buffs_count = len(self.non_empty_buffs)
-        # TODO: refactor
-        if non_empty_buffs_count == 1:
-            increased_attribute, value = self.non_empty_buffs[0]
-            return f'Increases {increased_attribute} by {value} for {self.duration} turns.'
-        elif non_empty_buffs_count == 2:
-            increased_attribute, value = self.non_empty_buffs[0]
-            increased_attribute2, value2 = self.non_empty_buffs[1]
-            return f'Increases {increased_attribute} by {value} and {increased_attribute2} by {value2} for {self.duration} turns.'
-        elif non_empty_buffs_count == 3:
-            increased_attribute, value = self.non_empty_buffs[0]
-            increased_attribute2, value2 = self.non_empty_buffs[1]
-            increased_attribute3, value3 = self.non_empty_buffs[2]
+        str_annexations = [f'{attr} by {inc}' for attr, inc in self.buff_amounts.items() if inc > 0]
+        main_annexation = ' and '.join(part for part in [', '.join(str_annexations[:-1])] + [str_annexations[-1]]
+                                       if part)  # escapes empty strings
 
-            return (f"Increases {increased_attribute} by {value}, {increased_attribute2} by {value2}"
-                    f" and {increased_attribute3} by {value3} for {self.duration} turns.")
-        else:
-            return ""
+        return f"Increases {main_annexation} for {self.duration} turns."
 
-    def _manage_buff_types(self, buff_list: list):
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            raise Exception('A BeneficialBuff can only be compared to another Beneficial Buff!')
+
+        return self.name == other.name and self.buff_amounts == other.buff_amounts and self.duration == other.duration
+
+    def __hash__(self):
+        return hash(self.name + str(self.buff_amounts) + str(self.duration))
+
+    def _manage_buff_types(self, buff_list: [(str, int)]):
         """
         Iterate through the list of tuples and add each buff to our buff_amounts dictionary
         :param buff_list: A list of tuples, each tuple holding the stat we are going to buff and the amount
@@ -78,22 +67,16 @@ class BeneficialBuff(StatusEffect):
                 if buff_type in self.buff_amounts.keys():
                     self.buff_amounts[buff_type] = buff_amount
                 else:
-                    raise ValueError(f'Buff type {buff_type} is not supported!')
+                    raise InvalidBuffError(f'Buff type {buff_type} is not supported!')
 
-    def get_buffed_attributes(self) -> dict:
+    def get_buffed_attributes(self) -> {str: int}:
         """
         Return a dictionary
             Key: buff_type (str)
             Value: buff_amount (int)
         Only filled with the buffs that are increased
         """
-        buffed_attributes = {}  # type: dict
-
-        for buff_type, buff_amount in self.buff_amounts.items():
-            if buff_amount:
-                buffed_attributes[buff_type] = buff_amount
-
-        return buffed_attributes
+        return {b_type: b_amount for b_type, b_amount in self.buff_amounts.items() if b_amount > 0}
 
 
 # Damage over time debuff
@@ -110,11 +93,17 @@ class DoT(StatusEffect):
         :param caster_lvl: the level of the caster
         """
         super().__init__(name, duration)
-        self.damage = damage_tick  # type: Damage
+        self.damage: Damage = damage_tick
         self.level = caster_lvl
 
     def __str__(self):
-        return f'{self.name} - Deals {self.damage} damage every turn for {self.duration} turns'
+        return f'{self.name} - Deals {self.damage} damage every turn for {self.duration} turns.'
+
+    def __eq__(self, other):
+        return self.name == other.name and self.damage == other.damage and self.duration == other.duration
+
+    def __hash__(self):
+        return hash(self.name + str(self.damage) + str(self.duration))
 
     def update_caster_level(self, level: int):
         self.level = level

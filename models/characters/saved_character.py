@@ -94,7 +94,7 @@ class SavedCharacterSchema(Base):
         """ Convert the SavedCharacter object to a Character object to be used in the game"""
         loaded_scripts: {str} = {script.script_name for script in self.loaded_scripts}
         killed_monsters: {int} = {monster.guid for monster in self.killed_monsters}
-        completed_quests: {str} = {quest.id for quest in self.completed_quests}
+        completed_quests: {str} = {quest.quest_id for quest in self.completed_quests}
         inventory: {str: tuple} = {i_schema.item.name: (i_schema.item.convert_to_item_object(), i_schema.item_count)
                                    for i_schema in self.inventory}
         inventory['gold'] = self.gold
