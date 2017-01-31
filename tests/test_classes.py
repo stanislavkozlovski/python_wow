@@ -259,6 +259,29 @@ class PaladinTests(unittest.TestCase):
         self.assertEqual(result, expected_damage)
         self.assertEqual(self.dummy.SOR_TURNS, 2)
 
+    def test_spell_seal_of_righteousness_attack_fade(self):
+        sor: PaladinSpell = self.dummy.learned_spells[Paladin.KEY_SEAL_OF_RIGHTEOUSNESS]
+        expected_message = f'{Paladin.KEY_SEAL_OF_RIGHTEOUSNESS} has faded from {self.dummy.name}'
+        self.dummy.spell_seal_of_righteousness(sor)
+        self.assertTrue(self.dummy.SOR_ACTIVE)
+        self.dummy.SOR_TURNS = 1
+        self.dummy._spell_seal_of_righteousness_attack()
+        self.assertEqual(self.dummy.SOR_TURNS, 0)
+        self.assertTrue(self.dummy.SOR_ACTIVE)
+
+        # Should fade now and not do any damage on turn end
+        try:
+            output = StringIO()
+            sys.stdout = output
+
+            self.dummy.end_turn_update()
+
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        self.assertFalse(self.dummy.SOR_ACTIVE)
+
 
 if __name__ == '__main__':
     unittest.main()
