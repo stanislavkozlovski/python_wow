@@ -93,6 +93,7 @@ class ProtectiveHeal(Heal):
     def __init__(self, heal_amount: float, target):
         super().__init__(heal_amount)
         self.target = target
+        self.added_shield = False
         self.shield = self._calculate_shield()
 
     def __str__(self):
@@ -109,10 +110,11 @@ class ProtectiveHeal(Heal):
     def _calculate_shield(self) -> float:
         return round((ABSORB_PERCENTAGE / 100) * self.heal_amount, 2)
 
-    @run_once
     def _apply_shield(self):
         """
         This method calculates the shield we would get from the heal and applies it to our target!
         :return:
         """
-        self.target.absorption_shield += self.shield
+        if not self.added_shield:
+            self.target.absorption_shield += self.shield
+            self.added_shield = True

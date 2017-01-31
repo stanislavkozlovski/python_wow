@@ -36,6 +36,7 @@ def db_connection(func):
     """
     Wraps a function that connects to the database and uses a context manager
     in order to automatically commit or rollback transactions.
+    NOTE: Will not work for Class instances!
     """
     def decorator(*args, **kwargs):
         with connection:
@@ -53,7 +54,6 @@ def run_once(func):
         except AttributeError:
             decorated.saved_result = func(*args, **kwargs)
             return decorated.saved_result
-
     return decorated
 
 
