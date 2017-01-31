@@ -1,6 +1,3 @@
-from database.main import connection
-
-
 def cast_spell(func):
     """
     Wraps a function that is tied to a spell cast.
@@ -29,19 +26,6 @@ def cast_spell(func):
             return False
 
         return func(*args, **kwargs)
-    return decorator
-
-
-def db_connection(func):
-    """
-    Wraps a function that connects to the database and uses a context manager
-    in order to automatically commit or rollback transactions.
-    NOTE: Will not work for Class instances!
-    """
-    def decorator(*args, **kwargs):
-        with connection:
-            return func(*args, **kwargs)
-
     return decorator
 
 
