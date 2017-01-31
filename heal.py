@@ -15,14 +15,15 @@ class Heal:
     def __str__(self):
         return f'{self.heal_amount:.2f}'
 
-    def __add__(self, other):
+    def __add__(self, other: float) -> float:
         return other + self.heal_amount
 
-    def __radd__(self, other):
+    def __radd__(self, other: float) -> float:
         return other + self.heal_amount
 
     def __iadd__(self, other: float) -> float:
-        return other + self.heal_amount
+        self.heal_amount += other
+        return self
 
     def __sub__(self, other: float) -> float:
         return self.heal_amount - other
@@ -32,6 +33,9 @@ class Heal:
 
     def __rsub__(self, other: float) -> float:
         return other - self.heal_amount
+
+    def __eq__(self, other):
+        return self.heal_amount == other.heal_amount
 
 
 class NatureHeal(Heal):
