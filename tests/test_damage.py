@@ -125,6 +125,14 @@ class DamageTests(unittest.TestCase):
 
         self.assertEqual(dmg_1-dmg_2, expected_result)
 
+    def test_isub_tuple(self):
+        dmg_1 = Damage(phys_dmg=10, magic_dmg=10)
+        dmg_2 = (5, 5)
+        expected_result = Damage(phys_dmg=5, magic_dmg=5)
+
+        dmg_1 -= dmg_2
+        self.assertEqual(dmg_1, expected_result)
+
 
 if __name__ == '__main__':
     unittest.main()
