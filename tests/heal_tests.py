@@ -178,6 +178,17 @@ class ProtectiveHealTests(unittest.TestCase):
 
         self.assertEqual(received_shield, expected_shield)
 
+    def test_apply_shield(self):
+        heal_am = 100
+        expected_shield = round((PROTECTIVE_HEAL_ABSORB_PERCENTAGE / 100) * heal_am, 2)
+        target = Mock(absorption_shield=0)
+        p_heal = ProtectiveHeal(heal_am, target)
+
+        self.assertEqual(p_heal.shield, expected_shield)
+        self.assertEqual(target.absorption_shield, 0)
+        p_heal._apply_shield()
+        self.assertEqual(target.absorption_shield, expected_shield)
+
 
 if __name__ == '__main__':
     unittest.main()
