@@ -49,8 +49,9 @@ class Damage:
     def __rsub__(self, other):
         return other - (self.phys_dmg + self.magic_dmg)
 
-    def __isub__(self, other: tuple):
-        other_phys, other_magic = 0, 0  # type: int
+    def __isub__(self, other: tuple or Damage):
+        other_phys, other_magic = 0, 0
+
         # unpack other damage
         if isinstance(other, tuple):
             other_phys, other_magic = other
@@ -66,7 +67,7 @@ class Damage:
                       magic_dmg=modified_magic_damage)
 
     def __iadd__(self, other: tuple):
-        other_phys, other_magic = 0, 0  # type: int
+        other_phys, other_magic = 0, 0
         # unpack other damage
         if isinstance(other, tuple):
             other_phys, other_magic = other
@@ -97,16 +98,9 @@ class Damage:
             self.magic_dmg = 0
 
             # subtract physical damage
-            if absorption_shield >= self.phys_dmg:
-                # shield is bigger
-                absorption_shield -= self.phys_dmg
-                self.phys_absorbed = self.phys_dmg
-                self.phys_dmg = 0
-            else:
-                #  shield is smaller
-                self.phys_dmg -= absorption_shield
-                self.phys_absorbed = absorption_shield
-                absorption_shield = 0
+            self.phys_absorbed = min(self.phys_dmg, absorption_shield)
+            absorption_shield = max(absorption_shield - self.phys_dmg, 0)
+            self.phys_dmg = max(self.phys_dmg - self.phys_absorbed, 0)
         else:
             # shield is smaller than magic_dmg, we won't get to absorb phys at all
             self.magic_dmg -= absorption_shield
