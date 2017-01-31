@@ -137,7 +137,17 @@ class DamageTests(unittest.TestCase):
         dmg_1 = Damage(phys_dmg=10, magic_dmg=10)
         dmg_2 = Damage(phys_dmg=5, magic_dmg=7)
         expected_result = Damage(phys_dmg=5, magic_dmg=3)
-        
+
+        dmg_1 -= dmg_2
+
+        self.assertEqual(dmg_1, expected_result)
+
+    def test_isub_negative_damage(self):
+        """ It should reset the damage to 0, rather than making it negative"""
+        dmg_1 = Damage(phys_dmg=10, magic_dmg=10)
+        dmg_2 = Damage(phys_dmg=15, magic_dmg=117)
+        expected_result = Damage(phys_dmg=0, magic_dmg=0)
+
         dmg_1 -= dmg_2
 
         self.assertEqual(dmg_1, expected_result)
