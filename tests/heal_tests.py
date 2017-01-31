@@ -128,15 +128,20 @@ class HolyHealTests(unittest.TestCase):
 
 
 class ProtectiveHealTests(unittest.TestCase):
-    def test_init(self):
-        target = "Targ"
-        heal_amount = 50
-        p_heal = ProtectiveHeal(heal_amount=heal_amount, target=target)
-        shield = round((PROTECTIVE_HEAL_ABSORB_PERCENTAGE / 100) * heal_amount, 2)
+    def setUp(self):
+        self.target = "Targ"
+        self.heal_amount = 50
+        self.p_heal = ProtectiveHeal(heal_amount=self.heal_amount, target=self.target)
+        self.shield = round((PROTECTIVE_HEAL_ABSORB_PERCENTAGE / 100) * self.heal_amount, 2)
 
-        self.assertEqual(p_heal.target, target)
-        self.assertEqual(p_heal.shield, shield)
-        self.assertEqual(p_heal.heal_amount, heal_amount)
+    def test_init(self):
+        self.assertEqual(self.p_heal.target, self.target)
+        self.assertEqual(self.p_heal.shield, self.shield)
+        self.assertEqual(self.p_heal.heal_amount, self.heal_amount)
+
+    def test_str(self):
+        expected_str = f'{self.heal_amount:.2f} ({self.shield:.2f} shield)'
+        self.assertEqual(str(self.p_heal), expected_str)
 
 
 if __name__ == '__main__':
