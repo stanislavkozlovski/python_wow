@@ -21,6 +21,16 @@ class HealTests(unittest.TestCase):
 
         self.assertEqual(heal + add_amount, expected_amount)
 
+    def test_radd(self):
+        heal_amount = 5
+        heal = Heal(heal_amount=heal_amount)
+
+        add_amount = 10
+        expected_amount = heal_amount + add_amount
+
+        add_amount += heal
+        self.assertEqual(add_amount, expected_amount)
+
 
 if __name__ == '__main__':
     unittest.main()
