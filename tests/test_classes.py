@@ -52,6 +52,19 @@ class PaladinTests(unittest.TestCase):
 
         self.assertTrue(all([spell._cooldown_counter == 0 for spell in self.dummy.learned_spells.values()]))
 
+    def test_level_up(self):
+        """ Except the normal behaviour, it should learn new spells for the character """
+        # empty the learned spells, it's stored as a static variable, which is not good practice but doesn't hurt in the game
+        Paladin.learned_spells = {}
+        pl = Paladin(name="fuck a nine to five")
+
+        spells_to_learn = [spell.name for spell in load_paladin_spells_for_level(pl.level + 1)]
+        for spell in spells_to_learn:
+            self.assertNotIn(spell, self.dummy.learned_spells)
+        pl._level_up()
+        for spell in spells_to_learn:
+            self.assertIn(spell, self.dummy.learned_spells)
+
 
 if __name__ == '__main__':
     unittest.main()
