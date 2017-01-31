@@ -65,6 +65,21 @@ class PaladinTests(unittest.TestCase):
         for spell in spells_to_learn:
             self.assertIn(spell, self.dummy.learned_spells)
 
+    def test_level_up_to_level(self):
+        """ Except the normal behaviour, it should learn new spells for the character """
+        # empty the learned spells, it's stored as a static variable, which is not good practice but doesn't hurt in the game
+        Paladin.learned_spells = {}
+        pl = Paladin(name="fuck a nine to five")
+        to_level = 4
+
+        spells_to_learn = [spell for level in range(2, to_level + 1) for spell in load_paladin_spells_for_level(level)]
+        for spell in spells_to_learn:
+            self.assertTrue(spell.name not in self.dummy.learned_spells
+                            or spell.rank > self.dummy.learned_spells[spell.name].rank)
+        pl._level_up(to_level=to_level)
+        for spell in spells_to_learn:
+            self.assertIn(spell.name, self.dummy.learned_spells)
+
 
 if __name__ == '__main__':
     unittest.main()
