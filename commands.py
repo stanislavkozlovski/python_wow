@@ -166,6 +166,5 @@ def get_available_paladin_abilities(character: Paladin):
     if "Melting Strike" in character.learned_spells.keys():
         available_spells.add('ms')
 
-    # TODO: Add a method in paladin that returns this set
     return available_spells
 #  ------------------------------PALADIN------------------------------
