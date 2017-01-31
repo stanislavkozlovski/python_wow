@@ -168,6 +168,13 @@ class DamageTests(unittest.TestCase):
         dmg_1 += dmg_2
         self.assertEqual(dmg_1, expected_result)
 
+    def test_mul(self):
+        dmg_1 = Damage(phys_dmg=2, magic_dmg=3)
+        multiplier = 2
+        expected = Damage(phys_dmg=2*2, magic_dmg=3*2)
+
+        self.assertEqual(dmg_1 * multiplier, expected)
+
 
 if __name__ == '__main__':
     unittest.main()
