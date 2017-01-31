@@ -247,6 +247,18 @@ class PaladinTests(unittest.TestCase):
         self.assertEqual(self.dummy.SOR_TURNS, 3)
         self.assertEqual(self.dummy.mana, expected_mana)
 
+    def test_spell_seal_of_righteousness_attack(self):
+        sor: PaladinSpell = self.dummy.learned_spells[Paladin.KEY_SEAL_OF_RIGHTEOUSNESS]
+        expected_damage = sor.damage1
+        self.dummy.spell_seal_of_righteousness(sor)
+        self.assertTrue(self.dummy.SOR_ACTIVE)
+        self.assertEqual(self.dummy.SOR_TURNS, 3)
+
+        result = self.dummy._spell_seal_of_righteousness_attack()
+
+        self.assertEqual(result, expected_damage)
+        self.assertEqual(self.dummy.SOR_TURNS, 2)
+
 
 if __name__ == '__main__':
     unittest.main()
