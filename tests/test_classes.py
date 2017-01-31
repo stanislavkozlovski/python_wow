@@ -23,6 +23,24 @@ class PaladinTests(unittest.TestCase):
 
             self.assertEqual(char_spell.rank, max_rank)
 
+    def test_leave_combat(self):
+        """
+        Except the normal behaviour, leave_combat should remove the SOR buff from the pally
+        and reset his spell cds
+        """
+        self.dummy._in_combat = True
+        self.dummy.SOR_ACTIVE = True
+        for spell in self.dummy.learned_spells.values():
+            spell._cooldown_counter = 100
+
+        self.assertTrue(self.dummy.is_in_combat())
+
+        self.dummy.leave_combat()
+
+        self.assertFalse(self.dummy.is_in_combat())
+        self.assertFalse(self.dummy.SOR_ACTIVE)
+        # All cooldowns should be reset
+        self.assertTrue(all([spell._cooldown_counter == 0 for spell in self.dummy.learned_spells.values()]))
 
 if __name__ == '__main__':
     unittest.main()
