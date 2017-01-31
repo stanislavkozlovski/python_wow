@@ -31,6 +31,16 @@ class HealTests(unittest.TestCase):
         add_amount += heal
         self.assertEqual(add_amount, expected_amount)
 
+    def test_iadd(self):
+        heal_amount = 5
+        heal = Heal(heal_amount=heal_amount)
+        add_amount = 10
+
+        expected_heal = Heal(heal_amount=heal_amount + add_amount)
+
+        heal += add_amount
+        self.assertEqual(heal, expected_heal)
+
 
 if __name__ == '__main__':
     unittest.main()
