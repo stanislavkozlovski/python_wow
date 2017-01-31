@@ -114,7 +114,17 @@ class HolyHealTests(unittest.TestCase):
         expected_message = f'{heal.heal_amount:.2f} crit'
         self.assertEqual(str(heal), expected_message)
 
-    
+    def test_check_double_heal(self):
+        """ check_double_heal returns a boolean whether the heal should be double """
+        heal = HolyHeal(heal_amount=5)
+        double_heals = [heal.check_double_heal() for _ in range(100)]
+        false_count = len([part for part in double_heals if not part])
+        true_count = len([part for part in double_heals if part])
+
+        # since it's a 30% chance, the false_count should always be bigger
+        self.assertGreater(false_count, true_count)
+        self.assertTrue(any(double_heals))
+
 
 
 if __name__ == '__main__':
