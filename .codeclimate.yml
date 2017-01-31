@@ -1,9 +1,10 @@
 engines:
   pep8:
-    enabled: true
+    enabled: 
+      true
     config:
-    	languages:
-        - python
+        languages:
+      - python
 
 ratings:
    paths:
