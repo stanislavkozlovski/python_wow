@@ -129,6 +129,26 @@ class PaladinTests(unittest.TestCase):
         for spell in expected_spells:
             self.assertEqual(vars(next(generator)), vars(spell))
 
+    def test_update_spell(self):
+        """ The update_spell() function updates a spell we already have learned"""
+        f_spell = PaladinSpell('Spell', rank=1)
+        s_spell = PaladinSpell('Spell', rank=2)
+        expected_message = f'Spell {f_spell.name} has been updated to rank {s_spell.rank}!'
+        self.dummy.learn_new_spell(f_spell)
+
+        try:
+            output = StringIO()
+            sys.stdout = output
+
+            self.dummy.update_spell(s_spell)
+
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        # assert that it updated the rank
+        self.assertEqual(self.dummy.learned_spells[s_spell.name].rank, s_spell.rank)
+        self.assertGreater(self.dummy.learned_spells[s_spell.name].rank, f_spell.rank)
 
 if __name__ == '__main__':
     unittest.main()
