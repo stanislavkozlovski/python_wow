@@ -150,5 +150,29 @@ class PaladinTests(unittest.TestCase):
         self.assertEqual(self.dummy.learned_spells[s_spell.name].rank, s_spell.rank)
         self.assertGreater(self.dummy.learned_spells[s_spell.name].rank, f_spell.rank)
 
+    def test_spell_handler(self):
+        """
+        The spell handler takes spell names and casts the appropriate function
+        It might work in a bad way since it's not too testable
+        """
+        unsuccessful_message = 'Unsuccessful cast'
+        sor_success_msg = 'SOR_CASTED'
+        sor_command_name = 'sor'
+        # Mock the function that should get called
+        self.dummy.spell_seal_of_righteousness = lambda x: sor_success_msg
+
+        try:
+            output = StringIO()
+            sys.stdout = output
+            result = self.dummy.spell_handler(sor_command_name, None)
+
+            self.assertNotIn(unsuccessful_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        # Assert that it called the spell_seal_of_righteousness function
+        self.assertEqual(result, sor_success_msg)
+
+
 if __name__ == '__main__':
     unittest.main()
