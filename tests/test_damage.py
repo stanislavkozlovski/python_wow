@@ -152,6 +152,13 @@ class DamageTests(unittest.TestCase):
 
         self.assertEqual(dmg_1, expected_result)
 
+    def test_iadd_tuple(self):
+        dmg_1 = Damage(phys_dmg=10, magic_dmg=10)
+        dmg_2 = (5, 6)
+        expected_result = Damage(phys_dmg=15, magic_dmg=16)
+
+        dmg_1 += dmg_2
+        self.assertEqual(dmg_1, expected_result)
 
 if __name__ == '__main__':
     unittest.main()
