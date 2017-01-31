@@ -211,6 +211,21 @@ class PaladinTests(unittest.TestCase):
         # Assert that it called the spell_seal_of_righteousness function
         self.assertEqual(result, ms_success_msg)
 
+    def test_spell_handler_invalid_spell(self):
+        unsuccessful_message = 'Unsuccessful cast'
+        invalid_command = 'WooHoo'
+
+        try:
+            output = StringIO()
+            sys.stdout = output
+            result = self.dummy.spell_handler(invalid_command, None)
+
+            self.assertIn(unsuccessful_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        self.assertFalse(result)
+
 
 if __name__ == '__main__':
     unittest.main()
