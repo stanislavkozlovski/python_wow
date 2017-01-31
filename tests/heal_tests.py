@@ -189,6 +189,19 @@ class ProtectiveHealTests(unittest.TestCase):
         p_heal._apply_shield()
         self.assertEqual(target.absorption_shield, expected_shield)
 
+    def test_apply_shield_run_once(self):
+        """ since it uses the decorator, it should run only once """
+        heal_am = 100
+        expected_shield = round((PROTECTIVE_HEAL_ABSORB_PERCENTAGE / 100) * heal_am, 2)
+        target = Mock(absorption_shield=0)
+        p_heal = ProtectiveHeal(heal_am, target)
+
+        self.assertEqual(p_heal.shield, expected_shield)
+        self.assertEqual(target.absorption_shield, 0)
+        for _ in range(100):
+            p_heal._apply_shield()
+        self.assertEqual(target.absorption_shield, expected_shield)
+
 
 if __name__ == '__main__':
     unittest.main()
