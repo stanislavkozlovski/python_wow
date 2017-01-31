@@ -2,6 +2,10 @@
 This module will hold the Heal class in the game.
 The heal class holds information about the type of heal we have
 """
+import random
+
+from constants import (HOLY_HEAL_DOUBLE_HEAL_CHANCE as DOUBLE_HEAL_CHANCE,
+                       PROTECTIVE_HEAL_ABSORB_PERCENTAGE as ABSORB_PERCENTAGE)
 
 
 class Heal:
@@ -32,20 +36,19 @@ class Heal:
 
 class NatureHeal(Heal):
     """
-    The idea with nature heal is that every such heal leaves off a HoT (healing over time effect) for a % of the main heal
+    The idea with nature heal is that every such heal leaves off a HoT (healing over time effect)
+    for a % of the main heal
     """
-    pass  # TODO: IMPLEMENT
+    raise NotImplementedError()
 
 
 class HolyHeal(Heal):
     """
     The idea with holy heal is that every such heal has a significant chance to heal for double it's original amount.
     """
-    DOUBLE_HEAL_CHANCE = 30  # percentage chance to double heal
-
     def __init__(self, heal_amount: float=0):
         super().__init__(heal_amount)
-        self.will_double_heal = self.check_double_heal()  # type: bool
+        self.will_double_heal: bool = self.check_double_heal()
 
         if self.will_double_heal:
             # double the heal
@@ -59,7 +62,6 @@ class HolyHeal(Heal):
     def check_double_heal(self) -> bool:
         """ Uses random odds to calculate if this heal should trigger it's double effect
             Chances are 30%"""
-        import random
         '''
         Generate a random float from 0.0 to ~0.9999 with random.random(), then multiply it by 100
         and compare it to the double_heal_chance. If the double_heal_chance is bigger, the item has dropped.
@@ -70,7 +72,7 @@ class HolyHeal(Heal):
         '''
         random_float = random.random() * 100
 
-        if random_float <= self.DOUBLE_HEAL_CHANCE:
+        if random_float <= DOUBLE_HEAL_CHANCE:
             # we will heal for double the amount
             return True
 
@@ -82,8 +84,6 @@ class ProtectiveHeal(Heal):
     The idea with protective heal is that every such heal leaves off a slight absorption shield on the target, absorbing
     a % of the original heal.
     """
-    ABSORB_PERCENTAGE = 30  # 30% of the damage will come up as a shield
-
     def __init__(self, heal_amount: float, target):
         super().__init__(heal_amount)
         self.target = target
@@ -105,7 +105,7 @@ class ProtectiveHeal(Heal):
         return other + self.heal_amount
 
     def _calculate_shield(self) -> float:
-        return round((self.ABSORB_PERCENTAGE / 100) * self.heal_amount, 2)
+        return round((ABSORB_PERCENTAGE / 100) * self.heal_amount, 2)
 
     def _apply_shield(self):
         """

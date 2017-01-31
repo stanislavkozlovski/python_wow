@@ -32,7 +32,6 @@ class Spell:
         Cast the spell, starting the cooldown counter and returning its mana cost
         """
         if not self.is_ready:
-            # TODO
             return False
         self._cooldown_counter = self.cooldown
         self.is_ready = False

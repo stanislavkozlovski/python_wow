@@ -6,6 +6,8 @@ from models.misc.loader import load_character_level_stats, load_character_xp_req
 ZONE_MOVE_BLOCK_SPECIAL_KEY = '$'
 GARRICK_PADFOOT_GUID = 14
 
+HOLY_HEAL_DOUBLE_HEAL_CHANCE = 30
+PROTECTIVE_HEAL_ABSORB_PERCENTAGE = 30
 KEY_ARMOR_ATTRIBUTE = "armor"
 KEY_STRENGTH_ATTRIBUTE = "strength"
 KEY_HEALTH_ATTRIBUTE = "health"
