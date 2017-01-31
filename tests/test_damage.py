@@ -98,5 +98,9 @@ class DamageTests(unittest.TestCase):
 
         self.assertEqual(str(dmg), expected_str)
 
+    def test_str_with_no_damage(self):
+        self.assertEqual(str(Damage()), "0 damage")
+
+
 if __name__ == '__main__':
     unittest.main()
