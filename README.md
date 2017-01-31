@@ -1,5 +1,6 @@
 # A console turn-based RPG game inspired by the Warcraft universe, written in Python 3.6 using SQLAlchemy.
 [![Code Climate](https://codeclimate.com/github/Enether/python_wow/badges/gpa.svg)](https://codeclimate.com/github/Enether/python_wow)
+[![Build](https://travis-ci.org/Enether/python_wow.svg?branch=master)](https://travis-ci.org/Enether/python_wow)
 <img src="https://i.imgur.com/aPFfeMt.jpg" width="100%"></img> 
 The game itself is turn-based and works through user text commands.
 The goal with this pet project is to create a somewhat complex game with good code structure, tests and documentation but most important of all: to learn how to handle a project bigger than 500 lines of code.
