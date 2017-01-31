@@ -96,6 +96,13 @@ class HolyHealTests(unittest.TestCase):
         expected_message = f'{heal.heal_amount:.2f}'
         self.assertEqual(str(heal), expected_message)
 
+    def test_str_with_double_heal(self):
+        heal = HolyHeal(heal_amount=5)
+        heal.will_double_heal = True
+
+        expected_message = f'{heal.heal_amount:.2f} crit'
+        self.assertEqual(str(heal), expected_message)
+
 
 if __name__ == '__main__':
     unittest.main()
