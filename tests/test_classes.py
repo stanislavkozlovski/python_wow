@@ -4,6 +4,7 @@ import sys
 from io import StringIO
 import inspect
 
+from damage import Damage
 from classes import Paladin
 from spells import PaladinSpell
 from models.spells.loader import load_paladin_spells_for_level
@@ -356,6 +357,20 @@ class PaladinTests(unittest.TestCase):
 
         self.assertTrue(result)
         self.assertEqual(expected_mana, self.dummy.mana)
+
+    def test_get_auto_attack_damage(self):
+        """ Applies damage reduction in regard to level and adds the sor_damage
+            It attaches the sor_damage to the magic_dmg in the Damage class and
+            returns the sor_dmg explicitly for easy printing"""
+        sor: PaladinSpell = self.dummy.learned_spells[Paladin.KEY_SEAL_OF_RIGHTEOUSNESS]
+        self.dummy.spell_seal_of_righteousness(sor)
+
+        received_dmg, sor_dmg = self.dummy.get_auto_attack_damage(self.dummy.level)
+
+        self.assertTrue(isinstance(received_dmg, Damage))
+        self.assertTrue(self.dummy.min_damage <= received_dmg.phys_dmg <= self.dummy.max_damage)
+        self.assertEqual(received_dmg.magic_dmg, sor.damage1)
+        self.assertEqual(sor_dmg, sor.damage1)
 
 
 if __name__ == '__main__':
