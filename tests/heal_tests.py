@@ -200,6 +200,7 @@ class ProtectiveHealTests(unittest.TestCase):
         self.assertEqual(target.absorption_shield, 0)
         for _ in range(100):
             p_heal._apply_shield()
+
         self.assertEqual(target.absorption_shield, expected_shield)
 
 
