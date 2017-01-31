@@ -205,12 +205,6 @@ class Paladin(Character):
 
         victim.take_attack(auto_attack, self.level)
 
-    def has_enough_mana(self, mana_cost: int) -> bool:
-        """
-        Check if we have enough mana to cast the spell we want to cast and return the result.
-        """
-        return self.mana >= mana_cost
-
     def get_class(self):
         """
         Return the class name in lowercase.

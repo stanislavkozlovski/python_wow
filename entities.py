@@ -41,6 +41,12 @@ class LivingThing:
     def is_in_combat(self):
         return self._in_combat
 
+    def has_enough_mana(self, mana_cost: int) -> bool:
+        """
+        Check if we have enough mana .
+        """
+        return self.mana >= mana_cost
+
     def enter_combat(self):
         self._in_combat = True
 
