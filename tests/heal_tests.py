@@ -1,6 +1,7 @@
 import unittest
 
-from heal import Heal, HolyHeal
+from constants import PROTECTIVE_HEAL_ABSORB_PERCENTAGE
+from heal import Heal, HolyHeal, ProtectiveHeal
 
 
 class HealTests(unittest.TestCase):
@@ -125,6 +126,17 @@ class HolyHealTests(unittest.TestCase):
         self.assertGreater(false_count, true_count)
         self.assertTrue(any(double_heals))
 
+
+class ProtectiveHealTests(unittest.TestCase):
+    def test_init(self):
+        target = "Targ"
+        heal_amount = 50
+        p_heal = ProtectiveHeal(heal_amount=heal_amount, target=target)
+        shield = round((PROTECTIVE_HEAL_ABSORB_PERCENTAGE / 100) * heal_amount, 2)
+
+        self.assertEqual(p_heal.target, target)
+        self.assertEqual(p_heal.shield, shield)
+        self.assertEqual(p_heal.heal_amount, heal_amount)
 
 
 if __name__ == '__main__':
