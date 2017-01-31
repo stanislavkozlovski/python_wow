@@ -226,6 +226,27 @@ class PaladinTests(unittest.TestCase):
 
         self.assertFalse(result)
 
+    def test_spell_seal_of_righteousness(self):
+        sor: PaladinSpell = self.dummy.learned_spells[Paladin.KEY_SEAL_OF_RIGHTEOUSNESS]
+        expected_message = f'{self.dummy.name} activates {Paladin.KEY_SEAL_OF_RIGHTEOUSNESS}!'
+        expected_mana = self.dummy.mana - sor.mana_cost
+        self.assertFalse(self.dummy.SOR_ACTIVE)
+        self.assertEqual(self.dummy.SOR_TURNS, 0)
+
+        try:
+            output = StringIO()
+            sys.stdout = output
+
+            self.dummy.spell_seal_of_righteousness(sor)
+
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        self.assertTrue(self.dummy.SOR_ACTIVE)
+        self.assertEqual(self.dummy.SOR_TURNS, 3)
+        self.assertEqual(self.dummy.mana, expected_mana)
+
 
 if __name__ == '__main__':
     unittest.main()
