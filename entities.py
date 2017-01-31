@@ -447,7 +447,7 @@ class Monster(LivingThing):
 
 
 class Character(LivingThing):
-    def __init__(self, name: str, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1,
+    def __init__(self, name: str, level: int=1, health: int = 1, mana: int = 1, strength: int = 1, agility: int = 1,
                  loaded_scripts: set=set(), killed_monsters: set=set(), completed_quests: set=set(),
                  saved_inventory: dict={'gold': 0}, saved_equipment: dict=CHARACTER_DEFAULT_EQUIPMENT):
         super().__init__(name, health, mana, level=0)
@@ -462,6 +462,9 @@ class Character(LivingThing):
         self._bonus_armor = 0
         self.attributes: {str: int} = create_character_attributes_template()
         self._level_up(False)  # level up to 1
+        if level > 1:
+            self._level_up(to_level=level)
+
         self.current_zone = CHAR_STARTER_ZONE
         self.current_subzone = CHAR_STARTER_SUBZONE
         # holds the scripts that the character has seen (which should load only once)
@@ -472,6 +475,7 @@ class Character(LivingThing):
         self.quest_log = {}
         self.inventory = saved_inventory # dict Key: str, Value: tuple(Item class instance, Item Count)
         self.equipment = saved_equipment # dict Key: Equipment slot, Value: object of class Equipment
+
         self._handle_load_saved_equipment()  # add up the attributes for our saved_equipment
 
     def start_turn_update(self):
