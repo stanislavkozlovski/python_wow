@@ -917,7 +917,7 @@ class Character(LivingThing):
     def _level_up(self, to_level: int=0, to_print=True):
         if to_level:
             # level up multiple times
-            for i in range(self.level, to_level):
+            for i in range(self.level, to_level-1):
                 self._level_up(to_print=to_print)
             self.xp_req_to_level: int = self._lookup_next_xp_level_req()
 
