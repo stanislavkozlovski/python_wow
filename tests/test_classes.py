@@ -282,6 +282,30 @@ class PaladinTests(unittest.TestCase):
 
         self.assertFalse(self.dummy.SOR_ACTIVE)
 
+    def test_spell_flash_of_light(self):
+        import heal
+        # Nullify the chance to double heal for consistent testing
+        heal.DOUBLE_HEAL_CHANCE = 0
+        fol: PaladinSpell = self.dummy.learned_spells[Paladin.KEY_FLASH_OF_LIGHT]
+        expected_message = f'{self.dummy.name} activates {Paladin.KEY_FLASH_OF_LIGHT}!'
+        expected_mana = self.dummy.mana - fol.mana_cost
+        orig_health = 1
+        self.dummy.health = orig_health
+        expected_message = f'{fol.name} healed {self.dummy.name} for {fol.heal1}.'
+
+        try:
+            output = StringIO()
+            sys.stdout = output
+
+            self.dummy.spell_flash_of_light(fol)
+
+            self.assertIn(expected_message, output.getvalue())
+        finally:
+            sys.stdout = sys.__stdout__
+
+        self.assertEqual(self.dummy.mana, expected_mana)
+        self.assertEqual(self.dummy.health, orig_health + fol.heal1)
+
 
 if __name__ == '__main__':
     unittest.main()
