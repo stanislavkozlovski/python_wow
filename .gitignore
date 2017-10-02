@@ -47,3 +47,6 @@ tmtagsHistory
 *.sublime-workspace
 .bundle
 docs/build/
+lib/
+bin/
+share/
