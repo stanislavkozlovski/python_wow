@@ -78,9 +78,9 @@ def load_character(character_name: str) -> Character:
     try:
         character = load_saved_character(character_name)
     except NoSuchCharacterError:
-        print(colored("!" * 50, 'red'))
-        print(colored("A character with the name {} does not exist in the database!", 'red'))
-        print(colored("!" * 50, 'red'))
+        print(colored("!" * 60, 'red'))
+        print(colored(f"A character with the name {character_name} does not exist in the database!", 'red'))
+        print(colored("!" * 60, 'red'))
 
         character = get_player_character()  # go back and read input again
 
@@ -90,7 +90,7 @@ def load_character(character_name: str) -> Character:
 def get_choice() -> str:
     new_colored = colored('new', color='magenta')
     load_colored = colored('load', color='magenta')
-    print("*"*50)
+    print("*" * 50)
     print('Would you like to create a new character or load an already existing character?')
     print(f'To create a new character, type {new_colored} and to load an already existing one, type {load_colored}')
 
